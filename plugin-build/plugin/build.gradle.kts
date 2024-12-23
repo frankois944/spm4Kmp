@@ -9,13 +9,19 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(gradleApi())
+    implementation(libs.kotlin.gradle)
 
-    testImplementation(libs.junit)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+kotlin {
+    explicitApi()
 }
 
 tasks.withType<KotlinCompile> {
@@ -33,7 +39,7 @@ gradlePlugin {
             description = property("DESCRIPTION").toString()
             displayName = property("DISPLAY_NAME").toString()
             // Note: tags cannot include "plugin" or "gradle" when publishing
-            tags.set(listOf("sample", "template"))
+            tags.set(listOf("kmp", "spm", "cinterp", "apple"))
         }
     }
 }
@@ -63,5 +69,16 @@ tasks.create("setupPluginUploadFromEnvironment") {
 
         System.setProperty("gradle.publish.key", key)
         System.setProperty("gradle.publish.secret", secret)
+    }
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+    debugOptions {
+        enabled = true
+        host = "localhost"
+        port = 4455
+        server = true
+        suspend = true
     }
 }

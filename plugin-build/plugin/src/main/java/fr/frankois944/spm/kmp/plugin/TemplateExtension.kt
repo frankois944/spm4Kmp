@@ -5,12 +5,14 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import javax.inject.Inject
 
-const val DEFAULT_OUTPUT_FILE = "template-example.txt"
+internal const val DEFAULT_OUTPUT_FILE: String = "template-example.txt"
 
 @Suppress("UnnecessaryAbstractClass")
-abstract class TemplateExtension
+internal abstract class OldTemplateExtension
     @Inject
-    constructor(project: Project) {
+    constructor(
+        project: Project,
+    ) {
         private val objects = project.objects
 
         // Example of a property that is mandatory. The task will

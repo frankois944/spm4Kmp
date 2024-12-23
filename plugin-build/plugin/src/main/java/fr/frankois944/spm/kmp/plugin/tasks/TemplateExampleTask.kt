@@ -1,4 +1,4 @@
-package fr.frankois944.spm.kmp.plugin
+package fr.frankois944.spm.kmp.plugin.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -9,28 +9,27 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 
-abstract class TemplateExampleTask : DefaultTask() {
+public abstract class OldTemplateExampleTask : DefaultTask() {
     init {
         description = "Just a sample template task"
-
         // Don't forget to set the group here.
         // group = BasePlugin.BUILD_GROUP
     }
 
     @get:Input
     @get:Option(option = "message", description = "A message to be printed in the output file")
-    abstract val message: Property<String>
+    public abstract val message: Property<String>
 
     @get:Input
     @get:Option(option = "tag", description = "A Tag to be used for debug and in the output file")
     @get:Optional
-    abstract val tag: Property<String>
+    public abstract val tag: Property<String>
 
     @get:OutputFile
-    abstract val outputFile: RegularFileProperty
+    public abstract val outputFile: RegularFileProperty
 
     @TaskAction
-    fun sampleAction() {
+    public fun sampleAction() {
         val prettyTag = tag.orNull?.let { "[$it]" }.orEmpty()
 
         logger.lifecycle("$prettyTag message is: ${message.orNull}")
