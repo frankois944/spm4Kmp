@@ -12,7 +12,7 @@ Just click on [![Use this template](https://img.shields.io/badge/-Use%20this%20t
 
 Once created don't forget to update the:
 - [gradle.properties](plugin-build/gradle.properties)
-- Plugin Usages (search for [com.ncorti.kotlin.gradle.template](https://github.com/cortinico/kotlin-gradle-plugin-template/search?q=com.ncorti.kotlin.gradle.template&unscoped_q=com.ncorti.kotlin.gradle.template) in the repo and replace it with your ID).
+- Plugin Usages (search for [fr.frankois944.spm.kmp](https://github.com/cortinico/kotlin-gradle-plugin-template/search?q=fr.frankois944.spm.kmp&unscoped_q=fr.frankois944.spm.kmp) in the repo and replace it with your ID).
 
 ## Features 🎨
 

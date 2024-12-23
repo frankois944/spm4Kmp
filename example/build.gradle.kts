@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.ncorti.kotlin.gradle.template.plugin")
+    id("fr.frankois944.spm.kmp.plugin")
 }
 
 templateExampleConfig {

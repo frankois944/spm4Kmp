@@ -1,4 +1,4 @@
-package com.ncorti.kotlin.gradle.template.plugin
+package fr.frankois944.spm.kmp.plugin
 
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty

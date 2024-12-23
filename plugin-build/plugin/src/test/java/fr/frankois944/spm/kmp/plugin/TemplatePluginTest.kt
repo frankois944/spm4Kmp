@@ -1,4 +1,4 @@
-package com.ncorti.kotlin.gradle.template.plugin
+package fr.frankois944.spm.kmp.plugin
 
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
@@ -18,7 +18,7 @@ class TemplatePluginTest {
     @Test
     fun `plugin is applied correctly to the project`() {
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.ncorti.kotlin.gradle.template.plugin")
+        project.pluginManager.apply("fr.frankois944.spm.kmp.plugin")
 
         assert(project.tasks.getByName("templateExample") is TemplateExampleTask)
     }
@@ -26,7 +26,7 @@ class TemplatePluginTest {
     @Test
     fun `extension templateExampleConfig is created correctly`() {
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.ncorti.kotlin.gradle.template.plugin")
+        project.pluginManager.apply("fr.frankois944.spm.kmp.plugin")
 
         assertNotNull(project.extensions.getByName("templateExampleConfig"))
     }
@@ -34,7 +34,7 @@ class TemplatePluginTest {
     @Test
     fun `parameters are passed correctly from extension to task`() {
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.ncorti.kotlin.gradle.template.plugin")
+        project.pluginManager.apply("fr.frankois944.spm.kmp.plugin")
         val aFile = File(project.projectDir, ".tmp")
         (project.extensions.getByName("templateExampleConfig") as TemplateExtension).apply {
             tag.set("a-sample-tag")
@@ -76,7 +76,7 @@ class TemplatePluginTest {
     private fun generateBuildFile(config: String) =
         """
         plugins {
-            id 'com.ncorti.kotlin.gradle.template.plugin'
+            id 'fr.frankois944.spm.kmp.plugin'
         }
         templateExampleConfig {
             $config
