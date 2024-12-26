@@ -1,10 +1,11 @@
 package fr.frankois944.spm.kmp.plugin.tasks
 
-import fr.frankois944.spm.kmp.plugin.definition.PackageRootDefinition
+import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
 import fr.frankois944.spm.kmp.plugin.manifest.generateManifest
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.plugins.BasePlugin
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
@@ -19,7 +20,31 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     }
 
     @get:Input
-    abstract val definition: Property<PackageRootDefinition>
+    val packages: ListProperty<SwiftPackageDependencyDefinition> =
+        project.objects.listProperty(
+            SwiftPackageDependencyDefinition::class.java,
+        )
+
+    @get:Input
+    public val generatedPackageDirectory: Property<String> = project.objects.property(String::class.java)
+
+    @get:Input
+    public val productName: Property<String> = project.objects.property(String::class.java)
+
+    @get:Input
+    public val minIos: Property<String> = project.objects.property(String::class.java)
+
+    @get:Input
+    public val minMacos: Property<String> = project.objects.property(String::class.java)
+
+    @get:Input
+    public val minTvos: Property<String> = project.objects.property(String::class.java)
+
+    @get:Input
+    public val minWatchos: Property<String> = project.objects.property(String::class.java)
+
+    @get:Input
+    public val toolsVersion: Property<String> = project.objects.property(String::class.java)
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
@@ -29,8 +54,18 @@ internal abstract class GenerateManifestTask : DefaultTask() {
 
     @TaskAction
     public fun generateFile() {
-        val manifest = generateManifest(definition.get())
-        logger.trace(manifest)
+        val manifest =
+            generateManifest(
+                packages.get(),
+                generatedPackageDirectory = generatedPackageDirectory.get(),
+                productName = productName.get(),
+                minIos = minIos.get(),
+                minMacos = minMacos.get(),
+                minTvos = minTvos.get(),
+                minWatchos = minWatchos.get(),
+                toolsVersion = toolsVersion.get(),
+            )
+        println("Generated manifest\n$manifest")
         outputFile.get().asFile.writeText(manifest)
     }
 }

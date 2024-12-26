@@ -4,6 +4,7 @@ kotlin = "2.1.0"
 ktlintGradle = "12.1.2"
 pluginPublish = "1.3.0"
 versionCheck = "0.51.0"
+autonomousapps-testkit = "0.11"
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
@@ -11,6 +12,7 @@ kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin"}
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle"}
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish"}
 versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck"}
+autonomousapps-testkit = { id = "com.autonomousapps.testkit", version.ref = "autonomousapps-testkit" }
 
 [libraries]
 junit = "junit:junit:4.13.2"

@@ -4,6 +4,8 @@ plugins {
     kotlin("jvm")
     `java-gradle-plugin`
     alias(libs.plugins.pluginPublish)
+    alias(libs.plugins.autonomousapps.testkit)
+    id("io.kotest")
 }
 
 dependencies {
@@ -11,13 +13,52 @@ dependencies {
     implementation(gradleApi())
     implementation(libs.kotlin.gradle)
 
+    testImplementation(gradleTestKit())
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:6.0.0.M1")
+    testImplementation("io.kotest:kotest-framework-engine-jvm:6.0.0.M1")
+    testImplementation("io.kotest:kotest-runner-junit5:6.0.0.M1")
+
+    functionalTestImplementation(gradleTestKit())
+    functionalTestImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    functionalTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    functionalTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+gradleTestKitSupport {
+    withSupportLibrary()
+    withTruthLibrary()
+}
+
+tasks.named<Test>("functionalTest") {
+    useJUnitPlatform()
+    systemProperty("com.autonomousapps.test.versions.kotlin", libs.versions.kotlin.get())
+    systemProperty("org.gradle.testkit.debug", true)
+    debug = true
+    beforeTest(
+        closureOf<TestDescriptor> {
+            logger.warn("Running functionalTest: $this")
+        },
+    )
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+    systemProperty("com.autonomousapps.test.versions.kotlin", libs.versions.kotlin.get())
+    systemProperty("org.gradle.testkit.debug", true)
+    debug = true
+    beforeTest(
+        closureOf<TestDescriptor> {
+            logger.warn("Running test: $this")
+        },
+    )
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 kotlin {
@@ -26,7 +67,7 @@ kotlin {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 }
 
@@ -69,16 +110,5 @@ tasks.create("setupPluginUploadFromEnvironment") {
 
         System.setProperty("gradle.publish.key", key)
         System.setProperty("gradle.publish.secret", secret)
-    }
-}
-
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-    debugOptions {
-        enabled = true
-        host = "localhost"
-        port = 4455
-        server = true
-        suspend = true
     }
 }

@@ -1,42 +1,51 @@
 package fr.frankois944.spm.kmp.plugin.manifest
 
-import fr.frankois944.spm.kmp.plugin.definition.PackageRootDefinition
 import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
-import java.io.File
+import kotlin.io.path.Path
+import kotlin.io.path.relativeTo
 
-internal fun generateManifest(definition: PackageRootDefinition): String {
+internal fun generateManifest(
+    dependencies: List<SwiftPackageDependencyDefinition>,
+    generatedPackageDirectory: String,
+    productName: String,
+    minIos: String,
+    minMacos: String,
+    minTvos: String,
+    minWatchos: String,
+    toolsVersion: String,
+): String {
     var binaryDependencies =
         listOfNotNull(
-            buildLocaleBinary(definition.dependencies, definition.generatedPackageDirectory).takeIf { it.isNotEmpty() },
-            buildRemoteBinary(definition.dependencies).takeIf { it.isNotEmpty() },
+            buildLocaleBinary(dependencies, generatedPackageDirectory).takeIf { it.isNotEmpty() },
+            buildRemoteBinary(dependencies).takeIf { it.isNotEmpty() },
         ).joinToString(",")
     if (binaryDependencies.isNotEmpty()) {
         binaryDependencies = ",$binaryDependencies"
     }
 
     return """
-        // swift-tools-version: ${definition.toolsVersion}
+        // swift-tools-version: $toolsVersion
         import PackageDescription
 
         let package = Package(
-            name: "${definition.productName}",
-            ${getPlatformBlock(definition.minIos, definition.minMacos, definition.minTvos, definition.minWatchos)},
+            name: "$productName",
+            ${getPlatformBlock(minIos, minMacos, minTvos, minWatchos)},
             products: [
                 .library(
-                    name: "${definition.productName}",
+                    name: "$productName",
                     type: .static,
-                    targets: [${getProductsTargets(definition.productName, definition.dependencies)}])
+                    targets: [${getProductsTargets(productName, dependencies)}])
             ],
             dependencies: [
-                ${getDependencies(definition.dependencies)}
+                ${getDependencies(dependencies)}
             ],
             targets: [
                 .target(
-                    name: "${definition.productName}",
+                    name: "$productName",
                     dependencies: [
-                        ${getDependenciesTargets(definition.dependencies)}
+                        ${getDependenciesTargets(dependencies)}
                     ],
-                    path: "${definition.productName}")
+                    path: "$productName")
                 $binaryDependencies
             ]
 
@@ -100,14 +109,14 @@ private fun getDependenciesTargets(dependencies: List<SwiftPackageDependencyDefi
 
 private fun buildLocaleBinary(
     dependencies: List<SwiftPackageDependencyDefinition>,
-    swiftBuildDir: File,
+    swiftBuildDir: String,
 ): String =
     buildList {
         dependencies
             .filterIsInstance<SwiftPackageDependencyDefinition.LocalBinary>()
             .forEach { dependency ->
                 // package path MUST be relative to somewhere, let's choose the swiftBuildDir
-                val path = dependency.path.relativeTo(swiftBuildDir).toString()
+                val path = Path(dependency.path).relativeTo(Path(swiftBuildDir)).toString()
                 add(".binaryTarget(name: \"${dependency.names.first()}\", path:\"${path}\")")
             }
     }.joinToString(",\n")
@@ -135,7 +144,7 @@ private fun SwiftPackageDependencyDefinition.toDependencyDeclaration(): String? 
     when (this) {
         is SwiftPackageDependencyDefinition.Local ->
             """
-            .package(path: "${path.absolutePath}")
+            .package(path: "$path")
             """.trimIndent()
 
         is SwiftPackageDependencyDefinition.RemoteDefinition.Version ->
