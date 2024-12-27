@@ -11,6 +11,18 @@ import kotlin.io.path.Path
 class BuildPackagePluginTest :
     WordSpec({
         val testProjectDir = tempdir()
+
+        fun buildOutputFile(vararg path: String): File =
+            Path(
+                testProjectDir.path,
+                "build",
+                "spmKmpPlugin",
+                "output",
+            ).apply {
+                path.forEach {
+                    this.resolve(it)
+                }
+            }.toFile()
         "Compile package" should {
             "compile Swift Package" {
                 File(testProjectDir, gradleFile)
@@ -25,20 +37,39 @@ class BuildPackagePluginTest :
 
                 val generatedManifestFileText = Path(testProjectDir.path, "build", "spmKmpPlugin", "input", "Package.swift").toFile()
                 generatedManifestFileText.exists() shouldBe true
-                generatedManifestFileText.readText() shouldContain "https://github.com/firebase/firebase-ios-sdk"
-                val generatedOutputDirectory = Path(testProjectDir.path, "build", "spmKmpPlugin", "output", "checkouts").toFile()
-                generatedOutputDirectory.exists() shouldBe true
+                generatedManifestFileText.readText() shouldContain "https://github.com/krzyzanowskim/CryptoSwift"
+                val binaryLib = buildOutputFile("arm64-apple-ios-simulator", "debug", "libproductBinary.a")
+                binaryLib.exists() shouldBe true
             }
-            "generate cinterop" {
+            "generate cinterop definition" {
                 File(testProjectDir, gradleFile)
                     .writeText(
                         generateBuildFile(
-                            packageTestContent1(testProjectDir.path),
+                            packageTestContent2(testProjectDir.path),
                         ),
                     )
 
                 val gradleResult = executeGradleRun("generateCInteropDefinition", testProjectDir)
                 logger.warn(gradleResult.output)
+                val crashlyticsDef = buildOutputFile("FirebaseCrashlytics.def").readText()
+                crashlyticsDef.shouldContain("modules = FirebaseCrashlytics")
+                crashlyticsDef.shouldContain("package = FirebaseCrashlytics")
+                crashlyticsDef.shouldContain("compilerOpts = -ObjC -fmodules -I")
+
+                val firebaseAnalyticsDef = buildOutputFile("FirebaseAnalytics.def").readText()
+                firebaseAnalyticsDef.shouldContain("modules = FirebaseAnalytics")
+                firebaseAnalyticsDef.shouldContain("package = FirebaseAnalytics")
+                firebaseAnalyticsDef.shouldContain("compilerOpts = -fmodules -framework -F")
+
+                val cryptoSwiftDef = buildOutputFile("CryptoSwift.def").readText()
+                cryptoSwiftDef.shouldContain("modules = CryptoSwift")
+                cryptoSwiftDef.shouldContain("package = CryptoSwift")
+                cryptoSwiftDef.shouldContain("compilerOpts = -ObjC -fmodules -I")
+
+                val firebaseCoreDef = buildOutputFile("FirebaseCore.def").readText()
+                firebaseCoreDef.shouldContain("modules = FirebaseCore")
+                firebaseCoreDef.shouldContain("package = FirebaseCore")
+                firebaseCoreDef.shouldContain("compilerOpts = -ObjC -fmodules -I")
             }
         }
     })

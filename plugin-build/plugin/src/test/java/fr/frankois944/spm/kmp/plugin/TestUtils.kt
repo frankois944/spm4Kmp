@@ -43,3 +43,25 @@ public fun packageTestContent1(path: String) =
         ),
     )
     """.trimIndent()
+
+public fun packageTestContent2(path: String) =
+    """
+    customPackageSourcePath = "$path/src/spm"
+    minIos = "14.0"
+    minMacos = "10.15"
+    packages.add(
+        SwiftPackageDependencyDefinition.RemoteDefinition.Version(
+            url = "https://github.com/krzyzanowskim/CryptoSwift.git",
+            names = listOf("CryptoSwift"),
+            version = "1.8.3",
+        ),
+    )
+    packages.add(
+        SwiftPackageDependencyDefinition.RemoteDefinition.Version(
+            url = "https://github.com/firebase/firebase-ios-sdk",
+            names = listOf("FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics"),
+            packageName = "firebase-ios-sdk",
+            version = "11.6.0",
+        ),
+    )
+    """.trimIndent()
