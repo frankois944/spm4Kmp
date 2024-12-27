@@ -18,10 +18,12 @@ class BuildPackagePluginTest :
                 "build",
                 "spmKmpPlugin",
                 "output",
-            ).apply {
-                path.forEach {
-                    this.resolve(it)
+            ).run {
+                var current = this
+                for (item in path) {
+                    current = current.resolve(item)
                 }
+                current
             }.toFile()
         "Compile package" should {
             "compile Swift Package" {

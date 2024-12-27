@@ -20,28 +20,25 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     }
 
     @get:Input
-    val packages: ListProperty<SwiftPackageDependencyDefinition> =
-        project.objects.listProperty(
-            SwiftPackageDependencyDefinition::class.java,
-        )
+    abstract val packages: ListProperty<SwiftPackageDependencyDefinition>
 
     @get:Input
-    val productName: Property<String> = project.objects.property(String::class.java)
+    abstract val productName: Property<String>
 
     @get:Input
-    val minIos: Property<String> = project.objects.property(String::class.java)
+    abstract val minIos: Property<String>
 
     @get:Input
-    val minMacos: Property<String> = project.objects.property(String::class.java)
+    abstract val minMacos: Property<String>
 
     @get:Input
-    val minTvos: Property<String> = project.objects.property(String::class.java)
+    abstract val minTvos: Property<String>
 
     @get:Input
-    val minWatchos: Property<String> = project.objects.property(String::class.java)
+    abstract val minWatchos: Property<String>
 
     @get:Input
-    val toolsVersion: Property<String> = project.objects.property(String::class.java)
+    abstract val toolsVersion: Property<String>
 
     @get:InputDirectory
     abstract val generatedPackageDirectory: DirectoryProperty
@@ -63,7 +60,6 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 minWatchos = minWatchos.get(),
                 toolsVersion = toolsVersion.get(),
             )
-        println("Generated manifest\n$manifest")
         outputFile.get().asFile.writeText(manifest)
     }
 }

@@ -27,7 +27,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Input
     abstract val target: Property<String>
 
-    val isDebugMode: Property<Boolean> = project.objects.property(Boolean::class.java)
+    @get:Input
+    abstract val debugMode: Property<Boolean>
 
     @get:OutputDirectory
     abstract val packageBuildOutputDirectory: DirectoryProperty
@@ -96,7 +97,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 "--scratch-path",
                 packageBuildOutputDirectory.get().asFile.path,
                 "-c",
-                if (isDebugMode.get()) "debug" else "release",
+                if (debugMode.get()) "debug" else "release",
             )
 
         logger.warn(

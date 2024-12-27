@@ -32,31 +32,28 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     abstract val target: Property<String>
 
     @get:Input
-    val productName: Property<String> = project.objects.property(String::class.java)
+    abstract val productName: Property<String>
 
     @get:Input
-    val packages: ListProperty<SwiftPackageDependencyDefinition> =
-        project.objects.listProperty(
-            SwiftPackageDependencyDefinition::class.java,
-        )
+    abstract val packages: ListProperty<SwiftPackageDependencyDefinition>
 
     @get:OutputFiles
     val outputFiles: List<File>
-        get() {
-            return buildList {
+        get() =
+            buildList {
                 getModuleNames().forEach { moduleName ->
                     add(packageBuildOutputDirectory.asFile.get().resolve("$moduleName.def"))
                 }
             }
-        }
 
-    val isDebugMode: Property<Boolean> = project.objects.property(Boolean::class.java)
+    @get:Input
+    abstract val debugMode: Property<Boolean>
 
     private fun getBuildDirectory(): File =
         packageBuildOutputDirectory.asFile
             .get()
             .resolve(target.get())
-            .resolve(if (isDebugMode.get()) "debug" else "release")
+            .resolve(if (debugMode.get()) "debug" else "release")
 
     private fun getModuleNames(): List<String> =
         packages
