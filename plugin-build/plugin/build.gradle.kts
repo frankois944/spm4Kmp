@@ -5,7 +5,7 @@ plugins {
     `java-gradle-plugin`
     alias(libs.plugins.pluginPublish)
     alias(libs.plugins.autonomousapps.testkit)
-    id("io.kotest")
+    // id("io.kotest")
 }
 
 dependencies {
@@ -13,7 +13,7 @@ dependencies {
     implementation(gradleApi())
     implementation(libs.kotlin.gradle)
 
-    testImplementation(gradleTestKit())
+    // testImplementation(gradleTestKit())
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -21,7 +21,7 @@ dependencies {
     testImplementation("io.kotest:kotest-framework-engine-jvm:6.0.0.M1")
     testImplementation("io.kotest:kotest-runner-junit5:6.0.0.M1")
 
-    functionalTestImplementation(gradleTestKit())
+    // functionalTestImplementation(gradleTestKit())
     functionalTestImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     functionalTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     functionalTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -45,6 +45,7 @@ tasks.named<Test>("functionalTest") {
 }
 
 tasks.named<Test>("test") {
+    println("SETUP test")
     useJUnitPlatform()
     systemProperty("com.autonomousapps.test.versions.kotlin", libs.versions.kotlin.get())
     systemProperty("org.gradle.testkit.debug", true)

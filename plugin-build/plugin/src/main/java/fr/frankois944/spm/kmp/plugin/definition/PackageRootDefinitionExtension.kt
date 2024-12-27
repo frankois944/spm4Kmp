@@ -4,12 +4,12 @@ import org.gradle.api.Project
 import javax.inject.Inject
 
 @Suppress("UnnecessaryAbstractClass")
-public abstract class PackageRootDefinition
+public abstract class PackageRootDefinitionExtension
     @Inject
     constructor(
         project: Project,
     ) {
-        public var generatedPackageDirectory: String = "${project.projectDir.path}/src/spm"
+        public var customPackageSourcePath: String = "${project.projectDir.path}/src/spm"
         public var productName: String = "productBinary"
         public var minIos: String = "12.0"
         public var minMacos: String = "10.13"

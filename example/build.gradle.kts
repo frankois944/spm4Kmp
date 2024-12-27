@@ -6,7 +6,7 @@ plugins {
 }
 
 swiftPackageConfig {
-    generatedPackageDirectory = "src/Package.swift"
+    customPackageSourcePath = "src/spm"
     minIos = "12.0"
     minMacos = "10.13"
 

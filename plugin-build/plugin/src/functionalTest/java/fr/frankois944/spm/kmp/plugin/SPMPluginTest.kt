@@ -47,7 +47,7 @@ class Test {
         val project = MyFixture().gradleProject
 
         // When
-        val result = build(project.rootDir, ":project:myTask")
+        val result = build(project.rootDir, ":generateSwiftPackage")
 
         // Then
         // assertThat(result).task(":project:myTask").succeeded()
