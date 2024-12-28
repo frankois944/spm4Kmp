@@ -19,7 +19,7 @@ internal enum class CompileTarget {
 
     fun getTriple(version: String): String = "${this.arch()}-apple-${this.osCompiler()}$version${this.simulatorSuffix()}"
 
-    fun getPackageBuildDir(): String = "${this.arch()}-apple-${this.osCompiler()}"
+    fun getPackageBuildDir(): String = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"
 
     private fun osCompiler(): String =
         when (this) {

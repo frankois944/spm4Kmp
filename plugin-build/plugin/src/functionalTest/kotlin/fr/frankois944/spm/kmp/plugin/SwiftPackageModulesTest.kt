@@ -4,6 +4,7 @@ import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
 import fr.frankois944.spm.kmp.plugin.fixture.SwiftSource
+import org.gradle.internal.cc.base.logger
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -48,8 +49,13 @@ class SwiftPackageModulesTest {
         val resolvedFile =
             File(
                 fixture.gradleProject.rootDir,
-                "library/build/swiftklib/test/iosArm64/swiftBuild/Package.resolved",
+                "library/build/spmKmpPlugin/",
             )
+        logger.warn(
+            """
+            Build Dir : ${File(fixture.gradleProject.rootDir, "library/build/spmKmpPlugin/")}
+            """.trimIndent(),
+        )
         assertTrue(resolvedFile.exists(), "Package.resolved file not found")
 
         getPackageResolvedContent(fixture) { content ->
@@ -69,7 +75,7 @@ class SwiftPackageModulesTest {
         val resolvedFile =
             File(
                 fixture.gradleProject.rootDir,
-                "library/build/swiftklib/test/iosArm64/swiftBuild/Package.swift",
+                "library/build/spmKmpPlugin/input/Package.swift",
             )
         assertTrue(resolvedFile.exists(), "Package.swift file not found")
         content(resolvedFile.readText())
@@ -82,7 +88,7 @@ class SwiftPackageModulesTest {
         val resolvedFile =
             File(
                 fixture.gradleProject.rootDir,
-                "library/build/swiftklib/test/iosArm64/swiftBuild/Package.resolved",
+                "library/build/spmKmpPlugin/input/Package.resolved",
             )
         assertTrue(resolvedFile.exists(), "Package.resolved file not found")
         content(resolvedFile.readText())

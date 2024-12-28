@@ -103,7 +103,7 @@ internal abstract class GenerateCInteropDefinitionTask
                                 isFramework = buildDir.extension == "framework",
                                 name = moduleName,
                                 buildDir = buildDir,
-                                packageBuildOutputDirectory.resolve("$moduleName.def"),
+                                definitionFile = packageBuildOutputDirectory.resolve("$moduleName.def"),
                             ),
                         )
                     }
@@ -135,6 +135,8 @@ internal abstract class GenerateCInteropDefinitionTask
                     )
                 } else {
                     val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
+                    logger.warn("mapFile: >>> $mapFile")
+                    logger.warn("moduleConfig definitionFile: >>> ${ moduleConfig.definitionFile.path}")
                     if (!mapFile.exists()) {
                         logger.error("Can't generate definition for ${moduleConfig.name} because no modulemap file found")
                         logger.error(
@@ -148,7 +150,7 @@ internal abstract class GenerateCInteropDefinitionTask
                             extractModuleNameFromModuleMap(mapFileContent)
                                 ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
                         val globalHeadersPath = getBuildDirectoriesContent()
-                        val headersPath = extractHeadersPathFromModuleMap(mapFileContent)
+                        val headersPath = globalHeadersPath + extractHeadersPathFromModuleMap(mapFileContent)
                         moduleConfig.definitionFile.writeText(
                             """
                             language = Objective-C

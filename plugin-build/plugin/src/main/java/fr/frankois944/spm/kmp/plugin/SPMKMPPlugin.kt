@@ -8,6 +8,7 @@ import fr.frankois944.spm.kmp.plugin.tasks.GenerateCInteropDefinitionTask
 import fr.frankois944.spm.kmp.plugin.tasks.GenerateManifestTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -53,43 +54,44 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                         it.createDirectories()
                     }.toFile()
 
-            //   val registerTasks = mutableMapOf<CompileTarget, Task>()
+            val task1 =
+                tasks
+                    .register(
+                        // name =
+                        TASK_GENERATE_MANIFEST,
+                        // type =
+                        GenerateManifestTask::class.java,
+                        // ...constructorArgs =
+                        extension.packages,
+                        extension.productName,
+                        extension.minIos,
+                        extension.minTvos,
+                        extension.minMacos,
+                        extension.minWatchos,
+                        extension.toolsVersion,
+                        sourcePackageDir,
+                        File(sourcePackageDir, "Package.swift"),
+                    )
 
-            CompileTarget.entries
-                .associateWith {
-                    getTaskName(name, it)
-                }.forEach { (cinteropTarget, name) ->
-                    logger.warn("Register task $name for target $cinteropTarget")
+            var taskGroup = mutableMapOf<CompileTarget, Task>()
 
-                    project.tasks
+            CompileTarget.entries.forEach { cinteropTarget ->
+                val buildDir = buildPackageDir.resolve(cinteropTarget.name)
+                if (!buildDir.exists()) {
+                    buildDir.mkdirs()
+                }
+                val task2 =
+                    tasks
                         .register(
                             // name =
-                            TASK_GENERATE_MANIFEST + cinteropTarget.toString().capitalized(),
-                            // type =
-                            GenerateManifestTask::class.java,
-                            // ...constructorArgs =
-                            extension.packages,
-                            extension.productName,
-                            extension.minIos,
-                            extension.minTvos,
-                            extension.minMacos,
-                            extension.minWatchos,
-                            extension.toolsVersion,
-                            sourcePackageDir,
-                            File(sourcePackageDir, "Package.swift"),
-                        )
-
-                    project.tasks
-                        .register(
-                            // name =
-                            TASK_COMPILE_PACKAGE + cinteropTarget.toString().capitalized(),
+                            getTaskName(TASK_COMPILE_PACKAGE, cinteropTarget),
                             // type =
                             CompileSwiftPackageTask::class.java,
                             // ...constructorArgs =
                             File(sourcePackageDir, "Package.swift"),
                             cinteropTarget,
                             extension.debug,
-                            buildPackageDir,
+                            buildDir,
                             customPackageSource,
                             cinteropTarget.getOsVersion(
                                 minIos = extension.minIos,
@@ -97,55 +99,53 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                                 minTvos = extension.minTvos,
                                 minMacos = extension.minMacos,
                             ),
-                        ).configure {
-                            it.dependsOn(
-                                project.tasks.withType(GenerateManifestTask::class.java).findByName(
-                                    TASK_GENERATE_MANIFEST + cinteropTarget.toString().capitalized(),
-                                ),
-                            )
-                        }
+                        )
 
-                    project.tasks
+                val task3 =
+                    tasks
                         .register(
                             // name =
-                            TASK_GENERATE_CINTEROP_DEF + cinteropTarget.toString().capitalized(),
+                            getTaskName(TASK_GENERATE_CINTEROP_DEF, cinteropTarget),
                             // type =
                             GenerateCInteropDefinitionTask::class.java,
                             // ...constructorArgs =
-                            buildPackageDir,
+                            buildDir,
                             cinteropTarget,
                             extension.productName,
                             extension.packages,
                             extension.debug,
-                        ).configure {
-                            it.dependsOn(
-                                project.tasks.withType(CompileSwiftPackageTask::class.java).findByName(
-                                    TASK_COMPILE_PACKAGE + cinteropTarget.toString().capitalized(),
-                                ),
-                            )
-                        }
-                }
+                        )
 
+                task2.get().mustRunAfter(task1.get())
+                task3.get().mustRunAfter(task2.get())
+                taskGroup[cinteropTarget] =
+                    task3
+                        .get()
+                        .dependsOn(task2.get())
+                        .dependsOn(task1.get())
+            }
+
+            var previousTarget: CompileTarget? = null
             tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
                 val cinteropTarget =
                     CompileTarget.byKonanName(cinterop.konanTarget.name)
                         ?: return@configureEach
 
-                val generateDefinitionTask =
-                    tasks.withType(GenerateCInteropDefinitionTask::class.java).findByName(
-                        TASK_GENERATE_CINTEROP_DEF + cinteropTarget.toString().capitalized(),
-                    ) ?: return@configureEach
+                val definitionTask =
+                    taskGroup[cinteropTarget] as GenerateCInteropDefinitionTask
 
-                logger.warn("outputFiles = ${generateDefinitionTask.outputFiles}")
-                cinterop.settings.definitionFile.set(generateDefinitionTask.outputFiles[0])
-                cinterop.dependsOn(
-                    generateDefinitionTask,
-                )
+                logger.warn("outputFiles = ${definitionTask.outputFiles}")
+                cinterop.settings.definitionFile.set(definitionTask.outputFiles[0])
+                previousTarget?.let {
+                    taskGroup[cinteropTarget]?.mustRunAfter(taskGroup[previousTarget])
+                }
+                cinterop.dependsOn(taskGroup[cinteropTarget])
+                previousTarget = cinteropTarget
             }
         }
 
     private fun getTaskName(
-        cinteropName: String,
+        task: String,
         cinteropTarget: CompileTarget,
-    ) = "${EXTENSION_NAME}${cinteropName.capitalized()}${cinteropTarget.name.capitalized()}"
+    ) = "${task.capitalized()}${cinteropTarget.name.capitalized()}"
 }
