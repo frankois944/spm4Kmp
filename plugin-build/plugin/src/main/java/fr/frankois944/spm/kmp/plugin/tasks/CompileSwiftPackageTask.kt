@@ -1,10 +1,8 @@
 package fr.frankois944.spm.kmp.plugin.tasks
 
+import fr.frankois944.spm.kmp.plugin.CompileTarget
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.plugins.BasePlugin
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
@@ -15,105 +13,105 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
-internal abstract class CompileSwiftPackageTask : DefaultTask() {
-    init {
-        description = "Compile a Swift Package manifest"
-        group = BasePlugin.BUILD_GROUP
-    }
+internal abstract class CompileSwiftPackageTask
+    @Inject
+    constructor(
+        @get:InputFile
+        val manifestFile: File,
+        @get:Input
+        val target: CompileTarget,
+        @get:Input
+        val debugMode: Boolean,
+        @get:OutputDirectory
+        val packageBuildOutputDirectory: File,
+        @get:InputDirectory
+        val customSourcePackage: File,
+        @get:Input
+        val osVersion: String,
+    ) : DefaultTask() {
+        @get:Inject
+        abstract val operation: ExecOperations
 
-    @get:InputFile
-    abstract val manifestFile: RegularFileProperty
-
-    @get:Input
-    abstract val target: Property<String>
-
-    @get:Input
-    abstract val debugMode: Property<Boolean>
-
-    @get:OutputDirectory
-    abstract val packageBuildOutputDirectory: DirectoryProperty
-
-    @get:InputDirectory
-    abstract val customSourcePackage: DirectoryProperty
-
-    @get:Inject
-    abstract val operation: ExecOperations
-
-    private fun prepareWorkingDir(): File {
-        val workingDir = manifestFile.asFile.get().parentFile
-        val sourceDir = workingDir.resolve("Source")
-        if (sourceDir.exists()) {
-            sourceDir.deleteRecursively()
+        init {
+            description = "Compile a Swift Package manifest"
+            group = BasePlugin.BUILD_GROUP
         }
-        sourceDir.mkdirs()
-        if (customSourcePackage.get().asFileTree.isEmpty) {
-            sourceDir.resolve("Dummy.swift").createNewFile()
-        } else {
-            customSourcePackage.get().asFile.copyTo(sourceDir)
+
+        private fun prepareWorkingDir(): File {
+            val workingDir = manifestFile.parentFile
+            val sourceDir = workingDir.resolve("Source")
+            if (sourceDir.exists()) {
+                sourceDir.deleteRecursively()
+            }
+            sourceDir.mkdirs()
+            if (customSourcePackage.list()?.isNotEmpty() == true) {
+                customSourcePackage.copyRecursively(sourceDir)
+            } else {
+                sourceDir.resolve("Dummy.swift").createNewFile()
+            }
+            return workingDir
         }
-        return workingDir
-    }
 
-    private fun getSDKPath(): String {
-        val args =
-            listOf(
-                "--sdk",
-                "iphonesimulator",
-                "--show-sdk-path",
-            )
+        private fun getSDKPath(): String {
+            val args =
+                listOf(
+                    "--sdk",
+                    target.sdk(),
+                    "--show-sdk-path",
+                )
 
-        logger.warn(
-            """
+            logger.warn(
+                """
             |getSDKPath
             |Build args :
             |${args.joinToString(" ")}
-            """.trimMargin(),
-        )
-
-        val output = ByteArrayOutputStream()
-        operation
-            .exec {
-                it.executable = "xcrun"
-                it.args = args
-                it.standardOutput = output
-            }
-        return output.toString().trim()
-    }
-
-    @TaskAction
-    fun compilePackage() {
-        logger.warn("Compile the manifest ${manifestFile.get().asFile}")
-        val sdkPath = getSDKPath()
-        val workingDir = prepareWorkingDir()
-
-        val args =
-            listOf(
-                "swift",
-                "build",
-                "--sdk",
-                sdkPath,
-                "--triple",
-                "arm64-apple-ios16.0-simulator",
-                "--scratch-path",
-                packageBuildOutputDirectory.get().asFile.path,
-                "-c",
-                if (debugMode.get()) "debug" else "release",
+                """.trimMargin(),
             )
 
-        logger.warn(
-            """
+            val output = ByteArrayOutputStream()
+            operation
+                .exec {
+                    it.executable = "xcrun"
+                    it.args = args
+                    it.standardOutput = output
+                }
+            return output.toString().trim()
+        }
+
+        @TaskAction
+        fun compilePackage() {
+            logger.warn("Compile the manifest $manifestFile")
+            val sdkPath = getSDKPath()
+            val workingDir = prepareWorkingDir()
+
+            val args =
+                listOf(
+                    "swift",
+                    "build",
+                    "--sdk",
+                    sdkPath,
+                    "--triple",
+                    target.getTriple(osVersion),
+                    "--scratch-path",
+                    packageBuildOutputDirectory.path,
+                    "-c",
+                    if (debugMode) "debug" else "release",
+                )
+
+            logger.warn(
+                """
             |compileManifest
             |Build args :
             |$workingDir
             |${args.joinToString(" ")}
-            """.trimMargin(),
-        )
+                """.trimMargin(),
+            )
 
-        operation
-            .exec {
-                it.executable = "xcrun"
-                it.workingDir = workingDir
-                it.args = args
-            }
+            operation
+                .exec {
+                    it.executable = "xcrun"
+                    it.workingDir = workingDir
+                    it.args = args
+                }
+        }
     }
-}

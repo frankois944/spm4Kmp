@@ -16,5 +16,13 @@ public abstract class PackageRootDefinitionExtension
         public var minTvos: String = "12.0"
         public var minWatchos: String = "4.0"
         public var toolsVersion: String = "5.9"
+        public var debug: Boolean = true
         public val packages: MutableList<SwiftPackageDependencyDefinition> = mutableListOf()
+
+        internal val distinctPackageNames: List<String>
+            get() =
+                packages
+                    .flatMap {
+                        it.names
+                    }.distinct()
     }
