@@ -7,14 +7,18 @@ import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
 import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import org.gradle.internal.cc.base.logger
 
 abstract class SmpKMPTestFixture private constructor(
     private val configuration: TestConfiguration,
 ) : AbstractGradleProject() {
-    val gradleProject: GradleProject = this.createProject()
+    private var _gradleProject: GradleProject? = null
+
+    val gradleProject: GradleProject
+        get() = _gradleProject ?: createProject().also { _gradleProject = it }
 
     data class TestConfiguration(
-        var customPackageSourcePath: String = "src",
+        var customPackageSourcePath: String = "src/swift",
         var productName: String = "dummy",
         var minIos: String = "12.0",
         var minMacos: String = "10.13",
@@ -28,11 +32,8 @@ abstract class SmpKMPTestFixture private constructor(
 
     protected abstract fun createProject(): GradleProject
 
-    protected fun createDefaultProject(): GradleProject {
-        val extension =
-            TestConfiguration()
-
-        return newGradleProjectBuilder(GradleProject.DslKind.KOTLIN)
+    protected fun createDefaultProject(extension: TestConfiguration): GradleProject =
+        newGradleProjectBuilder(GradleProject.DslKind.KOTLIN)
             .withRootProject {
                 withFile(
                     "gradle.properties",
@@ -42,12 +43,11 @@ abstract class SmpKMPTestFixture private constructor(
                 setupSources()
                 setupGradleConfig(extension)
             }.write()
-    }
 
     private fun Subproject.Builder.setupSources() {
         configuration.swiftSources.forEach { source ->
             withFile(
-                "${configuration.productName}/src/main/swift/${source.filename}",
+                "src/swift/${source.filename}",
                 source.content,
             )
         }
@@ -71,7 +71,10 @@ abstract class SmpKMPTestFixture private constructor(
             imports = Imports.of("fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition")
             plugins(
                 Plugin.of("org.jetbrains.kotlin.multiplatform", "2.1.0"),
-                Plugin("fr.frankois944.spm.kmp.plugin", System.getProperty("com.autonomousapps.plugin-under-test.version")),
+                Plugin(
+                    "fr.frankois944.spm.kmp.plugin",
+                    System.getProperty("com.autonomousapps.plugin-under-test.version"),
+                ),
             )
             withKotlin(createPluginBlock(extension))
         }
@@ -79,26 +82,71 @@ abstract class SmpKMPTestFixture private constructor(
 
     private fun createPluginBlock(extension: TestConfiguration): String {
         val pluginBlock =
-            """
-            swiftPackageConfig {
-                customPackageSourcePath = "${extension.customPackageSourcePath}"
-                toolsVersion = "${extension.toolsVersion}"
-                productName = "${extension.productName}"
-                minIos = "${extension.minIos}"
-                minMacos = "${extension.minMacos}"
-                minTvos = "${extension.minTvos}"
-                minWatchos = "${extension.minWatchos}"
-                packages.add(
-                    SwiftPackageDependencyDefinition.RemoteDefinition.Version(
-                        url = "https://github.com/krzyzanowskim/CryptoSwift.git",
-                        names = listOf("CryptoSwift"),
-                        version = "1.8.3",
-                    ),
-                )
-             }
-            """.trimIndent()
+            buildString {
+                append(
+                    """
+                    swiftPackageConfig {
+                        customPackageSourcePath = "${extension.customPackageSourcePath}"
+                        toolsVersion = "${extension.toolsVersion}"
+                        productName = "${extension.productName}"
+                        minIos = "${extension.minIos}"
+                        minMacos = "${extension.minMacos}"
+                        minTvos = "${extension.minTvos}"
+                        minWatchos = "${extension.minWatchos}"
 
-        return """
+                    """,
+                )
+                extension.packages.forEach { definition ->
+                    append("packages.add(")
+                    when (definition) {
+                        is SwiftPackageDependencyDefinition.Local -> {
+                            append("SwiftPackageDependencyDefinition.Local(")
+                            append("path = \"${definition.path}\",")
+                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                        }
+
+                        is SwiftPackageDependencyDefinition.LocalBinary -> {
+                            append("SwiftPackageDependencyDefinition.LocalBinary(")
+                            append("path = \"${definition.path}\",")
+                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                        }
+
+                        is SwiftPackageDependencyDefinition.RemoteBinary -> {
+                            append("SwiftPackageDependencyDefinition.RemoteBinary(")
+                            append("url = \"${definition.url}\",")
+                            append("checksum = \"${definition.checksum}\"")
+                        }
+
+                        is SwiftPackageDependencyDefinition.RemoteDefinition.Branch -> {
+                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Version(")
+                            append("url = \"${definition.url}\",")
+                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("branch = \"${definition.branch}\",")
+                            append("packageName = \"${definition.packageName}\"")
+                        }
+
+                        is SwiftPackageDependencyDefinition.RemoteDefinition.Commit -> {
+                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Version(")
+                            append("url = \"${definition.url}\",")
+                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("revision = \"${definition.revision}\",")
+                            append("packageName = \"${definition.packageName}\"")
+                        }
+
+                        is SwiftPackageDependencyDefinition.RemoteDefinition.Version -> {
+                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Version(")
+                            append("url = \"${definition.url}\",")
+                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("version = \"${definition.version}\",")
+                            append("packageName = \"${definition.packageName}\"")
+                        }
+                    }
+                    append("))")
+                }
+                append("}")
+            }
+        val script =
+            """
             kotlin {
                 listOf(
                     iosX64(),
@@ -115,6 +163,8 @@ abstract class SmpKMPTestFixture private constructor(
 
             $pluginBlock
             """.trimIndent()
+        logger.warn(script)
+        return script
     }
 
     class Builder {
@@ -137,7 +187,7 @@ abstract class SmpKMPTestFixture private constructor(
 
         fun build(): SmpKMPTestFixture =
             object : SmpKMPTestFixture(config) {
-                override fun createProject(): GradleProject = createDefaultProject()
+                override fun createProject(): GradleProject = createDefaultProject(config)
             }
     }
 

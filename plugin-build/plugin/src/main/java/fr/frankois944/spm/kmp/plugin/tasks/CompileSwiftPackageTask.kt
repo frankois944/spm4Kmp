@@ -44,10 +44,28 @@ internal abstract class CompileSwiftPackageTask
                 sourceDir.deleteRecursively()
             }
             sourceDir.mkdirs()
+            logger.warn(
+                """
+                Looking inside user source $customSourcePackage
+                """.trimIndent(),
+            )
             if (customSourcePackage.list()?.isNotEmpty() == true) {
+                logger.warn(
+                    """
+                    copy swift file ${customSourcePackage.list()?.toList()}
+                    to directory $sourceDir
+                    """.trimIndent(),
+                )
                 customSourcePackage.copyRecursively(sourceDir)
             } else {
+                logger.debug(
+                    """
+                    copy Dummy swift file
+                    to directory $sourceDir
+                    """.trimIndent(),
+                )
                 sourceDir.resolve("Dummy.swift").createNewFile()
+                sourceDir.resolve("Dummy.swift").writeText("import Foundation")
             }
             return workingDir
         }

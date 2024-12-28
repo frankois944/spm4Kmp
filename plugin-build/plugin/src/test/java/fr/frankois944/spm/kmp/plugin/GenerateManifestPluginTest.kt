@@ -39,8 +39,8 @@ class GenerateManifestPluginTest :
                     minMacos = "10.13"
                 }
                 val task = project.tasks.getByName("generateSwiftPackage") as GenerateManifestTask
-                task.generatedPackageDirectory.get() shouldBeEqual "${testProjectDir.path}/src/spm/"
-                task.minIos.get() shouldBeEqual "12.1"
+                task.generatedPackageDirectory shouldBeEqual "${testProjectDir.path}/src/input/"
+                task.minIos shouldBeEqual "12.1"
             }
             "Generate the manifest" should {
                 "Create package manifest" {

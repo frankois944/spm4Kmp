@@ -5,7 +5,7 @@ plugins {
     `java-gradle-plugin`
     alias(libs.plugins.pluginPublish)
     alias(libs.plugins.autonomousapps.testkit)
-    // id("io.kotest")
+    id("io.kotest")
 }
 
 dependencies {

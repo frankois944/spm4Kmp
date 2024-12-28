@@ -9,7 +9,7 @@ public abstract class PackageRootDefinitionExtension
     constructor(
         project: Project,
     ) {
-        public var customPackageSourcePath: String = "${project.projectDir.path}/src/spm"
+        public var customPackageSourcePath: String = "${project.projectDir.path}/src/swift"
         public var productName: String = "productBinary"
         public var minIos: String = "12.0"
         public var minMacos: String = "10.13"

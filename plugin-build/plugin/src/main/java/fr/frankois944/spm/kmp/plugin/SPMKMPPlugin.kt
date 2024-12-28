@@ -48,12 +48,11 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                     .also {
                         it.mkdirs()
                     }
-            val customPackageSource =
+            val userPackagePath =
                 Path(extension.customPackageSourcePath)
                     .also {
                         it.createDirectories()
                     }.toFile()
-
             val task1 =
                 tasks
                     .register(
@@ -73,12 +72,12 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                         File(sourcePackageDir, "Package.swift"),
                     )
 
-            var taskGroup = mutableMapOf<CompileTarget, Task>()
+            val taskGroup = mutableMapOf<CompileTarget, Task>()
 
             CompileTarget.entries.forEach { cinteropTarget ->
-                val buildDir = buildPackageDir.resolve(cinteropTarget.name)
-                if (!buildDir.exists()) {
-                    buildDir.mkdirs()
+                val packageScratchPath = buildPackageDir.resolve(cinteropTarget.name)
+                if (!buildPackageDir.exists()) {
+                    packageScratchPath.mkdirs()
                 }
                 val task2 =
                     tasks
@@ -91,8 +90,8 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                             File(sourcePackageDir, "Package.swift"),
                             cinteropTarget,
                             extension.debug,
-                            buildDir,
-                            customPackageSource,
+                            packageScratchPath,
+                            userPackagePath,
                             cinteropTarget.getOsVersion(
                                 minIos = extension.minIos,
                                 minWatchos = extension.minWatchos,
@@ -109,23 +108,23 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                             // type =
                             GenerateCInteropDefinitionTask::class.java,
                             // ...constructorArgs =
-                            buildDir,
+                            packageScratchPath,
                             cinteropTarget,
                             extension.productName,
                             extension.packages,
                             extension.debug,
                         )
 
-                task2.get().mustRunAfter(task1.get())
-                task3.get().mustRunAfter(task2.get())
                 taskGroup[cinteropTarget] =
                     task3
                         .get()
-                        .dependsOn(task2.get())
-                        .dependsOn(task1.get())
+                        .dependsOn(
+                            task2
+                                .get()
+                                .dependsOn(task1.get()),
+                        )
             }
 
-            var previousTarget: CompileTarget? = null
             tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
                 val cinteropTarget =
                     CompileTarget.byKonanName(cinterop.konanTarget.name)
@@ -136,11 +135,7 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
 
                 logger.warn("outputFiles = ${definitionTask.outputFiles}")
                 cinterop.settings.definitionFile.set(definitionTask.outputFiles[0])
-                previousTarget?.let {
-                    taskGroup[cinteropTarget]?.mustRunAfter(taskGroup[previousTarget])
-                }
                 cinterop.dependsOn(taskGroup[cinteropTarget])
-                previousTarget = cinteropTarget
             }
         }
 
