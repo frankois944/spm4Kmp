@@ -3,6 +3,13 @@ package fr.frankois944.spm.kmp.plugin.definition
 import org.gradle.api.Project
 import javax.inject.Inject
 
+/**
+ * Package root definition extension
+ *
+ * @constructor
+ *
+ * @param project
+ */
 @Suppress("UnnecessaryAbstractClass")
 public abstract class PackageRootDefinitionExtension
     @Inject
@@ -16,13 +23,11 @@ public abstract class PackageRootDefinitionExtension
         public var minTvos: String = "12.0"
         public var minWatchos: String = "4.0"
         public var toolsVersion: String = "5.9"
+
+        /*
+         * Build the package in debug/release
+         * this should be set at false for production/release distribution
+         */
         public var debug: Boolean = true
         public val packages: MutableList<SwiftPackageDependencyDefinition> = mutableListOf()
-
-        internal val distinctPackageNames: List<String>
-            get() =
-                packages
-                    .flatMap {
-                        it.names
-                    }.distinct()
     }

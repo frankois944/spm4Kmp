@@ -3,6 +3,7 @@ package fr.frankois944.spm.kmp.plugin
 import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import fr.frankois944.spm.kmp.plugin.fixture.KotlinSource
 import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
 import fr.frankois944.spm.kmp.plugin.fixture.SwiftSource
 import org.junit.jupiter.api.Test
@@ -14,7 +15,15 @@ class BasicModuleTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withDependencies(
+                .withKotlinSources(
+                    KotlinSource.of(
+                        content =
+                            """
+                            package test
+                            import CryptoSwift.SWIFT_TYPEDEFSFGHJK
+                            """.trimIndent(),
+                    ),
+                ).withDependencies(
                     buildList {
                         add(
                             SwiftPackageDependencyDefinition.RemoteDefinition.Version(

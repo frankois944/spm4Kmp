@@ -3,7 +3,6 @@ package fr.frankois944.spm.kmp.plugin.tasks
 import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
 import fr.frankois944.spm.kmp.plugin.manifest.generateManifest
 import org.gradle.api.DefaultTask
-import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
@@ -35,7 +34,7 @@ internal abstract class GenerateManifestTask
     ) : DefaultTask() {
         init {
             description = "Generate a Swift Package manifest"
-            group = BasePlugin.BUILD_GROUP
+            group = "fr.frankois944.spm.kmp.plugin.tasks"
         }
 
         @TaskAction
@@ -53,5 +52,11 @@ internal abstract class GenerateManifestTask
                     toolsVersion = toolsVersion,
                 )
             outputFile.writeText(manifest)
+            logger.debug(
+                """
+                Manifest file generated :
+                ${outputFile.readText()}
+                """.trimIndent(),
+            )
         }
     }

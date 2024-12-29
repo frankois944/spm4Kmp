@@ -2,7 +2,6 @@ package fr.frankois944.spm.kmp.plugin.tasks
 
 import fr.frankois944.spm.kmp.plugin.CompileTarget
 import org.gradle.api.DefaultTask
-import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
@@ -33,8 +32,8 @@ internal abstract class CompileSwiftPackageTask
         abstract val operation: ExecOperations
 
         init {
-            description = "Compile a Swift Package manifest"
-            group = BasePlugin.BUILD_GROUP
+            description = "Compile the Swift Package manifest"
+            group = "fr.frankois944.spm.kmp.plugin.tasks"
         }
 
         private fun prepareWorkingDir(): File {
@@ -44,24 +43,18 @@ internal abstract class CompileSwiftPackageTask
                 sourceDir.deleteRecursively()
             }
             sourceDir.mkdirs()
-            logger.warn(
-                """
-                Looking inside user source $customSourcePackage
-                """.trimIndent(),
-            )
             if (customSourcePackage.list()?.isNotEmpty() == true) {
-                logger.warn(
+                logger.debug(
                     """
-                    copy swift file ${customSourcePackage.list()?.toList()}
-                    to directory $sourceDir
+                    Copy User Swift files to directory $sourceDir
+                    ${customSourcePackage.list()?.toList()}
                     """.trimIndent(),
                 )
                 customSourcePackage.copyRecursively(sourceDir)
             } else {
                 logger.debug(
                     """
-                    copy Dummy swift file
-                    to directory $sourceDir
+                    Copy Dummy swift file to directory $sourceDir
                     """.trimIndent(),
                 )
                 sourceDir.resolve("Dummy.swift").createNewFile()
@@ -78,11 +71,10 @@ internal abstract class CompileSwiftPackageTask
                     "--show-sdk-path",
                 )
 
-            logger.warn(
+            logger.debug(
                 """
-            |getSDKPath
-            |Build args :
-            |${args.joinToString(" ")}
+                RUN getSDKPath
+                ARGS xcrun ${args.joinToString(" ")}
                 """.trimMargin(),
             )
 
@@ -98,7 +90,7 @@ internal abstract class CompileSwiftPackageTask
 
         @TaskAction
         fun compilePackage() {
-            logger.warn("Compile the manifest $manifestFile")
+            logger.debug("Compile the manifest {}", manifestFile.path)
             val sdkPath = getSDKPath()
             val workingDir = prepareWorkingDir()
 
@@ -116,12 +108,11 @@ internal abstract class CompileSwiftPackageTask
                     if (debugMode) "debug" else "release",
                 )
 
-            logger.warn(
+            logger.debug(
                 """
-            |compileManifest
-            |Build args :
-            |$workingDir
-            |${args.joinToString(" ")}
+                RUN compileManifest
+                ARGS xcrun ${args.joinToString(" ")}
+                From ${workingDir.path}
                 """.trimMargin(),
             )
 

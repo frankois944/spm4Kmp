@@ -3,7 +3,6 @@ package fr.frankois944.spm.kmp.plugin.tasks
 import fr.frankois944.spm.kmp.plugin.CompileTarget
 import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
 import org.gradle.api.DefaultTask
-import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFiles
@@ -28,11 +27,12 @@ internal abstract class GenerateCInteropDefinitionTask
         @get:Input val debugMode: Boolean,
     ) : DefaultTask() {
         init {
-            description = "Generate the cinterop definition"
-            group = BasePlugin.BUILD_GROUP
+            description = "Generate the cinterop definitions files"
+            group = "fr.frankois944.spm.kmp.plugin.tasks"
         }
 
-        @get:OutputFiles val outputFiles: List<File>
+        @get:OutputFiles
+        val outputFiles: List<File>
             get() =
                 buildList {
                     getModuleNames().forEach { moduleName ->
@@ -44,16 +44,6 @@ internal abstract class GenerateCInteropDefinitionTask
             packageBuildOutputDirectory
                 .resolve(target.getPackageBuildDir())
                 .resolve(if (debugMode) "debug" else "release")
-
-        private fun getModuleNames(): List<String> =
-            (
-                packages
-                    .filter {
-                        it.export
-                    }.flatMap {
-                        it.names
-                    } + productName
-            ).distinct()
 
         private fun getBuildDirectoriesContent(): Array<File> =
             getBuildDirectory()
@@ -84,13 +74,26 @@ internal abstract class GenerateCInteropDefinitionTask
                 } ?: emptyList()
         }
 
+        private fun getModuleNames(): List<String> =
+            buildList {
+                add(productName) // the first item must be the product name
+                addAll(
+                    packages
+                        .filter {
+                            it.export
+                        }.flatMap {
+                            it.names
+                        },
+                )
+            }.distinct()
+
         @TaskAction
         fun generateDefinitions() {
             val moduleConfigs = mutableListOf<ModuleConfig>()
             val buildDirs = getBuildDirectoriesContent()
             val moduleNames = getModuleNames()
 
-            logger.warn(
+            logger.debug(
                 """
                 moduleNames
                 $moduleNames
@@ -114,46 +117,39 @@ internal abstract class GenerateCInteropDefinitionTask
                 }.also {
                     logger.debug(
                         """
-                        modules
+                        modulesConfigs found
                         $moduleConfigs
                         """.trimIndent(),
                     )
                 }
 
             moduleConfigs.forEach { moduleConfig ->
-                if (moduleConfig.isFramework) {
-                    val mapFile = moduleConfig.buildDir.resolve("Modules").resolve("module.modulemap")
-                    val moduleName =
-                        extractModuleNameFromModuleMap(mapFile.readText())
-                            ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
-                    moduleConfig.definitionFile.writeText(
-                        """
-                        language = Objective-C
-                        modules = $moduleName
-                        package = ${moduleConfig.name}
-
-                        staticLibraries = lib$productName.a
-                        libraryPaths = ${getBuildDirectory().path}
-                        compilerOpts = -fmodules -framework -F"${getBuildDirectory().path}"
-                        """.trimIndent(),
-                    )
-                } else {
-                    val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
-                    logger.debug("mapFile: >>> {}", mapFile)
-                    logger.debug("moduleConfig definitionFile: >>> ${moduleConfig.definitionFile.path}")
-                    if (!mapFile.exists()) {
-                        logger.error(
+                logger.debug("Building definition file for: {}", moduleConfig)
+                try {
+                    if (moduleConfig.isFramework) {
+                        val mapFile = moduleConfig.buildDir.resolve("Modules").resolve("module.modulemap")
+                        logger.debug("Framework mapFile: {}", mapFile)
+                        val moduleName =
+                            extractModuleNameFromModuleMap(mapFile.readText())
+                                ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
+                        moduleConfig.definitionFile.writeText(
                             """
-                            Can't generate definition for ${moduleConfig.name} because no modulemap file found")
-                            Expected file ${moduleConfig.definitionFile.path}
-                            -> Set the `export` parameter to `false` for ignoring this module
+                            language = Objective-C
+                            modules = $moduleName
+                            package = ${moduleConfig.name}
+
+                            staticLibraries = lib$productName.a
+                            libraryPaths = ${getBuildDirectory().path}
+                            compilerOpts = -fmodules -framework -F"${getBuildDirectory().path}"
                             """.trimIndent(),
                         )
                     } else {
+                        val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
+                        logger.debug("Build mapFile: {}", mapFile)
                         val mapFileContent = mapFile.readText()
                         val moduleName =
                             extractModuleNameFromModuleMap(mapFileContent)
-                                ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
+                                ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
                         val globalHeadersPath = getBuildDirectoriesContent()
                         val headersPath = globalHeadersPath + extractHeadersPathFromModuleMap(mapFileContent)
                         moduleConfig.definitionFile.writeText(
@@ -168,14 +164,23 @@ internal abstract class GenerateCInteropDefinitionTask
                             """.trimIndent(),
                         )
                     }
-                }
-                logger.warn(
-                    """
-Create definition File : ${moduleConfig.definitionFile.name}
-Path: ${moduleConfig.definitionFile.path}
+                    logger.debug(
+                        """
+Definition File : ${moduleConfig.definitionFile.name}
+At Path: ${moduleConfig.definitionFile.path}
 ${moduleConfig.definitionFile.readText()}
-                    """.trimIndent(),
-                )
+                        """.trimIndent(),
+                    )
+                } catch (ex: Exception) {
+                    logger.error(
+                        """
+                        Can't generate definition for ${moduleConfig.name}")
+                        Expected file ${moduleConfig.definitionFile.path}
+                        -> Set the `export` parameter to `false` to ignore this module
+                        """.trimIndent(),
+                        ex,
+                    )
+                }
             }
         }
     }
