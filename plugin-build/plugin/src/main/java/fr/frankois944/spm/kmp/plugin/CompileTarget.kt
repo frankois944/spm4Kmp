@@ -99,6 +99,32 @@ internal enum class CompileTarget {
             -> minMacos
         }
 
+    internal fun linkerPlatformVersionName() =
+        when (this) {
+            iosArm64 -> "platform_version ios"
+            iosX64, iosSimulatorArm64 -> "platform_version ios-simulator"
+            watchosArm64 -> "platform_version watchos"
+            watchosX64, watchosSimulatorArm64 -> "platform_version watchos-simulator"
+            tvosArm64 -> "platform_version tvos"
+            tvosX64, tvosSimulatorArm64 -> "platform_version tvos-simulator"
+            macosX64, macosArm64 -> "platform_version macosx"
+        }
+
+    internal fun linkerMinOsVersionName() =
+        when (this) {
+            iosX64 -> "ios_simulator_version_min"
+            iosArm64 -> "ios_version_min"
+            iosSimulatorArm64 -> "ios_simulator_version_min"
+            watchosX64 -> "watchos_simulator_version_min"
+            watchosArm64 -> "watchos_version_min"
+            watchosSimulatorArm64 -> "watchos_simulator_version_min"
+            tvosX64 -> "tvos_simulator_version_min"
+            tvosArm64 -> "tvos_version_min"
+            tvosSimulatorArm64 -> "tvos_simulator_version_min"
+            macosX64 -> "macosx_version_min"
+            macosArm64 -> "macosx_version_min"
+        }
+
     /**
      * @see [KonanTarget](https://github.com/JetBrains/kotlin/blob/v2.1.0/native/utils/src/org/jetbrains/kotlin/konan/target/KonanTarget.kt)
      */

@@ -57,73 +57,86 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                     .also {
                         it.mkdirs()
                     }
-            val userPackagePath =
-                Path(extension.customPackageSourcePath)
-                    .also {
-                        it.createDirectories()
-                    }.toFile()
-            val task1 =
-                tasks
-                    .register(
-                        // name =
-                        TASK_GENERATE_MANIFEST,
-                        // type =
-                        GenerateManifestTask::class.java,
-                        // ...constructorArgs =
-                        extension.packages,
-                        extension.productName,
-                        extension.minIos,
-                        extension.minTvos,
-                        extension.minMacos,
-                        extension.minWatchos,
-                        extension.toolsVersion,
-                        sourcePackageDir,
-                        File(sourcePackageDir, "Package.swift"),
-                    )
 
-            val taskGroup = mutableMapOf<CompileTarget, Task>()
-            val dependencyTasks = mutableMapOf<CompileTarget, DefaultCInteropSettings>()
+            afterEvaluate {
+                val userPackagePath =
+                    Path(extension.customPackageSourcePath)
+                        .also {
+                            it.createDirectories()
+                        }.toFile()
 
-            CompileTarget.entries.forEach { cinteropTarget ->
-                val packageScratchPath = buildPackageDir.resolve(cinteropTarget.name)
-                if (!buildPackageDir.exists()) {
-                    packageScratchPath.mkdirs()
-                }
-                val task2 =
+                val task1 =
                     tasks
                         .register(
                             // name =
-                            getTaskName(TASK_COMPILE_PACKAGE, cinteropTarget),
+                            TASK_GENERATE_MANIFEST,
                             // type =
-                            CompileSwiftPackageTask::class.java,
+                            GenerateManifestTask::class.java,
                             // ...constructorArgs =
-                            File(sourcePackageDir, "Package.swift"),
-                            cinteropTarget,
-                            extension.debug,
-                            packageScratchPath,
-                            userPackagePath,
-                            cinteropTarget.getOsVersion(
-                                minIos = extension.minIos,
-                                minWatchos = extension.minWatchos,
-                                minTvos = extension.minTvos,
-                                minMacos = extension.minMacos,
-                            ),
-                        )
-
-                val task3 =
-                    tasks
-                        .register(
-                            // name =
-                            getTaskName(TASK_GENERATE_CINTEROP_DEF, cinteropTarget),
-                            // type =
-                            GenerateCInteropDefinitionTask::class.java,
-                            // ...constructorArgs =
-                            packageScratchPath,
-                            cinteropTarget,
-                            extension.productName,
                             extension.packages,
-                            extension.debug,
+                            extension.productName,
+                            extension.minIos,
+                            extension.minTvos,
+                            extension.minMacos,
+                            extension.minWatchos,
+                            extension.toolsVersion,
+                            sourcePackageDir,
+                            File(sourcePackageDir, "Package.swift"),
                         )
+
+                val taskGroup = mutableMapOf<CompileTarget, Task>()
+                val dependencyTasks = mutableMapOf<CompileTarget, DefaultCInteropSettings>()
+
+                CompileTarget.entries.forEach { cinteropTarget ->
+                    val packageScratchPath = buildPackageDir.resolve(cinteropTarget.name)
+                    if (!buildPackageDir.exists()) {
+                        packageScratchPath.mkdirs()
+                    }
+                    val task2 =
+                        tasks
+                            .register(
+                                // name =
+                                getTaskName(TASK_COMPILE_PACKAGE, cinteropTarget),
+                                // type =
+                                CompileSwiftPackageTask::class.java,
+                                // ...constructorArgs =
+                                File(sourcePackageDir, "Package.swift"),
+                                cinteropTarget,
+                                extension.debug,
+                                packageScratchPath,
+                                if (userPackagePath.startsWith("/")) {
+                                    userPackagePath
+                                } else {
+                                    layout.projectDirectory.asFile.resolve(userPackagePath)
+                                },
+                                cinteropTarget.getOsVersion(
+                                    minIos = extension.minIos,
+                                    minWatchos = extension.minWatchos,
+                                    minTvos = extension.minTvos,
+                                    minMacos = extension.minMacos,
+                                ),
+                            )
+
+                    val task3 =
+                        tasks
+                            .register(
+                                // name =
+                                getTaskName(TASK_GENERATE_CINTEROP_DEF, cinteropTarget),
+                                // type =
+                                GenerateCInteropDefinitionTask::class.java,
+                                // ...constructorArgs =
+                                packageScratchPath,
+                                cinteropTarget,
+                                extension.productName,
+                                extension.packages,
+                                extension.debug,
+                                cinteropTarget.getOsVersion(
+                                    minIos = extension.minIos,
+                                    minWatchos = extension.minWatchos,
+                                    minTvos = extension.minTvos,
+                                    minMacos = extension.minMacos,
+                                ),
+                            )
 
                     /*
                  val konanTargets = tasks.withType(CInteropProcess::class.java).asSequence().map { it.konanTarget }
@@ -136,52 +149,55 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                         }
                      */
 
-                taskGroup[cinteropTarget] =
-                    task3
-                        .get()
-                        .dependsOn(
-                            task2
-                                .get()
-                                .dependsOn(task1.get()),
-                        )
-            }
+                    taskGroup[cinteropTarget] =
+                        task3
+                            .get()
+                            .dependsOn(
+                                task2
+                                    .get()
+                                    .dependsOn(task1.get()),
+                            )
+                }
 
-            afterEvaluate {
-                taskGroup.forEach { (target, task) ->
-                    val dependenciesFiles = (task as GenerateCInteropDefinitionTask).outputFiles.drop(1)
-                    if (dependenciesFiles.isNotEmpty()) {
-                        val ktTarget =
-                            kotlinExtension.targets.findByName(target.name) as? KotlinNativeTarget
-                                ?: return@forEach
-                        val mainCompilation = ktTarget.compilations.getByName("main")
-                        dependenciesFiles.forEach { file ->
-                            val taskName = getTaskName(file.nameWithoutExtension.capitalized(), target)
-                            logger.debug("Create task name = {}", taskName)
-                            dependencyTasks[target] =
-                                mainCompilation.cinterops.create(
-                                    taskName,
-                                ) { task ->
-                                    task.defFile(file)
-                                }
+                afterEvaluate {
+                    // link the dependencies definition files
+                    taskGroup.forEach { (target, task) ->
+                        val dependenciesFiles = (task as GenerateCInteropDefinitionTask).outputFiles.drop(1)
+                        if (dependenciesFiles.isNotEmpty()) {
+                            val ktTarget =
+                                kotlinExtension.targets.findByName(target.name) as? KotlinNativeTarget
+                                    ?: return@forEach
+                            val mainCompilation = ktTarget.compilations.getByName("main")
+                            dependenciesFiles.forEach { file ->
+                                val taskName = getTaskName(file.nameWithoutExtension.capitalized(), target)
+                                logger.debug("Create task name = {}", taskName)
+                                dependencyTasks[target] =
+                                    mainCompilation.cinterops.create(
+                                        taskName,
+                                    ) { task ->
+                                        task.defFile(file)
+                                    }
+                            }
                         }
                     }
                 }
-            }
 
-            tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
-                val cinteropTarget =
-                    CompileTarget.byKonanName(cinterop.konanTarget.name)
-                        ?: return@configureEach
+                // link the main definition File
+                tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
+                    val cinteropTarget =
+                        CompileTarget.byKonanName(cinterop.konanTarget.name)
+                            ?: return@configureEach
 
-                val definitionTask =
-                    taskGroup[cinteropTarget] as GenerateCInteropDefinitionTask
+                    val definitionTask =
+                        taskGroup[cinteropTarget] as GenerateCInteropDefinitionTask
 
-                if (definitionTask.outputFiles.isEmpty()) {
-                    logger.error("No definition files found, can't use cinterop")
+                    if (definitionTask.outputFiles.isEmpty()) {
+                        logger.error("No definition files found, can't use cinterop")
+                    }
+                    logger.debug("outputFiles = {}", definitionTask.outputFiles)
+                    cinterop.settings.definitionFile.set(definitionTask.outputFiles.first())
+                    cinterop.dependsOn(taskGroup[cinteropTarget])
                 }
-                logger.debug("outputFiles = {}", definitionTask.outputFiles)
-                cinterop.settings.definitionFile.set(definitionTask.outputFiles.first())
-                cinterop.dependsOn(taskGroup[cinteropTarget])
             }
         }
 

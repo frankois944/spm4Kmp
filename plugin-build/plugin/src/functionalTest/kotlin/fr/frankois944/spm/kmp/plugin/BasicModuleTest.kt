@@ -6,24 +6,37 @@ import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
 import fr.frankois944.spm.kmp.plugin.fixture.KotlinSource
 import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
 import fr.frankois944.spm.kmp.plugin.fixture.SwiftSource
+import fr.frankois944.spm.kmp.plugin.utils.OpenFolderOnFailureExtension
+import fr.frankois944.spm.kmp.plugin.utils.assertPackageResolved
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class BasicModuleTest {
+    private var folderTopOpen: String? = null
+
+    @RegisterExtension
+    @JvmField
+    val openFolderOnFailure =
+        OpenFolderOnFailureExtension {
+            folderTopOpen ?: ""
+        }
+
+    @BeforeEach
+    fun beforeEach() {
+        folderTopOpen = null
+    }
+
+    fun onFailed() {
+    }
+
     @Test
     fun `build simple remote package`() {
         // Given
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withKotlinSources(
-                    KotlinSource.of(
-                        content =
-                            """
-                            package test
-                            import CryptoSwift.SWIFT_TYPEDEFSFGHJK
-                            """.trimIndent(),
-                    ),
-                ).withDependencies(
+                .withDependencies(
                     buildList {
                         add(
                             SwiftPackageDependencyDefinition.RemoteDefinition.Version(
@@ -33,13 +46,22 @@ class BasicModuleTest {
                             ),
                         )
                     },
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        content =
+                            """
+                            package com.example
+                            import CryptoSwift.SWIFT_TYPEDEF
+                            import dummy.CryptoSwift
+                            """.trimIndent(),
+                    ),
                 ).withSwiftSources(
                     SwiftSource.of(
                         content =
                             """
                             import Foundation
                             import CryptoSwift
-                            @objc public class CryptoSwift: NSObject {
+                            @objc public class MySwiftClass: NSObject {
                                 @objc public func toMD5(value: String) -> String {
                                     return value.md5()
                                 }
@@ -48,8 +70,10 @@ class BasicModuleTest {
                     ),
                 ).build()
 
+        val project = fixture.gradleProject.rootDir
+        folderTopOpen = project.absolutePath
         // When
-        val result = build(fixture.gradleProject.rootDir, "build")
+        val result = build(project, "build")
 
         // Then
         assertThat(result).task(":library:build").succeeded()

@@ -51,7 +51,6 @@ abstract class SmpKMPTestFixture private constructor(
                 source.content,
             )
         }
-
         val kotlinSources =
             configuration.kotlinSources.ifEmpty {
                 listOf(KotlinSource.default())
@@ -61,6 +60,7 @@ abstract class SmpKMPTestFixture private constructor(
                 Source
                     .kotlin(source.content)
                     .withPath(source.packageName, source.className)
+                    .withSourceSet("iosMain")
                     .build(),
             )
         }
@@ -69,6 +69,7 @@ abstract class SmpKMPTestFixture private constructor(
     private fun Subproject.Builder.setupGradleConfig(extension: TestConfiguration) {
         withBuildScript {
             imports = Imports.of("fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition")
+            sourceSets("iosMain", "tvosMain", "watchosMain", "macosMain")
             plugins(
                 Plugin.of("org.jetbrains.kotlin.multiplatform", "2.1.0"),
                 Plugin(
@@ -85,19 +86,18 @@ abstract class SmpKMPTestFixture private constructor(
             buildString {
                 append(
                     """
-                    swiftPackageConfig {
-                        customPackageSourcePath = "${extension.customPackageSourcePath}"
-                        toolsVersion = "${extension.toolsVersion}"
-                        productName = "${extension.productName}"
-                        minIos = "${extension.minIos}"
-                        minMacos = "${extension.minMacos}"
-                        minTvos = "${extension.minTvos}"
-                        minWatchos = "${extension.minWatchos}"
-
-                    """,
+swiftPackageConfig {
+    customPackageSourcePath = "${extension.customPackageSourcePath}"
+    toolsVersion = "${extension.toolsVersion}"
+    productName = "${extension.productName}"
+    minIos = "${extension.minIos}"
+    minMacos = "${extension.minMacos}"
+    minTvos = "${extension.minTvos}"
+    minWatchos = "${extension.minWatchos}"
+""",
                 )
                 extension.packages.forEach { definition ->
-                    append("packages.add(")
+                    append("    packages.add(\n     ")
                     when (definition) {
                         is SwiftPackageDependencyDefinition.Local -> {
                             append("SwiftPackageDependencyDefinition.Local(")
@@ -141,27 +141,30 @@ abstract class SmpKMPTestFixture private constructor(
                             append("packageName = \"${definition.packageName}\"")
                         }
                     }
-                    append("))")
+                    append(")\n     )\n")
                 }
-                append("}")
+                append("}\n")
             }
         val script =
             """
-            kotlin {
-                listOf(
-                    iosX64(),
-                    iosArm64(),
-                    iosSimulatorArm64()
-                ).forEach {
-                    it.compilations {
-                        val main by getting {
-                            cinterops.create("${configuration.productName}")
-                        }
-                    }
-                }
+kotlin {
+    listOf(
+        //iosX64(),
+        //iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.compilations {
+            val main by getting {
+                cinterops.create("${configuration.productName}")
             }
-
-            $pluginBlock
+        }
+        it.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
+}
+$pluginBlock
             """.trimIndent()
         logger.warn(script)
         return script

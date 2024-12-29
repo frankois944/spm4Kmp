@@ -1,6 +1,7 @@
 package fr.frankois944.spm.kmp.plugin.tasks
 
 import fr.frankois944.spm.kmp.plugin.CompileTarget
+import fr.frankois944.spm.kmp.plugin.operations.getSDKPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -8,7 +9,6 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
-import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
@@ -63,35 +63,10 @@ internal abstract class CompileSwiftPackageTask
             return workingDir
         }
 
-        private fun getSDKPath(): String {
-            val args =
-                listOf(
-                    "--sdk",
-                    target.sdk(),
-                    "--show-sdk-path",
-                )
-
-            logger.debug(
-                """
-                RUN getSDKPath
-                ARGS xcrun ${args.joinToString(" ")}
-                """.trimMargin(),
-            )
-
-            val output = ByteArrayOutputStream()
-            operation
-                .exec {
-                    it.executable = "xcrun"
-                    it.args = args
-                    it.standardOutput = output
-                }
-            return output.toString().trim()
-        }
-
         @TaskAction
         fun compilePackage() {
             logger.debug("Compile the manifest {}", manifestFile.path)
-            val sdkPath = getSDKPath()
+            val sdkPath = operation.getSDKPath(target)
             val workingDir = prepareWorkingDir()
 
             val args =

@@ -2,11 +2,14 @@ package fr.frankois944.spm.kmp.plugin.tasks
 
 import fr.frankois944.spm.kmp.plugin.CompileTarget
 import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import fr.frankois944.spm.kmp.plugin.operations.getXcodeDevPath
+import fr.frankois944.spm.kmp.plugin.operations.getXcodeVersion
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
 import java.io.File
 import javax.inject.Inject
 
@@ -25,6 +28,7 @@ internal abstract class GenerateCInteropDefinitionTask
         @get:Input val productName: String,
         @get:Input val packages: List<SwiftPackageDependencyDefinition>,
         @get:Input val debugMode: Boolean,
+        @get:Input val osVersion: String,
     ) : DefaultTask() {
         init {
             description = "Generate the cinterop definitions files"
@@ -40,6 +44,9 @@ internal abstract class GenerateCInteropDefinitionTask
                     }
                 }
 
+        @get:Inject
+        abstract val operation: ExecOperations
+
         private fun getBuildDirectory(): File =
             packageBuildOutputDirectory
                 .resolve(target.getPackageBuildDir())
@@ -47,7 +54,8 @@ internal abstract class GenerateCInteropDefinitionTask
 
         private fun getBuildDirectoriesContent(): Array<File> =
             getBuildDirectory()
-                .listFiles() ?: emptyArray()
+                .listFiles { it -> (it.extension == "build" || it.extension == "framework") }
+                ?: emptyArray()
 
         private fun extractModuleNameFromModuleMap(module: String): String? {
             val regex = """module\s+(\w+)""".toRegex()
@@ -87,6 +95,25 @@ internal abstract class GenerateCInteropDefinitionTask
                 )
             }.distinct()
 
+        private fun getExtraLinkers(): String {
+            val xcodeDevPath = operation.getXcodeDevPath()
+
+            val linkerPlatformVersion =
+                if (operation.getXcodeVersion().toDouble() >= 15) {
+                    target.linkerPlatformVersionName()
+                } else {
+                    target.linkerMinOsVersionName()
+                }
+
+            return listOf(
+                "-L/usr/lib/swift",
+                "-$linkerPlatformVersion",
+                osVersion,
+                osVersion,
+                "-L$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.sdk()}",
+            ).joinToString(" ")
+        }
+
         @TaskAction
         fun generateDefinitions() {
             val moduleConfigs = mutableListOf<ModuleConfig>()
@@ -103,7 +130,7 @@ internal abstract class GenerateCInteropDefinitionTask
             // find the build directory of the declared module in the manifest
             moduleNames
                 .forEach { moduleName ->
-                    buildDirs.find { it.nameWithoutExtension == moduleName && it.extension == "build" }?.let { buildDir ->
+                    buildDirs.find { it.nameWithoutExtension == moduleName }?.let { buildDir ->
                         logger.debug("find build dir {}", buildDir)
                         moduleConfigs.add(
                             ModuleConfig(
@@ -141,6 +168,7 @@ internal abstract class GenerateCInteropDefinitionTask
                             staticLibraries = lib$productName.a
                             libraryPaths = ${getBuildDirectory().path}
                             compilerOpts = -fmodules -framework -F"${getBuildDirectory().path}"
+                            linkerOpts = ${getExtraLinkers()}
                             """.trimIndent(),
                         )
                     } else {
@@ -161,6 +189,7 @@ internal abstract class GenerateCInteropDefinitionTask
                             staticLibraries = lib$productName.a
                             libraryPaths = "${getBuildDirectory().path}"
                             compilerOpts = -ObjC -fmodules -I${headersPath.joinToString(" -I")}
+                            linkerOpts = ${getExtraLinkers()}
                             """.trimIndent(),
                         )
                     }

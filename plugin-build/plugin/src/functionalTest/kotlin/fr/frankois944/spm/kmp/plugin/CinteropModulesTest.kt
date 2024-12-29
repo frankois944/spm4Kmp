@@ -5,6 +5,8 @@ import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import fr.frankois944.spm.kmp.plugin.fixture.KotlinSource
 import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
 import fr.frankois944.spm.kmp.plugin.fixture.SwiftSource
+import fr.frankois944.spm.kmp.plugin.utils.assumeLinux
+import fr.frankois944.spm.kmp.plugin.utils.assumeMacos
 import org.junit.jupiter.api.Test
 
 class CinteropModulesTest {

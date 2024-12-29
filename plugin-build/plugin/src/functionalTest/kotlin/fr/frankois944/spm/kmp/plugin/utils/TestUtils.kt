@@ -1,4 +1,4 @@
-package fr.frankois944.spm.kmp.plugin
+package fr.frankois944.spm.kmp.plugin.utils
 
 import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
 import org.gradle.internal.cc.base.logger
