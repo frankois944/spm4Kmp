@@ -2,11 +2,13 @@ package fr.frankois944.spm.kmp.plugin.tasks
 
 import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
 import fr.frankois944.spm.kmp.plugin.manifest.generateManifest
+import fr.frankois944.spm.kmp.plugin.operations.resolvePackage
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
 import java.io.File
 import javax.inject.Inject
 
@@ -28,10 +30,13 @@ internal abstract class GenerateManifestTask
         @get:Input
         val toolsVersion: String,
         @get:InputDirectory
-        val generatedPackageDirectory: File,
-        @get:OutputFile
-        val outputFile: File,
+        val packageDirectory: File,
+        @get:OutputDirectory
+        val scratchDirectory: File,
     ) : DefaultTask() {
+        @get:Inject
+        abstract val operation: ExecOperations
+
         init {
             description = "Generate a Swift Package manifest"
             group = "fr.frankois944.spm.kmp.plugin.tasks"
@@ -43,7 +48,7 @@ internal abstract class GenerateManifestTask
                 generateManifest(
                     packages,
                     generatedPackageDirectory =
-                        generatedPackageDirectory.toPath(),
+                        packageDirectory.toPath(),
                     productName = productName,
                     minIos = minIos,
                     minMacos = minMacos,
@@ -51,12 +56,13 @@ internal abstract class GenerateManifestTask
                     minWatchos = minWatchos,
                     toolsVersion = toolsVersion,
                 )
-            outputFile.writeText(manifest)
+            packageDirectory.resolve("Package.swift").writeText(manifest)
             logger.debug(
                 """
                 Manifest file generated :
-                ${outputFile.readText()}
+                ${packageDirectory.resolve("Package.swift")}
                 """.trimIndent(),
             )
+            operation.resolvePackage(packageDirectory, scratchDirectory)
         }
     }

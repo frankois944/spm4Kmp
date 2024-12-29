@@ -21,8 +21,10 @@ internal abstract class CompileSwiftPackageTask
         val target: CompileTarget,
         @get:Input
         val debugMode: Boolean,
+        @get:InputDirectory
+        val originalPackageScratchDir: File,
         @get:OutputDirectory
-        val packageBuildOutputDirectory: File,
+        val packageScratchDir: File,
         @get:InputDirectory
         val customSourcePackage: File,
         @get:Input
@@ -34,6 +36,13 @@ internal abstract class CompileSwiftPackageTask
         init {
             description = "Compile the Swift Package manifest"
             group = "fr.frankois944.spm.kmp.plugin.tasks"
+        }
+
+        private fun copyOriginalPackageScratchDir() {
+            if (!packageScratchDir.exists()) {
+                packageScratchDir.mkdirs()
+            }
+            originalPackageScratchDir.copyRecursively(packageScratchDir)
         }
 
         private fun prepareWorkingDir(): File {
@@ -60,6 +69,7 @@ internal abstract class CompileSwiftPackageTask
                 sourceDir.resolve("Dummy.swift").createNewFile()
                 sourceDir.resolve("Dummy.swift").writeText("import Foundation")
             }
+            copyOriginalPackageScratchDir()
             return workingDir
         }
 
@@ -78,7 +88,7 @@ internal abstract class CompileSwiftPackageTask
                     "--triple",
                     target.getTriple(osVersion),
                     "--scratch-path",
-                    packageBuildOutputDirectory.path,
+                    packageScratchDir.path,
                     "-c",
                     if (debugMode) "debug" else "release",
                 )

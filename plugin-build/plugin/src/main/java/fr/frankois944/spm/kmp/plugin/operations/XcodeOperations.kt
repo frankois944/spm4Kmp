@@ -3,6 +3,29 @@ package fr.frankois944.spm.kmp.plugin.operations
 import fr.frankois944.spm.kmp.plugin.CompileTarget
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
+import java.io.File
+
+internal fun ExecOperations.resolvePackage(
+    workingDir: File,
+    scratchPath: File,
+) {
+    val args =
+        listOf(
+            "swift",
+            "package",
+            "resolve",
+            "--scratch-path",
+            scratchPath.path,
+        )
+
+    val output = ByteArrayOutputStream()
+    exec {
+        it.executable = "xcrun"
+        it.args = args
+        it.workingDir = workingDir
+        it.standardOutput = output
+    }
+}
 
 internal fun ExecOperations.getXcodeVersion(): String {
     val args =

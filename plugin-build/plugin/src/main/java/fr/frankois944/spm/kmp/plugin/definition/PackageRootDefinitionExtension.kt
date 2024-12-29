@@ -2,6 +2,8 @@ package fr.frankois944.spm.kmp.plugin.definition
 
 import org.gradle.api.Project
 import javax.inject.Inject
+import kotlin.io.path.Path
+import kotlin.io.path.pathString
 
 /**
  * Package root definition extension
@@ -16,7 +18,7 @@ public abstract class PackageRootDefinitionExtension
     constructor(
         project: Project,
     ) {
-        public var customPackageSourcePath: String = "${project.projectDir.path}/src/swift"
+        public var customPackageSourcePath: String = Path(project.projectDir.path, "src", "swift").pathString
         public var productName: String = "productBinary"
         public var minIos: String = "12.0"
         public var minMacos: String = "10.13"

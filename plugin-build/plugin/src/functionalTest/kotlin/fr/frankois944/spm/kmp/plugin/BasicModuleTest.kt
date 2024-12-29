@@ -45,6 +45,14 @@ class BasicModuleTest {
                                 version = "1.8.3",
                             ),
                         )
+                        add(
+                            SwiftPackageDependencyDefinition.RemoteDefinition.Version(
+                                url = "https://github.com/firebase/firebase-ios-sdk.git",
+                                names = listOf("FirebaseCore", "FirebaseAnalytics"),
+                                version = "11.6.0",
+                                packageName = "firebase-ios-sdk",
+                            ),
+                        )
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
@@ -52,7 +60,7 @@ class BasicModuleTest {
                             """
                             package com.example
                             import CryptoSwift.SWIFT_TYPEDEF
-                            import dummy.CryptoSwift
+                            import dummy.MySwiftClass
                             """.trimIndent(),
                     ),
                 ).withSwiftSources(
