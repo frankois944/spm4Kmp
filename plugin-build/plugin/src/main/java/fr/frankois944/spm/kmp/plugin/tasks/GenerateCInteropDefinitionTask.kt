@@ -185,8 +185,7 @@ internal abstract class GenerateCInteropDefinitionTask
                         val moduleName =
                             extractModuleNameFromModuleMap(mapFileContent)
                                 ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
-                        val globalHeadersPath = getBuildDirectoriesContent()
-                        val headersPath = globalHeadersPath + extractHeadersPathFromModuleMap(mapFileContent)
+                        val headersPath = getBuildDirectoriesContent() + extractHeadersPathFromModuleMap(mapFileContent)
                         moduleConfig.definitionFile.writeText(
                             """
                             language = Objective-C
