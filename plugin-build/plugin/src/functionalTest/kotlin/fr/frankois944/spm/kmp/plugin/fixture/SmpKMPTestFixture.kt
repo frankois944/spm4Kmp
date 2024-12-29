@@ -149,8 +149,8 @@ swiftPackageConfig {
             """
 kotlin {
     listOf(
-        //iosX64(),
-        //iosArm64(),
+        iosX64(),
+        iosArm64(),
         iosSimulatorArm64()
     ).forEach {
         it.compilations {

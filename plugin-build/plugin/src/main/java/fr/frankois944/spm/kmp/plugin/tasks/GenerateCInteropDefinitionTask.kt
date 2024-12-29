@@ -5,10 +5,7 @@ import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
 import fr.frankois944.spm.kmp.plugin.operations.getXcodeDevPath
 import fr.frankois944.spm.kmp.plugin.operations.getXcodeVersion
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputFiles
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
 import java.io.File
 import javax.inject.Inject
@@ -18,6 +15,16 @@ private data class ModuleConfig(
     val name: String,
     val buildDir: File,
     val definitionFile: File,
+)
+
+internal data class ModuleConfigInfo(
+    val language: String,
+    val modules: String,
+    val `package`: String,
+    val staticLibraries: String,
+    val libraryPaths: String,
+    val compilerOpts: String,
+    val linkerOpts: String,
 )
 
 internal abstract class GenerateCInteropDefinitionTask
@@ -53,7 +60,7 @@ internal abstract class GenerateCInteropDefinitionTask
                 .resolve(if (debugMode) "debug" else "release")
 
         private fun getBuildDirectoriesContent(): Array<File> =
-            getBuildDirectory()
+            getBuildDirectory() // get folders with headers for internal dependencies
                 .listFiles { it -> (it.extension == "build" || it.extension == "framework") }
                 ?: emptyArray()
 
