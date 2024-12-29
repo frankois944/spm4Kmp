@@ -46,10 +46,14 @@ internal abstract class GenerateCInteropDefinitionTask
                 .resolve(if (debugMode) "debug" else "release")
 
         private fun getModuleNames(): List<String> =
-            packages
-                .flatMap {
-                    it.names
-                }.distinct()
+            (
+                packages
+                    .filter {
+                        it.export
+                    }.flatMap {
+                        it.names
+                    } + productName
+            ).distinct()
 
         private fun getBuildDirectoriesContent(): Array<File> =
             getBuildDirectory()
@@ -96,8 +100,8 @@ internal abstract class GenerateCInteropDefinitionTask
             // find the build directory of the declared module in the manifest
             moduleNames
                 .forEach { moduleName ->
-                    buildDirs.find { it.nameWithoutExtension == moduleName }?.let { buildDir ->
-                        logger.warn("find $buildDir")
+                    buildDirs.find { it.nameWithoutExtension == moduleName && it.extension == "build" }?.let { buildDir ->
+                        logger.debug("find build dir {}", buildDir)
                         moduleConfigs.add(
                             ModuleConfig(
                                 isFramework = buildDir.extension == "framework",
@@ -108,7 +112,7 @@ internal abstract class GenerateCInteropDefinitionTask
                         )
                     }
                 }.also {
-                    logger.warn(
+                    logger.debug(
                         """
                         modules
                         $moduleConfigs
@@ -135,13 +139,14 @@ internal abstract class GenerateCInteropDefinitionTask
                     )
                 } else {
                     val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
-                    logger.warn("mapFile: >>> $mapFile")
-                    logger.warn("moduleConfig definitionFile: >>> ${ moduleConfig.definitionFile.path}")
+                    logger.debug("mapFile: >>> {}", mapFile)
+                    logger.debug("moduleConfig definitionFile: >>> ${moduleConfig.definitionFile.path}")
                     if (!mapFile.exists()) {
-                        logger.error("Can't generate definition for ${moduleConfig.name} because no modulemap file found")
                         logger.error(
                             """
-                            File: $mapFile
+                            Can't generate definition for ${moduleConfig.name} because no modulemap file found")
+                            Expected file ${moduleConfig.definitionFile.path}
+                            -> Set the `export` parameter to `false` for ignoring this module
                             """.trimIndent(),
                         )
                     } else {
