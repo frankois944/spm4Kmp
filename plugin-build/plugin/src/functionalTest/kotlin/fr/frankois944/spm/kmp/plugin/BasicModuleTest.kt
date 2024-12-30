@@ -27,11 +27,8 @@ class BasicModuleTest {
         folderTopOpen = null
     }
 
-    fun onFailed() {
-    }
-
     @Test
-    fun `build simple remote package`() {
+    fun `build with remote packages`() {
         // Given
         val fixture =
             SmpKMPTestFixture
@@ -45,14 +42,6 @@ class BasicModuleTest {
                                 version = "1.8.3",
                             ),
                         )
-                        /*add(
-                            SwiftPackageDependencyDefinition.RemoteDefinition.Version(
-                                url = "https://github.com/firebase/firebase-ios-sdk.git",
-                                names = listOf("FirebaseCore", "FirebaseAnalytics"),
-                                version = "11.6.0",
-                                packageName = "firebase-ios-sdk",
-                            ),
-                        )*/
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
@@ -81,10 +70,64 @@ class BasicModuleTest {
         val project = fixture.gradleProject.rootDir
         folderTopOpen = project.absolutePath
         // When
-        val result = build(project, "build")
+        val result =
+            build(project, "build")
 
         // Then
         assertThat(result).task(":library:build").succeeded()
         assertPackageResolved(fixture, "CryptoSwift")
+    }
+
+    @Test
+    fun `build with complex remote packages`() {
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftPackageDependencyDefinition.RemoteDefinition.Version(
+                                url = "https://github.com/firebase/firebase-ios-sdk.git",
+                                names = listOf("FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics"),
+                                version = "11.6.0",
+                                packageName = "firebase-ios-sdk",
+                            ),
+                        )
+                    },
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        content =
+                            """
+                            package com.example
+                            import FirebaseCore.FIRApp
+                            import FirebaseCrashlytics.FIRCrashlyticsMeta
+                            import FirebaseAnalytics.FIRConsentStatusGranted
+                            """.trimIndent(),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import FirebaseCore
+                            import FirebaseAnalytics
+                            import FirebaseCrashlytics
+
+                            @objc public class MySwiftClass: NSObject {
+                            }
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        val project = fixture.gradleProject.rootDir
+        folderTopOpen = project.absolutePath
+        // When
+        val result =
+            build(project, "build")
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+        assertPackageResolved(fixture, "firebase-ios-sdk")
     }
 }

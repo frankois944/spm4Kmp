@@ -173,8 +173,8 @@ internal abstract class GenerateCInteropDefinitionTask
                             package = ${moduleConfig.name}
 
                             staticLibraries = lib$productName.a
-                            libraryPaths = ${getBuildDirectory().path}
-                            compilerOpts = -fmodules -framework -F"${getBuildDirectory().path}"
+                            libraryPaths = "${getBuildDirectory().path}"
+                            compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
                             linkerOpts = ${getExtraLinkers()}
                             """.trimIndent(),
                         )
@@ -194,12 +194,12 @@ internal abstract class GenerateCInteropDefinitionTask
 
                             staticLibraries = lib$productName.a
                             libraryPaths = "${getBuildDirectory().path}"
-                            compilerOpts = -ObjC -fmodules -I${headersPath.joinToString(" -I")}
+                            compilerOpts = -ObjC -fmodules -I"${headersPath.joinToString("\" -I\"")}"
                             linkerOpts = ${getExtraLinkers()}
                             """.trimIndent(),
                         )
                     }
-                    logger.debug(
+                    logger.warn(
                         """
 Definition File : ${moduleConfig.definitionFile.name}
 At Path: ${moduleConfig.definitionFile.path}

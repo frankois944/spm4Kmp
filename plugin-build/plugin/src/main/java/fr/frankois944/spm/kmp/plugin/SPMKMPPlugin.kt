@@ -100,8 +100,6 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                 val dependencyTaskNames = mutableMapOf<String, File>()
 
                 CompileTarget.entries.forEach { cinteropTarget ->
-                    logger.warn("INIT CInteropProcess ${cinteropTarget.name}")
-
                     val targetPackageScratchDir =
                         buildPackageDir
                             .resolve(cinteropTarget.name)
