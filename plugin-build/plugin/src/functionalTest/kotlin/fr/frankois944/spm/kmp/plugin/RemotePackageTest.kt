@@ -88,6 +88,7 @@ class RemotePackageTest {
                             SwiftPackageDependencyDefinition.RemoteDefinition.Branch(
                                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                                 names = listOf("CryptoSwift"),
+                                packageName = "CryptoSwift",
                                 branch = "main",
                             ),
                         )
@@ -127,7 +128,7 @@ class RemotePackageTest {
     }
 
     @Test
-    fun `build with remote packages by commi`() {
+    fun `build with remote packages by commit`() {
         // Given
         val fixture =
             SmpKMPTestFixture

@@ -10,7 +10,7 @@ public sealed interface SwiftPackageDependencyDefinition : Serializable {
     public val export: Boolean
 
     /**
-     * Local swift package `directory`
+     * Local swift package `directory` containing a Package.swift file
      *
      * @property path The absolute path to the package directory
      * @property packageName Name of the Swift package
@@ -43,7 +43,9 @@ public sealed interface SwiftPackageDependencyDefinition : Serializable {
     ) : SwiftPackageDependencyDefinition
 
     /**
-     * Remove `xcframework` bundle, it must be compressed with .zip
+     * Remote `xcframework` zipped bundle
+     *
+     * It must be compressed with .zip and have a correct checksum
      *
      * @property url An url to the zipped `xcframework`
      * @property packageName Name of the Swift package

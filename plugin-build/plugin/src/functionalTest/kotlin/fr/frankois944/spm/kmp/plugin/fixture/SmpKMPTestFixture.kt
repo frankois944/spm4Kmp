@@ -122,7 +122,7 @@ swiftPackageConfig {
                         }
 
                         is SwiftPackageDependencyDefinition.RemoteDefinition.Branch -> {
-                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Version(")
+                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Branch(")
                             append("url = \"${definition.url}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("branch = \"${definition.branch}\",")
@@ -130,7 +130,7 @@ swiftPackageConfig {
                         }
 
                         is SwiftPackageDependencyDefinition.RemoteDefinition.Commit -> {
-                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Version(")
+                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Commit(")
                             append("url = \"${definition.url}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("revision = \"${definition.revision}\",")
