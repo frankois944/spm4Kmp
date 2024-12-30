@@ -109,12 +109,15 @@ swiftPackageConfig {
                             append("SwiftPackageDependencyDefinition.LocalBinary(")
                             append("path = \"${definition.path}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("packageName = \"${definition.packageName}\"")
                         }
 
                         is SwiftPackageDependencyDefinition.RemoteBinary -> {
                             append("SwiftPackageDependencyDefinition.RemoteBinary(")
                             append("url = \"${definition.url}\",")
-                            append("checksum = \"${definition.checksum}\"")
+                            append("checksum = \"${definition.checksum}\",")
+                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("packageName = \"${definition.packageName}\"")
                         }
 
                         is SwiftPackageDependencyDefinition.RemoteDefinition.Branch -> {
@@ -149,7 +152,7 @@ swiftPackageConfig {
             """
 kotlin {
     listOf(
-        iosX64(),
+       // iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach {

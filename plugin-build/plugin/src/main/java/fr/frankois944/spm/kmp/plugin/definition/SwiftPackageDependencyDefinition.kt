@@ -15,16 +15,17 @@ public sealed interface SwiftPackageDependencyDefinition : Serializable {
     ) : SwiftPackageDependencyDefinition
 
     public data class LocalBinary(
+        // must be an absolute path from the system
         val path: String,
-        override val names: List<String>,
-        override val packageName: String = names.first(),
+        override val packageName: String,
+        override val names: List<String> = listOf(packageName),
         override val export: Boolean = true,
     ) : SwiftPackageDependencyDefinition
 
     public data class RemoteBinary(
         val url: String,
-        override val names: List<String>,
-        override val packageName: String = names.first(),
+        override val packageName: String,
+        override val names: List<String> = listOf(packageName),
         override val export: Boolean = true,
         val checksum: String,
     ) : SwiftPackageDependencyDefinition

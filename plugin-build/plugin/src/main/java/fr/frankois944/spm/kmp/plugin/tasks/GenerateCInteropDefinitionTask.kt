@@ -116,7 +116,6 @@ internal abstract class GenerateCInteropDefinitionTask
                 "-L/usr/lib/swift",
                 "-$linkerPlatformVersion",
                 osVersion,
-                osVersion,
                 "-L$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.sdk()}",
             ).joinToString(" ")
         }
