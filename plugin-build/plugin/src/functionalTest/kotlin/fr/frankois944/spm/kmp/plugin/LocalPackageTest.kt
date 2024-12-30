@@ -2,7 +2,7 @@ package fr.frankois944.spm.kmp.plugin
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
 import fr.frankois944.spm.kmp.plugin.fixture.KotlinSource
 import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
 import fr.frankois944.spm.kmp.plugin.fixture.SwiftSource
@@ -34,10 +34,11 @@ class LocalPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
+                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64)
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftPackageDependencyDefinition.Local(
+                            SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
                                 packageName = "LocalDummyFramework",
                             ),

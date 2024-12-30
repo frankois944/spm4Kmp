@@ -2,7 +2,7 @@ package fr.frankois944.spm.kmp.plugin
 
 import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
 import fr.frankois944.spm.kmp.plugin.fixture.KotlinSource
 import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
 import fr.frankois944.spm.kmp.plugin.fixture.SwiftSource
@@ -35,7 +35,7 @@ class RemotePackageTest {
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftPackageDependencyDefinition.RemoteDefinition.Version(
+                            SwiftDependency.Package.Remote.Version(
                                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                                 names = listOf("CryptoSwift"),
                                 version = "1.8.3",
@@ -85,7 +85,7 @@ class RemotePackageTest {
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftPackageDependencyDefinition.RemoteDefinition.Branch(
+                            SwiftDependency.Package.Remote.Branch(
                                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                                 names = listOf("CryptoSwift"),
                                 packageName = "CryptoSwift",
@@ -136,7 +136,7 @@ class RemotePackageTest {
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftPackageDependencyDefinition.RemoteDefinition.Commit(
+                            SwiftDependency.Package.Remote.Commit(
                                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                                 names = listOf("CryptoSwift"),
                                 revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
@@ -186,7 +186,7 @@ class RemotePackageTest {
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftPackageDependencyDefinition.RemoteDefinition.Version(
+                            SwiftDependency.Package.Remote.Version(
                                 url = "https://github.com/firebase/firebase-ios-sdk.git",
                                 names = listOf("FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics"),
                                 version = "11.6.0",

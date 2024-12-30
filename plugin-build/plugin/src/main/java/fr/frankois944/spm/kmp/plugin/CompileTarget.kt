@@ -3,7 +3,7 @@ package fr.frankois944.spm.kmp.plugin
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
 @Suppress("EnumEntryName")
-internal enum class CompileTarget {
+public enum class CompileTarget {
     iosX64,
     iosArm64,
     iosSimulatorArm64,
@@ -17,9 +17,9 @@ internal enum class CompileTarget {
     macosArm64,
     ;
 
-    fun getTriple(version: String): String = "${this.arch()}-apple-${this.osCompiler()}$version${this.simulatorSuffix()}"
+    internal fun getTriple(version: String): String = "${this.arch()}-apple-${this.osCompiler()}$version${this.simulatorSuffix()}"
 
-    fun getPackageBuildDir(): String = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"
+    internal fun getPackageBuildDir(): String = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"
 
     private fun osCompiler(): String =
         when (this) {
@@ -74,7 +74,7 @@ internal enum class CompileTarget {
             macosArm64 -> ""
         }
 
-    fun getOsVersion(
+    internal fun getOsVersion(
         minIos: String,
         minWatchos: String,
         minTvos: String,

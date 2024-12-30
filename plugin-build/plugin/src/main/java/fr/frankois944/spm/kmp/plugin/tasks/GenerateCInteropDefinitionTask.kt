@@ -1,7 +1,7 @@
 package fr.frankois944.spm.kmp.plugin.tasks
 
 import fr.frankois944.spm.kmp.plugin.CompileTarget
-import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
 import fr.frankois944.spm.kmp.plugin.operations.getXcodeDevPath
 import fr.frankois944.spm.kmp.plugin.operations.getXcodeVersion
 import org.gradle.api.DefaultTask
@@ -33,7 +33,7 @@ internal abstract class GenerateCInteropDefinitionTask
         @get:InputDirectory val packageBuildOutputDirectory: File,
         @get:Input val target: CompileTarget,
         @get:Input val productName: String,
-        @get:Input val packages: List<SwiftPackageDependencyDefinition>,
+        @get:Input val packages: List<SwiftDependency>,
         @get:Input val debugMode: Boolean,
         @get:Input val osVersion: String,
     ) : DefaultTask() {
@@ -97,7 +97,11 @@ internal abstract class GenerateCInteropDefinitionTask
                         .filter {
                             it.export
                         }.flatMap {
-                            it.names
+                            if (it is SwiftDependency.Package.Remote) {
+                                it.names
+                            } else {
+                                listOf(it.packageName)
+                            }
                         },
                 )
             }.distinct()

@@ -2,7 +2,7 @@ package fr.frankois944.spm.kmp.plugin
 
 import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
 import fr.frankois944.spm.kmp.plugin.fixture.KotlinSource
 import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
 import fr.frankois944.spm.kmp.plugin.fixture.SwiftSource
@@ -36,7 +36,7 @@ class BinaryPackageTest {
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftPackageDependencyDefinition.RemoteBinary(
+                            SwiftDependency.Binary.Remote(
                                 url = "https://raw.githubusercontent.com/frankois944/swift-klib-plugin/refs/heads/swift-spm-local-remote-lib/plugin/src/functionalTest/resources/DummyFramework.xcframework.zip",
                                 checksum = "20f6264c95e80b6e2da7d2c9b9abe44b4426dac799927ea49fb7a4982f1affdb",
                                 packageName = "DummyFramework",
@@ -82,7 +82,7 @@ class BinaryPackageTest {
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftPackageDependencyDefinition.LocalBinary(
+                            SwiftDependency.Binary.Local(
                                 path = xcframeworkDirectory.absolutePath,
                                 packageName = "DummyFramework",
                             ),

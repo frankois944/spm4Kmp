@@ -31,5 +31,5 @@ public abstract class PackageRootDefinitionExtension
          * this should be set at false for production/release distribution
          */
         public var debug: Boolean = true
-        public val packages: MutableList<SwiftPackageDependencyDefinition> = mutableListOf()
+        public val packages: MutableList<SwiftDependency> = mutableListOf()
     }

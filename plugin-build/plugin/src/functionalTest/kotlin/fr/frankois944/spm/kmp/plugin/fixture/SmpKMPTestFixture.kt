@@ -6,7 +6,8 @@ import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
-import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import fr.frankois944.spm.kmp.plugin.CompileTarget
+import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
 import org.gradle.internal.cc.base.logger
 
 abstract class SmpKMPTestFixture private constructor(
@@ -25,9 +26,10 @@ abstract class SmpKMPTestFixture private constructor(
         var minTvos: String = "12.0",
         var minWatchos: String = "4.0",
         var toolsVersion: String = "5.9",
+        var targets: List<CompileTarget> = listOf(CompileTarget.iosArm64, CompileTarget.iosSimulatorArm64),
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
-        val packages: List<SwiftPackageDependencyDefinition> = emptyList(),
+        val packages: List<SwiftDependency> = emptyList(),
     )
 
     protected abstract fun createProject(): GradleProject
@@ -68,7 +70,7 @@ abstract class SmpKMPTestFixture private constructor(
 
     private fun Subproject.Builder.setupGradleConfig(extension: TestConfiguration) {
         withBuildScript {
-            imports = Imports.of("fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition")
+            imports = Imports.of("fr.frankois944.spm.kmp.plugin.definition.SwiftDependency")
             sourceSets("iosMain", "tvosMain", "watchosMain", "macosMain")
             plugins(
                 Plugin.of("org.jetbrains.kotlin.multiplatform", "2.1.0"),
@@ -99,46 +101,44 @@ swiftPackageConfig {
                 extension.packages.forEach { definition ->
                     append("    packages.add(\n     ")
                     when (definition) {
-                        is SwiftPackageDependencyDefinition.Local -> {
-                            append("SwiftPackageDependencyDefinition.Local(")
+                        is SwiftDependency.Package.Local -> {
+                            append("SwiftDependency.Package.Local(")
                             append("path = \"${definition.path}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("packageName = \"${definition.packageName}\"")
                         }
 
-                        is SwiftPackageDependencyDefinition.LocalBinary -> {
-                            append("SwiftPackageDependencyDefinition.LocalBinary(")
+                        is SwiftDependency.Binary.Local -> {
+                            append("SwiftDependency.Binary.Local(")
                             append("path = \"${definition.path}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("packageName = \"${definition.packageName}\"")
                         }
 
-                        is SwiftPackageDependencyDefinition.RemoteBinary -> {
-                            append("SwiftPackageDependencyDefinition.RemoteBinary(")
+                        is SwiftDependency.Binary.Remote -> {
+                            append("SwiftDependency.Binary.Remote(")
                             append("url = \"${definition.url}\",")
                             append("checksum = \"${definition.checksum}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("packageName = \"${definition.packageName}\"")
                         }
 
-                        is SwiftPackageDependencyDefinition.RemoteDefinition.Branch -> {
-                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Branch(")
+                        is SwiftDependency.Package.Remote.Branch -> {
+                            append("SwiftDependency.Package.Remote.Branch(")
                             append("url = \"${definition.url}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("branch = \"${definition.branch}\",")
                             append("packageName = \"${definition.packageName}\"")
                         }
 
-                        is SwiftPackageDependencyDefinition.RemoteDefinition.Commit -> {
-                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Commit(")
+                        is SwiftDependency.Package.Remote.Commit -> {
+                            append("SwiftDependency.Package.Remote.Commit(")
                             append("url = \"${definition.url}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("revision = \"${definition.revision}\",")
                             append("packageName = \"${definition.packageName}\"")
                         }
 
-                        is SwiftPackageDependencyDefinition.RemoteDefinition.Version -> {
-                            append("SwiftPackageDependencyDefinition.RemoteDefinition.Version(")
+                        is SwiftDependency.Package.Remote.Version -> {
+                            append("SwiftDependency.Package.Remote.Version(")
                             append("url = \"${definition.url}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("version = \"${definition.version}\",")
@@ -149,13 +149,12 @@ swiftPackageConfig {
                 }
                 append("}\n")
             }
+        val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
             """
 kotlin {
     listOf(
-       // iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
+       $targets
     ).forEach {
         it.compilations {
             val main by getting {
@@ -187,7 +186,12 @@ $pluginBlock
                 config = config.copy(kotlinSources = sources.toList())
             }
 
-        fun withDependencies(definitions: List<SwiftPackageDependencyDefinition>) =
+        fun withTargets(vararg targets: CompileTarget) =
+            apply {
+                config = config.copy(targets = targets.toList())
+            }
+
+        fun withDependencies(definitions: List<SwiftDependency>) =
             apply {
                 config = config.copy(packages = definitions)
             }

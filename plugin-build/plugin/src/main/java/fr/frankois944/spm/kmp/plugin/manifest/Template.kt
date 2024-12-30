@@ -1,12 +1,12 @@
 package fr.frankois944.spm.kmp.plugin.manifest
 
-import fr.frankois944.spm.kmp.plugin.definition.SwiftPackageDependencyDefinition
+import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.relativeToOrSelf
 
 internal fun generateManifest(
-    dependencies: List<SwiftPackageDependencyDefinition>,
+    dependencies: List<SwiftDependency>,
     generatedPackageDirectory: Path,
     productName: String,
     minIos: String,
@@ -72,7 +72,7 @@ private fun getPlatformBlock(
 
 private fun getProductsTargets(
     cinteropName: String,
-    dependencies: List<SwiftPackageDependencyDefinition>,
+    dependencies: List<SwiftDependency>,
 ): String =
     buildList {
         add("\"$cinteropName\"")
@@ -83,7 +83,7 @@ private fun getProductsTargets(
             }
     }.joinToString(",")
 
-private fun getDependencies(dependencies: List<SwiftPackageDependencyDefinition>): String =
+private fun getDependencies(dependencies: List<SwiftDependency>): String =
     buildList {
         dependencies
             .filter { !it.isBinaryDependency }
@@ -94,13 +94,13 @@ private fun getDependencies(dependencies: List<SwiftPackageDependencyDefinition>
             }
     }.joinToString(",")
 
-private fun getDependenciesTargets(dependencies: List<SwiftPackageDependencyDefinition>): String =
+private fun getDependenciesTargets(dependencies: List<SwiftDependency>): String =
     buildList {
         dependencies
             .forEach { dependency ->
                 if (dependency.isBinaryDependency) {
                     add("\"${dependency.packageName}\"")
-                } else {
+                } else if (dependency is SwiftDependency.Package) {
                     dependency.names.forEach { library ->
                         add(".product(name: \"${library}\", package: \"${dependency.packageName}\")")
                     }
@@ -109,61 +109,29 @@ private fun getDependenciesTargets(dependencies: List<SwiftPackageDependencyDefi
     }.joinToString(",\n")
 
 private fun buildLocaleBinary(
-    dependencies: List<SwiftPackageDependencyDefinition>,
+    dependencies: List<SwiftDependency>,
     swiftBuildDir: Path,
 ): String =
     buildList {
         dependencies
-            .filterIsInstance<SwiftPackageDependencyDefinition.LocalBinary>()
+            .filterIsInstance<SwiftDependency.Binary.Local>()
             .forEach { dependency ->
                 // package path MUST be relative to somewhere, let's choose the swiftBuildDir
                 val path = Path(dependency.path).relativeToOrSelf(swiftBuildDir)
-                add(".binaryTarget(name: \"${dependency.names.first()}\", path:\"${path}\")")
+                add(".binaryTarget(name: \"${dependency.packageName}\", path:\"${path}\")")
             }
     }.joinToString(",\n")
 
-private fun buildRemoteBinary(dependencies: List<SwiftPackageDependencyDefinition>): String =
+private fun buildRemoteBinary(dependencies: List<SwiftDependency>): String =
     buildList {
         dependencies
-            .filterIsInstance<SwiftPackageDependencyDefinition.RemoteBinary>()
+            .filterIsInstance<SwiftDependency.Binary.Remote>()
             .forEach { dependency ->
                 // checksum is MANDATORY
                 add(
-                    ".binaryTarget(name: \"${dependency.names.first()}\", " +
+                    ".binaryTarget(name: \"${dependency.packageName}\", " +
                         "url:\"${dependency.url}\", " +
                         "checksum:\"${dependency.checksum}\")",
                 )
             }
     }.joinToString(",\n")
-
-private val SwiftPackageDependencyDefinition.isBinaryDependency: Boolean
-    get() =
-        (this is SwiftPackageDependencyDefinition.LocalBinary) ||
-            (this is SwiftPackageDependencyDefinition.RemoteBinary)
-
-private fun SwiftPackageDependencyDefinition.toDependencyDeclaration(): String? =
-    when (this) {
-        is SwiftPackageDependencyDefinition.Local ->
-            """
-            .package(path: "$path")
-            """.trimIndent()
-
-        is SwiftPackageDependencyDefinition.RemoteDefinition.Version ->
-            """
-            .package(url: "$url", exact: "$version")
-            """.trimIndent()
-
-        is SwiftPackageDependencyDefinition.RemoteDefinition.Commit -> {
-            """
-            .package(url: "$url", revision: "$revision")
-            """.trimIndent()
-        }
-
-        is SwiftPackageDependencyDefinition.RemoteDefinition.Branch ->
-            """
-            .package(url: "$url", branch: "$branch")
-            """.trimIndent()
-
-        is SwiftPackageDependencyDefinition.LocalBinary -> null
-        is SwiftPackageDependencyDefinition.RemoteBinary -> null
-    }
