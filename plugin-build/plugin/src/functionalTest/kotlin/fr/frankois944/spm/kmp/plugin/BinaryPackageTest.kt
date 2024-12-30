@@ -33,6 +33,7 @@ class BinaryPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
+                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64, CompileTarget.iosArm64)
                 .withDependencies(
                     buildList {
                         add(
@@ -74,7 +75,7 @@ class BinaryPackageTest {
 
     @Test
     fun `build with local binaru package`() {
-        val xcframeworkDirectory = File("src/functionalTest/resources/DummyFramework.xcframework")
+        val xcFrameworkDirectory = File("src/functionalTest/resources/DummyFramework.xcframework")
         // Given
         val fixture =
             SmpKMPTestFixture
@@ -83,7 +84,7 @@ class BinaryPackageTest {
                     buildList {
                         add(
                             SwiftDependency.Binary.Local(
-                                path = xcframeworkDirectory.absolutePath,
+                                path = xcFrameworkDirectory.absolutePath,
                                 packageName = "DummyFramework",
                             ),
                         )

@@ -34,7 +34,7 @@ class LocalPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64)
+                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64, CompileTarget.iosArm64)
                 .withDependencies(
                     buildList {
                         add(
