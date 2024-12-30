@@ -25,7 +25,7 @@ internal const val TASK_LINK_CINTEROP_DEF: String = "linkCInteropDefinition"
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SPMKMPPlugin : Plugin<Project> {
     private fun Project.resolvePath(destination: File): File =
-        if (destination.startsWith("/")) {
+        if (destination.isAbsolute) {
             destination
         } else {
             project.layout.projectDirectory.asFile

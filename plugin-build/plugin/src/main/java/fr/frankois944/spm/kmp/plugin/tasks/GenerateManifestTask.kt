@@ -57,10 +57,11 @@ internal abstract class GenerateManifestTask
                     toolsVersion = toolsVersion,
                 )
             packageDirectory.resolve("Package.swift").writeText(manifest)
-            logger.debug(
+            logger.warn(
                 """
                 Manifest file generated :
                 ${packageDirectory.resolve("Package.swift")}
+                ${packageDirectory.resolve("Package.swift").readText()}
                 """.trimIndent(),
             )
             operation.resolvePackage(packageDirectory, scratchDirectory)

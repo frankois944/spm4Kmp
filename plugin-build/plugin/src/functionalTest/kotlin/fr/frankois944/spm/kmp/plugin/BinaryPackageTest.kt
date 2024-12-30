@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
 
-class BinaryModuleTest {
+class BinaryPackageTest {
     private var folderTopOpen: String? = null
 
     @RegisterExtension
@@ -73,7 +73,7 @@ class BinaryModuleTest {
     }
 
     @Test
-    fun `build with local binaru packages`() {
+    fun `build with local binaru package`() {
         val xcframeworkDirectory = File("src/functionalTest/resources/DummyFramework.xcframework")
         // Given
         val fixture =

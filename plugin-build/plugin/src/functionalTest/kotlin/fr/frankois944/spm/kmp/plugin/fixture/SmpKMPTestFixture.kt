@@ -103,6 +103,7 @@ swiftPackageConfig {
                             append("SwiftPackageDependencyDefinition.Local(")
                             append("path = \"${definition.path}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("packageName = \"${definition.packageName}\"")
                         }
 
                         is SwiftPackageDependencyDefinition.LocalBinary -> {
