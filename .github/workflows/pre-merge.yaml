@@ -31,4 +31,4 @@ jobs:
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
       - name: Run Gradle tasks
-        run: ./gradlew preMerge --debug --continue
+        run: ./gradlew preMerge --continue

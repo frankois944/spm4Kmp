@@ -157,22 +157,22 @@ swiftPackageConfig {
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
             """
-kotlin {
-    listOf(
-       $targets
-    ).forEach {
-        it.compilations {
-            val main by getting {
-                cinterops.create("${configuration.cinteropsName}")
+            kotlin {
+                listOf(
+                   $targets
+                ).forEach {
+                    it.compilations {
+                        val main by getting {
+                            cinterops.create("${configuration.cinteropsName}")
+                        }
+                    }
+                    it.binaries.framework {
+                        baseName = "shared"
+                        isStatic = true
+                    }
+                }
             }
-        }
-        it.binaries.framework {
-            baseName = "shared"
-            isStatic = true
-        }
-    }
-}
-$pluginBlock
+            $pluginBlockpluginBlock
             """.trimIndent()
         logger.debug(script)
         return script
