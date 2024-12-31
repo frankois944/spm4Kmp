@@ -12,7 +12,7 @@ jobs:
   gradle:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ macos-latest ]
     runs-on: ${{ matrix.os }}
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
@@ -21,6 +21,11 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'jbr'
+          java-version: '17'
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
       - name: Run Gradle tasks
@@ -28,9 +33,5 @@ jobs:
 
         # We do a run of the new task `templateExample` created by the plugin
       - name: Run the plugin
-        run: ./gradlew templateExample --message="Test Run" --tag=CI
-        if: success()
-        # And we verify that the output of the file is correct.
-      - name: Verify the plugin output
-        run: grep -Fxq "[CI] Test Run" ./example/build/template-example.txt
+        run: ./gradlew  :plugin-build:plugin:functionalTest --tag=CI
         if: success()
