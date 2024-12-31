@@ -75,12 +75,18 @@ internal abstract class GenerateCInteropDefinitionTask
         }
 
         private fun extractHeadersPathFromModuleMap(module: String): List<File> {
-            val regex = """header\s+"([^"]+)"""".toRegex()
+            val regex = """header\s+"([^"]+)"""".toRegex() // TODO: find a better regex to extract the header value
             return regex
                 .find(module)
                 ?.groupValues
-                ?.map { File(it.replace("header", "").trim()) }
-                ?.map { file ->
+                ?.map {
+                    File(
+                        it
+                            .replace("header", "")
+                            .replace("\"", "")
+                            .trim(),
+                    )
+                }?.map { file ->
                     if (file.extension == "h") {
                         file.parentFile
                     } else {
@@ -117,10 +123,12 @@ internal abstract class GenerateCInteropDefinitionTask
                 }
 
             return listOf(
-                "-L/usr/lib/swift",
                 "-$linkerPlatformVersion",
                 osVersion,
-                "-L$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.sdk()}",
+                osVersion,
+                "-rpath",
+                "/usr/lib/swift",
+                "-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.sdk()}\"",
             ).joinToString(" ")
         }
 
@@ -197,12 +205,12 @@ internal abstract class GenerateCInteropDefinitionTask
 
                             staticLibraries = lib$productName.a
                             libraryPaths = "${getBuildDirectory().path}"
-                            compilerOpts = -ObjC -fmodules -I"${headersPath.joinToString("\" -I\"")}"
+                            compilerOpts = -ObjC -fmodules ${headersPath.joinToString(" ") { "-I\"${it.path}\"" }}
                             linkerOpts = ${getExtraLinkers()}
                             """.trimIndent(),
                         )
                     }
-                    logger.warn(
+                    logger.debug(
                         """
 Definition File : ${moduleConfig.definitionFile.name}
 At Path: ${moduleConfig.definitionFile.path}

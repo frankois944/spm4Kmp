@@ -20,7 +20,7 @@ public sealed interface SwiftDependency : Serializable {
             // must be an absolute path
             val path: String,
             override val packageName: String,
-            override val export: Boolean = true,
+            override val export: Boolean = false,
         ) : Binary
 
         /**
@@ -38,7 +38,7 @@ public sealed interface SwiftDependency : Serializable {
         public data class Remote(
             val url: String,
             override val packageName: String,
-            override val export: Boolean = true,
+            override val export: Boolean = false,
             val checksum: String,
         ) : Binary
     }
@@ -59,7 +59,7 @@ public sealed interface SwiftDependency : Serializable {
             val path: String,
             override val packageName: String,
             override val names: List<String> = listOf(packageName),
-            override val export: Boolean = true,
+            override val export: Boolean = false,
         ) : Package
 
         public sealed interface Remote : Package {
@@ -69,7 +69,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: String,
                 public override val names: List<String>,
                 public override val packageName: String = names.first(),
-                override val export: Boolean = true,
+                override val export: Boolean = false,
                 public val version: String,
             ) : Remote
 
@@ -77,7 +77,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: String,
                 public override val names: List<String>,
                 public override val packageName: String = names.first(),
-                override val export: Boolean = true,
+                override val export: Boolean = false,
                 public val branch: String,
             ) : Remote
 
@@ -85,7 +85,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: String,
                 public override val names: List<String>,
                 public override val packageName: String = names.first(),
-                override val export: Boolean = true,
+                override val export: Boolean = false,
                 public val revision: String,
             ) : Remote
         }

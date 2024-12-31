@@ -24,7 +24,7 @@ fun assertPackageResolved(
             fixture.gradleProject.rootDir,
             "library/build/spmKmpPlugin/",
         )
-    logger.warn(
+    logger.debug(
         """
         Build Dir : ${File(fixture.gradleProject.rootDir, "library/build/spmKmpPlugin/")}
         """.trimIndent(),

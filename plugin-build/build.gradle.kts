@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.autonomousapps.testkit) apply false
-    id("io.kotest") version "0.4.11" apply (false)
 }
 
 allprojects {

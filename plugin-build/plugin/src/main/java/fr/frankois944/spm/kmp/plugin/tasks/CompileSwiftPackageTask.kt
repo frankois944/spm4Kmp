@@ -41,8 +41,8 @@ internal abstract class CompileSwiftPackageTask
         private fun copyOriginalPackageScratchDir() {
             if (!packageScratchDir.exists()) {
                 packageScratchDir.mkdirs()
+                originalPackageScratchDir.copyRecursively(packageScratchDir)
             }
-            originalPackageScratchDir.copyRecursively(packageScratchDir)
         }
 
         private fun prepareWorkingDir(): File {

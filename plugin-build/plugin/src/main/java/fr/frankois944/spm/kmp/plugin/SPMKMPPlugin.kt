@@ -43,7 +43,9 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
             val extension = extensions.create(EXTENSION_NAME, PackageRootDefinitionExtension::class.java, project)
 
             // load the multiplatform extension and configuration
-            plugins.apply("org.jetbrains.kotlin.multiplatform")
+            if (!plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+                throw RuntimeException("The plugin SPMKMPPlugin requires the kotlin multiplatform plugin")
+            }
             val kotlinExtension = project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
             val sourcePackageDir =
@@ -86,7 +88,7 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                             GenerateManifestTask::class.java,
                             // ...constructorArgs =
                             extension.packages,
-                            extension.productName,
+                            extension.cinteropsName,
                             extension.minIos,
                             extension.minTvos,
                             extension.minMacos,
@@ -141,7 +143,7 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                                 // ...constructorArgs =
                                 targetPackageScratchDir,
                                 cinteropTarget,
-                                extension.productName,
+                                extension.cinteropsName,
                                 extension.packages,
                                 extension.debug,
                                 cinteropTarget.getOsVersion(

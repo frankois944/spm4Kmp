@@ -57,7 +57,7 @@ internal abstract class GenerateManifestTask
                     toolsVersion = toolsVersion,
                 )
             packageDirectory.resolve("Package.swift").writeText(manifest)
-            logger.warn(
+            logger.debug(
                 """
                 Manifest file generated :
                 ${packageDirectory.resolve("Package.swift")}

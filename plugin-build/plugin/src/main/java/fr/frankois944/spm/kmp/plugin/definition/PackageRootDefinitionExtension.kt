@@ -18,8 +18,8 @@ public abstract class PackageRootDefinitionExtension
     constructor(
         project: Project,
     ) {
+        public var cinteropsName: String = ""
         public var customPackageSourcePath: String = Path(project.projectDir.path, "src", "swift").pathString
-        public var productName: String = "productBinary"
         public var minIos: String = "12.0"
         public var minMacos: String = "10.13"
         public var minTvos: String = "12.0"

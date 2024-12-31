@@ -10,3 +10,4 @@
 /.idea/assetWizardSettings.xml
 build
 plugin-build/plugin/src/functionalTest/resources/LocalDummyFramework/.build
+.kotlin

@@ -20,7 +20,7 @@ abstract class SmpKMPTestFixture private constructor(
 
     data class TestConfiguration(
         var customPackageSourcePath: String = "src/swift",
-        var productName: String = "dummy",
+        var cinteropsName: String = "dummy",
         var minIos: String = "12.0",
         var minMacos: String = "10.13",
         var minTvos: String = "12.0",
@@ -89,9 +89,9 @@ abstract class SmpKMPTestFixture private constructor(
                 append(
                     """
 swiftPackageConfig {
+    cinteropsName = "${extension.cinteropsName}"
     customPackageSourcePath = "${extension.customPackageSourcePath}"
     toolsVersion = "${extension.toolsVersion}"
-    productName = "${extension.productName}"
     minIos = "${extension.minIos}"
     minMacos = "${extension.minMacos}"
     minTvos = "${extension.minTvos}"
@@ -158,7 +158,7 @@ kotlin {
     ).forEach {
         it.compilations {
             val main by getting {
-                cinterops.create("${configuration.productName}")
+                cinterops.create("${configuration.cinteropsName}")
             }
         }
         it.binaries.framework {
@@ -169,7 +169,7 @@ kotlin {
 }
 $pluginBlock
             """.trimIndent()
-        logger.warn(script)
+        logger.debug(script)
         return script
     }
 
