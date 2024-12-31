@@ -5,7 +5,10 @@ import fr.frankois944.spmForKmp.plugin.definition.SwiftDependency
 import fr.frankois944.spmForKmp.plugin.operations.getXcodeDevPath
 import fr.frankois944.spmForKmp.plugin.operations.getXcodeVersion
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import java.io.File
 import javax.inject.Inject
@@ -59,10 +62,11 @@ internal abstract class GenerateCInteropDefinitionTask
                 .resolve(target.getPackageBuildDir())
                 .resolve(if (debugMode) "debug" else "release")
 
-        private fun getBuildDirectoriesContent(): Array<File> =
+        private fun getBuildDirectoriesContent(): List<File> =
             getBuildDirectory() // get folders with headers for internal dependencies
-                .listFiles { it -> (it.extension == "build" || it.extension == "framework") }
-                ?: emptyArray()
+                .listFiles { file -> (file.extension == "build" || file.extension == "framework") }
+                ?.toList()
+                .orEmpty()
 
         private fun extractModuleNameFromModuleMap(module: String): String? {
             val regex = """module\s+(\w+)""".toRegex()
@@ -75,7 +79,10 @@ internal abstract class GenerateCInteropDefinitionTask
         }
 
         private fun extractHeadersPathFromModuleMap(module: String): List<File> {
-            val regex = """header\s+"([^"]+)"""".toRegex() // TODO: find a better regex to extract the header value
+            /*
+             * find a better regex to extract the header value
+             */
+            val regex = """header\s+"([^"]+)"""".toRegex()
             return regex
                 .find(module)
                 ?.groupValues
@@ -92,7 +99,7 @@ internal abstract class GenerateCInteropDefinitionTask
                     } else {
                         file
                     }
-                } ?: emptyList()
+                }.orEmpty()
         }
 
         private fun getModuleNames(): List<String> =
@@ -116,6 +123,7 @@ internal abstract class GenerateCInteropDefinitionTask
             val xcodeDevPath = operation.getXcodeDevPath()
 
             val linkerPlatformVersion =
+                @Suppress("MagicNumber")
                 if (operation.getXcodeVersion().toDouble() >= 15) {
                     target.linkerPlatformVersionName()
                 } else {
@@ -132,6 +140,7 @@ internal abstract class GenerateCInteropDefinitionTask
             ).joinToString(" ")
         }
 
+        @Suppress("LongMethod")
         @TaskAction
         fun generateDefinitions() {
             val moduleConfigs = mutableListOf<ModuleConfig>()

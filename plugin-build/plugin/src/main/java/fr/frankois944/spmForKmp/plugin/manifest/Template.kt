@@ -5,6 +5,7 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.relativeToOrSelf
 
+@Suppress("LongParameterList")
 internal fun generateManifest(
     dependencies: List<SwiftDependency>,
     generatedPackageDirectory: Path,

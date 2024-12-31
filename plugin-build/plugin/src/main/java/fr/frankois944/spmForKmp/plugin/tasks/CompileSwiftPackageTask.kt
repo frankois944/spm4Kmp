@@ -13,6 +13,7 @@ import java.io.File
 import javax.inject.Inject
 
 internal abstract class CompileSwiftPackageTask
+    @Suppress("LongParameterList")
     @Inject
     constructor(
         @get:InputFile

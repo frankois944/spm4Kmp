@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
  * Internal methods and properties are primarily used for specifying target details
  * in the context of building, linking, or generating compiler-specific configurations.
  */
-@Suppress("EnumEntryName")
+@Suppress("EnumEntryName", "EnumNaming")
 public enum class CompileTarget {
     iosX64,
     iosArm64,
@@ -40,6 +40,7 @@ public enum class CompileTarget {
     macosArm64,
     ;
 
+    @Suppress("MaxLineLength")
     internal fun getTriple(version: String): String = "${this.arch()}-apple-${this.osCompiler()}$version${this.simulatorSuffix()}"
 
     internal fun getPackageBuildDir(): String = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"

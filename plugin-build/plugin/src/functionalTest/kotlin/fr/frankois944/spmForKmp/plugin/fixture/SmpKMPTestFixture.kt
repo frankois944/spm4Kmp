@@ -88,13 +88,13 @@ abstract class SmpKMPTestFixture private constructor(
                 append(
                     """
 swiftPackageConfig {
-    customPackageSourcePath= "${extension.customPackageSourcePath}"
+    create("${extension.cinteropsName}") {
+    customPackageSourcePath = "${extension.customPackageSourcePath}"
     toolsVersion = "${extension.toolsVersion}"
     minIos = "${extension.minIos}"
     minMacos = "${extension.minMacos}"
     minTvos = "${extension.minTvos}"
     minWatchos = "${extension.minWatchos}"
-    create("${extension.cinteropsName}") {
 """,
                 )
                 extension.packages.forEach { definition ->

@@ -50,7 +50,8 @@ public abstract class PackageRootDefinitionExtension
          *
          * This property defines the macOS version targeted by the Swift package and its dependencies.
          * Used during the generation of SPM manifests and the compilation of Swift packages to ensure compatibility
-         * with the specified macOS version. It is a required property that influences the resulting build configuration.
+         * with the specified macOS version.
+         * It is a required property that influences the resulting build configuration.
          *
          * Default value: "10.13".
          */
@@ -102,13 +103,15 @@ public abstract class PackageRootDefinitionExtension
          * This property is mutable and holds a list of [SwiftDependency] instances. It is used to accumulate and manage
          * dependencies added through the `dependency` method in the containing class.
          */
-        internal var packageDependencies: MutableList<SwiftDependency> = mutableListOf()
+        internal val packageDependencies: MutableList<SwiftDependency> = mutableListOf()
 
         /**
          * Adds a Swift dependency to the package dependencies list.
          *
-         * @param dependency The Swift dependency to be added. This can include local or remote dependencies in the form of
-         * Swift packages or binary `xcframework` bundles. It supports different dependency models such as local, versioned
+         * @param dependency The Swift dependency to be added.
+         * This can include local or remote dependencies in the form of
+         * Swift packages or binary `xcframework` bundles.
+         * It supports different dependency models such as local, versioned
          * remote, branch-based remote, or commit-based remote dependencies.
          */
         public fun dependency(dependency: SwiftDependency) {

@@ -3,13 +3,15 @@ package fr.frankois944.spmForKmp.plugin.definition
 import java.io.Serializable
 
 /**
- * Represents a Swift dependency within a Kotlin Multiplatform project. This sealed interface serves as the base type for
- * various Swift dependency configurations, including binary and package dependencies. Dependencies can be local or remote.
+ * Represents a Swift dependency within a Kotlin Multiplatform project. This sealed interface serves as the base type
+ * for various Swift dependency configurations, including binary and package dependencies.
+ * Dependencies can be local or remote.
  *
- * @property packageName The name of the package associated with the dependency. This is utilized for identification within
+ * @property packageName The name of the package associated with the dependency.
+ * This is utilized for identification within
  * the Swift package ecosystem.
- * @property exportToKotlin A flag indicating whether the dependency's API should be exported to Kotlin code. By default,
- * this is set to `false`.
+ * @property exportToKotlin A flag indicating whether the dependency's API should be exported to Kotlin code.
+ * By default, this is set to `false`.
  */
 public sealed interface SwiftDependency : Serializable {
     public val packageName: String
@@ -69,11 +71,12 @@ public sealed interface SwiftDependency : Serializable {
             public val url: String
 
             /**
-             * Represents a specific version of a remote Swift package to be used as a dependency in a Kotlin Multiplatform project.
+             * Represents a specific version of a remote Swift package to be used
+             * as a dependency in a Kotlin Multiplatform project.
              *
              * @property url The URL of the remote Swift package repository.
              * @property names A list of possible names for the package used during dependency configuration.
-             * @property packageName The default name of the package, derived from the first entry in `names` by default.
+             * @property packageName The default name of the package, from the first entry in `names` by default.
              * @property exportToKotlin A flag indicating whether the package should be exported to Kotlin.
              * @property version The specific version of the Swift package to be imported.
              */
@@ -89,8 +92,10 @@ public sealed interface SwiftDependency : Serializable {
              * Represents a branch-based remote Swift dependency in a Kotlin Multiplatform project.
              *
              * @property url The URL of the remote Git repository where the package is hosted.
-             * @property names A list of name components identifying the package. Typically, this includes the package name.
-             * @property packageName The name of the package being declared. Defaults to the first name in the `names` list.
+             * @property names A list of name components identifying the package.
+             * Typically, this includes the package name.
+             * @property packageName The name of the package being declared.
+             * Defaults to the first name in the `names` list.
              * @property exportToKotlin Indicates whether the package should be exported for use in Kotlin code.
              * @property branch The branch name of the remote Git repository used for the dependency.
              */

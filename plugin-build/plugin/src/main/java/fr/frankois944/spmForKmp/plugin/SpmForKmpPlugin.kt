@@ -35,6 +35,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 .resolve(destination)
         }
 
+    @Suppress("LongMethod", "CyclomaticComplexMethod")
     override fun apply(target: Project): Unit =
         with(target) {
             if (!HostManager.hostIsMac) {
@@ -92,8 +93,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
                 val userSourcePackageDir =
                     resolvePath(File(extension.customPackageSourcePath))
-                        .also {
-                            it.mkdirs()
+                        .also { dir ->
+                            dir.mkdirs()
                         }
 
                 val task1 =
@@ -220,13 +221,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
     private fun getTaskName(
         task: String,
         cinteropTarget: CompileTarget? = null,
-    ) = "${EXTENSION_NAME.capitalized()}${task.capitalized()}${cinteropTarget?.name?.capitalized() ?: ""}"
+    ) = "${EXTENSION_NAME.capitalized()}${task.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}"
 
     private fun getCInteropTaskName(
         name: String,
         cinteropTarget: CompileTarget?,
     ): String =
         buildString {
-            append("cinterop${name.capitalized()}${cinteropTarget?.name?.capitalized() ?: ""}")
+            append("cinterop${name.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}")
         }
 }
