@@ -26,7 +26,7 @@ internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
 
 @Suppress("UnnecessaryAbstractClass")
-public abstract class SPMKMPPlugin : Plugin<Project> {
+public abstract class SpmForKmpPlugin : Plugin<Project> {
     private fun Project.resolvePath(destination: File): File =
         if (destination.isAbsolute) {
             destination

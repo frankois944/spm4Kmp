@@ -2,6 +2,29 @@ package fr.frankois944.spmForKmp.plugin
 
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
+/**
+ * Represents different compilation targets for Apple platforms, including iOS, watchOS, tvOS, and macOS.
+ *
+ * Enum entries correspond to specific architectures (e.g., x64, arm64) and environments
+ * (e.g., simulator or real device).
+ *
+ * This class provides utility methods to retrieve target-specific details such as architecture,
+ * SDK names, triple identifiers, platform versions, and minimum OS versions.
+ *
+ * Utility methods:
+ * - `getTriple(version: String)`: Constructs a triple identifier for the target.
+ * - `getPackageBuildDir()`: Retrieves the build directory identifier specific to the target.
+ * - `sdk()`: Determines the SDK name for the target.
+ * - `getOsVersion(...)`: Resolves the minimum OS version for the target based on platform-specific inputs.
+ * - `linkerPlatformVersionName()`: Retrieves the linker platform version flag for the target.
+ * - `linkerMinOsVersionName()`: Retrieves the linker minimum OS version flag for the target.
+ *
+ * Companion object:
+ * - `byKonanName(konanName: String)`: Maps a Konan target name to the corresponding `CompileTarget` enum entry.
+ *
+ * Internal methods and properties are primarily used for specifying target details
+ * in the context of building, linking, or generating compiler-specific configurations.
+ */
 @Suppress("EnumEntryName")
 public enum class CompileTarget {
     iosX64,

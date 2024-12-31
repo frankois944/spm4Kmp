@@ -33,7 +33,7 @@ swiftPackageConfig {
                 names = listOf("FirebaseAnalytics", "FirebaseCore"),
                 packageName = "firebase-ios-sdk",
                 version = "11.6.0",
-                export = true,
+                exportToKotlin = true,
             ),
         )
     }

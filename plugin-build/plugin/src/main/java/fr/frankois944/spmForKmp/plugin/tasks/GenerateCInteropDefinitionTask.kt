@@ -101,7 +101,7 @@ internal abstract class GenerateCInteropDefinitionTask
                 addAll(
                     packages
                         .filter {
-                            it.export
+                            it.exportToKotlin
                         }.flatMap {
                             if (it is SwiftDependency.Package.Remote) {
                                 it.names
