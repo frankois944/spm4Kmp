@@ -19,21 +19,22 @@ kotlin {
 }
 
 swiftPackageConfig {
-    cinteropsName = "nativeExample"
-    packages.add(
-        SwiftDependency.Package.Remote.Version(
-            url = "https://github.com/krzyzanowskim/CryptoSwift.git",
-            names = listOf("CryptoSwift"),
-            version = "1.8.4",
-        ),
-    )
-    packages.add(
-        SwiftDependency.Package.Remote.Version(
-            url = "https://github.com/firebase/firebase-ios-sdk.git",
-            names = listOf("FirebaseAnalytics", "FirebaseCore"),
-            packageName = "firebase-ios-sdk",
-            version = "11.6.0",
-            export = true,
-        ),
-    )
+    create("nativeExample") {
+        dependency(
+            SwiftDependency.Package.Remote.Version(
+                url = "https://github.com/krzyzanowskim/CryptoSwift.git",
+                names = listOf("CryptoSwift"),
+                version = "1.8.4",
+            ),
+        )
+        dependency(
+            SwiftDependency.Package.Remote.Version(
+                url = "https://github.com/firebase/firebase-ios-sdk.git",
+                names = listOf("FirebaseAnalytics", "FirebaseCore"),
+                packageName = "firebase-ios-sdk",
+                version = "11.6.0",
+                export = true,
+            ),
+        )
+    }
 }

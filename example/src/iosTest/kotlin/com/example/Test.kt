@@ -1,7 +1,7 @@
 package com.example
 
-import kotlin.test.Test
 import nativeExample.TestClass
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)

@@ -6,21 +6,24 @@ import fr.frankois944.spm.kmp.plugin.definition.PackageRootDefinitionExtension
 import fr.frankois944.spm.kmp.plugin.tasks.CompileSwiftPackageTask
 import fr.frankois944.spm.kmp.plugin.tasks.GenerateCInteropDefinitionTask
 import fr.frankois944.spm.kmp.plugin.tasks.GenerateManifestTask
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.reflect.TypeOf
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import kotlin.reflect.javaType
+import kotlin.reflect.typeOf
 
 internal const val EXTENSION_NAME: String = "swiftPackageConfig"
 internal const val TASK_GENERATE_MANIFEST: String = "generateSwiftPackage"
 internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
-internal const val TASK_LINK_CINTEROP_DEF: String = "linkCInteropDefinition"
 
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SPMKMPPlugin : Plugin<Project> {
@@ -39,13 +42,23 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                 return
             }
 
-            // the plugin extension configuration
-            val extension = extensions.create(EXTENSION_NAME, PackageRootDefinitionExtension::class.java, project)
-
-            // load the multiplatform extension and configuration
+            // check if the multiplatform plugin is loaded
             if (!plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
                 throw RuntimeException("The plugin SPMKMPPlugin requires the kotlin multiplatform plugin")
             }
+
+            val swiftPackageEntries: NamedDomainObjectContainer<out PackageRootDefinitionExtension> =
+                objects.domainObjectContainer(PackageRootDefinitionExtension::class.java) { name ->
+                    objects.newInstance(PackageRootDefinitionExtension::class.java, name)
+                }
+
+            val type =
+                TypeOf.typeOf<NamedDomainObjectContainer<out PackageRootDefinitionExtension>>(
+                    typeOf<NamedDomainObjectContainer<PackageRootDefinitionExtension>>().javaType,
+                )
+
+            project.extensions.add(type, EXTENSION_NAME, swiftPackageEntries)
+
             val kotlinExtension = project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
             val sourcePackageDir =
@@ -65,13 +78,17 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                         it.mkdirs()
                     }
 
+            val originalPackageScratchDir =
+                resolvePath(sourcePackageDir)
+                    .resolve("scratch")
+                    .also {
+                        it.mkdirs()
+                    }
             afterEvaluate {
-                val originalPackageScratchDir =
-                    resolvePath(sourcePackageDir)
-                        .resolve("scratch")
-                        .also {
-                            it.mkdirs()
-                        }
+                val extension = swiftPackageEntries.first()
+                if (swiftPackageEntries.size > 1) {
+                    logger.warn("Only the first entry is currently supported, the other will be ignored")
+                }
 
                 val userSourcePackageDir =
                     resolvePath(File(extension.customPackageSourcePath))
@@ -87,8 +104,8 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                             // type =
                             GenerateManifestTask::class.java,
                             // ...constructorArgs =
-                            extension.packages,
-                            extension.cinteropsName,
+                            extension.packageDependencies,
+                            extension.name,
                             extension.minIos,
                             extension.minTvos,
                             extension.minMacos,
@@ -143,8 +160,8 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
                                 // ...constructorArgs =
                                 targetPackageScratchDir,
                                 cinteropTarget,
-                                extension.cinteropsName,
-                                extension.packages,
+                                extension.name,
+                                extension.packageDependencies,
                                 extension.debug,
                                 cinteropTarget.getOsVersion(
                                     minIos = extension.minIos,
@@ -187,6 +204,9 @@ public abstract class SPMKMPPlugin : Plugin<Project> {
 
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
+                    cinterop.onlyIf {
+                        plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")
+                    }
                     val cinteropTarget =
                         CompileTarget.byKonanName(cinterop.konanTarget.name)
                             ?: return@configureEach
