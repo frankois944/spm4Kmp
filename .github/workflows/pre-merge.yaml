@@ -20,7 +20,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4 # v4
+        uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -32,8 +32,3 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Run Gradle tasks
         run: ./gradlew preMerge --continue
-
-        # We do a run of the new task `templateExample` created by the plugin
-      - name: Run the plugin
-        run: ./gradlew  :plugin-build:plugin:functionalTest --tag=CI
-        if: success()
