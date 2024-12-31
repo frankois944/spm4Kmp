@@ -172,7 +172,7 @@ swiftPackageConfig {
                     }
                 }
             }
-            $pluginBlockpluginBlock
+            $pluginBlock
             """.trimIndent()
         logger.debug(script)
         return script
