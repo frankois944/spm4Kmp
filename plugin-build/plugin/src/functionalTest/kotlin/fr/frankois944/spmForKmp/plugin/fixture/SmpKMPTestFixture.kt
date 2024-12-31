@@ -146,7 +146,7 @@ swiftPackageConfig {
                     }
                     append(")\n     )\n}\n")
                 }
-                append("}\n}\n")
+                append("}\n")
             }
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
