@@ -41,6 +41,7 @@ class LocalPackageTest {
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
                                 packageName = "LocalDummyFramework",
+                                exportToKotlin = true,
                             ),
                         )
                     },

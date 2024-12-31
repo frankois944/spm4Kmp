@@ -43,6 +43,7 @@ class ComplexPackageTest {
                                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                                 names = listOf("CryptoSwift"),
                                 version = "1.8.3",
+                                exportToKotlin = true,
                             ),
                         )
                         add(
@@ -63,12 +64,14 @@ class ComplexPackageTest {
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
                                 packageName = "LocalDummyFramework",
+                                exportToKotlin = true,
                             ),
                         )
                         add(
                             SwiftDependency.Binary.Local(
                                 path = xcFrameworkDirectory.absolutePath,
                                 packageName = "DummyFramework",
+                                exportToKotlin = true,
                             ),
                         )
                         add(

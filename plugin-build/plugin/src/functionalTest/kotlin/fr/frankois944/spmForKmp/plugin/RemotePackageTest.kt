@@ -39,6 +39,7 @@ class RemotePackageTest {
                                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                                 names = listOf("CryptoSwift"),
                                 version = "1.8.3",
+                                exportToKotlin = true,
                             ),
                         )
                     },
@@ -90,6 +91,7 @@ class RemotePackageTest {
                                 names = listOf("CryptoSwift"),
                                 packageName = "CryptoSwift",
                                 branch = "main",
+                                exportToKotlin = true,
                             ),
                         )
                     },
@@ -140,6 +142,7 @@ class RemotePackageTest {
                                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                                 names = listOf("CryptoSwift"),
                                 revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
+                                exportToKotlin = true,
                             ),
                         )
                     },
@@ -192,6 +195,7 @@ class RemotePackageTest {
                                 names = listOf("FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics"),
                                 version = "11.6.0",
                                 packageName = "firebase-ios-sdk",
+                                exportToKotlin = true,
                             ),
                         )
                     },

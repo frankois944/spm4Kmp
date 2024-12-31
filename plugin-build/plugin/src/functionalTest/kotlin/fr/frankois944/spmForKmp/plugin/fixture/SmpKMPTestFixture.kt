@@ -104,20 +104,23 @@ swiftPackageConfig {
                             append("SwiftDependency.Package.Local(")
                             append("path = \"${definition.path}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("packageName = \"${definition.packageName}\",")
+                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Binary.Local -> {
                             append("SwiftDependency.Binary.Local(")
                             append("path = \"${definition.path}\",")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("packageName = \"${definition.packageName}\",")
+                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Binary.Remote -> {
                             append("SwiftDependency.Binary.Remote(")
                             append("url = \"${definition.url}\",")
                             append("checksum = \"${definition.checksum}\",")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("packageName = \"${definition.packageName}\",")
+                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Package.Remote.Branch -> {
@@ -125,7 +128,8 @@ swiftPackageConfig {
                             append("url = \"${definition.url}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("branch = \"${definition.branch}\",")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("packageName = \"${definition.packageName}\",")
+                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Package.Remote.Commit -> {
@@ -133,7 +137,8 @@ swiftPackageConfig {
                             append("url = \"${definition.url}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("revision = \"${definition.revision}\",")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("packageName = \"${definition.packageName}\",")
+                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Package.Remote.Version -> {
@@ -141,12 +146,13 @@ swiftPackageConfig {
                             append("url = \"${definition.url}\",")
                             append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
                             append("version = \"${definition.version}\",")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("packageName = \"${definition.packageName}\",")
+                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
                     }
-                    append(")\n     )\n}\n")
+                    append(")\n     )\n")
                 }
-                append("}\n")
+                append("}\n}\n")
             }
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
