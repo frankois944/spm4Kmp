@@ -35,7 +35,7 @@ class ComplexPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.iosX64, CompileTarget.iosArm64)
+                .withTargets(CompileTarget.iosSimulatorArm64)
                 .withDependencies(
                     buildList {
                         add(

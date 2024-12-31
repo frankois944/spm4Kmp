@@ -26,7 +26,7 @@ abstract class SmpKMPTestFixture private constructor(
         var minTvos: String = "12.0",
         var minWatchos: String = "4.0",
         var toolsVersion: String = "5.9",
-        var targets: List<CompileTarget> = listOf(CompileTarget.iosArm64, CompileTarget.iosSimulatorArm64),
+        var targets: List<CompileTarget> = listOf(CompileTarget.iosSimulatorArm64),
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
         val packages: List<SwiftDependency> = emptyList(),

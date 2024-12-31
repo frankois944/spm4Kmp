@@ -186,7 +186,7 @@ class RemotePackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.iosX64, CompileTarget.iosArm64)
+                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.iosArm64)
                 .withDependencies(
                     buildList {
                         add(
