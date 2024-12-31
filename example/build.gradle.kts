@@ -1,8 +1,8 @@
-import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
+import fr.frankois944.spmForKmp.plugin.definition.SwiftDependency
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("fr.frankois944.spm.kmp.plugin")
+    id("fr.frankois944.spmForKmp.plugin")
 }
 
 kotlin {

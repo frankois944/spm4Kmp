@@ -1,7 +1,8 @@
 @file:OptIn(ExperimentalStdlibApi::class)
 
-package fr.frankois944.spm.kmp.plugin.definition
+package fr.frankois944.spmForKmp.plugin.definition
 
+import fr.frankois944.spmForKmp.plugin.definition.SwiftDependency
 import org.gradle.api.Project
 import javax.inject.Inject
 import kotlin.io.path.Path

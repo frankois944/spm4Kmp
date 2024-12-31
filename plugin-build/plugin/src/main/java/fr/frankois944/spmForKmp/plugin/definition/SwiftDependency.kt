@@ -1,4 +1,4 @@
-package fr.frankois944.spm.kmp.plugin.definition
+package fr.frankois944.spmForKmp.plugin.definition
 
 import java.io.Serializable
 

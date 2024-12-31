@@ -1,9 +1,9 @@
-package fr.frankois944.spm.kmp.plugin.tasks
+package fr.frankois944.spmForKmp.plugin.tasks
 
-import fr.frankois944.spm.kmp.plugin.CompileTarget
-import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
-import fr.frankois944.spm.kmp.plugin.operations.getXcodeDevPath
-import fr.frankois944.spm.kmp.plugin.operations.getXcodeVersion
+import fr.frankois944.spmForKmp.plugin.CompileTarget
+import fr.frankois944.spmForKmp.plugin.definition.SwiftDependency
+import fr.frankois944.spmForKmp.plugin.operations.getXcodeDevPath
+import fr.frankois944.spmForKmp.plugin.operations.getXcodeVersion
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
@@ -39,7 +39,7 @@ internal abstract class GenerateCInteropDefinitionTask
     ) : DefaultTask() {
         init {
             description = "Generate the cinterop definitions files"
-            group = "fr.frankois944.spm.kmp.plugin.tasks"
+            group = "fr.frankois944.spmForKmp.plugin.tasks"
         }
 
         @get:OutputFiles

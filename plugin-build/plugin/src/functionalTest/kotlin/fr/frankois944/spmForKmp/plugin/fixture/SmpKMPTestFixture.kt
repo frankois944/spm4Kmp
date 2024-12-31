@@ -1,4 +1,4 @@
-package fr.frankois944.spm.kmp.plugin.fixture
+package fr.frankois944.spmForKmp.plugin.fixture
 
 import com.autonomousapps.kit.AbstractGradleProject
 import com.autonomousapps.kit.GradleProject
@@ -6,8 +6,8 @@ import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
-import fr.frankois944.spm.kmp.plugin.CompileTarget
-import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
+import fr.frankois944.spmForKmp.plugin.CompileTarget
+import fr.frankois944.spmForKmp.plugin.definition.SwiftDependency
 import org.gradle.internal.cc.base.logger
 
 abstract class SmpKMPTestFixture private constructor(
@@ -70,12 +70,11 @@ abstract class SmpKMPTestFixture private constructor(
 
     private fun Subproject.Builder.setupGradleConfig(extension: TestConfiguration) {
         withBuildScript {
-            imports = Imports.of("fr.frankois944.spm.kmp.plugin.definition.SwiftDependency")
-            sourceSets("iosMain", "tvosMain", "watchosMain", "macosMain")
+            imports = Imports.of("fr.frankois944.spmForKmp.plugin.definition.SwiftDependency")
             plugins(
                 Plugin.of("org.jetbrains.kotlin.multiplatform", "2.1.0"),
                 Plugin(
-                    "fr.frankois944.spm.kmp.plugin",
+                    "fr.frankois944.spmForKmp.plugin",
                     System.getProperty("com.autonomousapps.plugin-under-test.version"),
                 ),
             )
@@ -89,17 +88,17 @@ abstract class SmpKMPTestFixture private constructor(
                 append(
                     """
 swiftPackageConfig {
-    cinteropsName = "${extension.cinteropsName}"
-    customPackageSourcePath = "${extension.customPackageSourcePath}"
+    customPackageSourcePath= "${extension.customPackageSourcePath}"
     toolsVersion = "${extension.toolsVersion}"
     minIos = "${extension.minIos}"
     minMacos = "${extension.minMacos}"
     minTvos = "${extension.minTvos}"
     minWatchos = "${extension.minWatchos}"
+    create("${extension.cinteropsName}") {
 """,
                 )
                 extension.packages.forEach { definition ->
-                    append("    packages.add(\n     ")
+                    append("    dependency(\n     ")
                     when (definition) {
                         is SwiftDependency.Package.Local -> {
                             append("SwiftDependency.Package.Local(")
@@ -145,9 +144,9 @@ swiftPackageConfig {
                             append("packageName = \"${definition.packageName}\"")
                         }
                     }
-                    append(")\n     )\n")
+                    append(")\n     )\n}\n")
                 }
-                append("}\n")
+                append("}\n}\n")
             }
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =

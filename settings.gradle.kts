@@ -26,7 +26,7 @@ develocity {
     }
 }
 
-rootProject.name = "spm-kmp-plugin"
+rootProject.name = "spmForKmp-plugin"
 
 include(":example")
 includeBuild("plugin-build")

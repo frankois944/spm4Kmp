@@ -33,6 +33,6 @@ develocity {
     }
 }
 
-rootProject.name = ("fr.frankois944.spm.kmp")
+rootProject.name = ("fr.frankois944.spmForKmp")
 
 include(":plugin")

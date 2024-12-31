@@ -1,4 +1,4 @@
-package fr.frankois944.spm.kmp.plugin.fixture
+package fr.frankois944.spmForKmp.plugin.fixture
 
 import org.intellij.lang.annotations.Language
 

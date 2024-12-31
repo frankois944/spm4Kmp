@@ -1,6 +1,6 @@
-package fr.frankois944.spm.kmp.plugin.utils
+package fr.frankois944.spmForKmp.plugin.utils
 
-import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
+import fr.frankois944.spmForKmp.plugin.fixture.SmpKMPTestFixture
 import org.gradle.internal.cc.base.logger
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue

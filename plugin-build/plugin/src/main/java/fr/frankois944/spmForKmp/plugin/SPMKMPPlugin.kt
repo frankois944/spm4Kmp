@@ -1,11 +1,11 @@
 @file:OptIn(ExperimentalStdlibApi::class)
 
-package fr.frankois944.spm.kmp.plugin
+package fr.frankois944.spmForKmp.plugin
 
-import fr.frankois944.spm.kmp.plugin.definition.PackageRootDefinitionExtension
-import fr.frankois944.spm.kmp.plugin.tasks.CompileSwiftPackageTask
-import fr.frankois944.spm.kmp.plugin.tasks.GenerateCInteropDefinitionTask
-import fr.frankois944.spm.kmp.plugin.tasks.GenerateManifestTask
+import fr.frankois944.spmForKmp.plugin.definition.PackageRootDefinitionExtension
+import fr.frankois944.spmForKmp.plugin.tasks.CompileSwiftPackageTask
+import fr.frankois944.spmForKmp.plugin.tasks.GenerateCInteropDefinitionTask
+import fr.frankois944.spmForKmp.plugin.tasks.GenerateManifestTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project

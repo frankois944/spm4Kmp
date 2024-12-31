@@ -1,6 +1,6 @@
-package fr.frankois944.spm.kmp.plugin.manifest
+package fr.frankois944.spmForKmp.plugin.manifest
 
-import fr.frankois944.spm.kmp.plugin.definition.SwiftDependency
+import fr.frankois944.spmForKmp.plugin.definition.SwiftDependency
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.relativeToOrSelf

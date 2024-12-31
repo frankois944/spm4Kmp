@@ -1,10 +1,10 @@
-package fr.frankois944.spm.kmp.plugin
+package fr.frankois944.spmForKmp.plugin
 
 import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import fr.frankois944.spm.kmp.plugin.fixture.KotlinSource
-import fr.frankois944.spm.kmp.plugin.fixture.SmpKMPTestFixture
-import fr.frankois944.spm.kmp.plugin.fixture.SwiftSource
+import fr.frankois944.spmForKmp.plugin.fixture.KotlinSource
+import fr.frankois944.spmForKmp.plugin.fixture.SmpKMPTestFixture
+import fr.frankois944.spmForKmp.plugin.fixture.SwiftSource
 import org.junit.jupiter.api.Test
 
 class BasicPackageTest {
