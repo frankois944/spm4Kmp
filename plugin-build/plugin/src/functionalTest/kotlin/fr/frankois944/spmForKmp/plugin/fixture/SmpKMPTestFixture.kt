@@ -39,7 +39,10 @@ abstract class SmpKMPTestFixture private constructor(
             .withRootProject {
                 withFile(
                     "gradle.properties",
-                    "kotlin.mpp.enableCInteropCommonization=true",
+                    """
+kotlin.mpp.enableCInteropCommonization=true
+org.gradle.caching=true
+                        """,
                 )
             }.withSubproject("library") {
                 setupSources()
