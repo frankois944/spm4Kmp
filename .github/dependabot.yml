@@ -9,3 +9,20 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    rebase-strategy: "disabled"
+  - package-ecosystem: "gradle" # See documentation for possible values
+    directory: "plugin-build/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    rebase-strategy: "disabled"
+  - package-ecosystem: "gradle" # See documentation for possible values
+    directory: "plugin-build/plugin/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    rebase-strategy: "disabled"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    rebase-strategy: "disabled"
+
