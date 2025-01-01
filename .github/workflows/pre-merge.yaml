@@ -34,7 +34,18 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
+      - name: Cache example scratch directory
+        id: cache-example-scratch
+        uses: actions/cache@v4
+        with:
+          path: example/build/spmKmpPlugin/input/scratch
+          key: ${{ runner.os }}-example-scratch
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
       - name: Run Gradle tasks
         run: ./gradlew preMerge --continue
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-pre-merge-report
+          path: plugin-build/plugin/build/reports/tests/
