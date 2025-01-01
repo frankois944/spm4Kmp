@@ -106,7 +106,7 @@ public abstract class PackageRootDefinitionExtension
         internal val packageDependencies: MutableList<SwiftDependency> = mutableListOf()
 
         /**
-         * Adds a Swift dependency to the package dependencies list.
+         * Adds a Swift dependency to the dependencies list.
          *
          * @param dependency The Swift dependency to be added.
          * This can include local or remote dependencies in the form of
@@ -116,5 +116,18 @@ public abstract class PackageRootDefinitionExtension
          */
         public fun dependency(dependency: SwiftDependency) {
             packageDependencies.add(dependency)
+        }
+
+        /**
+         * Adds one or more Swift dependencies to the dependencies list.
+         *
+         * @param dependency A variable number of `SwiftDependency` instances to be added.
+         * This can include local or remote dependencies in the form of
+         * Swift packages or binary `xcframework` bundles.
+         * It supports different dependency models such as local, versioned
+         * remote, branch-based remote, or commit-based remote dependencies.
+         */
+        public fun dependency(vararg dependency: SwiftDependency) {
+            packageDependencies.addAll(dependency)
         }
     }

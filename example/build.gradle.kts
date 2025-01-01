@@ -26,8 +26,6 @@ swiftPackageConfig {
                 names = listOf("CryptoSwift"),
                 version = "1.8.4",
             ),
-        )
-        dependency(
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/firebase/firebase-ios-sdk.git",
                 names = listOf("FirebaseAnalytics", "FirebaseCore"),
