@@ -78,7 +78,8 @@ The content of `src/swift` is optional and will be replaced with a dummy swift c
 
 ```kotlin
 wiftPackageConfig {
-    create("nativeExample") {
+    create("nativeExample") { // same name as the one in `cinterops.create("...")`
+        // optional content
     }
 }
 ```
@@ -95,7 +96,6 @@ The `exportToKotlin` parameter is used to export the package to Kotlin for use i
 By default, the package is not exported to Kotlin.
 
 ```kotlin
-// It will generate a `nativeExample` module with the content of the `src/swift` folder
 swiftPackageConfig {
     create("nativeExample") { // same name as the one in `cinterops.create("...")`
         customPackageSourcePath = "src/nativeExample" // (Optional) Custom path for your own swift source files
@@ -112,7 +112,7 @@ swiftPackageConfig {
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/firebase/firebase-ios-sdk.git", // Repository URL
                 names = listOf("FirebaseAnalytics", "FirebaseCore"),     // Libraries from the package
-                packageName = "firebase-ios-sdk",                        // (Optional) Package name
+                packageName = "firebase-ios-sdk",                        // (Optional) Package name, can be required in some cases
                 version = "11.6.0",                                      // Package version
                 exportToKotlin = true                                    // Export to Kotlin for use in shared kotlin code
             )
@@ -121,6 +121,16 @@ swiftPackageConfig {
     }
 }
 ```
+
+### 3.3 Supported Swift Package Types
+
+The plugin supports the following configurations :
+- **Remote Package**: A Swift package hosted on a remote repository using version, commit, or branch.
+- **Local Package**: A Swift package located in a local directory.
+- **Local Binary Package**: A xcFramework in a local directory.
+- **Remote Binary Package**: A xcFramework hosted on a remote repository.
+
+For more information, refer to the [SwiftDependency](https://github.com/frankois944/spm4Kmp/blob/main/plugin-build/plugin/src/main/java/fr/frankois944/spmForKmp/plugin/definition/SwiftDependency.kt) file.
 
 ---
 
@@ -131,7 +141,7 @@ You can now add your own swift code in the `src/swift` folder.
 ```swift
 import Foundation
 // inside the folder src/swift
-// the following all class will be automatically accessible from your kotlin code
+// everything will be automatically accessible from your kotlin code
 @objcMembers public class MySwiftDummyClass: NSObject {
     func mySwiftDummyFunction() -> String {
         return "Hello from Swift!"
@@ -141,25 +151,29 @@ import Foundation
 
 ```kotlin
 package com.example
-import dummy.MySwiftDummyClass
+import nativeExample.MySwiftDummyClass
 @kotlinx.cinterop.ExperimentalForeignApi
 val dummyClass = MySwiftDummyClass()
 ```
 
-### 5. Add you own swift code with dependencies
+### 5. Add you own swift code and uses the dependencies
 
 You can also use the swift packages you have added in the `swiftPackageConfig` block in your swift code.
 
-For example, `CryptoSwift` is not a library that can be used directly in kotlin code, but you can use it in your swift code and then expose the function you need to kotlin.
+For example, `CryptoSwift` is not a library that can be used directly in kotlin code, but you can create a bridge in your swift code.
 
-```gradle
-dependency(
-    SwiftDependency.Package.Remote.Version(
-        url = "https://github.com/krzyzanowskim/CryptoSwift.git",
-        names = listOf("CryptoSwift"),
-        version = "1.8.4",
-    )
-)
+```kotlin
+swiftPackageConfig {
+    create("dummy") {
+        dependency(
+            SwiftDependency.Package.Remote.Version(
+                url = "https://github.com/krzyzanowskim/CryptoSwift.git",
+                names = listOf("CryptoSwift"),
+                version = "1.8.4",
+            )
+        )
+    }
+}
 ```
 
 ```swift
@@ -178,6 +192,10 @@ import CryptoSwift
 package com.example
 import dummy.MySwiftClass
 ```
+
+---
+
+Please take a look at the functional tests in the [plugin-test](https://github.com/frankois944/spm4Kmp/tree/main/plugin-build/plugin/src/functionalTest/kotlin/fr/frankois944/spmForKmp/plugin) folder for more examples.
 
 ---
 
