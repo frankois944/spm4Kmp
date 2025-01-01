@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.GradlePublishPlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -87,7 +88,6 @@ tasks.create("setupPluginUploadFromEnvironment") {
         if (key == null || secret == null) {
             throw GradleException("gradlePublishKey and/or gradlePublishSecret are not defined environment variables")
         }
-
         System.setProperty("gradle.publish.key", key)
         System.setProperty("gradle.publish.secret", secret)
         System.setProperty("mavenCentralUsername", mavenKey ?: "")
@@ -99,6 +99,8 @@ tasks.create("setupPluginUploadFromEnvironment") {
 }
 
 mavenPublishing {
+    configure(GradlePublishPlugin())
+
     // Define coordinates for the published artifact
     coordinates(
         groupId = property("GROUP").toString(),
@@ -142,4 +144,10 @@ mavenPublishing {
 
     // Enable GPG signing for all publications
     signAllPublications()
+}
+
+tasks.configureEach {
+    if (name.contains("TestKit") && name.contains("Publication")) {
+        enabled = false
+    }
 }
