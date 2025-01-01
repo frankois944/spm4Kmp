@@ -156,7 +156,7 @@ import nativeExample.MySwiftDummyClass
 val dummyClass = MySwiftDummyClass()
 ```
 
-### 5. Add you own swift code and uses the dependencies
+### 5. Add your own swift code and uses the dependencies
 
 You can also use the swift packages you have added in the `swiftPackageConfig` block in your swift code.
 
@@ -180,7 +180,7 @@ swiftPackageConfig {
 import Foundation
 import CryptoSwift
 // inside the folder src/swift
-// the following all class will be automatically accessible from your kotlin code
+// the class will be automatically accessible from your kotlin code
 @objcMembers public class MySwiftDummyClassWithDependencies: NSObject {
     public func toMD5(value: String) -> String {
         return value.md5()
