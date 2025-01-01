@@ -60,6 +60,11 @@ kotlin {
         }
     }
 }
+
+swiftPackageConfig {
+    create("nativeExample") { // same name as the one in `cinterops.create("...")`
+    }
+}
 ```
 
 ---
@@ -77,7 +82,7 @@ The following example creates a `nativeExample` Kotlin module with the content o
 The content of `src/swift` is optional and will be replaced with a dummy Swift class, so you can only declare the dependencies.
 
 ```kotlin
-wiftPackageConfig {
+swiftPackageConfig {
     create("nativeExample") { // same name as the one in `cinterops.create("...")`
         // optional content
     }
