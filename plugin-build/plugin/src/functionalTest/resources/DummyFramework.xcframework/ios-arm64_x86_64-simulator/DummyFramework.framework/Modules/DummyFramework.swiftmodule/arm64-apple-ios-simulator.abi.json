@@ -1,0 +1,93 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "DummyFramework",
+    "printedName": "DummyFramework",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "DummyFramework",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "MyDummyFramework",
+        "printedName": "MyDummyFramework",
+        "children": [
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "MyDummyFramework",
+                "printedName": "DummyFramework.MyDummyFramework",
+                "usr": "s:14DummyFramework02MyaB0C"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:14DummyFramework02MyaB0CACycfc",
+            "mangledName": "$s14DummyFramework02MyaB0CACycfc",
+            "moduleName": "DummyFramework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "printSomeValue",
+            "printedName": "printSomeValue()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:14DummyFramework02MyaB0C14printSomeValueyyF",
+            "mangledName": "$s14DummyFramework02MyaB0C14printSomeValueyyF",
+            "moduleName": "DummyFramework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:14DummyFramework02MyaB0C",
+        "mangledName": "$s14DummyFramework02MyaB0C",
+        "moduleName": "DummyFramework",
+        "isOpen": true,
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": []
+}

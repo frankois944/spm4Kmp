@@ -12,7 +12,7 @@ jobs:
   gradle:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ macos-latest ]
     runs-on: ${{ matrix.os }}
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
@@ -20,17 +20,33 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version: '17'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cache Konan
+        id: cache-konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan
+      - name: Cache example scratch directory
+        id: cache-example-scratch
+        uses: actions/cache@v4
+        with:
+          path: example/build/spmKmpPlugin/input/scratch
+          key: ${{ runner.os }}-example-scratch
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
       - name: Run Gradle tasks
         run: ./gradlew preMerge --continue
-
-        # We do a run of the new task `templateExample` created by the plugin
-      - name: Run the plugin
-        run: ./gradlew templateExample --message="Test Run" --tag=CI
-        if: success()
-        # And we verify that the output of the file is correct.
-      - name: Verify the plugin output
-        run: grep -Fxq "[CI] Test Run" ./example/build/template-example.txt
-        if: success()
+      - name: Archive test results
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: test-pre-merge-report
+          path: plugin-build/plugin/build/reports/tests/

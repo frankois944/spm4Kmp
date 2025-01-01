@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.versionCheck)
+    alias(libs.plugins.autonomousapps.testkit) apply false
 }
 
 allprojects {
@@ -13,8 +14,16 @@ allprojects {
     version = property("VERSION").toString()
 
     apply {
-        plugin(rootProject.libs.plugins.detekt.get().pluginId)
-        plugin(rootProject.libs.plugins.ktlint.get().pluginId)
+        plugin(
+            rootProject.libs.plugins.detekt
+                .get()
+                .pluginId,
+        )
+        plugin(
+            rootProject.libs.plugins.ktlint
+                .get()
+                .pluginId,
+        )
     }
 
     ktlint {

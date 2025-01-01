@@ -1,0 +1,14 @@
+---
+triple:          'arm64_32-apple-darwin'
+binary-path:     '/Users/francoisdabonot/Library/Developer/Xcode/DerivedData/DummyFramework-heaxwzymygtjzrergcvdefjbkwaw/Build/Intermediates.noindex/ArchiveIntermediates/DummyFramework/InstallationBuildProductsLocation/Library/Frameworks/DummyFramework.framework/DummyFramework'
+relocations:
+  - { offset: 0x31523, size: 0x4, addend: 0x0, symName: _DummyFrameworkVersionString, symObjAddr: 0x0, symBinAddr: 0x4F80, symSize: 0x0 }
+  - { offset: 0x31553, size: 0x4, addend: 0x0, symName: _DummyFrameworkVersionNumber, symObjAddr: 0x38, symBinAddr: 0x4FB8, symSize: 0x0 }
+  - { offset: 0x3158B, size: 0x4, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfC', symObjAddr: 0x0, symBinAddr: 0x4000, symSize: 0x10 }
+  - { offset: 0x31630, size: 0x4, addend: 0x0, symName: ___swift_instantiateConcreteTypeFromMangledName, symObjAddr: 0xA0, symBinAddr: 0x40A0, symSize: 0x4C }
+  - { offset: 0x3163F, size: 0x4, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CMa', symObjAddr: 0x104, symBinAddr: 0x40FC, symSize: 0x20 }
+  - { offset: 0x31655, size: 0x4, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfC', symObjAddr: 0x0, symBinAddr: 0x4000, symSize: 0x10 }
+  - { offset: 0x31664, size: 0x4, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfc', symObjAddr: 0x10, symBinAddr: 0x4010, symSize: 0x8 }
+  - { offset: 0x316B4, size: 0x4, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C14printSomeValueyyF', symObjAddr: 0x18, symBinAddr: 0x4018, symSize: 0x88 }
+  - { offset: 0x31721, size: 0x4, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CfD', symObjAddr: 0xF4, symBinAddr: 0x40EC, symSize: 0x10 }
+...
