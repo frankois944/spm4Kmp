@@ -12,9 +12,9 @@ dependencies {
     implementation(gradleApi())
     implementation(libs.kotlin.gradle)
 
-    functionalTestImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
-    functionalTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    functionalTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    functionalTestImplementation(libs.junit.jupiter)
+    functionalTestRuntimeOnly(libs.junit.jupiter.engine)
+    functionalTestRuntimeOnly(libs.junit.platform.launcher)
     functionalTestImplementation(project(":plugin"))
 }
 
