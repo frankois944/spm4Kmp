@@ -134,7 +134,7 @@ For more information, refer to the [SwiftDependency](https://github.com/frankois
 
 ---
 
-### 4. Add you own swift code
+### 4. Add your own swift code
 
 You can now add your own swift code in the `src/swift` folder.
 
