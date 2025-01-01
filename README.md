@@ -1,4 +1,4 @@
-# The Swift Package Manager to Kotlin multiplatform Plugin
+# The Swift Package Manager for Kotlin multiplatform Plugin
 
 [![build&tests](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg)](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml)
 
