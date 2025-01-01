@@ -20,6 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = ("fr.frankois944.spmForKmp")
+rootProject.name = ("io.frankois944.spmForKmp")
 
 include(":plugin")

@@ -87,11 +87,11 @@ tasks.create("setupPluginUploadFromEnvironment") {
     }
 }
 
-mavenPublishing {
+/*mavenPublishing {
     // Define coordinates for the published artifact
     coordinates(
-        groupId = property("GROUP").toString(),
-        artifactId = "spmForKmp",
+        groupId = "io.frankois944.spmForKmp",
+        artifactId = "SpmForKmp",
         version = property("VERSION").toString(),
     )
 
@@ -132,3 +132,4 @@ mavenPublishing {
     // Enable GPG signing for all publications
     signAllPublications()
 }
+*/
