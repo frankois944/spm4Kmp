@@ -57,7 +57,7 @@ class ComplexPackageTest {
                             SwiftDependency.Package.Remote.Commit(
                                 url = "https://github.com/square/Valet",
                                 names = listOf("Valet"),
-                                revision = "0a928c410378db708dc4b9d1cf1c1cb0cb75621f",
+                                revision = "e900692d551b1986fc80aa3968d40e7af3b1e858",
                             ),
                         )
                         add(
