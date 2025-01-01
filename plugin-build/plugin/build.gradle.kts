@@ -101,7 +101,7 @@ tasks.create("setupPluginUploadFromEnvironment") {
 mavenPublishing {
     // Define coordinates for the published artifact
     coordinates(
-        groupId = "io.github.frankois944.spmForKmp",
+        groupId = property("GROUP").toString(),
         artifactId = "SpmForKmp",
         version = property("VERSION").toString(),
     )
