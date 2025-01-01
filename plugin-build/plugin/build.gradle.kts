@@ -78,19 +78,30 @@ tasks.create("setupPluginUploadFromEnvironment") {
         val key = System.getenv("GRADLE_PUBLISH_KEY")
         val secret = System.getenv("GRADLE_PUBLISH_SECRET")
 
+        val mavenKey = System.getenv("MAVEN_PUBLISH_KEY")
+        val mavenSecret = System.getenv("MAVEN_PUBLISH_SECRET")
+        val signingKeyId = System.getenv("SIGNING_KEY_ID")
+        val signingKeyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+        val signingFile = System.getenv("SIGNING_FILE")
+
         if (key == null || secret == null) {
             throw GradleException("gradlePublishKey and/or gradlePublishSecret are not defined environment variables")
         }
 
         System.setProperty("gradle.publish.key", key)
         System.setProperty("gradle.publish.secret", secret)
+        System.setProperty("mavenCentralUsername", mavenKey ?: "")
+        System.setProperty("mavenCentralPassword", mavenSecret ?: "")
+        System.setProperty("signing.keyId", signingKeyId ?: "")
+        System.setProperty("signing.password", signingKeyPassword ?: "")
+        System.setProperty("signing.secretKeyRingFile", signingFile ?: "")
     }
 }
 
-/*mavenPublishing {
+mavenPublishing {
     // Define coordinates for the published artifact
     coordinates(
-        groupId = "io.frankois944.spmForKmp",
+        groupId = "io.github.frankois944.spmForKmp",
         artifactId = "SpmForKmp",
         version = property("VERSION").toString(),
     )
@@ -132,4 +143,3 @@ tasks.create("setupPluginUploadFromEnvironment") {
     // Enable GPG signing for all publications
     signAllPublications()
 }
-*/
