@@ -3,7 +3,7 @@
 
 import Foundation
 
-@objc public class MySwiftClass: NSObject {
+@objcMembers public class MySwiftClass: NSObject {
     func test() -> String {
         return "TEST DUMMY FRAMEWORK"
     }

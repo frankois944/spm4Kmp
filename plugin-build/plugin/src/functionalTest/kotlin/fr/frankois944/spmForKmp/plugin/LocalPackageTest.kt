@@ -73,4 +73,41 @@ class LocalPackageTest {
         // Then
         assertThat(result).task(":library:build").succeeded()
     }
+
+    @Test
+    fun `build with local packages and no swift code`() {
+        val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64, CompileTarget.iosArm64)
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Local(
+                                path = localPackageDirectory.absolutePath,
+                                packageName = "LocalDummyFramework",
+                                exportToKotlin = true,
+                            ),
+                        )
+                    },
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        content =
+                            """
+                            package com.example
+                            import LocalDummyFramework.MySwiftClass
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        val project = fixture.gradleProject.rootDir
+        folderTopOpen = project.absolutePath
+        // When
+        val result = GradleBuilder.build(project, "build")
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
 }

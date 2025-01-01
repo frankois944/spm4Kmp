@@ -1,15 +1,17 @@
-# spmForKmp Plugin
+# The Swift Package Manager to Kotlin multiplatform Plugin
 
-The `spmForKmp` plugin (`fr.frankois944.spmForKmp.plugin`) is a Gradle plugin designed to simplify integrating Swift Package Manager (SPM) dependencies into Kotlin Multiplatform (KMP) projects. It allows you to effortlessly configure and use Swift packages in your Kotlin projects targeting Apple platforms, such as iOS.
+[![build&tests](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg)](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml)
+
+The Swift Package Manager for Kotlin multiplatform Plugin aka `spmForKmp` gradle plugin is a Gradle plugin designed to simplify integrating Swift Package Manager (SPM) dependencies into Kotlin Multiplatform (KMP) projects. It allows you to effortlessly configure and use Swift packages in your Kotlin projects targeting Apple platforms, such as iOS.
 
 ---
 
 ## Features
 
 - **Support for SPM Dependencies**: Seamlessly add remote SPM dependencies to your KMP modules.
-- **KMP Compatibility**: Configure Swift packages for iOS ARM64 and simulator targets.
-- **Export Dependencies to Kotlin**: Enable specific SPM dependencies to be exposed directly in your Kotlin code.
-- **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages.
+- **KMP Compatibility**: Configure Swift packages for iOS and other Apple targets.
+- **Export Dependencies to Kotlin**: Enable specific SPM dependencies to be exposed directly in your Kotlin code (if compatible).
+- **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages with dependencies.
 
 ---
 
@@ -34,7 +36,7 @@ Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("fr.frankois944.spmForKmp.plugin") // Apply the spmForKmp plugin
+    id("fr.frankois944.spmForKmp.plugin").version("0.0.1") // Apply the spmForKmp plugin
 }
 ```
 
@@ -42,13 +44,14 @@ plugins {
 
 ### 2. Configure Kotlin Multiplatform Targets
 
-Make sure you define your Kotlin Multiplatform targets for iOS. Here is an example configuration:
+Make sure you define your Kotlin Multiplatform targets for Apple. Here is an example configuration:
 
 ```kotlin
 kotlin {
     listOf(
         iosArm64(),           // iOS ARM64 (e.g., for physical devices)
         iosSimulatorArm64()   // iOS Simulator ARM64 (e.g., for M1/M2 machines)
+        // and more Apple targets...
     ).forEach {
         it.compilations {
             val main by getting {
@@ -61,14 +64,43 @@ kotlin {
 
 ---
 
-### 3. Configure Swift Package Dependencies
+### 3. Configure Swift Package Dependencies Plugin
 
 To use Swift Package Manager (SPM) dependencies in your project, define them in your `swiftPackageConfig` block.
 
+You have many options to configure the plugin, some examples hereafter.
+
+### 3.1 With no external dependencies
+
+The following example creates a `nativeExample` kotlin module with the content of the `src/swift` folder, it's the default behavior.
+
+The content of `src/swift` is optional and will be replaced with a dummy swift class, so you can only declare the dependencies.
+
 ```kotlin
-swiftPackageConfig {
+wiftPackageConfig {
     create("nativeExample") {
+    }
+}
+```
+
+### 3.2 With external dependencies
+
+The following example creates a `nativeExample` kotlin module with the content of the `src/swift` folder and the declared dependencies.
+
+- `CryptoSwift` is a Swift package that will be used in the swift code.
+- `firebase-ios-sdk` is a ObjC compatible package that can be used in the swift code and in the Kotlin code.
+
+The `exportToKotlin` parameter is used to export the package to Kotlin for use in shared kotlin code even the package is not compatible with Kotlin.
+
+By default, the package is not exported to Kotlin.
+
+```kotlin
+// It will generate a `nativeExample` module with the content of the `src/swift` folder
+swiftPackageConfig {
+    create("nativeExample") { // same name as the one in `cinterops.create("...")`
+        customPackageSourcePath = "src/nativeExample" // (Optional) Custom path for your own swift source files
         dependency(
+            // available only in the swift code
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/krzyzanowskim/CryptoSwift.git", // Repository URL
                 names = listOf("CryptoSwift"),                           // Library names
@@ -76,61 +108,76 @@ swiftPackageConfig {
             )
         )
         dependency(
+            // available in the swift and kolin code
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/firebase/firebase-ios-sdk.git", // Repository URL
                 names = listOf("FirebaseAnalytics", "FirebaseCore"),     // Libraries from the package
                 packageName = "firebase-ios-sdk",                        // (Optional) Package name
                 version = "11.6.0",                                      // Package version
-                exportToKotlin = true                                    // Export to Kotlin for use in shared code
+                exportToKotlin = true                                    // Export to Kotlin for use in shared kotlin code
             )
         )
+        // and more Swift packages...
     }
 }
 ```
 
 ---
 
-### 4. Build Your Project
+### 4. Add you own swift code
 
-Run the following Gradle task to build your project and let the `spmForKmp` plugin handle the integration:
+You can now add your own swift code in the `src/swift` folder.
 
-```bash
-./gradlew build
+```swift
+import Foundation
+// inside the folder src/swift
+// the following all class will be automatically accessible from your kotlin code
+@objcMembers public class MySwiftDummyClass: NSObject {
+    func mySwiftDummyFunction() -> String {
+        return "Hello from Swift!"
+    }
+}
 ```
 
-After the build completes, the specified SPM dependencies will be integrated into your KMP project.
+```kotlin
+package com.example
+import dummy.MySwiftDummyClass
+@kotlinx.cinterop.ExperimentalForeignApi
+val dummyClass = MySwiftDummyClass()
+```
 
----
+### 5. Add you own swift code with dependencies
 
-## Configuration Details
+You can also use the swift packages you have added in the `swiftPackageConfig` block in your swift code.
 
-The `swiftPackageConfig` block enables precise configuration of Swift packages. Each package is specified using the `dependency` function with the following parameters:
+For example, `CryptoSwift` is not a library that can be used directly in kotlin code, but you can use it in your swift code and then expose the function you need to kotlin.
 
-| Parameter            | Description                                                                                       |
-|----------------------|---------------------------------------------------------------------------------------------------|
-| `url`               | The remote URL of the Swift package (Git repository).                                            |
-| `names`             | The list of libraries in the package to link to your project.                                     |
-| `version`           | The version of the package to use (e.g., `1.0.0`, or a valid semantic version).                   |
-| `packageName`       | Optional: An explicit name for the package (useful for avoiding conflicts).                       |
-| `exportToKotlin`    | Optional: When `true`, exports the package for consumption directly within Kotlin code.           |
+```gradle
+dependency(
+    SwiftDependency.Package.Remote.Version(
+        url = "https://github.com/krzyzanowskim/CryptoSwift.git",
+        names = listOf("CryptoSwift"),
+        version = "1.8.4",
+    )
+)
+```
 
----
+```swift
+import Foundation
+import CryptoSwift
+// inside the folder src/swift
+// the following all class will be automatically accessible from your kotlin code
+@objcMembers public class MySwiftDummyClassWithDependencies: NSObject {
+    public func toMD5(value: String) -> String {
+        return value.md5()
+    }
+}
+```
 
-## Example Use Case
-
-Imagine you need to use the following Swift packages in your Kotlin Multiplatform project:
-
-1. **CryptoSwift**: A library for cryptographic operations.
-2. **Firebase iOS SDK**: A group of libraries for Firebase services.
-
-Using this plugin, you easily add and configure these dependencies inside `swiftPackageConfig`. Both will be fetched via SPM, and the Firebase package will be exported to Kotlin for usage.
-
----
-
-## Troubleshooting
-
-- **SPM Dependency Errors**: If a build error occurs related to a Swift dependency, ensure the specified version, URL, and library names are correct.
-- **Compatibility Issues**: Always ensure that your Apple targets (e.g., `iosArm64`, `iosSimulatorArm64`) are properly configured.
+```kotlin
+package com.example
+import dummy.MySwiftClass
+```
 
 ---
 
