@@ -39,9 +39,8 @@ class BinaryPackageTest {
                         add(
                             SwiftDependency.Binary.Remote(
                                 url =
-                                    "https://raw.githubusercontent.com/frankois944/swift-klib-plugin/refs/heads/" +
-                                        "swift-spm-local-remote-lib/plugin/src/functionalTest/" +
-                                        "resources/DummyFramework.xcframework.zip",
+                                    "https://github.com/frankois944/spm4Kmp/blob/main/plugin-build/plugin/src/" +
+                                        "functionalTest/resources/DummyFramework.xcframework.zip",
                                 checksum = "20f6264c95e80b6e2da7d2c9b9abe44b4426dac799927ea49fb7a4982f1affdb",
                                 packageName = "DummyFramework",
                                 exportToKotlin = true,
