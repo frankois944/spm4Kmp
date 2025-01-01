@@ -5,6 +5,13 @@ on:
     tags:
       - '*'
 
+concurrency:
+  # Use a unique identifier for the workflow cancellation group.
+  # Most commonly, the branch name or pull request reference.
+  group: ${{ github.ref }} # Cancels workflows for the same branch or PR
+  cancel-in-progress: true # Automatically cancels in-progress workflows
+
+
 jobs:
   gradle:
     runs-on: ubuntu-latest
