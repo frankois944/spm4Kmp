@@ -87,6 +87,31 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     }
             afterEvaluate {
                 val extension = swiftPackageEntries.first()
+
+                val sharedCacheDir: File? =
+                    extension.sharedCachePath?.run {
+                        resolvePath(File(this))
+                            .also { dir ->
+                                dir.mkdirs()
+                            }
+                    }
+
+                val sharedConfigDir: File? =
+                    extension.sharedConfigPath?.run {
+                        resolvePath(File(this))
+                            .also { dir ->
+                                dir.mkdirs()
+                            }
+                    }
+
+                val sharedSecurityDir: File? =
+                    extension.sharedSecurityPath?.run {
+                        resolvePath(File(this))
+                            .also { dir ->
+                                dir.mkdirs()
+                            }
+                    }
+
                 if (swiftPackageEntries.size > 1) {
                     logger.warn("Only the first entry is currently supported, the other will be ignored")
                 }
@@ -104,18 +129,20 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             TASK_GENERATE_MANIFEST,
                             // type =
                             GenerateManifestTask::class.java,
-                            // ...constructorArgs =
-                            extension.packageDependencies,
-                            extension.name,
-                            extension.minIos,
-                            extension.minTvos,
-                            extension.minMacos,
-                            extension.minWatchos,
-                            extension.toolsVersion,
-                            sourcePackageDir,
-                            originalPackageScratchDir,
-                        )
-
+                        ) {
+                            it.packages.set(extension.packageDependencies)
+                            it.productName.set(extension.name)
+                            it.minIos.set(extension.minIos)
+                            it.minTvos.set(extension.minTvos)
+                            it.minMacos.set(extension.minMacos)
+                            it.minWatchos.set(extension.minWatchos)
+                            it.toolsVersion.set(extension.toolsVersion)
+                            it.packageDirectory.set(sourcePackageDir)
+                            it.scratchDirectory.set(originalPackageScratchDir)
+                            it.sharedCacheDir.set(sharedCacheDir)
+                            it.sharedConfigDir.set(sharedConfigDir)
+                            it.sharedSecurityDir.set(sharedSecurityDir)
+                        }
                 val taskGroup = mutableMapOf<CompileTarget, Task>()
                 val dependencyTaskNames = mutableMapOf<String, File>()
 
@@ -136,20 +163,25 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 getTaskName(TASK_COMPILE_PACKAGE, cinteropTarget),
                                 // type =
                                 CompileSwiftPackageTask::class.java,
-                                // ...constructorArgs =
-                                File(sourcePackageDir, "Package.swift"),
-                                cinteropTarget,
-                                extension.debug,
-                                originalPackageScratchDir,
-                                targetPackageScratchDir,
-                                userSourcePackageDir,
-                                cinteropTarget.getOsVersion(
-                                    minIos = extension.minIos,
-                                    minWatchos = extension.minWatchos,
-                                    minTvos = extension.minTvos,
-                                    minMacos = extension.minMacos,
-                                ),
-                            )
+                            ) {
+                                it.manifestFile.set(File(sourcePackageDir, "Package.swift"))
+                                it.target.set(cinteropTarget)
+                                it.debugMode.set(extension.debug)
+                                it.originalPackageScratchDir.set(originalPackageScratchDir)
+                                it.packageScratchDir.set(targetPackageScratchDir)
+                                it.customSourcePackage.set(userSourcePackageDir)
+                                it.osVersion.set(
+                                    cinteropTarget.getOsVersion(
+                                        minIos = extension.minIos,
+                                        minWatchos = extension.minWatchos,
+                                        minTvos = extension.minTvos,
+                                        minMacos = extension.minMacos,
+                                    ),
+                                )
+                                it.sharedCacheDir.set(sharedCacheDir)
+                                it.sharedConfigDir.set(sharedConfigDir)
+                                it.sharedSecurityDir.set(sharedSecurityDir)
+                            }
 
                     val task3 =
                         tasks

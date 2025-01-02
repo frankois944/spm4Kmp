@@ -8,15 +8,31 @@ import java.io.File
 internal fun ExecOperations.resolvePackage(
     workingDir: File,
     scratchPath: File,
+    sharedCachePath: File?,
+    sharedConfigPath: File?,
+    sharedSecurityPath: File?,
 ) {
     val args =
-        listOf(
+        mutableListOf(
             "swift",
             "package",
             "resolve",
             "--scratch-path",
             scratchPath.path,
-        )
+        ).also { list ->
+            sharedCachePath?.let {
+                list.add("--cache-path")
+                list.add(it.path)
+            }
+            sharedConfigPath?.let {
+                list.add("--config-path")
+                list.add(it.path)
+            }
+            sharedSecurityPath?.let {
+                list.add("--security-path")
+                list.add(it.path)
+            }
+        }
 
     val output = ByteArrayOutputStream()
     exec {

@@ -30,6 +30,9 @@ abstract class SmpKMPTestFixture private constructor(
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
         val packages: List<SwiftDependency> = emptyList(),
+        val sharedCachePath: String? = "/tmp/build/sharedCachePath",
+        val sharedConfigPath: String? = "/tmp/build/sharedConfigPath",
+        val sharedSecurityPath: String? = "/tmp/build/sharedSecurityPath",
     )
 
     protected abstract fun createProject(): GradleProject
@@ -100,6 +103,15 @@ swiftPackageConfig {
     minWatchos = "${extension.minWatchos}"
 """,
                 )
+                extension.sharedCachePath?.let {
+                    append("sharedCachePath = \"${extension.sharedCachePath}\"\n")
+                }
+                extension.sharedConfigPath?.let {
+                    append("sharedConfigPath = \"${extension.sharedConfigPath}\"\n")
+                }
+                extension.sharedSecurityPath?.let {
+                    append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
+                }
                 extension.packages.forEach { definition ->
                     append("    dependency(\n     ")
                     when (definition) {
@@ -202,6 +214,21 @@ swiftPackageConfig {
         fun withDependencies(definitions: List<SwiftDependency>) =
             apply {
                 config = config.copy(packages = definitions)
+            }
+
+        fun withCache(path: String) =
+            apply {
+                config = config.copy(sharedCachePath = path)
+            }
+
+        fun withConfig(path: String) =
+            apply {
+                config = config.copy(sharedConfigPath = path)
+            }
+
+        fun withSecurity(path: String) =
+            apply {
+                config = config.copy(sharedSecurityPath = path)
             }
 
         fun build(): SmpKMPTestFixture =
