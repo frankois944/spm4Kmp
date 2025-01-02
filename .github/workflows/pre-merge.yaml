@@ -38,7 +38,9 @@ jobs:
         id: cache-example-scratch
         uses: actions/cache@v4
         with:
-          path: example/build/spmKmpPlugin/input/scratch
+          path: |
+            example/build/spmKmpPlugin/input/scratch
+            example/build/spmKmpPlugin/input/Package.resolved
           key: ${{ runner.os }}-example-scratch
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
