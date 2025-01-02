@@ -145,7 +145,7 @@ The plugin supports the following configurations :
 - **Local Binary Package**: A xcFramework in a local directory.
 - **Remote Binary Package**: A xcFramework hosted on a remote repository.
 
-For more information, refer to the [SwiftDependency](https://github.com/frankois944/spm4Kmp/blob/main/plugin-build/plugin/src/main/java/fr/frankois944/spmForKmp/plugin/definition/SwiftDependency.kt) file.
+For more information, refer to the [SwiftDependency](https://github.com/frankois944/spm4Kmp/blob/main/plugin-build/plugin/src/main/java/io/github/frankois944/spmForKmp/definition/PackageRootDefinitionExtension.kt) file.
 
 ---
 
@@ -210,7 +210,7 @@ import dummy.MySwiftClass
 
 ---
 
-Please take a look at the functional tests in the [plugin-test](https://github.com/frankois944/spm4Kmp/tree/main/plugin-build/plugin/src/functionalTest/kotlin/fr/frankois944/spmForKmp/plugin) folder for more examples.
+Please take a look at the functional tests in the [plugin-test](https://github.com/frankois944/spm4Kmp/tree/main/plugin-build/plugin/src/functionalTest/kotlin/io/github/frankois944/spmForKmp) folder for more examples.
 
 The `example` module of this repository is a playground where you can try to use the plugin
 
