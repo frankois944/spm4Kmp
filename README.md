@@ -6,6 +6,10 @@ The Swift Package Manager for Kotlin multiplatform Plugin aka `spmForKmp` gradle
 
 ---
 
+## Feedback
+
+This project greatly needs feedback and get information about the edge case for progressing; the discussion tab is welcomed.
+
 ## Features
 
 - **Support for SPM Dependencies**: Seamlessly add remote SPM dependencies to your KMP modules.
@@ -36,8 +40,14 @@ Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("fr.frankois944.spmForKmp.plugin").version("0.0.1") // Apply the spmForKmp plugin
+    id("io.github.frankois944.spmForKmp").version("0.0.1") // Apply the spmForKmp plugin
 }
+```
+
+In your gradle.properties, you must have this declaration :
+
+```
+kotlin.mpp.enableCInteropCommonization=true
 ```
 
 ---

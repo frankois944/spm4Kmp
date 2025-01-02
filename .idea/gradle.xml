@@ -7,7 +7,7 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
-              <build path="$PROJECT_DIR$/plugin-build" name="fr.frankois944.spmForKmp">
+              <build path="$PROJECT_DIR$/plugin-build" name="io.github.frankois944.spmForKmp">
                 <projects>
                   <project path="$PROJECT_DIR$/plugin-build" />
                   <project path="$PROJECT_DIR$/plugin-build/plugin" />
@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/plugin-build/plugin" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
