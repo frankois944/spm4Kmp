@@ -30,9 +30,9 @@ abstract class SmpKMPTestFixture private constructor(
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
         val packages: List<SwiftDependency> = emptyList(),
-        val sharedCachePath: String? = "/tmp/build/sharedCachePath",
-        val sharedConfigPath: String? = "/tmp/build/sharedConfigPath",
-        val sharedSecurityPath: String? = "/tmp/build/sharedSecurityPath",
+        val sharedCachePath: String? = "/tmp/spm4Ktm/sharedCachePath",
+        val sharedConfigPath: String? = "/tmp/spm4Ktm/sharedConfigPath",
+        val sharedSecurityPath: String? = "/tmp/spm4Ktm/sharedSecurityPath",
     )
 
     protected abstract fun createProject(): GradleProject
