@@ -6,6 +6,10 @@ The Swift Package Manager for Kotlin multiplatform Plugin aka `spmForKmp` gradle
 
 ---
 
+## Feedback
+
+This project greatly needs feedback and get information about the edge case for progressing; the discussion tab is welcomed.
+
 ## Features
 
 - **Support for SPM Dependencies**: Seamlessly add remote SPM dependencies to your KMP modules.
