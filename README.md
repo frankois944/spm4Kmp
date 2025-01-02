@@ -145,7 +145,7 @@ The plugin supports the following configurations :
 - **Local Binary Package**: A xcFramework in a local directory.
 - **Remote Binary Package**: A xcFramework hosted on a remote repository.
 
-For more information, refer to the [SwiftDependency](https://github.com/frankois944/spm4Kmp/blob/main/plugin-build/plugin/src/main/java/io/github/frankois944/spmForKmp/definition/PackageRootDefinitionExtension.kt) file.
+For more information, refer to the [SwiftDependency](https://github.com/frankois944/spm4Kmp/blob/main/plugin-build/plugin/src/main/java/io/github/frankois944/spmForKmp/definition/SwiftDependency.kt) file.
 
 ---
 
