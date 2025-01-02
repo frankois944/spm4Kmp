@@ -62,4 +62,5 @@ jobs:
         uses: mikepenz/action-junit-report@v5
         if: success() || failure() # always run even if the previous step fails
         with:
-          report_paths: 'build/test-results/**/TEST-*.xml'
+          report_paths: '**/build/test-results/**/TEST-*.xml'
+          include_passed: true
