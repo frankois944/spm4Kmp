@@ -7,12 +7,6 @@ on:
     branches:
       - '*'
 
-concurrency:
-  # Use a unique identifier for the workflow cancellation group.
-  # Most commonly, the branch name or pull request reference.
-  group: ${{ github.ref }} # Cancels workflows for the same branch or PR
-  cancel-in-progress: true # Automatically cancels in-progress workflows
-
 jobs:
   validation:
     name: Validation
@@ -22,4 +16,4 @@ jobs:
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v4
-      
+
