@@ -1,6 +1,6 @@
-package io.github.frankois944.spmForKmp.plugin.operations
+package io.github.frankois944.spmForKmp.operations
 
-import io.github.frankois944.spmForKmp.plugin.CompileTarget
+import io.github.frankois944.spmForKmp.CompileTarget
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File

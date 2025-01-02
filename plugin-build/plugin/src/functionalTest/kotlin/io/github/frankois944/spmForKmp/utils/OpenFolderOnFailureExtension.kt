@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.plugin.utils
+package io.github.frankois944.spmForKmp.utils
 
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.TestWatcher

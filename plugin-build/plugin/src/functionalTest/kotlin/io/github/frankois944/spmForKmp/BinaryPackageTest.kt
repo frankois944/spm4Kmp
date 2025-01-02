@@ -1,18 +1,18 @@
-package io.github.frankois944.spmForKmp.plugin
+package io.github.frankois944.spmForKmp
 
-import com.autonomousapps.kit.GradleBuilder
+import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.plugin.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.plugin.fixture.KotlinSource
-import io.github.frankois944.spmForKmp.plugin.fixture.SmpKMPTestFixture
-import io.github.frankois944.spmForKmp.plugin.fixture.SwiftSource
-import io.github.frankois944.spmForKmp.plugin.utils.OpenFolderOnFailureExtension
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.fixture.KotlinSource
+import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
+import io.github.frankois944.spmForKmp.fixture.SwiftSource
+import io.github.frankois944.spmForKmp.utils.OpenFolderOnFailureExtension
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
 
-class LocalPackageTest {
+class BinaryPackageTest {
     private var folderTopOpen: String? = null
 
     @RegisterExtension
@@ -28,19 +28,22 @@ class LocalPackageTest {
     }
 
     @Test
-    fun `build with local packages`() {
-        val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
+    fun `build with remote binary packages`() {
         // Given
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64, CompileTarget.iosArm64)
+                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64)
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftDependency.Package.Local(
-                                path = localPackageDirectory.absolutePath,
-                                packageName = "LocalDummyFramework",
+                            SwiftDependency.Binary.Remote(
+                                url =
+                                    "https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/" +
+                                        "plugin-build/plugin/src/functionalTest/" +
+                                        "resources/DummyFramework.xcframework.zip",
+                                checksum = "20f6264c95e80b6e2da7d2c9b9abe44b4426dac799927ea49fb7a4982f1affdb",
+                                packageName = "DummyFramework",
                                 exportToKotlin = true,
                             ),
                         )
@@ -50,7 +53,7 @@ class LocalPackageTest {
                         content =
                             """
                             package com.example
-                            import LocalDummyFramework.MySwiftClass
+                            import DummyFramework.DummyFrameworkVersionNumber
                             """.trimIndent(),
                     ),
                 ).withSwiftSources(
@@ -58,8 +61,8 @@ class LocalPackageTest {
                         content =
                             """
                             import Foundation
-                            import LocalDummyFramework
-                            @objc public class MySwiftDummyClass: NSObject {
+                            import DummyFramework
+                            @objc public class MySwiftClass: NSObject {
                             }
                             """.trimIndent(),
                     ),
@@ -68,26 +71,25 @@ class LocalPackageTest {
         val project = fixture.gradleProject.rootDir
         folderTopOpen = project.absolutePath
         // When
-        val result = GradleBuilder.build(project, "build")
+        val result = build(project, "build")
 
         // Then
         assertThat(result).task(":library:build").succeeded()
     }
 
     @Test
-    fun `build with local packages and no swift code`() {
-        val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
+    fun `build with local binaru package`() {
+        val xcFrameworkDirectory = File("src/functionalTest/resources/DummyFramework.xcframework")
         // Given
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64, CompileTarget.iosArm64)
                 .withDependencies(
                     buildList {
                         add(
-                            SwiftDependency.Package.Local(
-                                path = localPackageDirectory.absolutePath,
-                                packageName = "LocalDummyFramework",
+                            SwiftDependency.Binary.Local(
+                                path = xcFrameworkDirectory.absolutePath,
+                                packageName = "DummyFramework",
                                 exportToKotlin = true,
                             ),
                         )
@@ -97,7 +99,17 @@ class LocalPackageTest {
                         content =
                             """
                             package com.example
-                            import LocalDummyFramework.MySwiftClass
+                            import DummyFramework.DummyFrameworkVersionNumber
+                            """.trimIndent(),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import DummyFramework
+                            @objc public class MySwiftClass: NSObject {
+                            }
                             """.trimIndent(),
                     ),
                 ).build()
@@ -105,7 +117,7 @@ class LocalPackageTest {
         val project = fixture.gradleProject.rootDir
         folderTopOpen = project.absolutePath
         // When
-        val result = GradleBuilder.build(project, "build")
+        val result = build(project, "build")
 
         // Then
         assertThat(result).task(":library:build").succeeded()

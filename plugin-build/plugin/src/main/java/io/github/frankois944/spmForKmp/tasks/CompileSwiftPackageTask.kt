@@ -1,7 +1,7 @@
-package io.github.frankois944.spmForKmp.plugin.tasks
+package io.github.frankois944.spmForKmp.tasks
 
-import io.github.frankois944.spmForKmp.plugin.CompileTarget
-import io.github.frankois944.spmForKmp.plugin.operations.getSDKPath
+import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.operations.getSDKPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -36,7 +36,7 @@ internal abstract class CompileSwiftPackageTask
 
         init {
             description = "Compile the Swift Package manifest"
-            group = "io.github.frankois944.spmForKmp.plugin.tasks"
+            group = "io.github.frankois944.spmForKmp.tasks"
         }
 
         private fun copyOriginalPackageScratchDir() {

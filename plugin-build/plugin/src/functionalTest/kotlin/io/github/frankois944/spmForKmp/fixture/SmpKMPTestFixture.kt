@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.plugin.fixture
+package io.github.frankois944.spmForKmp.fixture
 
 import com.autonomousapps.kit.AbstractGradleProject
 import com.autonomousapps.kit.GradleProject
@@ -6,8 +6,8 @@ import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
-import io.github.frankois944.spmForKmp.plugin.CompileTarget
-import io.github.frankois944.spmForKmp.plugin.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import org.gradle.internal.cc.base.logger
 
 abstract class SmpKMPTestFixture private constructor(
@@ -73,11 +73,11 @@ org.gradle.caching=true
 
     private fun Subproject.Builder.setupGradleConfig(extension: TestConfiguration) {
         withBuildScript {
-            imports = Imports.of("io.github.frankois944.spmForKmp.plugin.definition.SwiftDependency")
+            imports = Imports.of("io.github.frankois944.spmForKmp.definition.SwiftDependency")
             plugins(
                 Plugin.of("org.jetbrains.kotlin.multiplatform", "2.1.0"),
                 Plugin(
-                    "io.github.frankois944.spmForKmp.plugin",
+                    "io.github.frankois944.spmForKmp",
                     System.getProperty("com.autonomousapps.plugin-under-test.version"),
                 ),
             )

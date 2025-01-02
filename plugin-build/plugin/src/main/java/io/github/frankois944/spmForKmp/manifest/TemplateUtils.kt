@@ -1,6 +1,6 @@
-package io.github.frankois944.spmForKmp.plugin.manifest
+package io.github.frankois944.spmForKmp.manifest
 
-import io.github.frankois944.spmForKmp.plugin.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
 
 internal val SwiftDependency.isBinaryDependency: Boolean
     get() =

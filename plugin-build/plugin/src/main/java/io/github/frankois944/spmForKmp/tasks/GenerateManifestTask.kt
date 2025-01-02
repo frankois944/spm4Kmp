@@ -1,8 +1,8 @@
-package io.github.frankois944.spmForKmp.plugin.tasks
+package io.github.frankois944.spmForKmp.tasks
 
-import io.github.frankois944.spmForKmp.plugin.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.plugin.manifest.generateManifest
-import io.github.frankois944.spmForKmp.plugin.operations.resolvePackage
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.manifest.generateManifest
+import io.github.frankois944.spmForKmp.operations.resolvePackage
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -40,7 +40,7 @@ internal abstract class GenerateManifestTask
 
         init {
             description = "Generate a Swift Package manifest"
-            group = "io.github.frankois944.spmForKmp.plugin.tasks"
+            group = "io.github.frankois944.spmForKmp.tasks"
         }
 
         @TaskAction

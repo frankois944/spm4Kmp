@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/plugin-build/plugin" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

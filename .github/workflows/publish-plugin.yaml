@@ -45,5 +45,8 @@ jobs:
           name: test-pre-merge-report
           path: plugin-build/plugin/build/reports/tests/
       - name: Publish on Plugin Portal
-        run: ./gradlew --project-dir plugin-build setupPluginUploadFromEnvironment publishPlugins
+        run: ./gradlew :plugin-build:plugin:setupPluginUploadFromEnvironment :plugin-build:plugin:publishPlugins
+        if: success()
+      - name: Publish on Maven Portal
+        run: ./gradlew :plugin-build:plugin:publishAllPublicationsToMavenCentralRepository --no-configuration-cache
         if: success()

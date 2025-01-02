@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalStdlibApi::class)
 
-package io.github.frankois944.spmForKmp.plugin.definition
+package io.github.frankois944.spmForKmp.definition
 
 import org.gradle.api.Project
 import javax.inject.Inject

@@ -1,16 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="publish to maven" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="premerge" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="--no-configuration-cache" />
+      <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
         <list>
-          <option value=":plugin-build:plugin:publishAllPublicationsToMavenCentralRepository" />
+          <option value=":preMerge" />
         </list>
       </option>
       <option name="vmOptions" />

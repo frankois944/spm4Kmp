@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.plugin
+package io.github.frankois944.spmForKmp
 
 import org.jetbrains.kotlin.konan.target.KonanTarget
 

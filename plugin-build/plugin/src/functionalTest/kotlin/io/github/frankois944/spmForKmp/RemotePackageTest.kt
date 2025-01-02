@@ -1,12 +1,12 @@
-package io.github.frankois944.spmForKmp.plugin
+package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.plugin.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.plugin.fixture.KotlinSource
-import io.github.frankois944.spmForKmp.plugin.fixture.SmpKMPTestFixture
-import io.github.frankois944.spmForKmp.plugin.fixture.SwiftSource
-import io.github.frankois944.spmForKmp.plugin.utils.OpenFolderOnFailureExtension
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.fixture.KotlinSource
+import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
+import io.github.frankois944.spmForKmp.fixture.SwiftSource
+import io.github.frankois944.spmForKmp.utils.OpenFolderOnFailureExtension
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
