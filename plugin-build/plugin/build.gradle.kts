@@ -142,7 +142,7 @@ tasks.configureEach {
 }
 
 tasks.named("installForFunctionalTest").configure {
-    this.setDependsOn(
-        this.dependsOn.filterNot { (it as String).contains("publishAllPublicationsToFunctionalTestRepository") },
-    )
+    // this.setDependsOn(
+    // this.dependsOn.filterNot { (it as String).contains("publishAllPublicationsToFunctionalTestRepository") },
+    // )
 }

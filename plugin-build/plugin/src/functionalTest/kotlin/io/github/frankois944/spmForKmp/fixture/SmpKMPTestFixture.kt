@@ -4,8 +4,7 @@ import com.autonomousapps.kit.AbstractGradleProject
 import com.autonomousapps.kit.GradleProject
 import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.Subproject
-import com.autonomousapps.kit.gradle.Imports
-import com.autonomousapps.kit.gradle.Plugin
+import com.autonomousapps.kit.gradle.*
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import org.gradle.internal.cc.base.logger
@@ -78,7 +77,10 @@ org.gradle.caching=true
         withBuildScript {
             imports = Imports.of("io.github.frankois944.spmForKmp.definition.SwiftDependency")
             plugins(
-                Plugin.of("org.jetbrains.kotlin.multiplatform", "2.1.0"),
+                Plugin(
+                    "org.jetbrains.kotlin.multiplatform",
+                    System.getProperty("com.autonomousapps.test.versions.kotlin"),
+                ),
                 Plugin(
                     "io.github.frankois944.spmForKmp",
                     System.getProperty("com.autonomousapps.plugin-under-test.version"),
