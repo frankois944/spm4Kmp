@@ -40,6 +40,12 @@ plugins {
 }
 ```
 
+In your gradle.properties, you must have this declaration :
+
+```
+kotlin.mpp.enableCInteropCommonization=true
+```
+
 ---
 
 ### 2. Configure Kotlin Multiplatform Targets
