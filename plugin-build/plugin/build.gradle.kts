@@ -1,4 +1,3 @@
-import com.vanniktech.maven.publish.GradlePublishPlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -6,7 +5,6 @@ plugins {
     `java-gradle-plugin`
     alias(libs.plugins.pluginPublish)
     alias(libs.plugins.autonomousapps.testkit)
-    alias(libs.plugins.publish)
 }
 
 dependencies {
@@ -84,59 +82,5 @@ tasks.create("setupPluginUploadFromEnvironment") {
         }
         System.setProperty("gradle.publish.key", key)
         System.setProperty("gradle.publish.secret", secret)
-    }
-}
-
-mavenPublishing {
-    configure(GradlePublishPlugin())
-
-    // Define coordinates for the published artifact
-    coordinates(
-        groupId = property("GROUP").toString(),
-        artifactId = property("ARTIFACT_ID").toString(),
-        version = property("VERSION").toString(),
-    )
-
-    // Configure POM metadata for the published artifact
-    pom {
-        name.set(property("DISPLAY_NAME").toString())
-        description.set(
-            property("DESCRIPTION").toString(),
-        )
-        inceptionYear.set("2025")
-        url.set(property("WEBSITE").toString())
-
-        licenses {
-            license {
-                name.set("MIT")
-                url.set(property("WEBSITE").toString())
-            }
-        }
-
-        // Specify developer information
-        developers {
-            developer {
-                id.set("frankois944")
-                name.set("Francois Dabonot")
-                email.set("dabonot.francois@gmail.com")
-            }
-        }
-
-        // Specify SCM information
-        scm {
-            url.set(property("VCS_URL").toString())
-        }
-    }
-
-    // Configure publishing to Maven Central
-    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
-
-    // Enable GPG signing for all publications
-    signAllPublications()
-}
-
-tasks.configureEach {
-    if (name.contains("TestKit") && name.contains("Publication")) {
-        enabled = false
     }
 }
