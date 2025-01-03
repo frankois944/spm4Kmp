@@ -8,7 +8,7 @@ plugins {
 kotlin {
     listOf(
         iosArm64(),
-        // iosSimulatorArm64(),
+        macosX64(),
     ).forEach {
         it.compilations {
             val main by getting {
@@ -20,9 +20,7 @@ kotlin {
 
 swiftPackageConfig {
     create("nativeExample") {
-        sharedCachePath = "/tmp/build/cache"
-        sharedSecurityPath = "/tmp/build/security"
-        sharedConfigPath = "/tmp/build/config"
+        minMacos = "10.15"
         dependency(
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
