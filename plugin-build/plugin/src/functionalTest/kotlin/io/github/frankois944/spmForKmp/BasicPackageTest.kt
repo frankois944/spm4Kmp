@@ -16,7 +16,11 @@ class BasicPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withSwiftSources(
+                .withTargets(
+                    CompileTarget.iosSimulatorArm64,
+                    CompileTarget.iosArm64,
+                    CompileTarget.iosX64,
+                ).withSwiftSources(
                     SwiftSource.of(
                         content =
                             """

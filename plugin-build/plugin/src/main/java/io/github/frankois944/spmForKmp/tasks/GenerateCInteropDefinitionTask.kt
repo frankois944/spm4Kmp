@@ -120,11 +120,11 @@ internal abstract class GenerateCInteropDefinitionTask
             }.distinct()
 
         private fun getExtraLinkers(): String {
-            val xcodeDevPath = operation.getXcodeDevPath()
+            val xcodeDevPath = operation.getXcodeDevPath(logger)
 
             val linkerPlatformVersion =
                 @Suppress("MagicNumber")
-                if (operation.getXcodeVersion().toDouble() >= 15) {
+                if (operation.getXcodeVersion(logger).toDouble() >= 15) {
                     target.linkerPlatformVersionName()
                 } else {
                     target.linkerMinOsVersionName()

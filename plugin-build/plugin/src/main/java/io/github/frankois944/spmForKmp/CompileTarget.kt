@@ -55,47 +55,36 @@ public enum class CompileTarget {
 
     internal fun sdk() =
         when (this) {
-            iosX64 -> "iphonesimulator"
             iosArm64 -> "iphoneos"
-            iosSimulatorArm64 -> "iphonesimulator"
-            watchosX64 -> "watchsimulator"
-            watchosArm64 -> "watchos"
+            iosX64, iosSimulatorArm64 -> "iphonesimulator"
+            watchosX64, watchosArm64 -> "watchos"
             watchosSimulatorArm64 -> "watchsimulator"
-            tvosX64 -> "appletvsimulator"
-            tvosArm64 -> "appletvos"
+            tvosX64, tvosArm64 -> "appletvos"
             tvosSimulatorArm64 -> "appletvsimulator"
-            macosX64 -> "macosx"
-            macosArm64 -> "macosx"
+            macosX64, macosArm64 -> "macosx"
         }
 
     private fun arch() =
         when (this) {
             iosX64 -> "x86_64"
-            iosArm64 -> "arm64"
-            iosSimulatorArm64 -> "arm64"
+            iosArm64, iosSimulatorArm64 -> "arm64"
             watchosX64 -> "x86_64"
-            watchosArm64 -> "arm64"
-            watchosSimulatorArm64 -> "arm64"
+            watchosArm64, watchosSimulatorArm64 -> "arm64"
             tvosX64 -> "x86_64"
-            tvosArm64 -> "arm64"
-            tvosSimulatorArm64 -> "arm64"
+            tvosArm64, tvosSimulatorArm64 -> "arm64"
             macosX64 -> "x86_64"
             macosArm64 -> "arm64"
         }
 
     private fun simulatorSuffix() =
         when (this) {
-            iosX64 -> "-simulator"
             iosArm64 -> ""
-            iosSimulatorArm64 -> "-simulator"
-            watchosX64 -> "-simulator"
+            iosX64, iosSimulatorArm64 -> "-simulator"
             watchosArm64 -> ""
-            watchosSimulatorArm64 -> "-simulator"
-            tvosX64 -> "-simulator"
+            watchosX64, watchosSimulatorArm64 -> "-simulator"
             tvosArm64 -> ""
-            tvosSimulatorArm64 -> "-simulator"
-            macosX64 -> ""
-            macosArm64 -> ""
+            tvosX64, tvosSimulatorArm64 -> "-simulator"
+            macosX64, macosArm64 -> ""
         }
 
     internal fun getOsVersion(
@@ -127,26 +116,22 @@ public enum class CompileTarget {
         when (this) {
             iosArm64 -> "platform_version ios"
             iosX64, iosSimulatorArm64 -> "platform_version ios-simulator"
-            watchosArm64 -> "platform_version watchos"
-            watchosX64, watchosSimulatorArm64 -> "platform_version watchos-simulator"
-            tvosArm64 -> "platform_version tvos"
-            tvosX64, tvosSimulatorArm64 -> "platform_version tvos-simulator"
+            watchosArm64, watchosX64 -> "platform_version watchos"
+            watchosSimulatorArm64 -> "platform_version watchos-simulator"
+            tvosArm64, tvosX64 -> "platform_version tvos"
+            tvosSimulatorArm64 -> "platform_version tvos-simulator"
             macosX64, macosArm64 -> "platform_version macosx"
         }
 
     internal fun linkerMinOsVersionName() =
         when (this) {
-            iosX64 -> "ios_simulator_version_min"
             iosArm64 -> "ios_version_min"
-            iosSimulatorArm64 -> "ios_simulator_version_min"
-            watchosX64 -> "watchos_simulator_version_min"
-            watchosArm64 -> "watchos_version_min"
+            iosX64, iosSimulatorArm64 -> "ios_simulator_version_min"
+            watchosX64, watchosArm64 -> "watchos_version_min"
             watchosSimulatorArm64 -> "watchos_simulator_version_min"
-            tvosX64 -> "tvos_simulator_version_min"
-            tvosArm64 -> "tvos_version_min"
+            tvosX64, tvosArm64 -> "tvos_version_min"
             tvosSimulatorArm64 -> "tvos_simulator_version_min"
-            macosX64 -> "macosx_version_min"
-            macosArm64 -> "macosx_version_min"
+            macosX64, macosArm64 -> "macosx_version_min"
         }
 
     /**

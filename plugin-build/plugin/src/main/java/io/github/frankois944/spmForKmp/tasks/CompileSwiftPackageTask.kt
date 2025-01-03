@@ -97,7 +97,7 @@ internal abstract class CompileSwiftPackageTask
         @TaskAction
         fun compilePackage() {
             logger.debug("Compile the manifest {}", manifestFile.get().path)
-            val sdkPath = operation.getSDKPath(target.get())
+            val sdkPath = operation.getSDKPath(target.get(), logger)
             val workingDir = prepareWorkingDir()
 
             val args =
@@ -129,9 +129,9 @@ internal abstract class CompileSwiftPackageTask
 
             logger.debug(
                 """
-                RUN compileManifest
-                ARGS xcrun ${args.joinToString(" ")}
-                From ${workingDir.path}
+RUN compileManifest
+ARGS xcrun ${args.joinToString(" ")}
+From ${workingDir.path}
                 """.trimMargin(),
             )
 
