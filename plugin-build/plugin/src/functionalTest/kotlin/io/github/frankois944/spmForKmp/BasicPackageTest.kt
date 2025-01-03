@@ -90,8 +90,8 @@ class BasicPackageTest {
         assertThat(result).task(":library:build").succeeded()
         assert(cache.listFiles()?.isNotEmpty() == true)
         assert(config.exists())
-        assert(security.exists()) x
-            cache.deleteRecursively()
+        assert(security.exists())
+        cache.deleteRecursively()
         config.deleteRecursively()
         security.deleteRecursively()
     }

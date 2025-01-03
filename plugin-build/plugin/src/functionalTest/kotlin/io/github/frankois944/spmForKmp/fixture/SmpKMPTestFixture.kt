@@ -4,7 +4,8 @@ import com.autonomousapps.kit.AbstractGradleProject
 import com.autonomousapps.kit.GradleProject
 import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.Subproject
-import com.autonomousapps.kit.gradle.*
+import com.autonomousapps.kit.gradle.Imports
+import com.autonomousapps.kit.gradle.Plugin
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import org.gradle.internal.cc.base.logger
