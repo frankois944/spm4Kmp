@@ -22,7 +22,7 @@ abstract class SmpKMPTestFixture private constructor(
         var customPackageSourcePath: String = "src/swift",
         var cinteropsName: String = "dummy",
         var minIos: String = "12.0",
-        var minMacos: String = "10.13",
+        var minMacos: String = "10.15",
         var minTvos: String = "12.0",
         var minWatchos: String = "4.0",
         var toolsVersion: String = "5.9",
