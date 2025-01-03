@@ -5,6 +5,8 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFiles
@@ -20,26 +22,27 @@ private data class ModuleConfig(
     val definitionFile: File,
 )
 
-internal data class ModuleConfigInfo(
-    val language: String,
-    val modules: String,
-    val `package`: String,
-    val staticLibraries: String,
-    val libraryPaths: String,
-    val compilerOpts: String,
-    val linkerOpts: String,
-)
-
 internal abstract class GenerateCInteropDefinitionTask
     @Inject
-    constructor(
-        @get:InputDirectory val packageBuildOutputDirectory: File,
-        @get:Input val target: CompileTarget,
-        @get:Input val productName: String,
-        @get:Input val packages: List<SwiftDependency>,
-        @get:Input val debugMode: Boolean,
-        @get:Input val osVersion: String,
-    ) : DefaultTask() {
+    constructor() : DefaultTask() {
+        @get:InputDirectory
+        abstract val packageBuildOutputDirectory: Property<File>
+
+        @get:Input
+        abstract val target: Property<CompileTarget>
+
+        @get:Input
+        abstract val productName: Property<String>
+
+        @get:Input
+        abstract val packages: ListProperty<SwiftDependency>
+
+        @get:Input
+        abstract val debugMode: Property<Boolean>
+
+        @get:Input
+        abstract val osVersion: Property<String>
+
         init {
             description = "Generate the cinterop definitions files"
             group = "io.github.frankois944.spmForKmp.tasks"
@@ -50,7 +53,7 @@ internal abstract class GenerateCInteropDefinitionTask
             get() =
                 buildList {
                     getModuleNames().forEach { moduleName ->
-                        add(packageBuildOutputDirectory.resolve("$moduleName.def"))
+                        add(packageBuildOutputDirectory.get().resolve("$moduleName.def"))
                     }
                 }
 
@@ -59,8 +62,7 @@ internal abstract class GenerateCInteropDefinitionTask
 
         private fun getBuildDirectory(): File =
             packageBuildOutputDirectory
-                .resolve(target.getPackageBuildDir())
-                .resolve(if (debugMode) "debug" else "release")
+                .get()
 
         private fun getBuildDirectoriesContent(): List<File> =
             getBuildDirectory() // get folders with headers for internal dependencies
@@ -79,9 +81,9 @@ internal abstract class GenerateCInteropDefinitionTask
         }
 
         private fun extractHeadersPathFromModuleMap(module: String): List<File> {
-            /*
-             * find a better regex to extract the header value
-             */
+        /*
+         * find a better regex to extract the header value
+         */
             val regex = """header\s+"([^"]+)"""".toRegex()
             return regex
                 .find(module)
@@ -104,9 +106,10 @@ internal abstract class GenerateCInteropDefinitionTask
 
         private fun getModuleNames(): List<String> =
             buildList {
-                add(productName) // the first item must be the product name
+                add(productName.get()) // the first item must be the product name
                 addAll(
                     packages
+                        .get()
                         .filter {
                             it.exportToKotlin
                         }.flatMap {
@@ -125,18 +128,18 @@ internal abstract class GenerateCInteropDefinitionTask
             val linkerPlatformVersion =
                 @Suppress("MagicNumber")
                 if (operation.getXcodeVersion(logger).toDouble() >= 15) {
-                    target.linkerPlatformVersionName()
+                    target.get().linkerPlatformVersionName()
                 } else {
-                    target.linkerMinOsVersionName()
+                    target.get().linkerMinOsVersionName()
                 }
 
             return listOf(
                 "-$linkerPlatformVersion",
-                osVersion,
-                osVersion,
+                osVersion.get(),
+                osVersion.get(),
                 "-rpath",
                 "/usr/lib/swift",
-                "-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.sdk()}\"",
+                "-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"",
             ).joinToString(" ")
         }
 
@@ -164,7 +167,7 @@ internal abstract class GenerateCInteropDefinitionTask
                                 isFramework = buildDir.extension == "framework",
                                 name = moduleName,
                                 buildDir = buildDir,
-                                definitionFile = packageBuildOutputDirectory.resolve("$moduleName.def"),
+                                definitionFile = packageBuildOutputDirectory.get().resolve("$moduleName.def"),
                             ),
                         )
                     }
@@ -192,7 +195,7 @@ internal abstract class GenerateCInteropDefinitionTask
                             modules = $moduleName
                             package = ${moduleConfig.name}
 
-                            staticLibraries = lib$productName.a
+                            staticLibraries = lib${productName.get()}.a
                             libraryPaths = "${getBuildDirectory().path}"
                             compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
                             linkerOpts = ${getExtraLinkers()}
@@ -212,7 +215,7 @@ internal abstract class GenerateCInteropDefinitionTask
                             modules = $moduleName
                             package = ${moduleConfig.name}
 
-                            staticLibraries = lib$productName.a
+                            staticLibraries = lib${productName.get()}.a
                             libraryPaths = "${getBuildDirectory().path}"
                             compilerOpts = -ObjC -fmodules ${headersPath.joinToString(" ") { "-I\"${it.path}\"" }}
                             linkerOpts = ${getExtraLinkers()}

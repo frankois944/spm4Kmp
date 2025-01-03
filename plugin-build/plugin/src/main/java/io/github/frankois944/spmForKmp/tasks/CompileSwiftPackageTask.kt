@@ -27,10 +27,10 @@ internal abstract class CompileSwiftPackageTask
         @get:Input
         abstract val debugMode: Property<Boolean>
 
-        @get:InputDirectory
-        abstract val originalPackageScratchDir: Property<File>
-
         @get:OutputDirectory
+        abstract val compiledTargetDir: Property<File>
+
+        @get:Input
         abstract val packageScratchDir: Property<File>
 
         @get:InputDirectory
@@ -59,13 +59,6 @@ internal abstract class CompileSwiftPackageTask
             group = "io.github.frankois944.spmForKmp.tasks"
         }
 
-        private fun copyOriginalPackageScratchDir() {
-            if (!packageScratchDir.get().exists()) {
-                packageScratchDir.get().mkdirs()
-                originalPackageScratchDir.get().copyRecursively(packageScratchDir.get())
-            }
-        }
-
         private fun prepareWorkingDir(): File {
             val workingDir = manifestFile.get().parentFile
             val sourceDir = workingDir.resolve("Source")
@@ -90,7 +83,6 @@ internal abstract class CompileSwiftPackageTask
                 sourceDir.resolve("Dummy.swift").createNewFile()
                 sourceDir.resolve("Dummy.swift").writeText("import Foundation")
             }
-            copyOriginalPackageScratchDir()
             return workingDir
         }
 

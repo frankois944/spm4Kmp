@@ -66,20 +66,11 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 layout.buildDirectory.asFile
                     .get()
                     .resolve("spmKmpPlugin")
-                    .resolve("input")
-                    .also {
-                        it.mkdirs()
-                    }
-            val buildPackageDir =
-                layout.buildDirectory.asFile
-                    .get()
-                    .resolve("spmKmpPlugin")
-                    .resolve("output")
                     .also {
                         it.mkdirs()
                     }
 
-            val originalPackageScratchDir =
+            val packageScratchDir =
                 resolvePath(sourcePackageDir)
                     .resolve("scratch")
                     .also {
@@ -87,6 +78,9 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     }
             afterEvaluate {
                 val extension = swiftPackageEntries.first()
+                if (swiftPackageEntries.size > 1) {
+                    logger.warn("Only the first entry is currently supported, the other will be ignored")
+                }
 
                 val sharedCacheDir: File? =
                     extension.sharedCachePath?.run {
@@ -112,10 +106,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             }
                     }
 
-                if (swiftPackageEntries.size > 1) {
-                    logger.warn("Only the first entry is currently supported, the other will be ignored")
-                }
-
                 val userSourcePackageDir =
                     resolvePath(File(extension.customPackageSourcePath))
                         .also { dir ->
@@ -138,7 +128,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             manifest.minWatchos.set(extension.minWatchos)
                             manifest.toolsVersion.set(extension.toolsVersion)
                             manifest.packageDirectory.set(sourcePackageDir)
-                            manifest.scratchDirectory.set(originalPackageScratchDir)
+                            manifest.scratchDirectory.set(packageScratchDir)
                             manifest.sharedCacheDir.set(sharedCacheDir)
                             manifest.sharedConfigDir.set(sharedConfigDir)
                             manifest.sharedSecurityDir.set(sharedSecurityDir)
@@ -147,14 +137,10 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val dependencyTaskNames = mutableMapOf<String, File>()
 
                 CompileTarget.entries.forEach { cinteropTarget ->
-                    val targetPackageScratchDir =
-                        buildPackageDir
-                            .resolve(cinteropTarget.name)
-                            .also {
-                                if (!it.exists()) {
-                                    it.mkdirs()
-                                }
-                            }
+                    val targetBuildDir =
+                        packageScratchDir
+                            .resolve(cinteropTarget.getPackageBuildDir())
+                            .resolve(if (extension.debug) "debug" else "release")
 
                     val task2 =
                         tasks
@@ -167,8 +153,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 it.manifestFile.set(File(sourcePackageDir, "Package.swift"))
                                 it.target.set(cinteropTarget)
                                 it.debugMode.set(extension.debug)
-                                it.originalPackageScratchDir.set(originalPackageScratchDir)
-                                it.packageScratchDir.set(targetPackageScratchDir)
+                                it.packageScratchDir.set(packageScratchDir)
+                                it.compiledTargetDir.set(targetBuildDir)
                                 it.customSourcePackage.set(userSourcePackageDir)
                                 it.osVersion.set(
                                     cinteropTarget.getOsVersion(
@@ -190,19 +176,21 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 getTaskName(TASK_GENERATE_CINTEROP_DEF, cinteropTarget),
                                 // type =
                                 GenerateCInteropDefinitionTask::class.java,
-                                // ...constructorArgs =
-                                targetPackageScratchDir,
-                                cinteropTarget,
-                                extension.name,
-                                extension.packageDependencies,
-                                extension.debug,
-                                cinteropTarget.getOsVersion(
-                                    minIos = extension.minIos,
-                                    minWatchos = extension.minWatchos,
-                                    minTvos = extension.minTvos,
-                                    minMacos = extension.minMacos,
-                                ),
-                            )
+                            ) {
+                                it.packageBuildOutputDirectory.set(targetBuildDir)
+                                it.target.set(cinteropTarget)
+                                it.productName.set(extension.name)
+                                it.packages.set(extension.packageDependencies)
+                                it.debugMode.set(extension.debug)
+                                it.osVersion.set(
+                                    cinteropTarget.getOsVersion(
+                                        minIos = extension.minIos,
+                                        minWatchos = extension.minWatchos,
+                                        minTvos = extension.minTvos,
+                                        minMacos = extension.minMacos,
+                                    ),
+                                )
+                            }
 
                     val dependenciesFiles = task3.get().outputFiles
                     if (dependenciesFiles.isNotEmpty()) {
