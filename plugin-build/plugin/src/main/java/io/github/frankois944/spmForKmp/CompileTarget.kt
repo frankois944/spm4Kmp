@@ -57,10 +57,10 @@ public enum class CompileTarget {
         when (this) {
             iosArm64 -> "iphoneos"
             iosX64, iosSimulatorArm64 -> "iphonesimulator"
-            watchosX64, watchosArm64 -> "watchos"
-            watchosSimulatorArm64 -> "watchsimulator"
-            tvosX64, tvosArm64 -> "appletvos"
-            tvosSimulatorArm64 -> "appletvsimulator"
+            watchosArm64 -> "watchos"
+            watchosX64, watchosSimulatorArm64 -> "watchsimulator"
+            tvosArm64 -> "appletvos"
+            tvosX64, tvosSimulatorArm64 -> "appletvsimulator"
             macosX64, macosArm64 -> "macosx"
         }
 
