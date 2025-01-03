@@ -22,7 +22,7 @@ abstract class SmpKMPTestFixture private constructor(
         var customPackageSourcePath: String = "src/swift",
         var cinteropsName: String = "dummy",
         var minIos: String = "12.0",
-        var minMacos: String = "10.13",
+        var minMacos: String = "10.15",
         var minTvos: String = "12.0",
         var minWatchos: String = "4.0",
         var toolsVersion: String = "5.9",
@@ -30,6 +30,9 @@ abstract class SmpKMPTestFixture private constructor(
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
         val packages: List<SwiftDependency> = emptyList(),
+        val sharedCachePath: String? = "/tmp/spm4Ktm/sharedCachePath",
+        val sharedConfigPath: String? = "/tmp/spm4Ktm/sharedConfigPath",
+        val sharedSecurityPath: String? = "/tmp/spm4Ktm/sharedSecurityPath",
     )
 
     protected abstract fun createProject(): GradleProject
@@ -75,7 +78,10 @@ org.gradle.caching=true
         withBuildScript {
             imports = Imports.of("io.github.frankois944.spmForKmp.definition.SwiftDependency")
             plugins(
-                Plugin.of("org.jetbrains.kotlin.multiplatform", "2.1.0"),
+                Plugin(
+                    "org.jetbrains.kotlin.multiplatform",
+                    System.getProperty("com.autonomousapps.test.versions.kotlin"),
+                ),
                 Plugin(
                     "io.github.frankois944.spmForKmp",
                     System.getProperty("com.autonomousapps.plugin-under-test.version"),
@@ -100,6 +106,15 @@ swiftPackageConfig {
     minWatchos = "${extension.minWatchos}"
 """,
                 )
+                extension.sharedCachePath?.let {
+                    append("sharedCachePath = \"${extension.sharedCachePath}\"\n")
+                }
+                extension.sharedConfigPath?.let {
+                    append("sharedConfigPath = \"${extension.sharedConfigPath}\"\n")
+                }
+                extension.sharedSecurityPath?.let {
+                    append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
+                }
                 extension.packages.forEach { definition ->
                     append("    dependency(\n     ")
                     when (definition) {
@@ -202,6 +217,21 @@ swiftPackageConfig {
         fun withDependencies(definitions: List<SwiftDependency>) =
             apply {
                 config = config.copy(packages = definitions)
+            }
+
+        fun withCache(path: String) =
+            apply {
+                config = config.copy(sharedCachePath = path)
+            }
+
+        fun withConfig(path: String) =
+            apply {
+                config = config.copy(sharedConfigPath = path)
+            }
+
+        fun withSecurity(path: String) =
+            apply {
+                config = config.copy(sharedSecurityPath = path)
             }
 
         fun build(): SmpKMPTestFixture =

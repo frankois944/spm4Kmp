@@ -4,8 +4,11 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.resolvePackage
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
@@ -15,28 +18,48 @@ import javax.inject.Inject
 internal abstract class GenerateManifestTask
     @Suppress("LongParameterList")
     @Inject
-    constructor(
-        @get:Input
-        val packages: List<SwiftDependency>,
-        @get:Input
-        val productName: String,
-        @get:Input
-        val minIos: String,
-        @get:Input
-        val minMacos: String,
-        @get:Input
-        val minTvos: String,
-        @get:Input
-        val minWatchos: String,
-        @get:Input
-        val toolsVersion: String,
-        @get:InputDirectory
-        val packageDirectory: File,
-        @get:OutputDirectory
-        val scratchDirectory: File,
-    ) : DefaultTask() {
+    constructor() : DefaultTask() {
         @get:Inject
         abstract val operation: ExecOperations
+
+        @get:Input
+        abstract val packages: ListProperty<SwiftDependency>
+
+        @get:Input
+        abstract val productName: Property<String>
+
+        @get:Input
+        abstract val minIos: Property<String>
+
+        @get:Input
+        abstract val minMacos: Property<String>
+
+        @get:Input
+        abstract val minTvos: Property<String>
+
+        @get:Input
+        abstract val minWatchos: Property<String>
+
+        @get:Input
+        abstract val toolsVersion: Property<String>
+
+        @get:InputDirectory
+        abstract val packageDirectory: Property<File>
+
+        @get:OutputDirectory
+        abstract val scratchDirectory: Property<File>
+
+        @get:OutputDirectory
+        @get:Optional
+        abstract val sharedCacheDir: Property<File?>
+
+        @get:OutputDirectory
+        @get:Optional
+        abstract val sharedConfigDir: Property<File?>
+
+        @get:OutputDirectory
+        @get:Optional
+        abstract val sharedSecurityDir: Property<File?>
 
         init {
             description = "Generate a Swift Package manifest"
@@ -47,24 +70,30 @@ internal abstract class GenerateManifestTask
         fun generateFile() {
             val manifest =
                 generateManifest(
-                    packages,
+                    packages.get(),
                     generatedPackageDirectory =
-                        packageDirectory.toPath(),
-                    productName = productName,
-                    minIos = minIos,
-                    minMacos = minMacos,
-                    minTvos = minTvos,
-                    minWatchos = minWatchos,
-                    toolsVersion = toolsVersion,
+                        packageDirectory.get().toPath(),
+                    productName = productName.get(),
+                    minIos = minIos.get(),
+                    minMacos = minMacos.get(),
+                    minTvos = minTvos.get(),
+                    minWatchos = minWatchos.get(),
+                    toolsVersion = toolsVersion.get(),
                 )
-            packageDirectory.resolve("Package.swift").writeText(manifest)
+            packageDirectory.get().resolve("Package.swift").writeText(manifest)
             logger.debug(
                 """
                 Manifest file generated :
-                ${packageDirectory.resolve("Package.swift")}
-                ${packageDirectory.resolve("Package.swift").readText()}
+                ${packageDirectory.get().resolve("Package.swift")}
+                ${packageDirectory.get().resolve("Package.swift").readText()}
                 """.trimIndent(),
             )
-            operation.resolvePackage(packageDirectory, scratchDirectory)
+            operation.resolvePackage(
+                workingDir = packageDirectory.get(),
+                scratchPath = scratchDirectory.get(),
+                sharedCachePath = sharedCacheDir.orNull,
+                sharedConfigPath = sharedConfigDir.orNull,
+                sharedSecurityPath = sharedSecurityDir.orNull,
+            )
         }
     }

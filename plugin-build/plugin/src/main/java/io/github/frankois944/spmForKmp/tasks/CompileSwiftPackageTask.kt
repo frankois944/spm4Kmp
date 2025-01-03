@@ -3,9 +3,11 @@ package io.github.frankois944.spmForKmp.tasks
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
@@ -15,22 +17,40 @@ import javax.inject.Inject
 internal abstract class CompileSwiftPackageTask
     @Suppress("LongParameterList")
     @Inject
-    constructor(
+    constructor() : DefaultTask() {
         @get:InputFile
-        val manifestFile: File,
+        abstract val manifestFile: Property<File>
+
         @get:Input
-        val target: CompileTarget,
+        abstract val target: Property<CompileTarget>
+
         @get:Input
-        val debugMode: Boolean,
+        abstract val debugMode: Property<Boolean>
+
         @get:InputDirectory
-        val originalPackageScratchDir: File,
+        abstract val originalPackageScratchDir: Property<File>
+
         @get:OutputDirectory
-        val packageScratchDir: File,
+        abstract val packageScratchDir: Property<File>
+
         @get:InputDirectory
-        val customSourcePackage: File,
+        abstract val customSourcePackage: Property<File>
+
         @get:Input
-        val osVersion: String,
-    ) : DefaultTask() {
+        abstract val osVersion: Property<String>
+
+        @get:InputDirectory
+        @get:Optional
+        abstract val sharedCacheDir: Property<File?>
+
+        @get:InputDirectory
+        @get:Optional
+        abstract val sharedConfigDir: Property<File?>
+
+        @get:InputDirectory
+        @get:Optional
+        abstract val sharedSecurityDir: Property<File?>
+
         @get:Inject
         abstract val operation: ExecOperations
 
@@ -40,27 +60,27 @@ internal abstract class CompileSwiftPackageTask
         }
 
         private fun copyOriginalPackageScratchDir() {
-            if (!packageScratchDir.exists()) {
-                packageScratchDir.mkdirs()
-                originalPackageScratchDir.copyRecursively(packageScratchDir)
+            if (!packageScratchDir.get().exists()) {
+                packageScratchDir.get().mkdirs()
+                originalPackageScratchDir.get().copyRecursively(packageScratchDir.get())
             }
         }
 
         private fun prepareWorkingDir(): File {
-            val workingDir = manifestFile.parentFile
+            val workingDir = manifestFile.get().parentFile
             val sourceDir = workingDir.resolve("Source")
             if (sourceDir.exists()) {
                 sourceDir.deleteRecursively()
             }
             sourceDir.mkdirs()
-            if (customSourcePackage.list()?.isNotEmpty() == true) {
+            if (customSourcePackage.get().list()?.isNotEmpty() == true) {
                 logger.debug(
                     """
                     Copy User Swift files to directory $sourceDir
-                    ${customSourcePackage.list()?.toList()}
+                    ${customSourcePackage.get().list()?.toList()}
                     """.trimIndent(),
                 )
-                customSourcePackage.copyRecursively(sourceDir)
+                customSourcePackage.get().copyRecursively(sourceDir)
             } else {
                 logger.debug(
                     """
@@ -76,29 +96,42 @@ internal abstract class CompileSwiftPackageTask
 
         @TaskAction
         fun compilePackage() {
-            logger.debug("Compile the manifest {}", manifestFile.path)
-            val sdkPath = operation.getSDKPath(target)
+            logger.debug("Compile the manifest {}", manifestFile.get().path)
+            val sdkPath = operation.getSDKPath(target.get(), logger)
             val workingDir = prepareWorkingDir()
 
             val args =
-                listOf(
+                mutableListOf(
                     "swift",
                     "build",
                     "--sdk",
                     sdkPath,
                     "--triple",
-                    target.getTriple(osVersion),
+                    target.get().getTriple(osVersion.get()),
                     "--scratch-path",
-                    packageScratchDir.path,
+                    packageScratchDir.get().path,
                     "-c",
-                    if (debugMode) "debug" else "release",
-                )
+                    if (debugMode.get()) "debug" else "release",
+                ).also { list ->
+                    sharedCacheDir.orNull?.let {
+                        list.add("--cache-path")
+                        list.add(it.path)
+                    }
+                    sharedConfigDir.orNull?.let {
+                        list.add("--config-path")
+                        list.add(it.path)
+                    }
+                    sharedSecurityDir.orNull?.let {
+                        list.add("--security-path")
+                        list.add(it.path)
+                    }
+                }
 
             logger.debug(
                 """
-                RUN compileManifest
-                ARGS xcrun ${args.joinToString(" ")}
-                From ${workingDir.path}
+RUN compileManifest
+ARGS xcrun ${args.joinToString(" ")}
+From ${workingDir.path}
                 """.trimMargin(),
             )
 
