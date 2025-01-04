@@ -44,7 +44,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.example.voidapp"
+    namespace = "com.example"
     compileSdk = 34
     defaultConfig {
         minSdk = 24
@@ -63,7 +63,7 @@ swiftPackageConfig {
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                 names = listOf("CryptoSwift"),
-                version = "1.8.4",
+                version = "1.8.1",
             ),
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/firebase/firebase-ios-sdk.git", // Repository URL

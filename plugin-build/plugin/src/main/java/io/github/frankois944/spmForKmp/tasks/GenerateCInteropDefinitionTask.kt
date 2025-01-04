@@ -223,8 +223,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         modules = $moduleName
                         package = ${moduleConfig.name}
 
+                        # Set a checksum for avoid build cache
                         # checkum: $checksum
-                        staticLibraries = lib${productName.get()}.a
+                        staticLibraries = $libName
                         libraryPaths = "${getBuildDirectory().path}"
                         compilerOpts = -ObjC -fmodules ${headersPath.joinToString(" ") { "-I\"${it.path}\"" }}
                         linkerOpts = ${getExtraLinkers()}
