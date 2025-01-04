@@ -4,7 +4,7 @@ package com.example
 import FirebaseAnalytics.FIRAnalytics
 import FirebaseCore.FIRApp
 import kotlinx.cinterop.ExperimentalForeignApi
-import nativeExample.TestClass
+import nativeShared.TestClass
 import platform.Foundation.version
 
 @ExperimentalForeignApi
