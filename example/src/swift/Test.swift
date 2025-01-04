@@ -6,4 +6,8 @@ import CryptoSwift
     public func getSomeValue() -> String {
         return "HelloTest!"
     }
+
+    public func getValueFromCrypt() -> String {
+        return "123".md5()
+    }
 }

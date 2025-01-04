@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.operations.getSDKPath
+import io.github.frankois944.spmForKmp.operations.printExecLogs
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -11,6 +12,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
+import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
@@ -124,11 +126,17 @@ From ${workingDir.path}
             """.trimMargin(),
         )
 
+        val standardOutput = ByteArrayOutputStream()
+        val errorOutput = ByteArrayOutputStream()
         operation
             .exec {
                 it.executable = "xcrun"
                 it.workingDir = workingDir
                 it.args = args
+                it.standardOutput = standardOutput
+                it.errorOutput = errorOutput
             }
+
+        printExecLogs(logger, "compilePackage", args, standardOutput, errorOutput)
     }
 }
