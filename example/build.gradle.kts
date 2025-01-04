@@ -59,9 +59,6 @@ android {
 swiftPackageConfig {
     create("nativeShared") {
         minIos = "15.5"
-        minMacos = ""
-        minTvos = ""
-        minWatchos = ""
         dependency(
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",

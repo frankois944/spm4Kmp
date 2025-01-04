@@ -79,8 +79,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 Copy Dummy swift file to directory $sourceDir
                 """.trimIndent(),
             )
-            sourceDir.resolve("Dummy.swift").createNewFile()
-            sourceDir.resolve("Dummy.swift").writeText("import Foundation")
+            sourceDir.resolve("DummySPMFile.swift").createNewFile()
+            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
         }
         return workingDir
     }
@@ -135,8 +135,17 @@ From ${workingDir.path}
                 it.args = args
                 it.standardOutput = standardOutput
                 it.errorOutput = errorOutput
+                it.isIgnoreExitValue = true
             }
-
-        printExecLogs(logger, "compilePackage", args, standardOutput, errorOutput)
+            .also {
+                printExecLogs(
+                    logger,
+                    "compilePackage",
+                    args,
+                    it.exitValue != 0,
+                    standardOutput,
+                    errorOutput
+                )
+            }
     }
 }

@@ -71,10 +71,10 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             generateManifest(
                 packageDependencies.get(),
                 generatedPackageDirectory =
-                    manifestFile
-                        .get()
-                        .asFile.parentFile
-                        .toPath(),
+                manifestFile
+                    .get()
+                    .asFile.parentFile
+                    .toPath(),
                 productName = packageName.get(),
                 minIos = minIos.get(),
                 minMacos = minMacos.get(),
@@ -83,19 +83,24 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 toolsVersion = toolsVersion.get(),
             )
         manifestFile.asFile.get().writeText(manifest)
-        logger.debug(
-            """
+
+        try {
+            operation.resolvePackage(
+                workingDir = manifestFile.asFile.get().parentFile,
+                scratchPath = packageScratchDir.get(),
+                sharedCachePath = sharedCacheDir.orNull,
+                sharedConfigPath = sharedConfigDir.orNull,
+                sharedSecurityPath = sharedSecurityDir.orNull,
+            )
+        } catch (ex: Exception) {
+            logger.error(
+                """
             Manifest file generated :
             ${manifestFile.get().asFile}
             ${manifestFile.get().asFile.readText()}
             """.trimIndent(),
-        )
-        operation.resolvePackage(
-            workingDir = manifestFile.asFile.get().parentFile,
-            scratchPath = packageScratchDir.get(),
-            sharedCachePath = sharedCacheDir.orNull,
-            sharedConfigPath = sharedConfigDir.orNull,
-            sharedSecurityPath = sharedSecurityDir.orNull,
-        )
+            )
+            throw ex
+        }
     }
 }

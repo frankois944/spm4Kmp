@@ -44,9 +44,17 @@ internal fun ExecOperations.resolvePackage(
         it.workingDir = workingDir
         it.standardOutput = standardOutput
         it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger,
+            "resolvePackage",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput
+        )
     }
-
-    printExecLogs(logger, "resolvePackage", args, standardOutput, errorOutput)
 }
 
 internal fun ExecOperations.getXcodeVersion(logger: Logger? = null): String {
@@ -63,8 +71,17 @@ internal fun ExecOperations.getXcodeVersion(logger: Logger? = null): String {
         it.args = args
         it.standardOutput = standardOutput
         it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger,
+            "getXcodeVersion",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput
+        )
     }
-    printExecLogs(logger, "getXcodeVersion", args, standardOutput, errorOutput)
     val regex = """Xcode\s(\d+\.\d+)""".toRegex()
     val match = regex.find(standardOutput.toString())
     return match?.groups?.get(1)?.value ?: throw RuntimeException("Can't find Xcode version")
@@ -84,8 +101,17 @@ internal fun ExecOperations.getXcodeDevPath(logger: Logger? = null): String {
         it.args = args
         it.standardOutput = standardOutput
         it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger,
+            "getXcodeDevPath",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput
+        )
     }
-    printExecLogs(logger, "getXcodeDevPath", args, standardOutput, errorOutput)
     return standardOutput.toString().trim()
 }
 
@@ -107,8 +133,15 @@ internal fun ExecOperations.getSDKPath(
         it.args = args
         it.standardOutput = standardOutput
         it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger, "getSDKPath",
+            args,
+            it.exitValue != 0,
+            standardOutput, errorOutput
+        )
     }
-    printExecLogs(logger, "getSDKPath", args, standardOutput, errorOutput)
     return standardOutput.toString().trim()
 }
 
@@ -117,10 +150,12 @@ internal fun printExecLogs(
     logger: Logger?,
     action: String,
     args: List<String>,
+    isError: Boolean,
     standardOutput: ByteArrayOutputStream,
-    errorOutput: ByteArrayOutputStream
+    errorOutput: ByteArrayOutputStream,
+    extraString: String? = null
 ) {
-    if (errorOutput.toString().isNotEmpty()) {
+    if (isError) {
         logger?.error(
             """
 ERROR FOUND WHEN EXEC
@@ -128,7 +163,13 @@ RUN $action
 ARGS xcrun ${args.joinToString(" ")}
 ERROR $errorOutput
 OUTPUT $standardOutput
+###
+${extraString ?: ""}
+###
         """.trimMargin(),
+        )
+        throw RuntimeException(
+            "RUN CMD $action failed",
         )
     } else {
         logger?.debug(
