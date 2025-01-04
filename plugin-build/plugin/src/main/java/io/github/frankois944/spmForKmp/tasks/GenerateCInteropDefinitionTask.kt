@@ -4,6 +4,7 @@ import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
+import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -181,6 +182,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEach { moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
             try {
+                val libName = "lib${productName.get()}.a"
+                val checksum = getBuildDirectory().resolve(libName).md5()
                 if (moduleConfig.isFramework) {
                     val mapFile = moduleConfig.buildDir.resolve("Modules").resolve("module.modulemap")
                     logger.debug("Framework mapFile: {}", mapFile)
@@ -193,7 +196,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         modules = $moduleName
                         package = ${moduleConfig.name}
 
-                        staticLibraries = lib${productName.get()}.a
+                        # Set a checksum for avoid build cache
+                        # checkum: $checksum
+                        staticLibraries = $libName
                         libraryPaths = "${getBuildDirectory().path}"
                         compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
                         linkerOpts = ${getExtraLinkers()}
@@ -213,6 +218,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         modules = $moduleName
                         package = ${moduleConfig.name}
 
+                        # checkum: $checksum
                         staticLibraries = lib${productName.get()}.a
                         libraryPaths = "${getBuildDirectory().path}"
                         compilerOpts = -ObjC -fmodules ${headersPath.joinToString(" ") { "-I\"${it.path}\"" }}
