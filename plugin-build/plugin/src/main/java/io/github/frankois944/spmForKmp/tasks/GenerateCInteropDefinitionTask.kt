@@ -6,10 +6,12 @@ import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
@@ -24,8 +26,6 @@ private data class ModuleConfig(
 )
 
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
-    @get:InputDirectory
-    abstract val packageBuildOutputDirectory: Property<File>
 
     @get:Input
     abstract val target: Property<CompileTarget>
@@ -42,6 +42,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
     abstract val osVersion: Property<String>
 
+    @get:InputFile
+    abstract val compiledBinary: RegularFileProperty
+
     init {
         description = "Generate the cinterop definitions files"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -52,7 +55,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         get() =
             buildList {
                 getModuleNames().forEach { moduleName ->
-                    add(packageBuildOutputDirectory.get().resolve("$moduleName.def"))
+                    add(getBuildDirectory().resolve("$moduleName.def"))
                 }
             }
 
@@ -60,8 +63,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     abstract val operation: ExecOperations
 
     private fun getBuildDirectory(): File =
-        packageBuildOutputDirectory
+        compiledBinary
+            .asFile
             .get()
+            .parentFile
 
     private fun getBuildDirectoriesContent(): List<File> =
         getBuildDirectory() // get folders with headers for internal dependencies
@@ -166,7 +171,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                             isFramework = buildDir.extension == "framework",
                             name = moduleName,
                             buildDir = buildDir,
-                            definitionFile = packageBuildOutputDirectory.get().resolve("$moduleName.def"),
+                            definitionFile = getBuildDirectory().resolve("$moduleName.def"),
                         ),
                     )
                 }
@@ -182,8 +187,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEach { moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
             try {
-                val libName = "lib${productName.get()}.a"
-                val checksum = getBuildDirectory().resolve(libName).md5()
+                val libName = compiledBinary.asFile.get().name
+                val checksum = compiledBinary.asFile.get().md5()
                 if (moduleConfig.isFramework) {
                     val mapFile = moduleConfig.buildDir.resolve("Modules").resolve("module.modulemap")
                     logger.debug("Framework mapFile: {}", mapFile)
@@ -230,7 +235,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     """
                     Definition File : ${moduleConfig.definitionFile.name}
                     At Path: ${moduleConfig.definitionFile.path}
-                    ${moduleConfig.definitionFile.readText()}moduleConfig.definitionFile.readText()}
+                    ${moduleConfig.definitionFile.readText()}}
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {
@@ -238,6 +243,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     """
                     Can't generate definition for ${moduleConfig.name}")
                     Expected file ${moduleConfig.definitionFile.path}
+                    CONTENT ${moduleConfig.definitionFile.readText()}}
                     -> Set the `export` parameter to `false` to ignore this module
                     """.trimIndent(),
                     ex,

@@ -60,7 +60,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
             project.extensions.add(type, EXTENSION_NAME, swiftPackageEntries)
 
-            val kotlinExtension = project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
+            val kotlinExtension =
+                project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
             val sourcePackageDir =
                 layout.buildDirectory.asFile
@@ -177,7 +178,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 // type =
                                 GenerateCInteropDefinitionTask::class.java,
                             ) {
-                                it.packageBuildOutputDirectory.set(targetBuildDir)
+                                it.compiledBinary.set(targetBuildDir.resolve("lib${extension.name}.a"))
                                 it.target.set(cinteropTarget)
                                 it.productName.set(extension.name)
                                 it.packages.set(extension.packageDependencies)
@@ -194,7 +195,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
                     val dependenciesFiles = task3.get().outputFiles
                     if (dependenciesFiles.isNotEmpty()) {
-                        val ktTarget = kotlinExtension.targets.findByName(cinteropTarget.name) as? KotlinNativeTarget
+                        val ktTarget =
+                            kotlinExtension.targets.findByName(cinteropTarget.name) as? KotlinNativeTarget
                         if (ktTarget != null) {
                             val mainCompilation = ktTarget.compilations.getByName("main")
                             dependenciesFiles.forEachIndexed { index, file ->
@@ -207,7 +209,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                     }
                                 }
                                 // store the cinterop task name for retrieving the file later
-                                val fullTaskName = getCInteropTaskName(file.nameWithoutExtension, cinteropTarget)
+                                val fullTaskName =
+                                    getCInteropTaskName(file.nameWithoutExtension, cinteropTarget)
                                 dependencyTaskNames[fullTaskName] = file
                             }
                         }
@@ -241,7 +244,9 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
     private fun getTaskName(
         task: String,
         cinteropTarget: CompileTarget? = null,
-    ) = "${EXTENSION_NAME.capitalized()}${task.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}"
+    ) = "${EXTENSION_NAME.capitalized()}${task.capitalized()}${
+        cinteropTarget?.name?.capitalized().orEmpty()
+    }"
 
     private fun getCInteropTaskName(
         name: String,

@@ -84,7 +84,7 @@ internal fun ExecOperations.getXcodeVersion(logger: Logger? = null): String {
     }
     val regex = """Xcode\s(\d+\.\d+)""".toRegex()
     val match = regex.find(standardOutput.toString())
-    return match?.groups?.get(1)?.value ?: throw RuntimeException("Can't find Xcode version")
+    return match?.groups?.get(1)?.value ?: throw RuntimeException("Can't find Xcode version with output $standardOutput")
 }
 
 internal fun ExecOperations.getXcodeDevPath(logger: Logger? = null): String {
