@@ -22,223 +22,221 @@ private data class ModuleConfig(
     val definitionFile: File,
 )
 
-internal abstract class GenerateCInteropDefinitionTask
-    @Inject
-    constructor() : DefaultTask() {
-        @get:InputDirectory
-        abstract val packageBuildOutputDirectory: Property<File>
+internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
+    @get:InputDirectory
+    abstract val packageBuildOutputDirectory: Property<File>
 
-        @get:Input
-        abstract val target: Property<CompileTarget>
+    @get:Input
+    abstract val target: Property<CompileTarget>
 
-        @get:Input
-        abstract val productName: Property<String>
+    @get:Input
+    abstract val productName: Property<String>
 
-        @get:Input
-        abstract val packages: ListProperty<SwiftDependency>
+    @get:Input
+    abstract val packages: ListProperty<SwiftDependency>
 
-        @get:Input
-        abstract val debugMode: Property<Boolean>
+    @get:Input
+    abstract val debugMode: Property<Boolean>
 
-        @get:Input
-        abstract val osVersion: Property<String>
+    @get:Input
+    abstract val osVersion: Property<String>
 
-        init {
-            description = "Generate the cinterop definitions files"
-            group = "io.github.frankois944.spmForKmp.tasks"
-        }
+    init {
+        description = "Generate the cinterop definitions files"
+        group = "io.github.frankois944.spmForKmp.tasks"
+    }
 
-        @get:OutputFiles
-        val outputFiles: List<File>
-            get() =
-                buildList {
-                    getModuleNames().forEach { moduleName ->
-                        add(packageBuildOutputDirectory.get().resolve("$moduleName.def"))
-                    }
+    @get:OutputFiles
+    val outputFiles: List<File>
+        get() =
+            buildList {
+                getModuleNames().forEach { moduleName ->
+                    add(packageBuildOutputDirectory.get().resolve("$moduleName.def"))
                 }
+            }
 
-        @get:Inject
-        abstract val operation: ExecOperations
+    @get:Inject
+    abstract val operation: ExecOperations
 
-        private fun getBuildDirectory(): File =
-            packageBuildOutputDirectory
-                .get()
+    private fun getBuildDirectory(): File =
+        packageBuildOutputDirectory
+            .get()
 
-        private fun getBuildDirectoriesContent(): List<File> =
-            getBuildDirectory() // get folders with headers for internal dependencies
-                .listFiles { file -> (file.extension == "build" || file.extension == "framework") }
-                ?.toList()
-                .orEmpty()
+    private fun getBuildDirectoriesContent(): List<File> =
+        getBuildDirectory() // get folders with headers for internal dependencies
+            .listFiles { file -> (file.extension == "build" || file.extension == "framework") }
+            ?.toList()
+            .orEmpty()
 
-        private fun extractModuleNameFromModuleMap(module: String): String? {
-            val regex = """module\s+(\w+)""".toRegex()
-            return regex
-                .find(module)
-                ?.groupValues
-                ?.firstOrNull()
-                ?.replace("module", "")
-                ?.trim()
-        }
+    private fun extractModuleNameFromModuleMap(module: String): String? {
+        val regex = """module\s+(\w+)""".toRegex()
+        return regex
+            .find(module)
+            ?.groupValues
+            ?.firstOrNull()
+            ?.replace("module", "")
+            ?.trim()
+    }
 
-        private fun extractHeadersPathFromModuleMap(module: String): List<File> {
+    private fun extractHeadersPathFromModuleMap(module: String): List<File> {
         /*
          * find a better regex to extract the header value
          */
-            val regex = """header\s+"([^"]+)"""".toRegex()
-            return regex
-                .find(module)
-                ?.groupValues
-                ?.map {
-                    File(
-                        it
-                            .replace("header", "")
-                            .replace("\"", "")
-                            .trim(),
-                    )
-                }?.map { file ->
-                    if (file.extension == "h") {
-                        file.parentFile
-                    } else {
-                        file
-                    }
-                }.orEmpty()
-        }
-
-        private fun getModuleNames(): List<String> =
-            buildList {
-                add(productName.get()) // the first item must be the product name
-                addAll(
-                    packages
-                        .get()
-                        .filter {
-                            it.exportToKotlin
-                        }.flatMap {
-                            if (it is SwiftDependency.Package.Remote) {
-                                it.names
-                            } else {
-                                listOf(it.packageName)
-                            }
-                        },
+        val regex = """header\s+"([^"]+)"""".toRegex()
+        return regex
+            .find(module)
+            ?.groupValues
+            ?.map {
+                File(
+                    it
+                        .replace("header", "")
+                        .replace("\"", "")
+                        .trim(),
                 )
-            }.distinct()
-
-        private fun getExtraLinkers(): String {
-            val xcodeDevPath = operation.getXcodeDevPath(logger)
-
-            val linkerPlatformVersion =
-                @Suppress("MagicNumber")
-                if (operation.getXcodeVersion(logger).toDouble() >= 15) {
-                    target.get().linkerPlatformVersionName()
+            }?.map { file ->
+                if (file.extension == "h") {
+                    file.parentFile
                 } else {
-                    target.get().linkerMinOsVersionName()
+                    file
                 }
+            }.orEmpty()
+    }
 
-            return listOf(
-                "-$linkerPlatformVersion",
-                osVersion.get(),
-                osVersion.get(),
-                "-rpath",
-                "/usr/lib/swift",
-                "-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"",
-            ).joinToString(" ")
-        }
-
-        @Suppress("LongMethod")
-        @TaskAction
-        fun generateDefinitions() {
-            val moduleConfigs = mutableListOf<ModuleConfig>()
-            val buildDirs = getBuildDirectoriesContent()
-            val moduleNames = getModuleNames()
-
-            logger.debug(
-                """
-                moduleNames
-                $moduleNames
-                """.trimIndent(),
+    private fun getModuleNames(): List<String> =
+        buildList {
+            add(productName.get()) // the first item must be the product name
+            addAll(
+                packages
+                    .get()
+                    .filter {
+                        it.exportToKotlin
+                    }.flatMap {
+                        if (it is SwiftDependency.Package.Remote) {
+                            it.names
+                        } else {
+                            listOf(it.packageName)
+                        }
+                    },
             )
+        }.distinct()
 
-            // find the build directory of the declared module in the manifest
+    private fun getExtraLinkers(): String {
+        val xcodeDevPath = operation.getXcodeDevPath(logger)
+
+        val linkerPlatformVersion =
+            @Suppress("MagicNumber")
+            if (operation.getXcodeVersion(logger).toDouble() >= 15) {
+                target.get().linkerPlatformVersionName()
+            } else {
+                target.get().linkerMinOsVersionName()
+            }
+
+        return listOf(
+            "-$linkerPlatformVersion",
+            osVersion.get(),
+            osVersion.get(),
+            "-rpath",
+            "/usr/lib/swift",
+            "-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"",
+        ).joinToString(" ")
+    }
+
+    @Suppress("LongMethod")
+    @TaskAction
+    fun generateDefinitions() {
+        val moduleConfigs = mutableListOf<ModuleConfig>()
+        val buildDirs = getBuildDirectoriesContent()
+        val moduleNames = getModuleNames()
+
+        logger.debug(
+            """
             moduleNames
-                .forEach { moduleName ->
-                    buildDirs.find { it.nameWithoutExtension == moduleName }?.let { buildDir ->
-                        logger.debug("find build dir {}", buildDir)
-                        moduleConfigs.add(
-                            ModuleConfig(
-                                isFramework = buildDir.extension == "framework",
-                                name = moduleName,
-                                buildDir = buildDir,
-                                definitionFile = packageBuildOutputDirectory.get().resolve("$moduleName.def"),
-                            ),
-                        )
-                    }
-                }.also {
-                    logger.debug(
+            $moduleNames
+            """.trimIndent(),
+        )
+
+        // find the build directory of the declared module in the manifest
+        moduleNames
+            .forEach { moduleName ->
+                buildDirs.find { it.nameWithoutExtension == moduleName }?.let { buildDir ->
+                    logger.debug("find build dir {}", buildDir)
+                    moduleConfigs.add(
+                        ModuleConfig(
+                            isFramework = buildDir.extension == "framework",
+                            name = moduleName,
+                            buildDir = buildDir,
+                            definitionFile = packageBuildOutputDirectory.get().resolve("$moduleName.def"),
+                        ),
+                    )
+                }
+            }.also {
+                logger.debug(
+                    """
+                    modulesConfigs found
+                    $moduleConfigs
+                    """.trimIndent(),
+                )
+            }
+
+        moduleConfigs.forEach { moduleConfig ->
+            logger.debug("Building definition file for: {}", moduleConfig)
+            try {
+                if (moduleConfig.isFramework) {
+                    val mapFile = moduleConfig.buildDir.resolve("Modules").resolve("module.modulemap")
+                    logger.debug("Framework mapFile: {}", mapFile)
+                    val moduleName =
+                        extractModuleNameFromModuleMap(mapFile.readText())
+                            ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
+                    moduleConfig.definitionFile.writeText(
                         """
-                        modulesConfigs found
-                        $moduleConfigs
+                        language = Objective-C
+                        modules = $moduleName
+                        package = ${moduleConfig.name}
+
+                        staticLibraries = lib${productName.get()}.a
+                        libraryPaths = "${getBuildDirectory().path}"
+                        compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
+                        linkerOpts = ${getExtraLinkers()}
+                        """.trimIndent(),
+                    )
+                } else {
+                    val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
+                    logger.debug("Build mapFile: {}", mapFile)
+                    val mapFileContent = mapFile.readText()
+                    val moduleName =
+                        extractModuleNameFromModuleMap(mapFileContent)
+                            ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
+                    val headersPath = getBuildDirectoriesContent() + extractHeadersPathFromModuleMap(mapFileContent)
+                    moduleConfig.definitionFile.writeText(
+                        """
+                        language = Objective-C
+                        modules = $moduleName
+                        package = ${moduleConfig.name}
+
+                        staticLibraries = lib${productName.get()}.a
+                        libraryPaths = "${getBuildDirectory().path}"
+                        compilerOpts = -ObjC -fmodules ${headersPath.joinToString(" ") { "-I\"${it.path}\"" }}
+                        linkerOpts = ${getExtraLinkers()}
                         """.trimIndent(),
                     )
                 }
-
-            moduleConfigs.forEach { moduleConfig ->
-                logger.debug("Building definition file for: {}", moduleConfig)
-                try {
-                    if (moduleConfig.isFramework) {
-                        val mapFile = moduleConfig.buildDir.resolve("Modules").resolve("module.modulemap")
-                        logger.debug("Framework mapFile: {}", mapFile)
-                        val moduleName =
-                            extractModuleNameFromModuleMap(mapFile.readText())
-                                ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
-                        moduleConfig.definitionFile.writeText(
-                            """
-                            language = Objective-C
-                            modules = $moduleName
-                            package = ${moduleConfig.name}
-
-                            staticLibraries = lib${productName.get()}.a
-                            libraryPaths = "${getBuildDirectory().path}"
-                            compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
-                            linkerOpts = ${getExtraLinkers()}
-                            """.trimIndent(),
-                        )
-                    } else {
-                        val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
-                        logger.debug("Build mapFile: {}", mapFile)
-                        val mapFileContent = mapFile.readText()
-                        val moduleName =
-                            extractModuleNameFromModuleMap(mapFileContent)
-                                ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
-                        val headersPath = getBuildDirectoriesContent() + extractHeadersPathFromModuleMap(mapFileContent)
-                        moduleConfig.definitionFile.writeText(
-                            """
-                            language = Objective-C
-                            modules = $moduleName
-                            package = ${moduleConfig.name}
-
-                            staticLibraries = lib${productName.get()}.a
-                            libraryPaths = "${getBuildDirectory().path}"
-                            compilerOpts = -ObjC -fmodules ${headersPath.joinToString(" ") { "-I\"${it.path}\"" }}
-                            linkerOpts = ${getExtraLinkers()}
-                            """.trimIndent(),
-                        )
-                    }
-                    logger.debug(
-                        """
-                        Definition File : ${moduleConfig.definitionFile.name}
-                        At Path: ${moduleConfig.definitionFile.path}
-                        ${moduleConfig.definitionFile.readText()}moduleConfig.definitionFile.readText()}
-                        """.trimIndent(),
-                    )
-                } catch (ex: Exception) {
-                    logger.error(
-                        """
-                        Can't generate definition for ${moduleConfig.name}")
-                        Expected file ${moduleConfig.definitionFile.path}
-                        -> Set the `export` parameter to `false` to ignore this module
-                        """.trimIndent(),
-                        ex,
-                    )
-                }
+                logger.debug(
+                    """
+                    Definition File : ${moduleConfig.definitionFile.name}
+                    At Path: ${moduleConfig.definitionFile.path}
+                    ${moduleConfig.definitionFile.readText()}moduleConfig.definitionFile.readText()}
+                    """.trimIndent(),
+                )
+            } catch (ex: Exception) {
+                logger.error(
+                    """
+                    Can't generate definition for ${moduleConfig.name}")
+                    Expected file ${moduleConfig.definitionFile.path}
+                    -> Set the `export` parameter to `false` to ignore this module
+                    """.trimIndent(),
+                    ex,
+                )
             }
         }
     }
+}

@@ -120,15 +120,15 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             // type =
                             GenerateManifestTask::class.java,
                         ) { manifest ->
-                            manifest.packages.set(extension.packageDependencies)
-                            manifest.productName.set(extension.name)
+                            manifest.packageDependencies.set(extension.packageDependencies.toList())
+                            manifest.packageName.set(extension.name)
                             manifest.minIos.set(extension.minIos)
                             manifest.minTvos.set(extension.minTvos)
                             manifest.minMacos.set(extension.minMacos)
                             manifest.minWatchos.set(extension.minWatchos)
                             manifest.toolsVersion.set(extension.toolsVersion)
-                            manifest.packageDirectory.set(sourcePackageDir)
-                            manifest.scratchDirectory.set(packageScratchDir)
+                            manifest.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
+                            manifest.packageScratchDir.set(packageScratchDir)
                             manifest.sharedCacheDir.set(sharedCacheDir)
                             manifest.sharedConfigDir.set(sharedConfigDir)
                             manifest.sharedSecurityDir.set(sharedSecurityDir)
