@@ -1,7 +1,5 @@
 package com.example
 
-import com.example.Platform
-
 class Greeting {
     private val platform: Platform = getPlatform()
 

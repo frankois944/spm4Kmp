@@ -35,7 +35,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            //put your multiplatform dependencies here
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -55,23 +54,34 @@ android {
     }
 }
 
-
 swiftPackageConfig {
     create("nativeShared") {
-        minIos = "15.5"
+        // optional parameters
+        // minIos = "12.0" : the ios minimal version
+        // minTvos = "12.0" : the tvos minimal version
+        // minWatchos = "12.0" : the watchos minimal version
+        // minMacos = "10.13" : the macos minimal version
+        // customPackageSourcePath = "{buildDir}/src/swift" : the directory where your own swift code is located
+        // debug = false : the swift code is build in debug by default
         dependency(
+            SwiftDependency.Package.Remote.Version(
+                // Repository URL
+                url = "https://github.com/firebase/firebase-ios-sdk.git",
+                // Libraries from the package
+                names = listOf("FirebaseAnalytics", "FirebaseCore"),
+                // (Optional) Package name, can be required in some cases
+                packageName = "firebase-ios-sdk",
+                // Package version
+                version = "11.6.0",
+                // Export to Kotlin for use in shared Kotlin code, false by default
+                exportToKotlin = true,
+            ),
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/krzyzanowskim/CryptoSwift.git",
                 names = listOf("CryptoSwift"),
                 version = "1.8.1",
             ),
-            SwiftDependency.Package.Remote.Version(
-                url = "https://github.com/firebase/firebase-ios-sdk.git", // Repository URL
-                names = listOf("FirebaseAnalytics", "FirebaseCore"), // Libraries from the package
-                packageName = "firebase-ios-sdk", // (Optional) Package name, can be required in some cases
-                version = "11.6.0", // Package version
-                exportToKotlin = true, // Export to Kotlin for use in shared Kotlin code
-            ),
+            // see SwiftDependency class for more use cases
         )
     }
 }
