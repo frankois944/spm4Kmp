@@ -7,6 +7,7 @@ versionCheck = "0.51.0"
 autonomousapps-testkit = "0.11"
 junit = "5.11.4"
 publish="0.30.0"
+agp = "8.7.3"
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
@@ -16,9 +17,12 @@ pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish
 versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck"}
 autonomousapps-testkit = { id = "com.autonomousapps.testkit", version.ref = "autonomousapps-testkit" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform" }
 
 [libraries]
 kotlin-gradle = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine" }
 junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

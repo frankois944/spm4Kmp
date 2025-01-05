@@ -6,12 +6,14 @@ import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+@Suppress("LongParameterList")
 internal fun ExecOperations.resolvePackage(
     workingDir: File,
     scratchPath: File,
     sharedCachePath: File?,
     sharedConfigPath: File?,
     sharedSecurityPath: File?,
+    logger: Logger? = null,
 ) {
     val args =
         mutableListOf(
@@ -35,12 +37,24 @@ internal fun ExecOperations.resolvePackage(
             }
         }
 
-    val output = ByteArrayOutputStream()
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
     exec {
         it.executable = "xcrun"
         it.args = args
         it.workingDir = workingDir
-        it.standardOutput = output
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger,
+            "resolvePackage",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
     }
 }
 
@@ -50,22 +64,29 @@ internal fun ExecOperations.getXcodeVersion(logger: Logger? = null): String {
             "xcodebuild",
             "-version",
         )
-    val output = ByteArrayOutputStream()
+
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
     exec {
         it.executable = "xcrun"
         it.args = args
-        it.standardOutput = output
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger,
+            "getXcodeVersion",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
     }
-    logger?.debug(
-        """
-RUN getXcodeVersion
-ARGS xcrun ${args.joinToString(" ")}
-OUTPUT $output
-        """.trimMargin(),
-    )
     val regex = """Xcode\s(\d+\.\d+)""".toRegex()
-    val match = regex.find(output.toString())
-    return match?.groups?.get(1)?.value ?: throw RuntimeException("Can't find Xcode version")
+    val match = regex.find(standardOutput.toString())
+    return match?.groups?.get(1)?.value
+        ?: throw RuntimeException("Can't find Xcode version with output $standardOutput")
 }
 
 internal fun ExecOperations.getXcodeDevPath(logger: Logger? = null): String {
@@ -75,20 +96,25 @@ internal fun ExecOperations.getXcodeDevPath(logger: Logger? = null): String {
             "-p",
         )
 
-    val output = ByteArrayOutputStream()
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
     exec {
         it.executable = "xcrun"
         it.args = args
-        it.standardOutput = output
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger,
+            "getXcodeDevPath",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
     }
-    logger?.debug(
-        """
-RUN getXcodeVersion
-ARGS xcrun ${args.joinToString(" ")}
-OUTPUT $output
-        """.trimMargin(),
-    )
-    return output.toString().trim()
+    return standardOutput.toString().trim()
 }
 
 internal fun ExecOperations.getSDKPath(
@@ -102,18 +128,60 @@ internal fun ExecOperations.getSDKPath(
             "--show-sdk-path",
         )
 
-    val output = ByteArrayOutputStream()
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
     exec {
         it.executable = "xcrun"
         it.args = args
-        it.standardOutput = output
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger,
+            "getSDKPath",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
     }
-    logger?.debug(
-        """
-RUN getSDKPath
+    return standardOutput.toString().trim()
+}
+
+@Suppress("LongParameterList")
+internal fun printExecLogs(
+    logger: Logger?,
+    action: String,
+    args: List<String>,
+    isError: Boolean,
+    standardOutput: ByteArrayOutputStream,
+    errorOutput: ByteArrayOutputStream,
+    extraString: String? = null,
+) {
+    if (isError) {
+        logger?.error(
+            """
+ERROR FOUND WHEN EXEC
+RUN $action
 ARGS xcrun ${args.joinToString(" ")}
-OUTPUT $output
-        """.trimMargin(),
-    )
-    return output.toString().trim()
+ERROR $errorOutput
+OUTPUT $standardOutput
+###
+${extraString.orEmpty()}
+###
+            """.trimMargin(),
+        )
+        throw RuntimeException(
+            "RUN CMD $action failed",
+        )
+    } else {
+        logger?.debug(
+            """
+RUN $action
+ARGS xcrun ${args.joinToString(" ")}
+OUTPUT $standardOutput
+            """.trimMargin(),
+        )
+    }
 }

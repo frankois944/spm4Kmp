@@ -60,26 +60,18 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
             project.extensions.add(type, EXTENSION_NAME, swiftPackageEntries)
 
-            val kotlinExtension = project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
+            val kotlinExtension =
+                project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
             val sourcePackageDir =
                 layout.buildDirectory.asFile
                     .get()
                     .resolve("spmKmpPlugin")
-                    .resolve("input")
-                    .also {
-                        it.mkdirs()
-                    }
-            val buildPackageDir =
-                layout.buildDirectory.asFile
-                    .get()
-                    .resolve("spmKmpPlugin")
-                    .resolve("output")
                     .also {
                         it.mkdirs()
                     }
 
-            val originalPackageScratchDir =
+            val packageScratchDir =
                 resolvePath(sourcePackageDir)
                     .resolve("scratch")
                     .also {
@@ -87,6 +79,9 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     }
             afterEvaluate {
                 val extension = swiftPackageEntries.first()
+                if (swiftPackageEntries.size > 1) {
+                    logger.warn("Only the first entry is currently supported, the other will be ignored")
+                }
 
                 val sharedCacheDir: File? =
                     extension.sharedCachePath?.run {
@@ -112,10 +107,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             }
                     }
 
-                if (swiftPackageEntries.size > 1) {
-                    logger.warn("Only the first entry is currently supported, the other will be ignored")
-                }
-
                 val userSourcePackageDir =
                     resolvePath(File(extension.customPackageSourcePath))
                         .also { dir ->
@@ -130,15 +121,15 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             // type =
                             GenerateManifestTask::class.java,
                         ) { manifest ->
-                            manifest.packages.set(extension.packageDependencies)
-                            manifest.productName.set(extension.name)
+                            manifest.packageDependencies.set(extension.packageDependencies.toList())
+                            manifest.packageName.set(extension.name)
                             manifest.minIos.set(extension.minIos)
                             manifest.minTvos.set(extension.minTvos)
                             manifest.minMacos.set(extension.minMacos)
                             manifest.minWatchos.set(extension.minWatchos)
                             manifest.toolsVersion.set(extension.toolsVersion)
-                            manifest.packageDirectory.set(sourcePackageDir)
-                            manifest.scratchDirectory.set(originalPackageScratchDir)
+                            manifest.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
+                            manifest.packageScratchDir.set(packageScratchDir)
                             manifest.sharedCacheDir.set(sharedCacheDir)
                             manifest.sharedConfigDir.set(sharedConfigDir)
                             manifest.sharedSecurityDir.set(sharedSecurityDir)
@@ -147,14 +138,10 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val dependencyTaskNames = mutableMapOf<String, File>()
 
                 CompileTarget.entries.forEach { cinteropTarget ->
-                    val targetPackageScratchDir =
-                        buildPackageDir
-                            .resolve(cinteropTarget.name)
-                            .also {
-                                if (!it.exists()) {
-                                    it.mkdirs()
-                                }
-                            }
+                    val targetBuildDir =
+                        packageScratchDir
+                            .resolve(cinteropTarget.getPackageBuildDir())
+                            .resolve(if (extension.debug) "debug" else "release")
 
                     val task2 =
                         tasks
@@ -167,8 +154,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 it.manifestFile.set(File(sourcePackageDir, "Package.swift"))
                                 it.target.set(cinteropTarget)
                                 it.debugMode.set(extension.debug)
-                                it.originalPackageScratchDir.set(originalPackageScratchDir)
-                                it.packageScratchDir.set(targetPackageScratchDir)
+                                it.packageScratchDir.set(packageScratchDir)
+                                it.compiledTargetDir.set(targetBuildDir)
                                 it.customSourcePackage.set(userSourcePackageDir)
                                 it.osVersion.set(
                                     cinteropTarget.getOsVersion(
@@ -190,23 +177,26 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 getTaskName(TASK_GENERATE_CINTEROP_DEF, cinteropTarget),
                                 // type =
                                 GenerateCInteropDefinitionTask::class.java,
-                                // ...constructorArgs =
-                                targetPackageScratchDir,
-                                cinteropTarget,
-                                extension.name,
-                                extension.packageDependencies,
-                                extension.debug,
-                                cinteropTarget.getOsVersion(
-                                    minIos = extension.minIos,
-                                    minWatchos = extension.minWatchos,
-                                    minTvos = extension.minTvos,
-                                    minMacos = extension.minMacos,
-                                ),
-                            )
+                            ) {
+                                it.compiledBinary.set(targetBuildDir.resolve("lib${extension.name}.a"))
+                                it.target.set(cinteropTarget)
+                                it.productName.set(extension.name)
+                                it.packages.set(extension.packageDependencies)
+                                it.debugMode.set(extension.debug)
+                                it.osVersion.set(
+                                    cinteropTarget.getOsVersion(
+                                        minIos = extension.minIos,
+                                        minWatchos = extension.minWatchos,
+                                        minTvos = extension.minTvos,
+                                        minMacos = extension.minMacos,
+                                    ),
+                                )
+                            }
 
                     val dependenciesFiles = task3.get().outputFiles
                     if (dependenciesFiles.isNotEmpty()) {
-                        val ktTarget = kotlinExtension.targets.findByName(cinteropTarget.name) as? KotlinNativeTarget
+                        val ktTarget =
+                            kotlinExtension.targets.findByName(cinteropTarget.name) as? KotlinNativeTarget
                         if (ktTarget != null) {
                             val mainCompilation = ktTarget.compilations.getByName("main")
                             dependenciesFiles.forEachIndexed { index, file ->
@@ -219,7 +209,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                     }
                                 }
                                 // store the cinterop task name for retrieving the file later
-                                val fullTaskName = getCInteropTaskName(file.nameWithoutExtension, cinteropTarget)
+                                val fullTaskName =
+                                    getCInteropTaskName(file.nameWithoutExtension, cinteropTarget)
                                 dependencyTaskNames[fullTaskName] = file
                             }
                         }
@@ -253,7 +244,9 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
     private fun getTaskName(
         task: String,
         cinteropTarget: CompileTarget? = null,
-    ) = "${EXTENSION_NAME.capitalized()}${task.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}"
+    ) = "${EXTENSION_NAME.capitalized()}${task.capitalized()}${
+        cinteropTarget?.name?.capitalized().orEmpty()
+    }"
 
     private fun getCInteropTaskName(
         name: String,

@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.publish) apply false
+    alias(libs.plugins.androidLibrary) apply false
 }
 
 subprojects {
