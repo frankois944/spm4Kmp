@@ -6,6 +6,7 @@ import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+@Suppress("LongParameterList")
 internal fun ExecOperations.resolvePackage(
     workingDir: File,
     scratchPath: File,
@@ -84,7 +85,8 @@ internal fun ExecOperations.getXcodeVersion(logger: Logger? = null): String {
     }
     val regex = """Xcode\s(\d+\.\d+)""".toRegex()
     val match = regex.find(standardOutput.toString())
-    return match?.groups?.get(1)?.value ?: throw RuntimeException("Can't find Xcode version with output $standardOutput")
+    return match?.groups?.get(1)?.value
+        ?: throw RuntimeException("Can't find Xcode version with output $standardOutput")
 }
 
 internal fun ExecOperations.getXcodeDevPath(logger: Logger? = null): String {
@@ -145,7 +147,7 @@ internal fun ExecOperations.getSDKPath(
     return standardOutput.toString().trim()
 }
 
-
+@Suppress("LongParameterList")
 internal fun printExecLogs(
     logger: Logger?,
     action: String,
@@ -164,7 +166,7 @@ ARGS xcrun ${args.joinToString(" ")}
 ERROR $errorOutput
 OUTPUT $standardOutput
 ###
-${extraString ?: ""}
+${extraString.orEmpty()}
 ###
         """.trimMargin(),
         )
