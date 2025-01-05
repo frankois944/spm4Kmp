@@ -33,7 +33,6 @@ class BinaryPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
-                .withTargets(CompileTarget.iosSimulatorArm64, CompileTarget.macosArm64)
                 .withDependencies(
                     buildList {
                         add(

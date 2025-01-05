@@ -136,15 +136,14 @@ From ${workingDir.path}
                 it.standardOutput = standardOutput
                 it.errorOutput = errorOutput
                 it.isIgnoreExitValue = true
-            }
-            .also {
+            }.also {
                 printExecLogs(
                     logger,
                     "compilePackage",
                     args,
                     it.exitValue != 0,
                     standardOutput,
-                    errorOutput
+                    errorOutput,
                 )
             }
     }

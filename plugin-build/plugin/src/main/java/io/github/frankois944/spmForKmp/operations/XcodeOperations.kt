@@ -13,7 +13,7 @@ internal fun ExecOperations.resolvePackage(
     sharedCachePath: File?,
     sharedConfigPath: File?,
     sharedSecurityPath: File?,
-    logger: Logger? = null
+    logger: Logger? = null,
 ) {
     val args =
         mutableListOf(
@@ -53,7 +53,7 @@ internal fun ExecOperations.resolvePackage(
             args,
             it.exitValue != 0,
             standardOutput,
-            errorOutput
+            errorOutput,
         )
     }
 }
@@ -80,7 +80,7 @@ internal fun ExecOperations.getXcodeVersion(logger: Logger? = null): String {
             args,
             it.exitValue != 0,
             standardOutput,
-            errorOutput
+            errorOutput,
         )
     }
     val regex = """Xcode\s(\d+\.\d+)""".toRegex()
@@ -111,7 +111,7 @@ internal fun ExecOperations.getXcodeDevPath(logger: Logger? = null): String {
             args,
             it.exitValue != 0,
             standardOutput,
-            errorOutput
+            errorOutput,
         )
     }
     return standardOutput.toString().trim()
@@ -138,10 +138,12 @@ internal fun ExecOperations.getSDKPath(
         it.isIgnoreExitValue = true
     }.also {
         printExecLogs(
-            logger, "getSDKPath",
+            logger,
+            "getSDKPath",
             args,
             it.exitValue != 0,
-            standardOutput, errorOutput
+            standardOutput,
+            errorOutput,
         )
     }
     return standardOutput.toString().trim()
@@ -155,7 +157,7 @@ internal fun printExecLogs(
     isError: Boolean,
     standardOutput: ByteArrayOutputStream,
     errorOutput: ByteArrayOutputStream,
-    extraString: String? = null
+    extraString: String? = null,
 ) {
     if (isError) {
         logger?.error(
@@ -168,7 +170,7 @@ OUTPUT $standardOutput
 ###
 ${extraString.orEmpty()}
 ###
-        """.trimMargin(),
+            """.trimMargin(),
         )
         throw RuntimeException(
             "RUN CMD $action failed",
@@ -179,7 +181,7 @@ ${extraString.orEmpty()}
 RUN $action
 ARGS xcrun ${args.joinToString(" ")}
 OUTPUT $standardOutput
-        """.trimMargin(),
+            """.trimMargin(),
         )
     }
 }

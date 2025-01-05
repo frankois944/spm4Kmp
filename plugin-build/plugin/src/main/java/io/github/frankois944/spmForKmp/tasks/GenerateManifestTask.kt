@@ -71,10 +71,10 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             generateManifest(
                 packageDependencies.get(),
                 generatedPackageDirectory =
-                manifestFile
-                    .get()
-                    .asFile.parentFile
-                    .toPath(),
+                    manifestFile
+                        .get()
+                        .asFile.parentFile
+                        .toPath(),
                 productName = packageName.get(),
                 minIos = minIos.get(),
                 minMacos = minMacos.get(),
@@ -95,10 +95,10 @@ internal abstract class GenerateManifestTask : DefaultTask() {
         } catch (ex: Exception) {
             logger.error(
                 """
-            Manifest file generated :
-            ${manifestFile.get().asFile}
-            ${manifestFile.get().asFile.readText()}
-            """.trimIndent(),
+                Manifest file generated :
+                ${manifestFile.get().asFile}
+                ${manifestFile.get().asFile.readText()}
+                """.trimIndent(),
             )
             throw ex
         }
