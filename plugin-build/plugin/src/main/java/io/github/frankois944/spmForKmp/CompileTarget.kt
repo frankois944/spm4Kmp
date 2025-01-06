@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp
 
 import org.jetbrains.kotlin.konan.target.KonanTarget
+import java.io.Serializable
 
 /**
  * Represents different compilation targets for Apple platforms, including iOS, watchOS, tvOS, and macOS.
@@ -26,7 +27,7 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
  * in the context of building, linking, or generating compiler-specific configurations.
  */
 @Suppress("EnumEntryName", "EnumNaming")
-public enum class CompileTarget {
+public enum class CompileTarget : Serializable {
     iosX64,
     iosArm64,
     iosSimulatorArm64,

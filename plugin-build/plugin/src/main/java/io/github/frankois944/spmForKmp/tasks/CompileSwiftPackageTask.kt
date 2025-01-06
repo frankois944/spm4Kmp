@@ -38,15 +38,15 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Input
     abstract val osVersion: Property<String>
 
-    @get:InputDirectory
+    @get:Input
     @get:Optional
     abstract val sharedCacheDir: Property<File?>
 
-    @get:InputDirectory
+    @get:Input
     @get:Optional
     abstract val sharedConfigDir: Property<File?>
 
-    @get:InputDirectory
+    @get:Input
     @get:Optional
     abstract val sharedSecurityDir: Property<File?>
 
@@ -103,20 +103,19 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 packageScratchDir.get().path,
                 "-c",
                 if (debugMode.get()) "debug" else "release",
-            ).also { list ->
-                sharedCacheDir.orNull?.let {
-                    list.add("--cache-path")
-                    list.add(it.path)
-                }
-                sharedConfigDir.orNull?.let {
-                    list.add("--config-path")
-                    list.add(it.path)
-                }
-                sharedSecurityDir.orNull?.let {
-                    list.add("--security-path")
-                    list.add(it.path)
-                }
-            }
+            )
+        sharedCacheDir.orNull?.let {
+            args.add("--cache-path")
+            args.add(it.path)
+        }
+        sharedConfigDir.orNull?.let {
+            args.add("--config-path")
+            args.add(it.path)
+        }
+        sharedSecurityDir.orNull?.let {
+            args.add("--security-path")
+            args.add(it.path)
+        }
 
         logger.debug(
             """

@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import io.github.frankois944.spmForKmp.utils.md5
@@ -42,6 +43,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:InputFile
     abstract val compiledBinary: RegularFileProperty
+
+    @get:InputFile
+    abstract val manifestFile: RegularFileProperty
 
     init {
         description = "Generate the cinterop definitions files"
@@ -214,7 +218,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     val moduleName =
                         extractModuleNameFromModuleMap(mapFileContent)
                             ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
-                    val headersPath = getBuildDirectoriesContent() + extractHeadersPathFromModuleMap(mapFileContent)
+                    val implicitDependencies =
+                        operation
+                            .getPackageImplicitDependencies(
+                                workingDir = manifestFile.asFile.get().parentFile,
+                                logger = logger,
+                            ).getFolders("Public")
+                    val headersPath =
+                        getBuildDirectoriesContent() +
+                            extractHeadersPathFromModuleMap(mapFileContent) +
+                            implicitDependencies
                     moduleConfig.definitionFile.writeText(
                         """
                         language = Objective-C

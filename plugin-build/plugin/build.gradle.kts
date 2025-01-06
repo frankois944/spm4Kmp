@@ -1,3 +1,4 @@
+
 import org.gradle.plugin.devel.tasks.PluginUnderTestMetadata.IMPLEMENTATION_CLASSPATH_PROP_KEY
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.Serializable
@@ -20,6 +21,8 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(gradleApi())
     implementation(libs.kotlin.gradle)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.module.kotlin)
 
     functionalTestImplementation(libs.junit.jupiter)
     functionalTestRuntimeOnly(libs.junit.jupiter.engine)
