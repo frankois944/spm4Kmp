@@ -1,7 +1,9 @@
 # The Swift Package Manager for Kotlin multiplatform Plugin
 
+[![GitHub Release](https://img.shields.io/github/v/release/frankois944/spm4Kmp)](https://github.com/frankois944/spm4Kmp/releases/)
 [![build&tests](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg)](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml)
 [![codecov](https://codecov.io/gh/frankois944/spm4Kmp/graph/badge.svg?token=OXEHFLQG1I)](https://codecov.io/gh/frankois944/spm4Kmp)
+![GitHub License](https://img.shields.io/github/license/frankois944/spm4kmp)
 
 The Swift Package Manager for Kotlin multiplatform Plugin aka `spmForKmp` gradle plugin is a Gradle plugin designed to simplify integrating Swift Package Manager (SPM) dependencies into Kotlin Multiplatform (KMP) projects. It allows you to effortlessly configure and use Swift packages in your Kotlin projects targeting Apple platforms, such as iOS.
 
@@ -38,6 +40,7 @@ Follow these steps to add and configure the `spmForKmp` plugin in your project:
 
 Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `plugins` block:
 
+[![GitHub Release](https://img.shields.io/github/v/release/frankois944/spm4Kmp)](https://github.com/frankois944/spm4Kmp/releases/)
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
