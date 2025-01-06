@@ -60,7 +60,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     private fun prepareWorkingDir(): File {
         val workingDir = manifestFile.get().parentFile
-        val sourceDir = workingDir.resolve("Source")
+        val sourceDir = workingDir.resolve("Sources")
         if (sourceDir.exists()) {
             sourceDir.deleteRecursively()
         }

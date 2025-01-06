@@ -46,8 +46,7 @@ internal fun generateManifest(
                     name: "$productName",
                     dependencies: [
                         ${getDependenciesTargets(dependencies)}
-                    ],
-                    path: "Source")
+                    ])
                 $binaryDependencies
             ]
 
