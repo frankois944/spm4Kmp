@@ -1,11 +1,20 @@
+import org.gradle.plugin.devel.tasks.PluginUnderTestMetadata.IMPLEMENTATION_CLASSPATH_PROP_KEY
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.Serializable
+import java.nio.channels.FileChannel
+import java.nio.file.StandardOpenOption
+import java.util.Properties
 
 plugins {
     kotlin("jvm")
     `java-gradle-plugin`
     alias(libs.plugins.pluginPublish)
     alias(libs.plugins.autonomousapps.testkit)
+    jacoco
 }
+
+val jacocoAgentJar: Configuration by configurations.creating
+jacocoAgentJar.isCanBeResolved = true
 
 dependencies {
     implementation(kotlin("stdlib"))
@@ -16,17 +25,12 @@ dependencies {
     functionalTestRuntimeOnly(libs.junit.jupiter.engine)
     functionalTestRuntimeOnly(libs.junit.platform.launcher)
     functionalTestImplementation(project(":plugin"))
+    jacocoAgentJar("org.jacoco:org.jacoco.agent:0.8.12:runtime")
 }
 
 gradleTestKitSupport {
     withSupportLibrary()
     withTruthLibrary()
-}
-
-tasks.named<Test>("functionalTest") {
-    useJUnitPlatform()
-    systemProperty("com.autonomousapps.test.versions.kotlin", libs.versions.kotlin.get())
-    systemProperty("org.gradle.testkit.debug", true)
 }
 
 java {
@@ -83,4 +87,108 @@ tasks.create("setupPluginUploadFromEnvironment") {
         System.setProperty("gradle.publish.key", key)
         System.setProperty("gradle.publish.secret", secret)
     }
+}
+
+tasks.named<Test>("functionalTest") {
+    useJUnitPlatform()
+    systemProperty("com.autonomousapps.test.versions.kotlin", libs.versions.kotlin.get())
+    systemProperty("org.gradle.testkit.debug", true)
+
+    // add jacoco on functionalTest
+    // https://github.com/gradle/gradle/issues/1465
+    // https://github.com/tomkoptel/jacoco-gradle-testkit/blob/develop/build.gradle.kts
+    val jacocoTaskExtension = the<JacocoTaskExtension>()
+
+    finalizedBy(tasks.jacocoTestReport)
+    val testRuns = layout.buildDirectory.dir("functionalTest")
+    systemProperty("testEnv.workDir", LazyString(testRuns.map { it.asFile.apply { mkdirs() }.absolutePath }))
+
+    val jacocoAgentJar = jacocoAgentJar.singleFile.absolutePath
+
+    // Set system properties for the test task
+    systemProperty("jacocoAgentJar", jacocoAgentJar)
+    systemProperty("jacocoDestfile", jacocoTaskExtension.destinationFile!!.absolutePath)
+
+    // Add doLast action for read lock
+    doLast {
+        val jacocoDestfile = jacocoTaskExtension.destinationFile!!
+        FileChannel.open(jacocoDestfile.toPath(), StandardOpenOption.READ).use {
+            it.lock(0, Long.MAX_VALUE, true).release()
+        }
+    }
+}
+
+tasks.named<Test>("functionalTest") {
+    the<JacocoTaskExtension>().excludes = listOf("*")
+}
+
+// add jacoco on functionalTest
+// https://github.com/gradle/gradle/issues/1465
+// https://github.com/tomkoptel/jacoco-gradle-testkit/blob/develop/build.gradle.kts
+val disableFix: String? by project
+val shouldDisableFix = disableFix?.toBoolean() ?: false
+if (!shouldDisableFix) {
+    val jacocoAnt by configurations.existing
+    tasks.pluginUnderTestMetadata {
+        inputs.files(jacocoAnt).withPropertyName("jacocoAntPath").withNormalizer(ClasspathNormalizer::class.java)
+        actions.clear()
+        doLast {
+            val jacocoAntPath = inputs.files.asPath
+            val instrumentedPluginClasspath = temporaryDir.resolve("instrumentedPluginClasspath")
+            instrumentedPluginClasspath.deleteRecursively()
+            ant.withGroovyBuilder {
+                "taskdef"(
+                    "name" to "instrument",
+                    "classname" to "org.jacoco.ant.InstrumentTask",
+                    "classpath" to jacocoAntPath,
+                )
+                "instrument"("destdir" to instrumentedPluginClasspath) {
+                    pluginClasspath.asFileTree.visit {
+                        "gradleFileResource"(
+                            "file" to file.absolutePath.replace("$", "$$"),
+                            "name" to relativePath.pathString.replace("$", "$$"),
+                        )
+                    }
+                }
+            }
+
+            val properties = Properties()
+            if (!pluginClasspath.isEmpty) {
+                properties.setProperty(
+                    IMPLEMENTATION_CLASSPATH_PROP_KEY,
+                    listOf(
+                        instrumentedPluginClasspath
+                            .absoluteFile
+                            .invariantSeparatorsPath,
+                        *instrumentedPluginClasspath
+                            .listFiles { _, name -> name.endsWith(".jar") }!!
+                            .map { it.absoluteFile.invariantSeparatorsPath }
+                            .toTypedArray(),
+                    ).joinToString(File.pathSeparator),
+                )
+            }
+            outputDirectory.file(PluginUnderTestMetadata.METADATA_FILE_NAME).get().asFile.outputStream().use {
+                properties.store(it, null)
+            }
+        }
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+    executionData(files(tasks.withType<Test>()).filter { it.name.endsWith(".exec") && it.exists() })
+    dependsOn(tasks.named<Test>("functionalTest"))
+}
+
+class LazyString(
+    private val source: Lazy<String>,
+) : Serializable {
+    constructor(source: () -> String) : this(lazy(source))
+    constructor(source: Provider<String>) : this(source::get)
+
+    override fun toString() = source.value
 }

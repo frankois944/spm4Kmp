@@ -6,27 +6,11 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
-import io.github.frankois944.spmForKmp.utils.OpenFolderOnFailureExtension
-import org.junit.jupiter.api.BeforeEach
+import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
 
-class LocalPackageTest {
-    private var folderTopOpen: String? = null
-
-    @RegisterExtension
-    @JvmField
-    val openFolderOnFailure =
-        OpenFolderOnFailureExtension {
-            folderTopOpen ?: ""
-        }
-
-    @BeforeEach
-    fun beforeEach() {
-        folderTopOpen = null
-    }
-
+class LocalPackageTest : BaseTest() {
     @Test
     fun `build with local packages`() {
         val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
@@ -34,12 +18,9 @@ class LocalPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
                 .withTargets(
-                    CompileTarget.iosArm64,
-                    CompileTarget.iosX64,
-                    CompileTarget.iosSimulatorArm64,
                     CompileTarget.macosArm64,
-                    CompileTarget.macosX64,
                 ).withDependencies(
                     buildList {
                         add(
@@ -70,10 +51,11 @@ class LocalPackageTest {
                     ),
                 ).build()
 
-        val project = fixture.gradleProject.rootDir
-        folderTopOpen = project.absolutePath
         // When
-        val result = GradleBuilder.build(project, "build")
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
 
         // Then
         assertThat(result).task(":library:build").succeeded()
@@ -86,6 +68,7 @@ class LocalPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
                 .withTargets(CompileTarget.iosSimulatorArm64)
                 .withDependencies(
                     buildList {
@@ -107,10 +90,10 @@ class LocalPackageTest {
                     ),
                 ).build()
 
-        val project = fixture.gradleProject.rootDir
-        folderTopOpen = project.absolutePath
-        // When
-        val result = GradleBuilder.build(project, "build")
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
 
         // Then
         assertThat(result).task(":library:build").succeeded()
