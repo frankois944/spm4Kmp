@@ -1,6 +1,10 @@
 package io.github.frankois944.spmForKmp.fixture
 
-import com.autonomousapps.kit.*
+import com.autonomousapps.kit.AbstractGradleProject
+import com.autonomousapps.kit.GradleProject
+import com.autonomousapps.kit.RootProject
+import com.autonomousapps.kit.Source
+import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
 import io.github.frankois944.spmForKmp.CompileTarget
@@ -54,11 +58,11 @@ org.gradle.caching=true
         if (jacocoDestfile != null) {
             content +=
                 """
-# code coverage
-systemProp.jacoco-agent.destfile=$jacocoDestfile
-systemProp.jacoco-agent.append=true
-systemProp.jacoco-agent.dumponexit=false
-systemProp.jacoco-agent.jmx=true
+                # code coverage
+                systemProp.jacoco-agent.destfile=$jacocoDestfile
+                systemProp.jacoco-agent.append=true
+                systemProp.jacoco-agent.dumponexit=false
+                systemProp.jacoco-agent.jmx=true
                 """.trimIndent()
         }
         withFile(
@@ -190,45 +194,45 @@ swiftPackageConfig {
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
             """
-// START enable code-coverage
-import java.lang.management.ManagementFactory
-import javax.management.ObjectName
+            // START enable code-coverage
+            import java.lang.management.ManagementFactory
+            import javax.management.ObjectName
 
-abstract class JacocoDumper : BuildService<BuildServiceParameters.None>, AutoCloseable {
-    override fun close() {
-        val mBeanServer = ManagementFactory.getPlatformMBeanServer()
-        val jacocoObjectName = ObjectName.getInstance("org.jacoco:type=Runtime")
-        if (mBeanServer.isRegistered(jacocoObjectName)) {
-            mBeanServer.invoke(jacocoObjectName, "dump", arrayOf(true), arrayOf("boolean"))
-        }
-    }
-}
-val jacocoDumper = gradle.sharedServices.registerIfAbsent("jacocoDumper", JacocoDumper::class) {}
-jacocoDumper.get()
-gradle.allprojects {
-    tasks.configureEach {
-        usesService(jacocoDumper)
-    }
-}
-
-// END enable code-coverage
-
-kotlin {
-    listOf(
-       $targets
-    ).forEach {
-        it.compilations {
-            val main by getting {
-                cinterops.create("${configuration.cinteropsName}")
+            abstract class JacocoDumper : BuildService<BuildServiceParameters.None>, AutoCloseable {
+                override fun close() {
+                    val mBeanServer = ManagementFactory.getPlatformMBeanServer()
+                    val jacocoObjectName = ObjectName.getInstance("org.jacoco:type=Runtime")
+                    if (mBeanServer.isRegistered(jacocoObjectName)) {
+                        mBeanServer.invoke(jacocoObjectName, "dump", arrayOf(true), arrayOf("boolean"))
+                    }
+                }
             }
-        }
-        it.binaries.framework {
-            baseName = "shared"
-            isStatic = true
-        }
-    }
-}
-$pluginBlock
+            val jacocoDumper = gradle.sharedServices.registerIfAbsent("jacocoDumper", JacocoDumper::class) {}
+            jacocoDumper.get()
+            gradle.allprojects {
+                tasks.configureEach {
+                    usesService(jacocoDumper)
+                }
+            }
+
+            // END enable code-coverage
+
+            kotlin {
+                listOf(
+                   $targets
+                ).forEach {
+                    it.compilations {
+                        val main by getting {
+                            cinterops.create("${configuration.cinteropsName}")
+                        }
+                    }
+                    it.binaries.framework {
+                        baseName = "shared"
+                        isStatic = true
+                    }
+                }
+            }
+            $pluginBlock
             """.trimIndent()
         logger.debug(script)
         return script

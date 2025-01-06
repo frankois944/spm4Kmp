@@ -1,8 +1,6 @@
 package io.github.frankois944.spmForKmp.utils
 
 import com.autonomousapps.kit.GradleBuilder
-import io.github.frankois944.spmForKmp.utils.BaseTest
-import io.github.frankois944.spmForKmp.utils.OpenFolderOnFailureExtension
 import org.gradle.internal.impldep.org.junit.Rule
 import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import org.gradle.testkit.runner.GradleRunner

@@ -65,6 +65,7 @@ jobs:
           report_paths: '**/build/test-results/**/TEST-*.xml'
           include_passed: true
       - name: Upload coverage to Codecov
+        if: ${{ !cancelled() }}
         uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}

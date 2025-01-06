@@ -32,8 +32,8 @@ subprojects {
         ignoreFailures.set(false)
         enableExperimentalRules.set(true)
         filter {
-            exclude("**/generated/**")
             include("**/kotlin/**")
+            exclude("**/generated/**", "**/kotlin/functionalTest/**")
         }
     }
 
