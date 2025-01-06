@@ -1,21 +1,24 @@
 package io.github.frankois944.spmForKmp
 
+import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
+import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
 import java.io.File
 
-class BasicPackageTest {
+class BasicPackageTest : BaseTest() {
     @Test
     fun `build with imported UIKit framework is successful`() {
         // Given
         val fixture =
             SmpKMPTestFixture
                 .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
                 .withSwiftSources(
                     SwiftSource.of(
                         content =
@@ -37,7 +40,10 @@ class BasicPackageTest {
                 ).build()
 
         // When
-        val result = build(fixture.gradleProject.rootDir, "build")
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
 
         // Then
         assertThat(result).task(":library:build").succeeded()
@@ -54,6 +60,7 @@ class BasicPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
                 .withTargets(CompileTarget.macosX64)
                 .withCache(cache.path)
                 .withSecurity(security.path)
@@ -84,7 +91,10 @@ class BasicPackageTest {
                 ).build()
 
         // When
-        val result = build(fixture.gradleProject.rootDir, "build")
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
 
         // Then
         assertThat(result).task(":library:build").succeeded()

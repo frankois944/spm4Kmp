@@ -23,6 +23,7 @@ jobs:
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
       GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     steps:
       - name: Checkout Repo
@@ -51,16 +52,22 @@ jobs:
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
       - name: Run Gradle tasks
-        run: ./gradlew preMerge --continue
+        run: ./gradlew preMerge :plugin-build:plugin:jacocoTestReport --continue
       - name: Archive test results
         uses: actions/upload-artifact@v4
-        if: success() || failure()
+        if: ${{ !cancelled() }}
         with:
           name: test-pre-merge-report
           path: plugin-build/plugin/build/reports/
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v5
-        if: success() || failure() # always run even if the previous step fails
+        if: ${{ !cancelled() }}
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
           include_passed: true
+      - name: Upload coverage to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v5
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1

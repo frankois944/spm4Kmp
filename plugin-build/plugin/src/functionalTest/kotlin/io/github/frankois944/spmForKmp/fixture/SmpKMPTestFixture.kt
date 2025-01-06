@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.fixture
 
 import com.autonomousapps.kit.AbstractGradleProject
 import com.autonomousapps.kit.GradleProject
+import com.autonomousapps.kit.RootProject
 import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
@@ -12,13 +13,15 @@ import org.gradle.internal.cc.base.logger
 
 abstract class SmpKMPTestFixture private constructor(
     private val configuration: TestConfiguration,
-) : AbstractGradleProject() {
+) : AbstractGradleProject(configuration.buildPath) {
+    private val jacocoDestfile: String? get() = System.getProperty("jacocoDestfile")?.replace("""\""", """\\""")
     private var _gradleProject: GradleProject? = null
 
     val gradleProject: GradleProject
         get() = _gradleProject ?: createProject().also { _gradleProject = it }
 
     data class TestConfiguration(
+        val buildPath: String = "build/functionalTest",
         var customPackageSourcePath: String = "src/swift",
         var cinteropsName: String = "dummy",
         var minIos: String = "12.0",
@@ -40,17 +43,33 @@ abstract class SmpKMPTestFixture private constructor(
     protected fun createDefaultProject(extension: TestConfiguration): GradleProject =
         newGradleProjectBuilder(GradleProject.DslKind.KOTLIN)
             .withRootProject {
-                withFile(
-                    "gradle.properties",
-                    """
-kotlin.mpp.enableCInteropCommonization=true
-org.gradle.caching=true
-                        """,
-                )
+                setupProperties()
             }.withSubproject("library") {
                 setupSources()
                 setupGradleConfig(extension)
             }.write()
+
+    private fun RootProject.Builder.setupProperties() {
+        var content = """
+kotlin.mpp.enableCInteropCommonization=true
+org.gradle.caching=true
+"""
+        // code coverage
+        if (jacocoDestfile != null) {
+            content +=
+                """
+                # code coverage
+                systemProp.jacoco-agent.destfile=$jacocoDestfile
+                systemProp.jacoco-agent.append=true
+                systemProp.jacoco-agent.dumponexit=false
+                systemProp.jacoco-agent.jmx=true
+                """.trimIndent()
+        }
+        withFile(
+            "gradle.properties",
+            content,
+        )
+    }
 
     private fun Subproject.Builder.setupSources() {
         configuration.swiftSources.forEach { source ->
@@ -175,6 +194,29 @@ swiftPackageConfig {
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
             """
+            // START enable code-coverage
+            import java.lang.management.ManagementFactory
+            import javax.management.ObjectName
+
+            abstract class JacocoDumper : BuildService<BuildServiceParameters.None>, AutoCloseable {
+                override fun close() {
+                    val mBeanServer = ManagementFactory.getPlatformMBeanServer()
+                    val jacocoObjectName = ObjectName.getInstance("org.jacoco:type=Runtime")
+                    if (mBeanServer.isRegistered(jacocoObjectName)) {
+                        mBeanServer.invoke(jacocoObjectName, "dump", arrayOf(true), arrayOf("boolean"))
+                    }
+                }
+            }
+            val jacocoDumper = gradle.sharedServices.registerIfAbsent("jacocoDumper", JacocoDumper::class) {}
+            jacocoDumper.get()
+            gradle.allprojects {
+                tasks.configureEach {
+                    usesService(jacocoDumper)
+                }
+            }
+
+            // END enable code-coverage
+
             kotlin {
                 listOf(
                    $targets
@@ -198,6 +240,11 @@ swiftPackageConfig {
 
     class Builder {
         private var config = TestConfiguration()
+
+        fun withBuildPath(buildPath: String) =
+            apply {
+                config = config.copy(buildPath = buildPath)
+            }
 
         fun withSwiftSources(vararg sources: SwiftSource) =
             apply {

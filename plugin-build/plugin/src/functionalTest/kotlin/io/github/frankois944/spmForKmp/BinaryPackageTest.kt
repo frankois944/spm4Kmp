@@ -1,38 +1,24 @@
 package io.github.frankois944.spmForKmp
 
+import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
-import io.github.frankois944.spmForKmp.utils.OpenFolderOnFailureExtension
-import org.junit.jupiter.api.BeforeEach
+import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
 
-class BinaryPackageTest {
-    private var folderTopOpen: String? = null
-
-    @RegisterExtension
-    @JvmField
-    val openFolderOnFailure =
-        OpenFolderOnFailureExtension {
-            folderTopOpen ?: ""
-        }
-
-    @BeforeEach
-    fun beforeEach() {
-        folderTopOpen = null
-    }
-
+class BinaryPackageTest : BaseTest() {
     @Test
     fun `build with remote binary packages`() {
         // Given
         val fixture =
             SmpKMPTestFixture
                 .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
                 .withDependencies(
                     buildList {
                         add(
@@ -67,10 +53,10 @@ class BinaryPackageTest {
                     ),
                 ).build()
 
-        val project = fixture.gradleProject.rootDir
-        folderTopOpen = project.absolutePath
-        // When
-        val result = build(project, "build")
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
 
         // Then
         assertThat(result).task(":library:build").succeeded()
@@ -83,6 +69,7 @@ class BinaryPackageTest {
         val fixture =
             SmpKMPTestFixture
                 .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
                 .withDependencies(
                     buildList {
                         add(
@@ -113,10 +100,10 @@ class BinaryPackageTest {
                     ),
                 ).build()
 
-        val project = fixture.gradleProject.rootDir
-        folderTopOpen = project.absolutePath
-        // When
-        val result = build(project, "build")
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
 
         // Then
         assertThat(result).task(":library:build").succeeded()
