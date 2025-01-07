@@ -54,6 +54,7 @@ tasks.withType<Detekt>().configureEach {
 
 tasks.register("clean", Delete::class.java) {
     delete(rootProject.layout.buildDirectory)
+    delete("example/build")
 }
 
 tasks.wrapper {

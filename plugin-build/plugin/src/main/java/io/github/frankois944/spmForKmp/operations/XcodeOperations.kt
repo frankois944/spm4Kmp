@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.dump.dependency.PackageImplicitDependencies
 import org.gradle.api.logging.Logger
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
@@ -22,20 +23,19 @@ internal fun ExecOperations.resolvePackage(
             "resolve",
             "--scratch-path",
             scratchPath.path,
-        ).also { list ->
-            sharedCachePath?.let {
-                list.add("--cache-path")
-                list.add(it.path)
-            }
-            sharedConfigPath?.let {
-                list.add("--config-path")
-                list.add(it.path)
-            }
-            sharedSecurityPath?.let {
-                list.add("--security-path")
-                list.add(it.path)
-            }
-        }
+        )
+    sharedCachePath?.let {
+        args.add("--cache-path")
+        args.add(it.path)
+    }
+    sharedConfigPath?.let {
+        args.add("--config-path")
+        args.add(it.path)
+    }
+    sharedSecurityPath?.let {
+        args.add("--security-path")
+        args.add(it.path)
+    }
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
@@ -149,6 +149,41 @@ internal fun ExecOperations.getSDKPath(
     return standardOutput.toString().trim()
 }
 
+internal fun ExecOperations.getPackageImplicitDependencies(
+    workingDir: File,
+    logger: Logger? = null,
+): PackageImplicitDependencies {
+    val args =
+        listOf(
+            "swift",
+            "package",
+            "show-dependencies",
+            "--format",
+            "json",
+        )
+
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
+    exec {
+        it.executable = "xcrun"
+        it.workingDir = workingDir
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        printExecLogs(
+            logger,
+            "show-dependencies",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
+    return PackageImplicitDependencies.fromString(standardOutput.toString())
+}
+
 @Suppress("LongParameterList")
 internal fun printExecLogs(
     logger: Logger?,
@@ -181,6 +216,9 @@ ${extraString.orEmpty()}
 RUN $action
 ARGS xcrun ${args.joinToString(" ")}
 OUTPUT $standardOutput
+###
+${extraString.orEmpty()}
+###
             """.trimMargin(),
         )
     }

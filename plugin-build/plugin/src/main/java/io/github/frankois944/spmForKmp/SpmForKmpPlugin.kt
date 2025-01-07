@@ -117,7 +117,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     tasks
                         .register(
                             // name =
-                            TASK_GENERATE_MANIFEST,
+                            getTaskName(TASK_GENERATE_MANIFEST),
                             // type =
                             GenerateManifestTask::class.java,
                         ) { manifest ->
@@ -191,6 +191,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                         minMacos = extension.minMacos,
                                     ),
                                 )
+                                it.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
                             }
 
                     val dependenciesFiles = task3.get().outputFiles

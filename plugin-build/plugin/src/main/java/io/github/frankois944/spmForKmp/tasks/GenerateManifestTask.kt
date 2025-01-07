@@ -91,6 +91,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 sharedCachePath = sharedCacheDir.orNull,
                 sharedConfigPath = sharedConfigDir.orNull,
                 sharedSecurityPath = sharedSecurityDir.orNull,
+                logger = logger,
             )
         } catch (ex: Exception) {
             logger.error(

@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import io.github.frankois944.spmForKmp.utils.md5
@@ -43,6 +44,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:InputFile
     abstract val compiledBinary: RegularFileProperty
 
+    @get:InputFile
+    abstract val manifestFile: RegularFileProperty
+
     init {
         description = "Generate the cinterop definitions files"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -66,13 +70,19 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             .get()
             .parentFile
 
-    private fun getBuildDirectoriesContent(): List<File> =
+    private fun getBuildDirectoriesContent(vararg extensions: String): List<File> =
         getBuildDirectory() // get folders with headers for internal dependencies
-            .listFiles { file -> (file.extension == "build" || file.extension == "framework") }
+            .listFiles { file -> extensions.contains(file.extension) || file.name == "Modules" }
+            // remove folder with weird names, cinterop doesn't like module with symbol names like grp-c++
+            // it doesn't matter for the kotlin export.
+            ?.filter { file -> !file.nameWithoutExtension.lowercase().contains("grpc") }
             ?.toList()
             .orEmpty()
 
     private fun extractModuleNameFromModuleMap(module: String): String? {
+        /*
+         * find a better regex to extract the module value
+         */
         val regex = """module\s+(\w+)""".toRegex()
         return regex
             .find(module)
@@ -82,7 +92,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             ?.trim()
     }
 
-    private fun extractHeadersPathFromModuleMap(module: String): List<File> {
+    private fun extractHeaderPathFromModuleMap(module: String): File? {
         /*
          * find a better regex to extract the header value
          */
@@ -90,20 +100,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         return regex
             .find(module)
             ?.groupValues
-            ?.map {
-                File(
-                    it
-                        .replace("header", "")
-                        .replace("\"", "")
-                        .trim(),
-                )
-            }?.map { file ->
-                if (file.extension == "h") {
-                    file.parentFile
-                } else {
-                    file
-                }
-            }.orEmpty()
+            ?.firstOrNull()
+            ?.replace("header", "")
+            ?.replace("\"", "")
+            ?.trim()
+            ?.let { File(it) }
     }
 
     private fun getModuleNames(): List<String> =
@@ -124,6 +125,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             )
         }.distinct()
 
+    /**
+     * Constructs and returns a string of linker flags and options specific to the build configuration.
+     *
+     * The method determines the appropriate linker platform version name or minimum OS version name
+     * based on the Xcode version. It combines various flags such as platform version, OS version,
+     * runtime path, and library path for the generated binary.
+     *
+     * @return A string of linker flags and options constructed based on the build configuration.
+     */
     private fun getExtraLinkers(): String {
         val xcodeDevPath = operation.getXcodeDevPath(logger)
 
@@ -149,7 +159,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @TaskAction
     fun generateDefinitions() {
         val moduleConfigs = mutableListOf<ModuleConfig>()
-        val buildDirs = getBuildDirectoriesContent()
         val moduleNames = getModuleNames()
 
         logger.debug(
@@ -162,17 +171,24 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         // find the build directory of the declared module in the manifest
         moduleNames
             .forEach { moduleName ->
-                buildDirs.find { it.nameWithoutExtension == moduleName }?.let { buildDir ->
-                    logger.debug("find build dir {}", buildDir)
-                    moduleConfigs.add(
-                        ModuleConfig(
-                            isFramework = buildDir.extension == "framework",
-                            name = moduleName,
-                            buildDir = buildDir,
-                            definitionFile = getBuildDirectory().resolve("$moduleName.def"),
-                        ),
-                    )
-                }
+                logger.debug("LOOKING for module dir {}", moduleName)
+                getBuildDirectoriesContent("build", "framework")
+                    .find {
+                        // removing -beta is a quickfix for firebase who use package alias
+                        // the relationship can be found in Package.swift of firebase
+                        val reference = moduleName.lowercase().replace("-beta", "")
+                        it.nameWithoutExtension.lowercase() == reference
+                    }?.let { buildDir ->
+                        logger.debug("Found dir {} for {}", buildDir, moduleName)
+                        moduleConfigs.add(
+                            ModuleConfig(
+                                isFramework = buildDir.extension == "framework",
+                                name = moduleName,
+                                buildDir = buildDir,
+                                definitionFile = getBuildDirectory().resolve("$moduleName.def"),
+                            ),
+                        )
+                    }
             }.also {
                 logger.debug(
                     """
@@ -189,7 +205,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 val checksum = compiledBinary.asFile.get().md5()
                 if (moduleConfig.isFramework) {
                     val mapFile = moduleConfig.buildDir.resolve("Modules").resolve("module.modulemap")
-                    logger.debug("Framework mapFile: {}", mapFile)
                     val moduleName =
                         extractModuleNameFromModuleMap(mapFile.readText())
                             ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
@@ -209,12 +224,25 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     )
                 } else {
                     val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
-                    logger.debug("Build mapFile: {}", mapFile)
                     val mapFileContent = mapFile.readText()
                     val moduleName =
                         extractModuleNameFromModuleMap(mapFileContent)
                             ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
-                    val headersPath = getBuildDirectoriesContent() + extractHeadersPathFromModuleMap(mapFileContent)
+                    val implicitDependencies =
+                        operation
+                            .getPackageImplicitDependencies(
+                                workingDir = manifestFile.asFile.get().parentFile,
+                                logger = logger,
+                            ).getFolders("Public")
+                    val headersBuildPath =
+                        buildList {
+                            addAll(getBuildDirectoriesContent("build"))
+                            addAll(implicitDependencies)
+                            extractHeaderPathFromModuleMap(mapFileContent)?.let {
+                                add(it)
+                            }
+                        }.joinToString(" ") { "-I\"${it}\"" }
+
                     moduleConfig.definitionFile.writeText(
                         """
                         language = Objective-C
@@ -225,8 +253,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         # checkum: $checksum
                         staticLibraries = $libName
                         libraryPaths = "${getBuildDirectory().path}"
-                        compilerOpts = -ObjC -fmodules ${headersPath.joinToString(" ") { "-I\"${it.path}\"" }}
-                        linkerOpts = ${getExtraLinkers()}
+                        compilerOpts = -ObjC -fmodules $headersBuildPath -F"${getBuildDirectory().path}"
+                        linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
                         """.trimIndent(),
                     )
                 }
@@ -234,7 +262,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     """
                     Definition File : ${moduleConfig.definitionFile.name}
                     At Path: ${moduleConfig.definitionFile.path}
-                    ${moduleConfig.definitionFile.readText()}}
+                    ${moduleConfig.definitionFile.readText()}
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {
@@ -242,7 +270,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     """
                     Can't generate definition for ${moduleConfig.name}")
                     Expected file ${moduleConfig.definitionFile.path}
-                    CONTENT ${moduleConfig.definitionFile.readText()}}
+                    CONTENT ${moduleConfig.definitionFile.readText()}
                     -> Set the `export` parameter to `false` to ignore this module
                     """.trimIndent(),
                     ex,

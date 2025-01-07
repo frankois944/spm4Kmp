@@ -2,6 +2,11 @@
 
 package io.github.frankois944.spmForKmp.definition
 
+import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_IOS_VERSION
+import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_MAC_OS_VERSION
+import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_TV_OS_VERSION
+import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_WATCH_OS_VERSION
+import io.github.frankois944.spmForKmp.manifest.DEFAULT_TOOL_VERSION
 import org.gradle.api.Project
 import javax.inject.Inject
 import kotlin.io.path.Path
@@ -41,9 +46,9 @@ public abstract class PackageRootDefinitionExtension
          * within the Kotlin Multiplatform project. Modifying this value adjusts the generated build configuration
          * and compatibility of the resulting package with iOS devices and emulators.
          *
-         * Default value: `"12.0"`
+         * Default value: [DEFAULT_MIN_IOS_VERSION]
          */
-        public var minIos: String = "12.0"
+        public var minIos: String = DEFAULT_MIN_IOS_VERSION
 
         /**
          * Specifies the minimum supported macOS version for the Swift Package Manager (SPM) integration.
@@ -51,20 +56,20 @@ public abstract class PackageRootDefinitionExtension
          * This property defines the macOS version targeted by the Swift package and its dependencies.
          * Used during the generation of SPM manifests and the compilation of Swift packages to ensure compatibility
          * with the specified macOS version.
-         * It is a required property that influences the resulting build configuration.
          *
-         * Default value: "10.13".
+         * Default value: [DEFAULT_MIN_MAC_OS_VERSION]
          */
-        public var minMacos: String = "10.13"
+        public var minMacos: String = DEFAULT_MIN_MAC_OS_VERSION
 
         /**
          * Specifies the minimum required version of tvOS for the Swift package definition.
          *
          * This property is used to configure the minimum tvOS version that the Swift package
-         * dependencies and targets must support. It is set to a default value of "12.0" but can
-         * be overridden to adapt to specific project requirements.
+         * dependencies and targets must support.
+         *
+         * Default value: [DEFAULT_MIN_TV_OS_VERSION]
          */
-        public var minTvos: String = "12.0"
+        public var minTvos: String = DEFAULT_MIN_TV_OS_VERSION
 
         /**
          * Minimum watchOS version required for the Swift package.
@@ -73,9 +78,9 @@ public abstract class PackageRootDefinitionExtension
          * when building or running tasks involving watchOS-specific code. It ensures compatibility
          * with the defined platform version during build processes or runtime configurations.
          *
-         * Default value: "4.0"
+         * Default value: [DEFAULT_MIN_WATCH_OS_VERSION]
          */
-        public var minWatchos: String = "4.0"
+        public var minWatchos: String = DEFAULT_MIN_WATCH_OS_VERSION
 
         /**
          * Specifies the version of Swift tools that will be utilized.
@@ -84,15 +89,16 @@ public abstract class PackageRootDefinitionExtension
          * The `toolsVersion` value impacts the structure of the `Package.swift` manifest file and
          * the behavior of the Swift package dependencies during resolution and compilation.
          *
-         * Default value: "5.9"
+         * Default value: [DEFAULT_TOOL_VERSION]
          */
-        public var toolsVersion: String = "5.9"
+        public var toolsVersion: String = DEFAULT_TOOL_VERSION
 
         /**
          * Indicates whether the Swift package is built in debug mode.
          *
          * If set to `true`, the package is being built with debug configuration. This can be useful for
          * testing or development purposes where debug symbols and additional information are required.
+         *
          * Set to `false` for release builds.
          */
         public var debug: Boolean = true
