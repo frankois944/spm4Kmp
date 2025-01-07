@@ -91,7 +91,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             ?.trim()
     }
 
-    private fun extractHeadersPathFromModuleMap(module: String): String {
+    private fun extractHeaderPathFromModuleMap(module: String): File? {
         /*
          * find a better regex to extract the header value
          */
@@ -103,7 +103,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             ?.replace("header", "")
             ?.replace("\"", "")
             ?.trim()
-            .orEmpty()
+            ?.let { File(it) }
     }
 
     private fun getModuleNames(): List<String> =
@@ -124,6 +124,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             )
         }.distinct()
 
+    /**
+     * Constructs and returns a string of linker flags and options specific to the build configuration.
+     *
+     * The method determines the appropriate linker platform version name or minimum OS version name
+     * based on the Xcode version. It combines various flags such as platform version, OS version,
+     * runtime path, and library path for the generated binary.
+     *
+     * @return A string of linker flags and options constructed based on the build configuration.
+     */
     private fun getExtraLinkers(): String {
         val xcodeDevPath = operation.getXcodeDevPath(logger)
 
@@ -225,9 +234,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 logger = logger,
                             ).getFolders("Public")
                     val headersBuildPath =
-                        getBuildDirectoriesContent("build")
-                    extractHeadersPathFromModuleMap(mapFileContent) +
-                        implicitDependencies
+                        buildList {
+                            addAll(getBuildDirectoriesContent("build"))
+                            addAll(implicitDependencies)
+                            extractHeaderPathFromModuleMap(mapFileContent)?.let {
+                                add(it)
+                            }
+                        }.joinToString(" ") { "-I\"${it}\"" }
+
                     moduleConfig.definitionFile.writeText(
                         """
                         language = Objective-C
@@ -238,9 +252,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         # checkum: $checksum
                         staticLibraries = $libName
                         libraryPaths = "${getBuildDirectory().path}"
-                        compilerOpts = -ObjC -fmodules ${headersBuildPath.joinToString(
-                            " ",
-                        ) { "-I\"${it}\"" }} -F"${getBuildDirectory().path}"
+                        compilerOpts = -ObjC -fmodules $headersBuildPath -F"${getBuildDirectory().path}"
                         linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
                         """.trimIndent(),
                     )

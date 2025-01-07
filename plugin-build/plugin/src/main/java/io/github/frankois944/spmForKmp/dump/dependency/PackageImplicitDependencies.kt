@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.dump.dependency
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.gradle.internal.cc.base.logger
 import org.gradle.internal.impldep.com.google.errorprone.annotations.Keep
 import java.io.File
 
@@ -32,16 +33,28 @@ internal data class PackageImplicitDependencies(
     }
 
     fun getFolders(vararg names: String = arrayOf("Public")): Set<File> =
-        buildSet {
-            dependencies?.forEach { dependency ->
-                dependency.dependencies?.forEach { subDep ->
-                    subDep.path?.let { path ->
-                        addAll(walkFolder(path, *names))
-                    }
-                    addAll(subDep.getFolders(names = names))
+        searchInFolder(
+            dependencies = this.dependencies,
+            names = names,
+        ).distinct()
+            .toSet()
+
+    private fun searchInFolder(
+        dependencies: List<PackageImplicitDependencies>?,
+        vararg names: String = arrayOf("Public"),
+    ): Set<File> {
+        val results = mutableSetOf<File>()
+        dependencies?.forEach { dependency ->
+            dependency.dependencies?.forEach { subDep ->
+                subDep.path?.let { path ->
+                    val found = walkFolder(path, *names)
+                    results.addAll(found)
                 }
+                results.addAll(searchInFolder(subDep.dependencies, names = names))
             }
         }
+        return results
+    }
 
     private fun walkFolder(
         path: String,
@@ -53,7 +66,8 @@ internal data class PackageImplicitDependencies(
                 .filter { file ->
                     file.isDirectory && names.contains(file.name)
                 }.toSet()
-        } catch (e: Exception) {
+        } catch (ex: Exception) {
+            logger.error("Cant look for dependencies in path: $path", ex)
             emptySet()
         }
 }

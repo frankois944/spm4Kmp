@@ -120,19 +120,19 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             getTaskName(TASK_GENERATE_MANIFEST),
                             // type =
                             GenerateManifestTask::class.java,
-                        ) {
-                            it.packageDependencies.set(extension.packageDependencies.toList())
-                            it.packageName.set(extension.name)
-                            it.minIos.set(extension.minIos)
-                            it.minTvos.set(extension.minTvos)
-                            it.minMacos.set(extension.minMacos)
-                            it.minWatchos.set(extension.minWatchos)
-                            it.toolsVersion.set(extension.toolsVersion)
-                            it.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
-                            it.packageScratchDir.set(packageScratchDir)
-                            it.sharedCacheDir.set(sharedCacheDir)
-                            it.sharedConfigDir.set(sharedConfigDir)
-                            it.sharedSecurityDir.set(sharedSecurityDir)
+                        ) { manifest ->
+                            manifest.packageDependencies.set(extension.packageDependencies.toList())
+                            manifest.packageName.set(extension.name)
+                            manifest.minIos.set(extension.minIos)
+                            manifest.minTvos.set(extension.minTvos)
+                            manifest.minMacos.set(extension.minMacos)
+                            manifest.minWatchos.set(extension.minWatchos)
+                            manifest.toolsVersion.set(extension.toolsVersion)
+                            manifest.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
+                            manifest.packageScratchDir.set(packageScratchDir)
+                            manifest.sharedCacheDir.set(sharedCacheDir)
+                            manifest.sharedConfigDir.set(sharedConfigDir)
+                            manifest.sharedSecurityDir.set(sharedSecurityDir)
                         }
                 val taskGroup = mutableMapOf<CompileTarget, Task>()
                 val dependencyTaskNames = mutableMapOf<String, File>()

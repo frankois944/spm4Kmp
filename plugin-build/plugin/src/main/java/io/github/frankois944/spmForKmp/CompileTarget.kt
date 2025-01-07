@@ -154,5 +154,7 @@ public enum class CompileTarget : Serializable {
                 KonanTarget.MACOS_ARM64.name -> macosArm64
                 else -> null
             }
+
+        private const val serialVersionUID: Long = 1
     }
 }
