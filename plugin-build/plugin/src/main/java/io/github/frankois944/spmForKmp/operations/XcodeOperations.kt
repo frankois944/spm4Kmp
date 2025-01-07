@@ -3,7 +3,6 @@ package io.github.frankois944.spmForKmp.operations
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.dump.dependency.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.dump.manifest.PackageDump
-// import io.github.frankois944.spmForKmp.dependencies.PackageInternalDependencies
 import org.gradle.api.logging.Logger
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
