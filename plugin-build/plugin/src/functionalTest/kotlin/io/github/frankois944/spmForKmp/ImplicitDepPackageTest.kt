@@ -54,4 +54,52 @@ class ImplicitDepPackageTest : BaseTest() {
         // Then
         assertThat(result).task(":library:build").succeeded()
     }
+
+    @Test
+    fun `build and export complex firebase dependencies`() {
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Remote.Version(
+                                url = "https://github.com/firebase/firebase-ios-sdk.git",
+                                names = listOf("FirebaseAppDistribution-Beta", "FirebaseStorage"),
+                                packageName = "firebase-ios-sdk",
+                                version = "11.6.0",
+                                exportToKotlin = true,
+                            ),
+                        )
+                    },
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        content =
+                            """
+                            package com.example
+                            import `FirebaseAppDistribution-Beta`.FIRAppDistribution
+                            import FirebaseStorage.FIRStorage
+                            """.trimIndent(),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import FirebaseAppDistribution
+                            import FirebaseStorage
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
 }
