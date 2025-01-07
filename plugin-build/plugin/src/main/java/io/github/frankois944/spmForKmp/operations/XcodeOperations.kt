@@ -2,7 +2,6 @@ package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.dump.dependency.PackageImplicitDependencies
-import io.github.frankois944.spmForKmp.dump.manifest.PackageDump
 import org.gradle.api.logging.Logger
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
@@ -183,42 +182,6 @@ internal fun ExecOperations.getPackageImplicitDependencies(
         )
     }
     return PackageImplicitDependencies.fromString(standardOutput.toString())
-}
-
-internal fun ExecOperations.getPackageDump(
-    workingDir: File,
-    scratchPath: File,
-    logger: Logger? = null,
-): PackageDump {
-    val args =
-        listOf(
-            "swift",
-            "package",
-            "--scratch-path",
-            scratchPath.path,
-            "dump-package",
-        )
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = "xcrun"
-        it.workingDir = workingDir
-        it.args = args
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        printExecLogs(
-            logger,
-            "dump-package",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
-    return PackageDump.fromString(standardOutput.toString())
 }
 
 @Suppress("LongParameterList")

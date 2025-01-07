@@ -73,7 +73,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     private fun getBuildDirectoriesContent(vararg extensions: String): List<File> =
         getBuildDirectory() // get folders with headers for internal dependencies
             .listFiles { file -> extensions.contains(file.extension) || file.name == "Modules" }
-            // remove folder with weird names
+            // remove folder with weird names, cinterop doesn't like module with symbol names like grp-c++
+            // it doesn't matter for the kotlin export.
             ?.filter { file -> !file.nameWithoutExtension.lowercase().contains("grpc") }
             ?.toList()
             .orEmpty()
@@ -259,18 +260,18 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 }
                 logger.debug(
                     """
-Definition File : ${moduleConfig.definitionFile.name}
-At Path: ${moduleConfig.definitionFile.path}
-${moduleConfig.definitionFile.readText()}
+                    Definition File : ${moduleConfig.definitionFile.name}
+                    At Path: ${moduleConfig.definitionFile.path}
+                    ${moduleConfig.definitionFile.readText()}
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {
                 logger.error(
                     """
-Can't generate definition for ${moduleConfig.name}")
-Expected file ${moduleConfig.definitionFile.path}
-CONTENT ${moduleConfig.definitionFile.readText()}
--> Set the `export` parameter to `false` to ignore this module
+                    Can't generate definition for ${moduleConfig.name}")
+                    Expected file ${moduleConfig.definitionFile.path}
+                    CONTENT ${moduleConfig.definitionFile.readText()}
+                    -> Set the `export` parameter to `false` to ignore this module
                     """.trimIndent(),
                     ex,
                 )
