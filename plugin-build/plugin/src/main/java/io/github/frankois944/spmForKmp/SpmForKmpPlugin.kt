@@ -192,6 +192,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                     ),
                                 )
                                 it.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
+                                it.scratchDir.set(packageScratchDir)
                             }
 
                     val dependenciesFiles = task3.get().outputFiles

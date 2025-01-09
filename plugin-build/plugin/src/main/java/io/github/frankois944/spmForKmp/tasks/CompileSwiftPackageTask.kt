@@ -88,7 +88,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @TaskAction
     fun compilePackage() {
         logger.debug("Compile the manifest {}", manifestFile.get().path)
-        val sdkPath = operation.getSDKPath(target.get(), logger)
+        val sdkPath = project.getSDKPath(target.get(), logger)
         val workingDir = prepareWorkingDir()
 
         val args =

@@ -14,9 +14,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
-import org.gradle.process.ExecOperations
 import java.io.File
-import javax.inject.Inject
 
 private data class ModuleConfig(
     val isFramework: Boolean,
@@ -47,6 +45,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:InputFile
     abstract val manifestFile: RegularFileProperty
 
+    @get:Input
+    abstract val scratchDir: Property<File>
+
     init {
         description = "Generate the cinterop definitions files"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -60,9 +61,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     add(getBuildDirectory().resolve("$moduleName.def"))
                 }
             }
-
-    @get:Inject
-    abstract val operation: ExecOperations
 
     private fun getBuildDirectory(): File =
         compiledBinary
@@ -135,11 +133,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
      * @return A string of linker flags and options constructed based on the build configuration.
      */
     private fun getExtraLinkers(): String {
-        val xcodeDevPath = operation.getXcodeDevPath(logger)
+        val xcodeDevPath = project.getXcodeDevPath(logger)
 
         val linkerPlatformVersion =
             @Suppress("MagicNumber")
-            if (operation.getXcodeVersion(logger).toDouble() >= 15) {
+            if (project.getXcodeVersion(logger).toDouble() >= 15) {
                 target.get().linkerPlatformVersionName()
             } else {
                 target.get().linkerMinOsVersionName()
@@ -229,10 +227,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         extractModuleNameFromModuleMap(mapFileContent)
                             ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
                     val implicitDependencies =
-                        operation
+                        project
                             .getPackageImplicitDependencies(
                                 workingDir = manifestFile.asFile.get().parentFile,
                                 logger = logger,
+                                scratchPath = scratchDir.get(),
                             ).getFolders("Public")
                     val headersBuildPath =
                         buildList {

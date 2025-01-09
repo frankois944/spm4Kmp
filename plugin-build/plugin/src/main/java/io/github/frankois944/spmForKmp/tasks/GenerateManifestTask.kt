@@ -12,15 +12,10 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.process.ExecOperations
 import java.io.File
-import javax.inject.Inject
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
-    @get:Inject
-    abstract val operation: ExecOperations
-
     @get:Input
     abstract val packageDependencies: ListProperty<SwiftDependency>
 
@@ -85,7 +80,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
         manifestFile.asFile.get().writeText(manifest)
 
         try {
-            operation.resolvePackage(
+            project.resolvePackage(
                 workingDir = manifestFile.asFile.get().parentFile,
                 scratchPath = packageScratchDir.get(),
                 sharedCachePath = sharedCacheDir.orNull,
