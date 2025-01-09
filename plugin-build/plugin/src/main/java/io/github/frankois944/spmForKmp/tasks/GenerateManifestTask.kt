@@ -3,6 +3,7 @@ package io.github.frankois944.spmForKmp.tasks
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.resolvePackage
+import io.github.frankois944.spmForKmp.operations.swiftFormat
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -86,7 +87,9 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 sharedCachePath = sharedCacheDir.orNull,
                 sharedConfigPath = sharedConfigDir.orNull,
                 sharedSecurityPath = sharedSecurityDir.orNull,
-                logger = logger,
+            )
+            project.swiftFormat(
+                manifestFile.asFile.get(),
             )
         } catch (ex: Exception) {
             logger.error(

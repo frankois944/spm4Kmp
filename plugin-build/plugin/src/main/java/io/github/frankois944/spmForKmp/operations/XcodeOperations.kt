@@ -4,7 +4,6 @@ import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.dump.dependency.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.utils.InjectedExecOps
 import org.gradle.api.Project
-import org.gradle.api.logging.Logger
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -15,7 +14,6 @@ internal fun Project.resolvePackage(
     sharedCachePath: File?,
     sharedConfigPath: File?,
     sharedSecurityPath: File?,
-    logger: Logger? = null,
 ) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
@@ -51,7 +49,6 @@ internal fun Project.resolvePackage(
             it.isIgnoreExitValue = true
         }.also {
             printExecLogs(
-                logger,
                 "resolvePackage",
                 args,
                 it.exitValue != 0,
@@ -61,7 +58,7 @@ internal fun Project.resolvePackage(
         }
 }
 
-internal fun Project.getXcodeVersion(logger: Logger? = null): String {
+internal fun Project.getXcodeVersion(): String {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
@@ -80,7 +77,6 @@ internal fun Project.getXcodeVersion(logger: Logger? = null): String {
             it.isIgnoreExitValue = true
         }.also {
             printExecLogs(
-                logger,
                 "getXcodeVersion",
                 args,
                 it.exitValue != 0,
@@ -94,7 +90,7 @@ internal fun Project.getXcodeVersion(logger: Logger? = null): String {
         ?: throw RuntimeException("Can't find Xcode version with output $standardOutput")
 }
 
-internal fun Project.getXcodeDevPath(logger: Logger? = null): String {
+internal fun Project.getXcodeDevPath(): String {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
@@ -113,7 +109,6 @@ internal fun Project.getXcodeDevPath(logger: Logger? = null): String {
             it.isIgnoreExitValue = true
         }.also {
             printExecLogs(
-                logger,
                 "getXcodeDevPath",
                 args,
                 it.exitValue != 0,
@@ -124,10 +119,7 @@ internal fun Project.getXcodeDevPath(logger: Logger? = null): String {
     return standardOutput.toString().trim()
 }
 
-internal fun Project.getSDKPath(
-    target: CompileTarget,
-    logger: Logger? = null,
-): String {
+internal fun Project.getSDKPath(target: CompileTarget): String {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
@@ -147,7 +139,6 @@ internal fun Project.getSDKPath(
             it.isIgnoreExitValue = true
         }.also {
             printExecLogs(
-                logger,
                 "getSDKPath",
                 args,
                 it.exitValue != 0,
@@ -161,7 +152,6 @@ internal fun Project.getSDKPath(
 internal fun Project.getPackageImplicitDependencies(
     workingDir: File,
     scratchPath: File,
-    logger: Logger? = null,
 ): PackageImplicitDependencies {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
@@ -187,7 +177,6 @@ internal fun Project.getPackageImplicitDependencies(
             it.isIgnoreExitValue = true
         }.also {
             printExecLogs(
-                logger,
                 "show-dependencies",
                 args,
                 it.exitValue != 0,
@@ -198,41 +187,64 @@ internal fun Project.getPackageImplicitDependencies(
     return PackageImplicitDependencies.fromString(standardOutput.toString())
 }
 
+internal fun Project.swiftFormat(file: File) {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
+    val args =
+        listOf(
+            "swift-format",
+            "-i",
+            file.path,
+        )
+
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
+    operation.execOps
+        .exec {
+            it.executable = "xcrun"
+            it.args = args
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "swift-format",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
+}
+
 @Suppress("LongParameterList")
-internal fun printExecLogs(
-    logger: Logger?,
+internal fun Project.printExecLogs(
     action: String,
     args: List<String>,
     isError: Boolean,
     standardOutput: ByteArrayOutputStream,
     errorOutput: ByteArrayOutputStream,
-    extraString: String? = null,
 ) {
     if (isError) {
-        logger?.error(
+        logger.error(
             """
-ERROR FOUND WHEN EXEC
-RUN $action
-ARGS xcrun ${args.joinToString(" ")}
-ERROR $errorOutput
-OUTPUT $standardOutput
-###
-${extraString.orEmpty()}
-###
+            ERROR FOUND WHEN EXEC
+            RUN $action
+            ARGS xcrun ${args.joinToString(" ")}
+            ERROR $errorOutput
+            OUTPUT $standardOutput
+            ###
             """.trimMargin(),
         )
         throw RuntimeException(
             "RUN CMD $action failed",
         )
     } else {
-        logger?.debug(
+        logger.debug(
             """
-RUN $action
-ARGS xcrun ${args.joinToString(" ")}
-OUTPUT $standardOutput
-###
-${extraString.orEmpty()}
-###
+            RUN $action
+            ARGS xcrun ${args.joinToString(" ")}
+            OUTPUT $standardOutput
+            ###
             """.trimMargin(),
         )
     }

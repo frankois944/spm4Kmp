@@ -133,11 +133,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
      * @return A string of linker flags and options constructed based on the build configuration.
      */
     private fun getExtraLinkers(): String {
-        val xcodeDevPath = project.getXcodeDevPath(logger)
+        val xcodeDevPath = project.getXcodeDevPath()
 
         val linkerPlatformVersion =
             @Suppress("MagicNumber")
-            if (project.getXcodeVersion(logger).toDouble() >= 15) {
+            if (project.getXcodeVersion().toDouble() >= 15) {
                 target.get().linkerPlatformVersionName()
             } else {
                 target.get().linkerMinOsVersionName()
@@ -230,7 +230,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         project
                             .getPackageImplicitDependencies(
                                 workingDir = manifestFile.asFile.get().parentFile,
-                                logger = logger,
                                 scratchPath = scratchDir.get(),
                             ).getFolders("Public")
                     val headersBuildPath =
@@ -257,11 +256,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         """.trimIndent(),
                     )
                 }
-                logger.debug(
+                logger.warn(
                     """
+                    ######
                     Definition File : ${moduleConfig.definitionFile.name}
                     At Path: ${moduleConfig.definitionFile.path}
                     ${moduleConfig.definitionFile.readText()}
+                    ######
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {

@@ -88,7 +88,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @TaskAction
     fun compilePackage() {
         logger.debug("Compile the manifest {}", manifestFile.get().path)
-        val sdkPath = project.getSDKPath(target.get(), logger)
+        val sdkPath = project.getSDKPath(target.get())
         val workingDir = prepareWorkingDir()
 
         val args =
@@ -117,14 +117,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             args.add(it.path)
         }
 
-        logger.debug(
-            """
-RUN compileManifest
-ARGS xcrun ${args.joinToString(" ")}
-From ${workingDir.path}
-            """.trimMargin(),
-        )
-
         val standardOutput = ByteArrayOutputStream()
         val errorOutput = ByteArrayOutputStream()
         operation
@@ -136,9 +128,8 @@ From ${workingDir.path}
                 it.errorOutput = errorOutput
                 it.isIgnoreExitValue = true
             }.also {
-                printExecLogs(
-                    logger,
-                    "compilePackage",
+                project.printExecLogs(
+                    "buildPackage",
                     args,
                     it.exitValue != 0,
                     standardOutput,
