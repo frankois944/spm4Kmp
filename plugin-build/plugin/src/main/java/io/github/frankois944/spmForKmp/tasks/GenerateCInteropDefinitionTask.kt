@@ -149,8 +149,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             add("-rpath")
             add("/usr/lib/swift")
             add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
-            add("-Wl")
-            add("--whole-archive")
         }.joinToString(" ")
     }
 

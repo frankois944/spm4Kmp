@@ -19,7 +19,7 @@ kotlin {
     }
 
     listOf(
-        // iosArm64(),
+        iosArm64(),
         iosSimulatorArm64(),
     ).forEach {
         it.binaries.framework {
@@ -74,7 +74,7 @@ swiftPackageConfig {
                 // Repository URL
                 url = "https://github.com/firebase/firebase-ios-sdk.git",
                 // Libraries from the package
-                names = listOf("FirebaseAnalytics", "FirebaseCore"),
+                names = listOf("FirebaseCore"),
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
