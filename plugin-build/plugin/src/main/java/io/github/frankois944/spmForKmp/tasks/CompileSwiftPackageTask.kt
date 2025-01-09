@@ -93,6 +93,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
         val args =
             mutableListOf(
+                "--sdk",
+                "macosx",
                 "swift",
                 "build",
                 "--sdk",

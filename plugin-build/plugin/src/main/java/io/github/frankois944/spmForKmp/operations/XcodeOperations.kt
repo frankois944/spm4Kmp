@@ -1,7 +1,7 @@
 package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.CompileTarget
-import io.github.frankois944.spmForKmp.dump.dependency.PackageImplicitDependencies
+import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.utils.InjectedExecOps
 import org.gradle.api.Project
 import java.io.ByteArrayOutputStream
@@ -18,6 +18,8 @@ internal fun Project.resolvePackage(
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         mutableListOf(
+            "--sdk",
+            "macosx",
             "swift",
             "package",
             "resolve",
@@ -62,6 +64,8 @@ internal fun Project.getXcodeVersion(): String {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "xcodebuild",
             "-version",
         )
@@ -94,6 +98,8 @@ internal fun Project.getXcodeDevPath(): String {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "xcode-select",
             "-p",
         )
@@ -123,6 +129,8 @@ internal fun Project.getSDKPath(target: CompileTarget): String {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "--sdk",
             target.sdk(),
             "--show-sdk-path",
@@ -156,6 +164,8 @@ internal fun Project.getPackageImplicitDependencies(
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "swift",
             "package",
             "show-dependencies",
@@ -191,6 +201,8 @@ internal fun Project.swiftFormat(file: File) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "swift-format",
             "-i",
             file.path,

@@ -79,17 +79,16 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 toolsVersion = toolsVersion.get(),
             )
         manifestFile.asFile.get().writeText(manifest)
-
         try {
+            project.swiftFormat(
+                manifestFile.asFile.get(),
+            )
             project.resolvePackage(
                 workingDir = manifestFile.asFile.get().parentFile,
                 scratchPath = packageScratchDir.get(),
                 sharedCachePath = sharedCacheDir.orNull,
                 sharedConfigPath = sharedConfigDir.orNull,
                 sharedSecurityPath = sharedSecurityDir.orNull,
-            )
-            project.swiftFormat(
-                manifestFile.asFile.get(),
             )
         } catch (ex: Exception) {
             logger.error(

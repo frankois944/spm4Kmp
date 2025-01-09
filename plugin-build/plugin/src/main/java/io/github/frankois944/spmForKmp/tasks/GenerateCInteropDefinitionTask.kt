@@ -6,6 +6,8 @@ import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import io.github.frankois944.spmForKmp.utils.md5
+import io.github.frankois944.spmForKmp.xcodeconfig.ModuleConfig
+import io.github.frankois944.spmForKmp.xcodeconfig.generateXcodeConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -15,13 +17,6 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-
-private data class ModuleConfig(
-    val isFramework: Boolean,
-    val name: String,
-    val buildDir: File,
-    val definitionFile: File,
-)
 
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
@@ -143,11 +138,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 target.get().linkerMinOsVersionName()
             }
         return buildList {
-            add("-$linkerPlatformVersion")
-            add(osVersion.get())
-            add(osVersion.get())
-            add("-rpath")
-            add("/usr/lib/swift")
+            // add("-$linkerPlatformVersion")
+            // add(osVersion.get())
+            // add(osVersion.get())
+            // add("-rpath")
+            // add("/usr/lib/swift")
             add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
         }.joinToString(" ")
     }
@@ -211,8 +206,8 @@ package = ${moduleConfig.name}
 # Set a checksum for avoid build cache
 # checkum: $checksum
 libraryPaths = "${getBuildDirectory().path}"
-compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
-linkerOpts = ${getExtraLinkers()} -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
+compilerOpts = -fmodules -framework "${moduleConfig.buildDir.nameWithoutExtension}" -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -framework "${moduleConfig.buildDir.nameWithoutExtension}" -F"${getBuildDirectory().path}"
                         """
                 } else {
                     val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
@@ -255,7 +250,7 @@ staticLibraries = $libName
                 if (definition.isNotEmpty()) {
                     moduleConfig.definitionFile.writeText(definition.trimIndent())
                 }
-                logger.warn(
+                logger.debug(
                     """
 ######
 Definition File : ${moduleConfig.definitionFile.name}
@@ -276,5 +271,10 @@ CONTENT ${moduleConfig.definitionFile.readText()}
                 )
             }
         }
+        project.generateXcodeConfig(
+            moduleConfigs = moduleConfigs,
+            buildDir = getBuildDirectory(),
+            isDebug = debugMode.get(),
+        )
     }
 }
