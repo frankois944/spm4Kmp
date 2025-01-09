@@ -331,6 +331,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+					"/Users/francoisdabonot/DEV/spm-kmp-plugin/example/build/spmKmpPlugin/scratch/arm64-apple-ios-simulator/debug",
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -340,8 +341,11 @@
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
+					"-ObjC",
 					"-framework",
 					shared,
+					"-framework",
+					FirebaseAnalytics,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = fr.frankois944.kmp.smp4kmp.example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -369,8 +373,11 @@
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
+					"-ObjC",
 					"-framework",
 					shared,
+					"-framework",
+					FirebaseAnalytics,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = fr.frankois944.kmp.smp4kmp.example;
 				PRODUCT_NAME = "$(TARGET_NAME)";

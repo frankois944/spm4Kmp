@@ -132,7 +132,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
      *
      * @return A string of linker flags and options constructed based on the build configuration.
      */
-    private fun getExtraLinkers(isMainProduct: Boolean): String {
+    private fun getExtraLinkers(): String {
         val xcodeDevPath = project.getXcodeDevPath()
 
         val linkerPlatformVersion =
@@ -186,17 +186,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                             ),
                         )
                     }
-            }.also {
-                logger.debug(
-                    """
-                    modulesConfigs found
-                    $moduleConfigs
-                    """.trimIndent(),
-                )
             }
-
+        logger.debug(
+            """
+            modulesConfigs found
+            $moduleConfigs
+            """.trimIndent(),
+        )
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
+            var definition = ""
             try {
                 val libName = compiledBinary.asFile.get().name
                 val checksum = compiledBinary.asFile.get().md5()
@@ -205,19 +204,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     val moduleName =
                         extractModuleNameFromModuleMap(mapFile.readText())
                             ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
-                    moduleConfig.definitionFile.writeText(
+                    definition = """
+language = Objective-C
+modules = $moduleName
+package = ${moduleConfig.name}
+# Set a checksum for avoid build cache
+# checkum: $checksum
+libraryPaths = "${getBuildDirectory().path}"
+compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
                         """
-                        language = Objective-C
-                        modules = $moduleName
-                        package = ${moduleConfig.name}
-                        # Set a checksum for avoid build cache
-                        # checkum: $checksum
-                        staticLibraries = $libName
-                        libraryPaths = "${getBuildDirectory().path}"
-                        compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
-                        linkerOpts = ${getExtraLinkers(index == 0)}
-                        """.trimIndent(),
-                    )
                 } else {
                     val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
                     val mapFileContent = mapFile.readText()
@@ -238,20 +234,26 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 add(it)
                             }
                         }.joinToString(" ") { "-I\"${it}\"" }
-
-                    moduleConfig.definitionFile.writeText(
+                    definition =
                         """
-                        language = Objective-C
-                        modules = $moduleName
-                        package = ${moduleConfig.name}
-                        # Set a checksum for avoid build cache
-                        # checkum: $checksum
-                        staticLibraries = $libName
-                        libraryPaths = "${getBuildDirectory().path}"
-                        compilerOpts = -ObjC -fmodules $headersBuildPath -F"${getBuildDirectory().path}"
-                        linkerOpts = ${getExtraLinkers(index == 0)} -F"${getBuildDirectory().path}"
-                        """.trimIndent(),
-                    )
+language = Objective-C
+modules = $moduleName
+package = ${moduleConfig.name}
+# Set a checksum for avoid build cache
+# checkum: $checksum
+libraryPaths = "${getBuildDirectory().path}"
+compilerOpts = -fmodules $headersBuildPath -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+                        """
+                }
+                if (index == 0) {
+                    definition = """
+$definition
+staticLibraries = $libName
+                            """
+                }
+                if (definition.isNotEmpty()) {
+                    moduleConfig.definitionFile.writeText(definition.trimIndent())
                 }
                 logger.warn(
                     """

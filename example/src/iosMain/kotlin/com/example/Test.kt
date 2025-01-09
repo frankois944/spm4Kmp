@@ -1,4 +1,5 @@
 package com.example
+import FirebaseAnalytics.FIRConsentStatusGranted
 import FirebaseCore.FIRApp
 import kotlinx.cinterop.ExperimentalForeignApi
 import nativeShared.TestClass
@@ -8,4 +9,6 @@ val getSwiftValue = TestClass().getSomeValue()
 
 @ExperimentalForeignApi
 public fun configureFirebase() = FIRApp.configure()
-// val testFirebaseAnalyticsVersion = FIRAnalytics.version()
+
+@ExperimentalForeignApi
+public val consentStatusGranted = FIRConsentStatusGranted
