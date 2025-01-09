@@ -132,7 +132,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
      *
      * @return A string of linker flags and options constructed based on the build configuration.
      */
-    private fun getExtraLinkers(): String {
+    private fun getExtraLinkers(isMainProduct: Boolean): String {
         val xcodeDevPath = project.getXcodeDevPath()
 
         val linkerPlatformVersion =
@@ -142,15 +142,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             } else {
                 target.get().linkerMinOsVersionName()
             }
-
-        return listOf(
-            "-$linkerPlatformVersion",
-            osVersion.get(),
-            osVersion.get(),
-            "-rpath",
-            "/usr/lib/swift",
-            "-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"",
-        ).joinToString(" ")
+        return buildList {
+            add("-$linkerPlatformVersion")
+            add(osVersion.get())
+            add(osVersion.get())
+            add("-rpath")
+            add("/usr/lib/swift")
+            add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
+            add("-Wl")
+            add("--whole-archive")
+        }.joinToString(" ")
     }
 
     @Suppress("LongMethod")
@@ -196,7 +197,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 )
             }
 
-        moduleConfigs.forEach { moduleConfig ->
+        moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
             try {
                 val libName = compiledBinary.asFile.get().name
@@ -211,13 +212,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         language = Objective-C
                         modules = $moduleName
                         package = ${moduleConfig.name}
-
                         # Set a checksum for avoid build cache
                         # checkum: $checksum
                         staticLibraries = $libName
                         libraryPaths = "${getBuildDirectory().path}"
                         compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
-                        linkerOpts = ${getExtraLinkers()}
+                        linkerOpts = ${getExtraLinkers(index == 0)}
                         """.trimIndent(),
                     )
                 } else {
@@ -246,32 +246,31 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         language = Objective-C
                         modules = $moduleName
                         package = ${moduleConfig.name}
-
                         # Set a checksum for avoid build cache
                         # checkum: $checksum
                         staticLibraries = $libName
                         libraryPaths = "${getBuildDirectory().path}"
                         compilerOpts = -ObjC -fmodules $headersBuildPath -F"${getBuildDirectory().path}"
-                        linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+                        linkerOpts = ${getExtraLinkers(index == 0)} -F"${getBuildDirectory().path}"
                         """.trimIndent(),
                     )
                 }
                 logger.warn(
                     """
-                    ######
-                    Definition File : ${moduleConfig.definitionFile.name}
-                    At Path: ${moduleConfig.definitionFile.path}
-                    ${moduleConfig.definitionFile.readText()}
-                    ######
+######
+Definition File : ${moduleConfig.definitionFile.name}
+At Path: ${moduleConfig.definitionFile.path}
+${moduleConfig.definitionFile.readText()}
+######
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {
                 logger.error(
                     """
-                    Can't generate definition for ${moduleConfig.name}")
-                    Expected file ${moduleConfig.definitionFile.path}
-                    CONTENT ${moduleConfig.definitionFile.readText()}
-                    -> Set the `export` parameter to `false` to ignore this module
+Can't generate definition for ${moduleConfig.name}")
+Expected file ${moduleConfig.definitionFile.path}
+CONTENT ${moduleConfig.definitionFile.readText()}
+-> Set the `export` parameter to `false` to ignore this module
                     """.trimIndent(),
                     ex,
                 )

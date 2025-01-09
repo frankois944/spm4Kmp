@@ -1,5 +1,9 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package com.example
 
+import kotlinx.cinterop.ExperimentalForeignApi
+import nativeShared.MySwiftDummyClass
 import platform.UIKit.UIDevice
 
 class IOSPlatform : Platform {
@@ -8,3 +12,8 @@ class IOSPlatform : Platform {
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()
+
+// @Throws(Exception::class)
+// fun firebaseConfigure() = FirebaseCore.FIRApp.configure()
+// val firebaseAnalytics = FirebaseAnalytics.FIRAnalytics.resetAnalyticsData()
+val myNativeClass = MySwiftDummyClass().mySwiftDummyFunction()
