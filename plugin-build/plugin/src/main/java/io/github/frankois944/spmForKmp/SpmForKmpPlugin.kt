@@ -137,7 +137,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             manifest.sharedConfigDir.set(sharedConfigDir)
                             manifest.sharedSecurityDir.set(sharedSecurityDir)
                         }
-                val exportablePackage = extension.packageDependencies.filter { it.exportToKotlin }
+                val exportablePackage =
+                    extension.packageDependencies.filter { product ->
+                        product.exportToKotlin
+                    }
+                val manifestDir =
+                    project.layout.projectDirectory.asFile
+                        .resolve("exported${extension.name.capitalized()}")
                 val task4: TaskProvider<GenerateExportableManifestTask>? =
                     if (exportablePackage.isNotEmpty()) {
                         tasks
@@ -154,13 +160,11 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 manifest.minMacos.set(extension.minMacos)
                                 manifest.minWatchos.set(extension.minWatchos)
                                 manifest.toolsVersion.set(extension.toolsVersion)
-                                val manifestDir =
-                                    project.layout.projectDirectory.asFile
-                                        .resolve("exported${extension.name.capitalized()}")
-                                        .also { it.mkdirs() }
+                                manifestDir.mkdirs()
                                 manifest.manifestFile.set(manifestDir.resolve("Package.swift"))
                             }
                     } else {
+                        manifestDir.deleteRecursively()
                         null
                     }
 

@@ -251,20 +251,20 @@ staticLibraries = $libName
                 }
                 logger.debug(
                     """
-######
-Definition File : ${moduleConfig.definitionFile.name}
-At Path: ${moduleConfig.definitionFile.path}
-${moduleConfig.definitionFile.readText()}
-######
+                    ######
+                    Definition File : ${moduleConfig.definitionFile.name}
+                    At Path: ${moduleConfig.definitionFile.path}
+                    ${moduleConfig.definitionFile.readText()}moduleConfig.definitionFile.readText()}
+                    ######
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {
                 logger.error(
                     """
-Can't generate definition for ${moduleConfig.name}")
-Expected file ${moduleConfig.definitionFile.path}
-CONTENT ${moduleConfig.definitionFile.readText()}
--> Set the `export` parameter to `false` to ignore this module
+                    Can't generate definition for ${moduleConfig.name}")
+                    Expected file ${moduleConfig.definitionFile.path}
+                    CONTENT ${moduleConfig.definitionFile.readText()}
+                    -> Set the `export` parameter to `false` to ignore this module
                     """.trimIndent(),
                     ex,
                 )

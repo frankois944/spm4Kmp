@@ -13,3 +13,4 @@ plugin-build/plugin/src/functionalTest/resources/LocalDummyFramework/.build
 .kotlin
 example/iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata
 example/iosApp/iosApp.xcodeproj/xcuserdata
+example/exportedNativeShared
