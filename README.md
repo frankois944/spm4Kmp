@@ -3,7 +3,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/frankois944/spm4Kmp)](https://github.com/frankois944/spm4Kmp/releases/)
 [![build&tests](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg)](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml)
 [![codecov](https://codecov.io/gh/frankois944/spm4Kmp/graph/badge.svg?token=OXEHFLQG1I)](https://codecov.io/gh/frankois944/spm4Kmp)
-[![GitHub License](https://img.shields.io/github/license/frankois944/spm4kmp)(https://github.com/frankois944/spm4Kmp/blob/main/LICENSE)]
+[![GitHub License](https://img.shields.io/github/license/frankois944/spm4kmp)](https://github.com/frankois944/spm4Kmp/blob/main/LICENSE)
 
 The Swift Package Manager for Kotlin multiplatform Plugin aka `spmForKmp` gradle plugin is a Gradle plugin designed to simplify integrating Swift Package Manager (SPM) dependencies into Kotlin Multiplatform (KMP) projects. It allows you to (almost) effortlessly configure and use Swift packages in your Kotlin projects targeting Apple platforms, such as iOS.
 
@@ -11,7 +11,7 @@ The Swift Package Manager for Kotlin multiplatform Plugin aka `spmForKmp` gradle
 
 ## Feedback
 
-This project greatly needs feedback and informations about the edge case for progressing; the discussion tab is welcomed.
+This project greatly needs feedback and information about the edge case for progressing; the discussion tab is welcomed.
 
 ## Features
 
@@ -74,7 +74,7 @@ swiftPackageConfig {
             )
         )
         dependency(
-            // available in the Swift and kolin code
+            // available in the Swift and Kolin code
             SwiftDependency.Package.Remote.Version(
                 url = "https://github.com/firebase/firebase-ios-sdk.git", // Repository URL
                 names = listOf("FirebaseAnalytics", "FirebaseCore"),     // Libraries from the package
@@ -170,11 +170,15 @@ swiftPackageConfig {
 
 > [!IMPORTANT]
 > When exporting dependency, some configuration need to be added to your xcode project
+> 
 > A local swift package is being generated during the build of the application and this message diplayed
+>
 > `
 > Spm4Kmp: A local package has been generated in /path/to/the/local/package
+>
 > Please add it to your project as a local package dependency.
 > `
+>
 > Add the folder to your project as a Local package, that's all.
 
 
