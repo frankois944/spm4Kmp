@@ -24,7 +24,7 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "shared"
-            isStatic = false
+            isStatic = true
         }
         it.compilations {
             val main by getting {
@@ -42,6 +42,21 @@ kotlin {
     }
 }
 
+val copyTestResources =
+    tasks.register<Copy>("copyTestResources") {
+        from(
+            "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources" +
+                "/DummyFramework.xcframework/ios-arm64_x86_64-simulator/",
+        ) {
+            include("*.framework/**")
+        }
+        into("${layout.projectDirectory.asFile.path}/build/bin/iosSimulatorArm64/debugTest/Frameworks/")
+    }
+
+tasks.named("iosSimulatorArm64Test") {
+    dependsOn(copyTestResources)
+}
+
 android {
     namespace = "com.example"
     compileSdk = 34
@@ -53,7 +68,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-val resources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
+val testRessources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
     create("nativeShared") {
         // optional parameters
@@ -87,12 +102,12 @@ swiftPackageConfig {
                 exportToKotlin = true,
             ),
             SwiftDependency.Binary.Local(
-                path = "$resources/DummyFramework.xcframework.zip",
+                path = "$testRessources/DummyFramework.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
             ),
             SwiftDependency.Package.Local(
-                path = "$resources/LocalSourceDummyFramework",
+                path = "$testRessources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
                 exportToKotlin = true,
             ),
