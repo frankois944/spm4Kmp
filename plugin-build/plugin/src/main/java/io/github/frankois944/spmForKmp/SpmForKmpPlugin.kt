@@ -162,6 +162,12 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 manifest.toolsVersion.set(extension.toolsVersion)
                                 manifestDir.mkdirs()
                                 manifest.manifestFile.set(manifestDir.resolve("Package.swift"))
+                                logger.warn(
+                                    "Spm4Kmp: A local Swift package has been generated in $manifestDir",
+                                )
+                                logger.warn(
+                                    "Please add it to your xcode project as a local package dependency.",
+                                )
                             }
                     } else {
                         manifestDir.deleteRecursively()
