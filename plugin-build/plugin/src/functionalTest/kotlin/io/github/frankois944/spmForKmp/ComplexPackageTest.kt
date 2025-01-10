@@ -13,7 +13,7 @@ import java.io.File
 class ComplexPackageTest : BaseTest() {
     @Test
     fun `build with multiple packages type`() {
-        val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
         val xcFrameworkDirectory = File("src/functionalTest/resources/DummyFramework.xcframework")
         // Given
         val fixture =
@@ -75,7 +75,7 @@ class ComplexPackageTest : BaseTest() {
                             package com.example
                             import CryptoSwift.SWIFT_TYPEDEFS
                             import dummy.MySwiftClassEmbedded
-                            import LocalDummyFramework.MySwiftClass
+                            import LocalSourceDummyFramework.LocalSourceDummy
 
                             """.trimIndent(),
                     ),
@@ -88,7 +88,7 @@ class ComplexPackageTest : BaseTest() {
                             import KeychainAccess
                             import Valet
                             import DummyFramework
-                            import LocalDummyFramework
+                            import LocalSourceDummyFramework
                             import FirebaseCore
                             import FirebaseAnalytics
                             import FirebaseCrashlytics

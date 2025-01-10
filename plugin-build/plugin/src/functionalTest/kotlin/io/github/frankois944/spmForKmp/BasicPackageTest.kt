@@ -53,7 +53,7 @@ class BasicPackageTest : BaseTest() {
         val cache = File("/tmp/spm4kmp/cache").also { it.deleteRecursively() }
         val security = File("/tmp/spm4kmp/security").also { it.deleteRecursively() }
         val config = File("/tmp/spm4kmp/config").also { it.deleteRecursively() }
-        val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
 
         // Given
         val fixture =
