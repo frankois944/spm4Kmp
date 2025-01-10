@@ -14,3 +14,5 @@ plugin-build/plugin/src/functionalTest/resources/LocalDummyFramework/.build
 example/iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata
 example/iosApp/iosApp.xcodeproj/xcuserdata
 example/exportedNativeShared
+example/iosApp/spm
+plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework/.build

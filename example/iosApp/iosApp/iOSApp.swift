@@ -8,8 +8,9 @@ struct iOSApp: App {
     
     init() {
         print(shared.Platform_iosKt.myNativeClass)
-        shared.TestKt.configureFirebase()
-        print(shared.TestKt.consentStatusGranted)
+        shared.Platform_iosKt.configureFirebase()
+        print(shared.Platform_iosKt.consentStatusGranted)
+        print(shared.Platform_iosKt.localSourceDummyTest)
         Analytics.logEvent(AnalyticsEventSelectContent, parameters: [
           AnalyticsParameterItemID: "id-",
           AnalyticsParameterItemName: "title",

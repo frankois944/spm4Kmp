@@ -53,7 +53,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-
+val resources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
     create("nativeShared") {
         // optional parameters
@@ -78,28 +78,22 @@ swiftPackageConfig {
                     listOf(
                         "FirebaseCore",
                         "FirebaseAnalytics",
-                        "FirebaseAppCheck",
-                        "FirebaseAppDistribution-Beta",
-                        "FirebaseAuth",
-                        "FirebaseFirestore",
-                        "FirebaseFunctions",
-                        "FirebaseMessaging",
-                        "FirebaseStorage",
-                        "FirebaseCrashlytics",
-                        "FirebaseDynamicLinks",
-                        "FirebaseInAppMessaging-Beta",
-                        "FirebaseInstallations",
-                        "FirebaseMLModelDownloader",
-                        "FirebasePerformance",
-                        "FirebaseDatabase",
-                        "FirebaseRemoteConfig",
-                        "FirebaseVertexAI",
                     ),
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
                 version = "11.6.0",
                 // Export to Kotlin for use in shared Kotlin code, false by default
+                exportToKotlin = true,
+            ),
+            SwiftDependency.Binary.Local(
+                path = "$resources/DummyFramework.xcframework.zip",
+                packageName = "DummyFramework",
+                exportToKotlin = true,
+            ),
+            SwiftDependency.Package.Local(
+                path = "$resources/LocalSourceDummyFramework",
+                packageName = "LocalSourceDummyFramework",
                 exportToKotlin = true,
             ),
             SwiftDependency.Package.Remote.Version(

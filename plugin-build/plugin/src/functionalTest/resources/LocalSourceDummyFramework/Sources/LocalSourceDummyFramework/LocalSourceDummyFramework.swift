@@ -3,8 +3,8 @@
 
 import Foundation
 
-@objcMembers public class MySwiftClass: NSObject {
-    func test() -> String {
+@objcMembers public class LocalSourceDummy: NSObject {
+    public func test() -> String {
         return "TEST DUMMY FRAMEWORK"
     }
 }

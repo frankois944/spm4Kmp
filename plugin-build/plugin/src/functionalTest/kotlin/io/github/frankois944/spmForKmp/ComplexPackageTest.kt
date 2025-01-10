@@ -48,7 +48,7 @@ class ComplexPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
-                                packageName = "LocalDummyFramework",
+                                packageName = "LocalSourceDummyFramework",
                                 exportToKotlin = true,
                             ),
                         )
