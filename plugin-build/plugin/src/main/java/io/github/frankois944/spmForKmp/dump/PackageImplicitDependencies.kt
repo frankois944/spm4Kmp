@@ -1,6 +1,7 @@
-package io.github.frankois944.spmForKmp.dump.dependency
+package io.github.frankois944.spmForKmp.dump
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.gradle.internal.cc.base.logger
 import org.gradle.internal.impldep.com.google.errorprone.annotations.Keep
 import java.io.File
@@ -22,8 +23,7 @@ internal data class PackageImplicitDependencies(
 ) {
     companion object {
         private val objectMapper =
-            com.fasterxml.jackson.databind
-                .ObjectMapper()
+            ObjectMapper()
 
         fun fromString(input: String): PackageImplicitDependencies =
             objectMapper.readValue(

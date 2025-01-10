@@ -6,6 +6,7 @@ import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import io.github.frankois944.spmForKmp.utils.md5
+import io.github.frankois944.spmForKmp.xcodeconfig.ModuleConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -14,16 +15,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
-import org.gradle.process.ExecOperations
 import java.io.File
-import javax.inject.Inject
-
-private data class ModuleConfig(
-    val isFramework: Boolean,
-    val name: String,
-    val buildDir: File,
-    val definitionFile: File,
-)
 
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
@@ -47,6 +39,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:InputFile
     abstract val manifestFile: RegularFileProperty
 
+    @get:Input
+    abstract val scratchDir: Property<File>
+
     init {
         description = "Generate the cinterop definitions files"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -60,9 +55,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     add(getBuildDirectory().resolve("$moduleName.def"))
                 }
             }
-
-    @get:Inject
-    abstract val operation: ExecOperations
 
     private fun getBuildDirectory(): File =
         compiledBinary
@@ -135,24 +127,23 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
      * @return A string of linker flags and options constructed based on the build configuration.
      */
     private fun getExtraLinkers(): String {
-        val xcodeDevPath = operation.getXcodeDevPath(logger)
+        val xcodeDevPath = project.getXcodeDevPath()
 
         val linkerPlatformVersion =
             @Suppress("MagicNumber")
-            if (operation.getXcodeVersion(logger).toDouble() >= 15) {
+            if (project.getXcodeVersion().toDouble() >= 15) {
                 target.get().linkerPlatformVersionName()
             } else {
                 target.get().linkerMinOsVersionName()
             }
-
-        return listOf(
-            "-$linkerPlatformVersion",
-            osVersion.get(),
-            osVersion.get(),
-            "-rpath",
-            "/usr/lib/swift",
-            "-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"",
-        ).joinToString(" ")
+        return buildList {
+            // add("-$linkerPlatformVersion")
+            // add(osVersion.get())
+            // add(osVersion.get())
+            // add("-rpath")
+            // add("/usr/lib/swift")
+            add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
+        }.joinToString(" ")
     }
 
     @Suppress("LongMethod")
@@ -189,17 +180,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                             ),
                         )
                     }
-            }.also {
-                logger.debug(
-                    """
-                    modulesConfigs found
-                    $moduleConfigs
-                    """.trimIndent(),
-                )
             }
-
-        moduleConfigs.forEach { moduleConfig ->
+        logger.debug(
+            """
+            modulesConfigs found
+            $moduleConfigs
+            """.trimIndent(),
+        )
+        moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
+            var definition = ""
             try {
                 val libName = compiledBinary.asFile.get().name
                 val checksum = compiledBinary.asFile.get().md5()
@@ -208,20 +198,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     val moduleName =
                         extractModuleNameFromModuleMap(mapFile.readText())
                             ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
-                    moduleConfig.definitionFile.writeText(
+                    definition = """
+language = Objective-C
+modules = $moduleName
+package = ${moduleConfig.name}
+# Set a checksum for avoid build cache
+# checkum: $checksum
+libraryPaths = "${getBuildDirectory().path}"
+compilerOpts = -fmodules -framework "${moduleConfig.buildDir.nameWithoutExtension}" -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -framework "${moduleConfig.buildDir.nameWithoutExtension}" -F"${getBuildDirectory().path}"
                         """
-                        language = Objective-C
-                        modules = $moduleName
-                        package = ${moduleConfig.name}
-
-                        # Set a checksum for avoid build cache
-                        # checkum: $checksum
-                        staticLibraries = $libName
-                        libraryPaths = "${getBuildDirectory().path}"
-                        compilerOpts = -fmodules -framework "${moduleConfig.buildDir.name}" -F"${getBuildDirectory().path}"
-                        linkerOpts = ${getExtraLinkers()}
-                        """.trimIndent(),
-                    )
                 } else {
                     val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
                     val mapFileContent = mapFile.readText()
@@ -229,10 +215,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         extractModuleNameFromModuleMap(mapFileContent)
                             ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
                     val implicitDependencies =
-                        operation
+                        project
                             .getPackageImplicitDependencies(
                                 workingDir = manifestFile.asFile.get().parentFile,
-                                logger = logger,
+                                scratchPath = scratchDir.get(),
                             ).getFolders("Public")
                     val headersBuildPath =
                         buildList {
@@ -242,27 +228,34 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 add(it)
                             }
                         }.joinToString(" ") { "-I\"${it}\"" }
-
-                    moduleConfig.definitionFile.writeText(
+                    definition =
                         """
-                        language = Objective-C
-                        modules = $moduleName
-                        package = ${moduleConfig.name}
-
-                        # Set a checksum for avoid build cache
-                        # checkum: $checksum
-                        staticLibraries = $libName
-                        libraryPaths = "${getBuildDirectory().path}"
-                        compilerOpts = -ObjC -fmodules $headersBuildPath -F"${getBuildDirectory().path}"
-                        linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
-                        """.trimIndent(),
-                    )
+language = Objective-C
+modules = $moduleName
+package = ${moduleConfig.name}
+# Set a checksum for avoid build cache
+# checkum: $checksum
+libraryPaths = "${getBuildDirectory().path}"
+compilerOpts = -fmodules $headersBuildPath -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+                        """
+                }
+                if (index == 0) {
+                    definition = """
+$definition
+staticLibraries = $libName
+                            """
+                }
+                if (definition.isNotEmpty()) {
+                    moduleConfig.definitionFile.writeText(definition.trimIndent())
                 }
                 logger.debug(
                     """
+                    ######
                     Definition File : ${moduleConfig.definitionFile.name}
                     At Path: ${moduleConfig.definitionFile.path}
-                    ${moduleConfig.definitionFile.readText()}
+                    ${moduleConfig.definitionFile.readText()}moduleConfig.definitionFile.readText()}
+                    ######
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {

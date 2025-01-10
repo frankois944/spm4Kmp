@@ -1,7 +1,6 @@
 package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
-import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
@@ -54,7 +53,7 @@ class BasicPackageTest : BaseTest() {
         val cache = File("/tmp/spm4kmp/cache").also { it.deleteRecursively() }
         val security = File("/tmp/spm4kmp/security").also { it.deleteRecursively() }
         val config = File("/tmp/spm4kmp/config").also { it.deleteRecursively() }
-        val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
 
         // Given
         val fixture =
@@ -76,7 +75,7 @@ class BasicPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
-                                packageName = "LocalDummyFramework",
+                                packageName = "LocalSourceDummyFramework",
                                 exportToKotlin = true,
                             ),
                         )

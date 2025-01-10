@@ -13,7 +13,7 @@ import java.io.File
 class LocalPackageTest : BaseTest() {
     @Test
     fun `build with local packages`() {
-        val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
         // Given
         val fixture =
             SmpKMPTestFixture
@@ -26,7 +26,7 @@ class LocalPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
-                                packageName = "LocalDummyFramework",
+                                packageName = "LocalSourceDummyFramework",
                                 exportToKotlin = true,
                             ),
                         )
@@ -36,7 +36,7 @@ class LocalPackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import LocalDummyFramework.MySwiftClass
+                            import LocalDummyFramework.LocalSourceDummy
                             """.trimIndent(),
                     ),
                 ).withSwiftSources(
@@ -44,7 +44,7 @@ class LocalPackageTest : BaseTest() {
                         content =
                             """
                             import Foundation
-                            import LocalDummyFramework
+                            import LocalSourceDummyFramework
                             @objc public class MySwiftDummyClass: NSObject {
                             }
                             """.trimIndent(),
@@ -63,7 +63,7 @@ class LocalPackageTest : BaseTest() {
 
     @Test
     fun `build with local packages and no swift code`() {
-        val localPackageDirectory = File("src/functionalTest/resources/LocalDummyFramework")
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
         // Given
         val fixture =
             SmpKMPTestFixture
@@ -75,7 +75,7 @@ class LocalPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
-                                packageName = "LocalDummyFramework",
+                                packageName = "LocalSourceDummyFramework",
                                 exportToKotlin = true,
                             ),
                         )
@@ -85,7 +85,7 @@ class LocalPackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import LocalDummyFramework.MySwiftClass
+                            import LocalSourceDummyFramework.LocalSourceDummy
                             """.trimIndent(),
                     ),
                 ).build()

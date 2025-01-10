@@ -42,6 +42,21 @@ kotlin {
     }
 }
 
+val copyTestResources =
+    tasks.register<Copy>("copyTestResources") {
+        from(
+            "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources" +
+                "/DummyFramework.xcframework/ios-arm64_x86_64-simulator/",
+        ) {
+            include("*.framework/**")
+        }
+        into("${layout.projectDirectory.asFile.path}/build/bin/iosSimulatorArm64/debugTest/Frameworks/")
+    }
+
+tasks.named("iosSimulatorArm64Test") {
+    dependsOn(copyTestResources)
+}
+
 android {
     namespace = "com.example"
     compileSdk = 34
@@ -53,7 +68,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-
+val testRessources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
     create("nativeShared") {
         // optional parameters
@@ -74,12 +89,26 @@ swiftPackageConfig {
                 // Repository URL
                 url = "https://github.com/firebase/firebase-ios-sdk.git",
                 // Libraries from the package
-                names = listOf("FirebaseAnalytics", "FirebaseCore"),
+                names =
+                    listOf(
+                        "FirebaseCore",
+                        "FirebaseAnalytics",
+                    ),
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
                 version = "11.6.0",
                 // Export to Kotlin for use in shared Kotlin code, false by default
+                exportToKotlin = true,
+            ),
+            SwiftDependency.Binary.Local(
+                path = "$testRessources/DummyFramework.xcframework.zip",
+                packageName = "DummyFramework",
+                exportToKotlin = true,
+            ),
+            SwiftDependency.Package.Local(
+                path = "$testRessources/LocalSourceDummyFramework",
+                packageName = "LocalSourceDummyFramework",
                 exportToKotlin = true,
             ),
             SwiftDependency.Package.Remote.Version(

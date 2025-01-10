@@ -17,7 +17,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@v4 # v4
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
       - name: Cache Konan
@@ -32,14 +32,6 @@ jobs:
         with:
           path: /Users/runner/work/spm4Kmp/spm4Kmp/example/build/spmKmpPlugin/input/scratch
           key: ${{ runner.os }}-example-scratch
-      - name: Run Gradle tasks
-        run: ./gradlew preMerge --continue
-      - name: Archive test results
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: test-pre-merge-report
-          path: plugin-build/plugin/build/reports/
       - name: Publish on Plugin Portal
         run: ./gradlew :plugin-build:plugin:setupPluginUploadFromEnvironment :plugin-build:plugin:publishPlugins
         if: success()

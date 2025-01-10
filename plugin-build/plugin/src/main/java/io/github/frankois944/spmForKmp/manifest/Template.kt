@@ -50,9 +50,8 @@ internal fun generateManifest(
                     path: "Sources")
                 $binaryDependencies
             ]
-
         )
-        """.trimIndent()
+        """
 }
 
 private fun getPlatformBlock(
@@ -107,7 +106,7 @@ private fun getDependenciesTargets(dependencies: List<SwiftDependency>): String 
                     }
                 }
             }
-    }.joinToString(",\n")
+    }.joinToString(",")
 
 private fun buildLocaleBinary(
     dependencies: List<SwiftDependency>,
@@ -121,7 +120,7 @@ private fun buildLocaleBinary(
                 val path = Path(dependency.path).relativeToOrSelf(swiftBuildDir)
                 add(".binaryTarget(name: \"${dependency.packageName}\", path:\"${path}\")")
             }
-    }.joinToString(",\n")
+    }.joinToString(",")
 
 private fun buildRemoteBinary(dependencies: List<SwiftDependency>): String =
     buildList {
@@ -135,4 +134,4 @@ private fun buildRemoteBinary(dependencies: List<SwiftDependency>): String =
                         "checksum:\"${dependency.checksum}\")",
                 )
             }
-    }.joinToString(",\n")
+    }.joinToString(",")

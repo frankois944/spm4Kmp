@@ -1,23 +1,25 @@
 package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.CompileTarget
-import io.github.frankois944.spmForKmp.dump.dependency.PackageImplicitDependencies
-import org.gradle.api.logging.Logger
-import org.gradle.process.ExecOperations
+import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
+import io.github.frankois944.spmForKmp.utils.InjectedExecOps
+import org.gradle.api.Project
 import java.io.ByteArrayOutputStream
 import java.io.File
 
 @Suppress("LongParameterList")
-internal fun ExecOperations.resolvePackage(
+internal fun Project.resolvePackage(
     workingDir: File,
     scratchPath: File,
     sharedCachePath: File?,
     sharedConfigPath: File?,
     sharedSecurityPath: File?,
-    logger: Logger? = null,
 ) {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         mutableListOf(
+            "--sdk",
+            "macosx",
             "swift",
             "package",
             "resolve",
@@ -39,90 +41,96 @@ internal fun ExecOperations.resolvePackage(
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = "xcrun"
-        it.args = args
-        it.workingDir = workingDir
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        printExecLogs(
-            logger,
-            "resolvePackage",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
+    operation.execOps
+        .exec {
+            it.executable = "xcrun"
+            it.args = args
+            it.workingDir = workingDir
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "resolvePackage",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
 }
 
-internal fun ExecOperations.getXcodeVersion(logger: Logger? = null): String {
+internal fun Project.getXcodeVersion(): String {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "xcodebuild",
             "-version",
         )
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = "xcrun"
-        it.args = args
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        printExecLogs(
-            logger,
-            "getXcodeVersion",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
+    operation.execOps
+        .exec {
+            it.executable = "xcrun"
+            it.args = args
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "getXcodeVersion",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
     val regex = """Xcode\s(\d+\.\d+)""".toRegex()
     val match = regex.find(standardOutput.toString())
     return match?.groups?.get(1)?.value
         ?: throw RuntimeException("Can't find Xcode version with output $standardOutput")
 }
 
-internal fun ExecOperations.getXcodeDevPath(logger: Logger? = null): String {
+internal fun Project.getXcodeDevPath(): String {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "xcode-select",
             "-p",
         )
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = "xcrun"
-        it.args = args
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        printExecLogs(
-            logger,
-            "getXcodeDevPath",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
+    operation.execOps
+        .exec {
+            it.executable = "xcrun"
+            it.args = args
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "getXcodeDevPath",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
     return standardOutput.toString().trim()
 }
 
-internal fun ExecOperations.getSDKPath(
-    target: CompileTarget,
-    logger: Logger? = null,
-): String {
+internal fun Project.getSDKPath(target: CompileTarget): String {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "--sdk",
             target.sdk(),
             "--show-sdk-path",
@@ -130,95 +138,125 @@ internal fun ExecOperations.getSDKPath(
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = "xcrun"
-        it.args = args
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        printExecLogs(
-            logger,
-            "getSDKPath",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
+    operation.execOps
+        .exec {
+            it.executable = "xcrun"
+            it.args = args
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "getSDKPath",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
     return standardOutput.toString().trim()
 }
 
-internal fun ExecOperations.getPackageImplicitDependencies(
+internal fun Project.getPackageImplicitDependencies(
     workingDir: File,
-    logger: Logger? = null,
+    scratchPath: File,
 ): PackageImplicitDependencies {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
+            "--sdk",
+            "macosx",
             "swift",
             "package",
             "show-dependencies",
+            "--scratch-path",
+            scratchPath.path,
             "--format",
             "json",
         )
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = "xcrun"
-        it.workingDir = workingDir
-        it.args = args
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        printExecLogs(
-            logger,
-            "show-dependencies",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
+    operation.execOps
+        .exec {
+            it.executable = "xcrun"
+            it.workingDir = workingDir
+            it.args = args
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "show-dependencies",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
     return PackageImplicitDependencies.fromString(standardOutput.toString())
 }
 
+internal fun Project.swiftFormat(file: File) {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
+    val args =
+        listOf(
+            "--sdk",
+            "macosx",
+            "swift-format",
+            "-i",
+            file.path,
+        )
+
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
+    operation.execOps
+        .exec {
+            it.executable = "xcrun"
+            it.args = args
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "swift-format",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
+}
+
 @Suppress("LongParameterList")
-internal fun printExecLogs(
-    logger: Logger?,
+internal fun Project.printExecLogs(
     action: String,
     args: List<String>,
     isError: Boolean,
     standardOutput: ByteArrayOutputStream,
     errorOutput: ByteArrayOutputStream,
-    extraString: String? = null,
 ) {
     if (isError) {
-        logger?.error(
+        logger.error(
             """
-ERROR FOUND WHEN EXEC
-RUN $action
-ARGS xcrun ${args.joinToString(" ")}
-ERROR $errorOutput
-OUTPUT $standardOutput
-###
-${extraString.orEmpty()}
-###
+            ERROR FOUND WHEN EXEC
+            RUN $action
+            ARGS xcrun ${args.joinToString(" ")}
+            ERROR $errorOutput
+            OUTPUT $standardOutput
+            ###
             """.trimMargin(),
         )
         throw RuntimeException(
             "RUN CMD $action failed",
         )
     } else {
-        logger?.debug(
+        logger.debug(
             """
-RUN $action
-ARGS xcrun ${args.joinToString(" ")}
-OUTPUT $standardOutput
-###
-${extraString.orEmpty()}
-###
+            RUN $action
+            ARGS xcrun ${args.joinToString(" ")}
+            OUTPUT $standardOutput
+            ###
             """.trimMargin(),
         )
     }

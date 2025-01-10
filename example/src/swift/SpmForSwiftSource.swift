@@ -11,3 +11,10 @@ import CryptoSwift
         return "123".md5()
     }
 }
+
+
+@objcMembers public class MySwiftDummyClass: NSObject {
+    public func mySwiftDummyFunction() -> String {
+        return "Hello from Swift!"
+    }
+}
