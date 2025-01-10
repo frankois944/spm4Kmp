@@ -15,7 +15,7 @@ This project greatly needs feedback and information about the edge case for prog
 
 ## Features
 
-- **Support for SPM Dependencies**: Seamlessly add remote SPM dependencies to your KMP modules.
+- **Create a bridge easily**: Import your own Swift code for functionality can't be done in Kotlin for example.
 - **Import Swift compatible code to Kotlin**: Enable **SPM dependencies** and your **own Swift code** to be exposed directly in your Kotlin code (if compatible).
 - **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages with dependencies.
 
@@ -83,12 +83,11 @@ swiftPackageConfig {
                 exportToKotlin = true                                    // Export to Kotlin for usage in shared Kotlin code
             )
         )
-        // and more : https://github.com/frankois944/spm4Kmp/blob/main/plugin-build/plugin/src/main/java/io/github/frankois944/spmForKmp/definition/SwiftDependency.kt
     }
 }
 ```
 
-### 2.1. Supported Swift Package Types
+### 2.1. Supported Swift Package Dependency Types
 
 The plugin supports the following configurations :
 - **Remote Package**: A Swift package hosted on a remote repository using version, commit, or branch.
