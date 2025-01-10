@@ -169,16 +169,13 @@ swiftPackageConfig {
 ```
 
 > [!IMPORTANT]
-> When exporting dependency, some configuration need to be added to your xcode project
+> When exporting dependency, some configuration need to be added to your xcode project.
 > 
 > A local swift package is being generated during the build of the application and this message diplayed
->
-> `
+> ```
 > Spm4Kmp: A local package has been generated in /path/to/the/local/package
->
 > Please add it to your project as a local package dependency.
-> `
->
+> ```
 > Add the folder to your project as a Local package, that's all.
 
 
