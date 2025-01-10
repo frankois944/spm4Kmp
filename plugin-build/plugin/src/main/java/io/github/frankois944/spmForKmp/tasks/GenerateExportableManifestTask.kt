@@ -80,9 +80,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 "Spm4Kmp: A local package has been generated in ${manifestFile.get().asFile.parentFile.path}",
             )
             logger.warn(
-                "Please add it to your project as a local package dependency. " +
-                    "You can find more information here: https://github.com/frankois944/spm-for-kmp" +
-                    "#exporting-package-to-your-project",
+                "Please add it to your xcode project as a local package dependency.",
             )
         } catch (ex: Exception) {
             logger.error(
