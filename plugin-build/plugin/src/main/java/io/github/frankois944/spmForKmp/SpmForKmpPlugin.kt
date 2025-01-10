@@ -5,12 +5,14 @@ package io.github.frankois944.spmForKmp
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.GenerateCInteropDefinitionTask
+import io.github.frankois944.spmForKmp.tasks.GenerateExportableManifestTask
 import io.github.frankois944.spmForKmp.tasks.GenerateManifestTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -24,6 +26,7 @@ internal const val EXTENSION_NAME: String = "swiftPackageConfig"
 internal const val TASK_GENERATE_MANIFEST: String = "generateSwiftPackage"
 internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
+internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
 
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
@@ -121,7 +124,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             // type =
                             GenerateManifestTask::class.java,
                         ) { manifest ->
-                            manifest.packageDependencies.set(extension.packageDependencies.toList())
+                            manifest.packageDependencies.set(extension.packageDependencies)
                             manifest.packageName.set(extension.name)
                             manifest.minIos.set(extension.minIos)
                             manifest.minTvos.set(extension.minTvos)
@@ -134,6 +137,33 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             manifest.sharedConfigDir.set(sharedConfigDir)
                             manifest.sharedSecurityDir.set(sharedSecurityDir)
                         }
+                val exportablePackage = extension.packageDependencies.filter { it.exportToKotlin }
+                val task4: TaskProvider<GenerateExportableManifestTask>? =
+                    if (exportablePackage.isNotEmpty()) {
+                        tasks
+                            .register(
+                                // name =
+                                getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE),
+                                // type =
+                                GenerateExportableManifestTask::class.java,
+                            ) { manifest ->
+                                manifest.packageDependencies.set(exportablePackage)
+                                manifest.packageName.set("exported${extension.name.capitalized()}")
+                                manifest.minIos.set(extension.minIos)
+                                manifest.minTvos.set(extension.minTvos)
+                                manifest.minMacos.set(extension.minMacos)
+                                manifest.minWatchos.set(extension.minWatchos)
+                                manifest.toolsVersion.set(extension.toolsVersion)
+                                val manifestDir =
+                                    project.layout.projectDirectory.asFile
+                                        .resolve("exported${extension.name.capitalized()}")
+                                        .also { it.mkdirs() }
+                                manifest.manifestFile.set(manifestDir.resolve("Package.swift"))
+                            }
+                    } else {
+                        null
+                    }
+
                 val taskGroup = mutableMapOf<CompileTarget, Task>()
                 val dependencyTaskNames = mutableMapOf<String, File>()
 
@@ -223,7 +253,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 .dependsOn(
                                     task2
                                         .get()
-                                        .dependsOn(task1.get()),
+                                        .dependsOn(listOfNotNull(task1.get(), task4?.get())),
                                 )
                     }
                 }

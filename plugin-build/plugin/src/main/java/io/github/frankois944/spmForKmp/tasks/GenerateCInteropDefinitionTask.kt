@@ -7,7 +7,6 @@ import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import io.github.frankois944.spmForKmp.utils.md5
 import io.github.frankois944.spmForKmp.xcodeconfig.ModuleConfig
-import io.github.frankois944.spmForKmp.xcodeconfig.generateXcodeConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -271,10 +270,5 @@ CONTENT ${moduleConfig.definitionFile.readText()}
                 )
             }
         }
-        project.generateXcodeConfig(
-            moduleConfigs = moduleConfigs,
-            buildDir = getBuildDirectory(),
-            isDebug = debugMode.get(),
-        )
     }
 }

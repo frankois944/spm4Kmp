@@ -74,7 +74,27 @@ swiftPackageConfig {
                 // Repository URL
                 url = "https://github.com/firebase/firebase-ios-sdk.git",
                 // Libraries from the package
-                names = listOf("FirebaseCore", "FirebaseAnalytics"),
+                names =
+                    listOf(
+                        "FirebaseCore",
+                        "FirebaseAnalytics",
+                        "FirebaseAppCheck",
+                        "FirebaseAppDistribution-Beta",
+                        "FirebaseAuth",
+                        "FirebaseFirestore",
+                        "FirebaseFunctions",
+                        "FirebaseMessaging",
+                        "FirebaseStorage",
+                        "FirebaseCrashlytics",
+                        "FirebaseDynamicLinks",
+                        "FirebaseInAppMessaging-Beta",
+                        "FirebaseInstallations",
+                        "FirebaseMLModelDownloader",
+                        "FirebasePerformance",
+                        "FirebaseDatabase",
+                        "FirebaseRemoteConfig",
+                        "FirebaseVertexAI",
+                    ),
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
