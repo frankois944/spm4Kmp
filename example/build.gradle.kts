@@ -1,3 +1,4 @@
+
 import io.github.frankois944.spmForKmp.definition.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -109,12 +110,12 @@ swiftPackageConfig {
                 version = "11.6.0",
             ),
             SwiftDependency.Binary.Local(
-                path = URI("file://$testRessources/DummyFramework.xcframework.zip"),
+                path = "$testRessources/DummyFramework.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
             ),
             SwiftDependency.Package.Local(
-                path = URI("file://$testRessources/LocalSourceDummyFramework"),
+                path = "$testRessources/LocalSourceDummyFramework",
                 products =
                     listOf(
                         // Export to Kotlin for use in shared Kotlin code, false by default

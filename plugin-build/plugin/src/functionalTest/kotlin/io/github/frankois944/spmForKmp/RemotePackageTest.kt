@@ -3,12 +3,14 @@ package io.github.frankois944.spmForKmp
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
+import io.github.frankois944.spmForKmp.definition.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
+import java.net.URI
 
 class RemotePackageTest : BaseTest() {
     @Test
@@ -22,10 +24,14 @@ class RemotePackageTest : BaseTest() {
                     buildList {
                         add(
                             SwiftDependency.Package.Remote.Version(
-                                url = "https://github.com/krzyzanowskim/CryptoSwift.git",
-                                names = listOf("CryptoSwift"),
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 version = "1.8.3",
-                                exportToKotlin = true,
+                                products =
+                                    listOf(
+                                        ProductPackageConfig(
+                                            name = "CryptoSwift",
+                                        ),
+                                    ),
                             ),
                         )
                     },
@@ -34,7 +40,6 @@ class RemotePackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import CryptoSwift.SWIFT_TYPEDEFS
                             import dummy.MySwiftClass
                             """.trimIndent(),
                     ),
@@ -73,11 +78,14 @@ class RemotePackageTest : BaseTest() {
                     buildList {
                         add(
                             SwiftDependency.Package.Remote.Branch(
-                                url = "https://github.com/krzyzanowskim/CryptoSwift.git",
-                                names = listOf("CryptoSwift"),
-                                packageName = "CryptoSwift",
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 branch = "main",
-                                exportToKotlin = true,
+                                products =
+                                    listOf(
+                                        ProductPackageConfig(
+                                            name = "CryptoSwift",
+                                        ),
+                                    ),
                             ),
                         )
                     },
@@ -86,7 +94,6 @@ class RemotePackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import CryptoSwift.SWIFT_TYPEDEFS
                             import dummy.MySwiftClass
                             """.trimIndent(),
                     ),
@@ -125,10 +132,14 @@ class RemotePackageTest : BaseTest() {
                     buildList {
                         add(
                             SwiftDependency.Package.Remote.Commit(
-                                url = "https://github.com/krzyzanowskim/CryptoSwift.git",
-                                names = listOf("CryptoSwift"),
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
-                                exportToKotlin = true,
+                                products =
+                                    listOf(
+                                        ProductPackageConfig(
+                                            name = "CryptoSwift",
+                                        ),
+                                    ),
                             ),
                         )
                     },
@@ -137,7 +148,6 @@ class RemotePackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import CryptoSwift.SWIFT_TYPEDEFS
                             import dummy.MySwiftClass
                             """.trimIndent(),
                     ),
@@ -177,11 +187,23 @@ class RemotePackageTest : BaseTest() {
                     buildList {
                         add(
                             SwiftDependency.Package.Remote.Version(
-                                url = "https://github.com/firebase/firebase-ios-sdk.git",
-                                names = listOf("FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics"),
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                                 version = "11.6.0",
-                                packageName = "firebase-ios-sdk",
-                                exportToKotlin = true,
+                                products =
+                                    listOf(
+                                        ProductPackageConfig(
+                                            name = "FirebaseCore",
+                                            exportToKotlin = true,
+                                        ),
+                                        ProductPackageConfig(
+                                            name = "FirebaseAnalytics",
+                                            exportToKotlin = true,
+                                        ),
+                                        ProductPackageConfig(
+                                            name = "FirebaseCrashlytics",
+                                            exportToKotlin = true,
+                                        ),
+                                    ),
                             ),
                         )
                     },

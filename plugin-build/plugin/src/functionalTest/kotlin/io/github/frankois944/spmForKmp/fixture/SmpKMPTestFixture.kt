@@ -95,7 +95,14 @@ org.gradle.caching=true
 
     private fun Subproject.Builder.setupGradleConfig(extension: TestConfiguration) {
         withBuildScript {
-            imports = Imports.of("io.github.frankois944.spmForKmp.definition.SwiftDependency")
+            imports =
+                Imports.of(
+                    "io.github.frankois944.spmForKmp.definition.SwiftDependency",
+                    "java.net.URI",
+                    "java.lang.management.ManagementFactory",
+                    "javax.management.ObjectName",
+                    "io.github.frankois944.spmForKmp.definition.ProductPackageConfig",
+                )
             plugins(
                 Plugin(
                     "org.jetbrains.kotlin.multiplatform",
@@ -135,14 +142,23 @@ swiftPackageConfig {
                     append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
                 }
                 extension.packages.forEach { definition ->
-                    append("    dependency(\n     ")
+                    appendLine("    dependency(     ")
                     when (definition) {
                         is SwiftDependency.Package.Local -> {
                             append("SwiftDependency.Package.Local(")
                             append("path = \"${definition.path}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("products = listOf(")
+                            definition.products.forEach {
+                                append("ProductPackageConfig(")
+                                append("name = \"${it.name}\",")
+                                append("exportToKotlin = ${it.exportToKotlin},")
+                                it.alias?.let { alias ->
+                                    append("alias = \"${alias}\"")
+                                }
+                                append("),")
+                            }
+                            append("),")
                             append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Binary.Local -> {
@@ -154,7 +170,7 @@ swiftPackageConfig {
 
                         is SwiftDependency.Binary.Remote -> {
                             append("SwiftDependency.Binary.Remote(")
-                            append("url = \"${definition.url}\",")
+                            append("url = URI(\"${definition.url}\"),")
                             append("checksum = \"${definition.checksum}\",")
                             append("packageName = \"${definition.packageName}\",")
                             append("exportToKotlin = ${definition.exportToKotlin}")
@@ -162,41 +178,67 @@ swiftPackageConfig {
 
                         is SwiftDependency.Package.Remote.Branch -> {
                             append("SwiftDependency.Package.Remote.Branch(")
-                            append("url = \"${definition.url}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("url = URI(\"${definition.url}\"),")
+                            append("products = listOf(")
+                            definition.products.forEach {
+                                append("ProductPackageConfig(")
+                                append("name = \"${it.name}\",")
+                                append("exportToKotlin = ${it.exportToKotlin},")
+                                it.alias?.let { alias ->
+                                    append("alias = \"${alias}\"")
+                                }
+                                append("),")
+                            }
+                            append("),")
                             append("branch = \"${definition.branch}\",")
                             append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Package.Remote.Commit -> {
                             append("SwiftDependency.Package.Remote.Commit(")
-                            append("url = \"${definition.url}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("url = URI(\"${definition.url}\"),")
+                            append("products = listOf(")
+                            definition.products.forEach {
+                                append("ProductPackageConfig(")
+                                append("name = \"${it.name}\",")
+                                append("exportToKotlin = ${it.exportToKotlin},")
+                                it.alias?.let { alias ->
+                                    append("alias = \"${alias}\"")
+                                }
+                                append("),")
+                            }
+                            append("),")
                             append("revision = \"${definition.revision}\",")
                             append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Package.Remote.Version -> {
                             append("SwiftDependency.Package.Remote.Version(")
-                            append("url = \"${definition.url}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
+                            append("url = URI(\"${definition.url}\"),")
+                            append("products = listOf(")
+                            definition.products.forEach {
+                                append("ProductPackageConfig(")
+                                append("name = \"${it.name}\",")
+                                append("exportToKotlin = ${it.exportToKotlin},")
+                                it.alias?.let { alias ->
+                                    append("alias = \"${alias}\"")
+                                }
+                                append("),")
+                            }
+                            append("),")
                             append("version = \"${definition.version}\",")
                             append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
                         }
                     }
-                    append(")\n     )\n")
+                    appendLine(")\n     )")
                 }
-                append("}\n}\n")
+                appendLine("}")
+                appendLine("}")
             }
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
             """
             // START enable code-coverage
-            import java.lang.management.ManagementFactory
-            import javax.management.ObjectName
 
             abstract class JacocoDumper : BuildService<BuildServiceParameters.None>, AutoCloseable {
                 override fun close() {

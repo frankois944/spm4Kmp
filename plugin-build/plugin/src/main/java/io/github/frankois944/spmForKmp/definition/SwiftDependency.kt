@@ -51,7 +51,7 @@ public sealed interface SwiftDependency : Serializable {
          * @property exportToKotlin Defines whether the dependency should be exported for use in Kotlin code.
          */
         public data class Local(
-            val path: URI,
+            val path: String,
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
         ) : Binary
@@ -86,7 +86,7 @@ public sealed interface SwiftDependency : Serializable {
          * @property products A list of the product's package used during dependency configuration.
          */
         public data class Local(
-            val path: URI,
+            val path: String,
             override val packageName: String = products.first().name,
             override val products: List<ProductPackageConfig>,
         ) : Package

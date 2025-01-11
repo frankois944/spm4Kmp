@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.Serializable
 import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
-import java.util.Properties
+import java.util.*
 
 plugins {
     kotlin("jvm")
@@ -186,7 +186,6 @@ tasks.jacocoTestReport {
         csv.required.set(false)
     }
     executionData(files(tasks.withType<Test>()).filter { it.name.endsWith(".exec") && it.exists() })
-    dependsOn(tasks.named<Test>("functionalTest"))
 }
 
 class LazyString(

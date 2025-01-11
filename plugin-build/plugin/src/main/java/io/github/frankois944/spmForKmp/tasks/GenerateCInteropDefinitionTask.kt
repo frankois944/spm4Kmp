@@ -5,7 +5,6 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
-import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import io.github.frankois944.spmForKmp.utils.md5
 import io.github.frankois944.spmForKmp.xcodeconfig.ModuleConfig
 import org.gradle.api.DefaultTask
@@ -109,7 +108,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     .filterExportableDependency()
                     .flatMap {
                         if (it is SwiftDependency.Package) {
-                            it.products.map { it.alias ?: it.name }
+                            it.products.map { product ->
+                                product.name
+                            }
                         } else {
                             listOf(it.packageName)
                         }
@@ -128,20 +129,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
      */
     private fun getExtraLinkers(): String {
         val xcodeDevPath = project.getXcodeDevPath()
-
-        val linkerPlatformVersion =
-            @Suppress("MagicNumber")
-            if (project.getXcodeVersion().toDouble() >= 15) {
-                target.get().linkerPlatformVersionName()
-            } else {
-                target.get().linkerMinOsVersionName()
-            }
         return buildList {
-            // add("-$linkerPlatformVersion")
-            // add(osVersion.get())
-            // add(osVersion.get())
-            // add("-rpath")
-            // add("/usr/lib/swift")
             add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
         }.joinToString(" ")
     }

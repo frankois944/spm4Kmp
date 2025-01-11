@@ -10,6 +10,7 @@ import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.net.URI
 
 class BinaryPackageTest : BaseTest() {
     @Test
@@ -24,9 +25,11 @@ class BinaryPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Binary.Remote(
                                 url =
-                                    "https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/" +
-                                        "plugin-build/plugin/src/functionalTest/" +
-                                        "resources/DummyFramework.xcframework.zip",
+                                    URI(
+                                        "https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/" +
+                                            "plugin-build/plugin/src/functionalTest/" +
+                                            "resources/DummyFramework.xcframework.zip",
+                                    ),
                                 checksum = "20f6264c95e80b6e2da7d2c9b9abe44b4426dac799927ea49fb7a4982f1affdb",
                                 packageName = "DummyFramework",
                                 exportToKotlin = true,
