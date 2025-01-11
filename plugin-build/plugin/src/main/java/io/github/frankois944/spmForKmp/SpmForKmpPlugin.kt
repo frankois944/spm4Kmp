@@ -3,6 +3,7 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
+import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.GenerateExportableManifestTask
@@ -81,9 +82,17 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         it.mkdirs()
                     }
             afterEvaluate {
-                val extension = swiftPackageEntries.first()
+                val extension =
+                    swiftPackageEntries.firstOrNull()
+                        ?: throw RuntimeException(
+                            "No swiftPackageConfig found, " +
+                                "please declare at least one configuration",
+                        )
                 if (swiftPackageEntries.size > 1) {
-                    logger.warn("Only the first entry is currently supported, the other will be ignored")
+                    logger.warn(
+                        "Only the first entry of swiftPackageConfig is currently supported, " +
+                            "the next will be ignored",
+                    )
                 }
 
                 val sharedCacheDir: File? =
@@ -138,9 +147,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             manifest.sharedSecurityDir.set(sharedSecurityDir)
                         }
                 val exportablePackage =
-                    extension.packageDependencies.filter { product ->
-                        product.exportToKotlin
-                    }
+                    extension.packageDependencies.filterExportableDependency()
                 val manifestDir =
                     project.layout.projectDirectory.asFile
                         .resolve("exported${extension.name.capitalized()}")

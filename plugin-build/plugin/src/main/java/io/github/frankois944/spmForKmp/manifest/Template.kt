@@ -2,8 +2,8 @@ package io.github.frankois944.spmForKmp.manifest
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import java.nio.file.Path
-import kotlin.io.path.Path
 import kotlin.io.path.relativeToOrSelf
+import kotlin.io.path.toPath
 
 @Suppress("LongParameterList")
 internal fun generateManifest(
@@ -101,8 +101,8 @@ private fun getDependenciesTargets(dependencies: List<SwiftDependency>): String 
                 if (dependency.isBinaryDependency) {
                     add("\"${dependency.packageName}\"")
                 } else if (dependency is SwiftDependency.Package) {
-                    dependency.names.forEach { library ->
-                        add(".product(name: \"${library}\", package: \"${dependency.packageName}\")")
+                    dependency.products.forEach { library ->
+                        add(".product(name: \"${library.name}\", package: \"${dependency.packageName}\")")
                     }
                 }
             }
@@ -117,7 +117,7 @@ private fun buildLocaleBinary(
             .filterIsInstance<SwiftDependency.Binary.Local>()
             .forEach { dependency ->
                 // package path MUST be relative to somewhere, let's choose the swiftBuildDir
-                val path = Path(dependency.path).relativeToOrSelf(swiftBuildDir)
+                val path = dependency.path.toPath().relativeToOrSelf(swiftBuildDir)
                 add(".binaryTarget(name: \"${dependency.packageName}\", path:\"${path}\")")
             }
     }.joinToString(",")

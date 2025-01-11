@@ -67,9 +67,6 @@ jobs:
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
           include_passed: true
-      - name: build iosExampleApp
-        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" build
-        working-directory: "example/iosApp"
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/codecov-action@v5

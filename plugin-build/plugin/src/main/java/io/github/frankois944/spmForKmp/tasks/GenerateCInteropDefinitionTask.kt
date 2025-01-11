@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.operations.getXcodeVersion
@@ -105,11 +106,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             addAll(
                 packages
                     .get()
-                    .filter {
-                        it.exportToKotlin
-                    }.flatMap {
-                        if (it is SwiftDependency.Package.Remote) {
-                            it.names
+                    .filterExportableDependency()
+                    .flatMap {
+                        if (it is SwiftDependency.Package) {
+                            it.products.map { it.alias ?: it.name }
                         } else {
                             listOf(it.packageName)
                         }
@@ -165,10 +165,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 logger.debug("LOOKING for module dir {}", moduleName)
                 getBuildDirectoriesContent("build", "framework")
                     .find {
-                        // removing -beta is a quickfix for firebase who use package alias
-                        // the relationship can be found in Package.swift of firebase
-                        val reference = moduleName.lowercase().replace("-beta", "")
-                        it.nameWithoutExtension.lowercase() == reference
+                        it.nameWithoutExtension.lowercase() == moduleName.lowercase()
                     }?.let { buildDir ->
                         logger.debug("Found dir {} for {}", buildDir, moduleName)
                         moduleConfigs.add(
