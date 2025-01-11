@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.Serializable
 import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
-import java.util.*
+import java.util.Properties
 
 plugins {
     kotlin("jvm")
