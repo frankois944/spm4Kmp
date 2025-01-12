@@ -38,7 +38,6 @@ class LocalPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
-                                packageName = "LocalSourceDummyFramework",
                                 products =
                                     listOf(
                                         ProductPackageConfig(
@@ -54,7 +53,7 @@ class LocalPackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import LocalSourceDummyFramework.MySwiftDummyClass
+                            import LocalSourceDummyFramework.LocalSourceDummy
                             """.trimIndent(),
                     ),
                 ).withSwiftSources(
