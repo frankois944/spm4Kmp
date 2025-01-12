@@ -47,7 +47,6 @@ jobs:
         with:
           path: |
             example/build/spmKmpPlugin/scratch
-            example/build/spmKmpPlugin/Package.resolved
             example/iosApp/spm
           key: ${{ runner.os }}-example-scratch
       - name: Cache Gradle Caches
