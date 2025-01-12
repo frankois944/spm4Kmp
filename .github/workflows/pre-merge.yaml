@@ -41,14 +41,13 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
-      - name: Cache example scratch directory
+      - name: Cache example
         id: cache-example-scratch
         uses: actions/cache@v4
         with:
           path: |
             example/build/spmKmpPlugin/scratch
             example/build/spmKmpPlugin/Package.resolved
-            example/iosApp/build
             example/iosApp/spm
           key: ${{ runner.os }}-example-scratch
       - name: Cache Gradle Caches
