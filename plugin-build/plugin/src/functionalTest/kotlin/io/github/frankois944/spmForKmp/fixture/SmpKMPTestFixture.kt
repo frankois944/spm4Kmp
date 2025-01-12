@@ -207,8 +207,9 @@ swiftPackageConfig {
                                 appendLine("),")
                             }
                             appendLine("),")
-                            append("branch = \"${definition.branch}\",")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("branch = \"${definition.branch}\"")
+                            // remove packageName for better testing
+                            // append("packageName = \"${definition.packageName}\"")
                         }
 
                         is SwiftDependency.Package.Remote.Commit -> {

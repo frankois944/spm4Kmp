@@ -99,10 +99,12 @@ public enum class CompileTarget : Serializable {
             iosArm64,
             iosSimulatorArm64,
             -> minIos
+
             watchosX64,
             watchosArm64,
             watchosSimulatorArm64,
             -> minWatchos
+
             tvosX64,
             tvosArm64,
             tvosSimulatorArm64,
@@ -111,28 +113,6 @@ public enum class CompileTarget : Serializable {
             macosX64,
             macosArm64,
             -> minMacos
-        }
-
-    internal fun linkerPlatformVersionName() =
-        when (this) {
-            iosArm64 -> "platform_version ios"
-            iosX64, iosSimulatorArm64 -> "platform_version ios-simulator"
-            watchosArm64, watchosX64 -> "platform_version watchos"
-            watchosSimulatorArm64 -> "platform_version watchos-simulator"
-            tvosArm64, tvosX64 -> "platform_version tvos"
-            tvosSimulatorArm64 -> "platform_version tvos-simulator"
-            macosX64, macosArm64 -> "platform_version macosx"
-        }
-
-    internal fun linkerMinOsVersionName() =
-        when (this) {
-            iosArm64 -> "ios_version_min"
-            iosX64, iosSimulatorArm64 -> "ios_simulator_version_min"
-            watchosX64, watchosArm64 -> "watchos_version_min"
-            watchosSimulatorArm64 -> "watchos_simulator_version_min"
-            tvosX64, tvosArm64 -> "tvos_version_min"
-            tvosSimulatorArm64 -> "tvos_simulator_version_min"
-            macosX64, macosArm64 -> "macosx_version_min"
         }
 
     /**

@@ -25,7 +25,9 @@ class LocalPackageTest : BaseTest() {
                         it.withTargets(
                             CompileTarget.macosArm64,
                             CompileTarget.watchosArm64,
+                            CompileTarget.watchosSimulatorArm64,
                             CompileTarget.tvosArm64,
+                            CompileTarget.tvosSimulatorArm64,
                             CompileTarget.iosArm64,
                         )
                     } else {

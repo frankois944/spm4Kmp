@@ -32,7 +32,7 @@ class ComplexPackageTest : BaseTest() {
                                     listOf(
                                         ProductPackageConfig(
                                             "CryptoSwift",
-                                            exportToKotlin = true,
+                                            exportToKotlin = false,
                                         ),
                                     ),
                                 version = "1.8.3",
@@ -103,7 +103,6 @@ class ComplexPackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import CryptoSwift.SWIFT_TYPEDEFS
                             import dummy.MySwiftClassEmbedded
                             import LocalSourceDummyFramework.LocalSourceDummy
 
