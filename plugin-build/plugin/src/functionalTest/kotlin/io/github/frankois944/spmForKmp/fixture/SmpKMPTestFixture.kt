@@ -87,7 +87,7 @@ org.gradle.caching=true
                 Source
                     .kotlin(source.content)
                     .withPath(source.packageName, source.className)
-                    .withSourceSet("iosMain")
+                    .withSourceSet("appleMain")
                     .build(),
             )
         }

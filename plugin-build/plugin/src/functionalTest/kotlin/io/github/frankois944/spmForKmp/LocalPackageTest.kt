@@ -54,7 +54,7 @@ class LocalPackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import LocalDummyFramework.LocalSourceDummy
+                            import LocalSourceDummyFramework.MySwiftDummyClass
                             """.trimIndent(),
                     ),
                 ).withSwiftSources(
