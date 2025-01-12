@@ -32,7 +32,7 @@ class ComplexPackageTest : BaseTest() {
                                     listOf(
                                         ProductPackageConfig(
                                             "CryptoSwift",
-                                            true,
+                                            exportToKotlin = true,
                                         ),
                                     ),
                                 version = "1.8.3",
@@ -70,7 +70,7 @@ class ComplexPackageTest : BaseTest() {
                                     listOf(
                                         ProductPackageConfig(
                                             "LocalSourceDummyFramework",
-                                            true,
+                                            exportToKotlin = true,
                                         ),
                                     ),
                             ),
@@ -89,11 +89,7 @@ class ComplexPackageTest : BaseTest() {
                                     listOf(
                                         ProductPackageConfig(
                                             "FirebaseCore",
-                                        ),
-                                        ProductPackageConfig(
                                             "FirebaseAnalytics",
-                                        ),
-                                        ProductPackageConfig(
                                             "FirebaseCrashlytics",
                                         ),
                                     ),

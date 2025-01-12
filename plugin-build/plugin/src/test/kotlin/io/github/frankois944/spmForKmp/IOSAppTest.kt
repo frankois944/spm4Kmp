@@ -9,6 +9,7 @@ class IOSAppTest {
     @Suppress("MaxLineLength")
     /*
      * Run the command xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" build
+     * This should also do a simple test as proof it's starting, but I think it will break the CI quota
      */
     @Test
     fun `build the ios example app`() {

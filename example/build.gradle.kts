@@ -94,14 +94,15 @@ swiftPackageConfig {
                 // Libraries from the package
                 products =
                     listOf(
-                        // Export to Kotlin for use in shared Kotlin code, false by default
                         ProductPackageConfig(
-                            name = "FirebaseCore",
+                            "FirebaseCore",
+                            "FirebaseAnalytics",
                             exportToKotlin = true,
                         ),
+                        // add FirebaseDatabase to your own swift code but don't export it
                         ProductPackageConfig(
-                            name = "FirebaseAnalytics",
-                            exportToKotlin = true,
+                            "FirebaseDatabase",
+                            exportToKotlin = false,
                         ),
                     ),
                 // (Optional) Package name, can be required in some cases
@@ -120,7 +121,7 @@ swiftPackageConfig {
                     listOf(
                         // Export to Kotlin for use in shared Kotlin code, false by default
                         ProductPackageConfig(
-                            name = "LocalSourceDummyFramework",
+                            "LocalSourceDummyFramework",
                             exportToKotlin = true,
                         ),
                     ),
@@ -130,10 +131,9 @@ swiftPackageConfig {
                 version = "1.8.1",
                 products =
                     listOf(
-                        // Export to Kotlin for use in shared Kotlin code, false by default
+                        // Can be only used in your "src/swift" code.
                         ProductPackageConfig(
-                            name = "CryptoSwift",
-                            exportToKotlin = true,
+                            "CryptoSwift",
                         ),
                     ),
             ),

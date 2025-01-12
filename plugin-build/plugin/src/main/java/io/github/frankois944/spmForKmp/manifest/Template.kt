@@ -102,7 +102,9 @@ private fun getDependenciesTargets(dependencies: List<SwiftDependency>): String 
                 } else if (dependency is SwiftDependency.Package) {
                     dependency.products.forEach { library ->
                         @Suppress("MaxLineLength")
-                        add(".product(name: \"${library.alias ?: library.name}\", package: \"${dependency.packageName}\")")
+                        library.names.forEach { product ->
+                            add(".product(name: \"${product.alias ?: product.name}\", package: \"${dependency.packageName}\")")
+                        }
                     }
                 }
             }

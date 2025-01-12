@@ -20,9 +20,20 @@ class LocalPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withTargets(
-                    CompileTarget.macosArm64,
-                ).withDependencies(
+                .also {
+                    if (isCI) {
+                        it.withTargets(
+                            CompileTarget.macosArm64,
+                            CompileTarget.watchosArm64,
+                            CompileTarget.tvosArm64,
+                            CompileTarget.iosArm64,
+                        )
+                    } else {
+                        it.withTargets(
+                            CompileTarget.macosArm64,
+                        )
+                    }
+                }.withDependencies(
                     buildList {
                         add(
                             SwiftDependency.Package.Local(
@@ -31,7 +42,7 @@ class LocalPackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "LocalSourceDummyFramework",
+                                            "LocalSourceDummyFramework",
                                             exportToKotlin = true,
                                         ),
                                     ),
@@ -86,7 +97,7 @@ class LocalPackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "LocalSourceDummyFramework",
+                                            "LocalSourceDummyFramework",
                                             exportToKotlin = true,
                                         ),
                                     ),

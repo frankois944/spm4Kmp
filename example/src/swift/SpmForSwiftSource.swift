@@ -1,6 +1,7 @@
 import Foundation
 
 import CryptoSwift
+import FirebaseDatabase
 
 @objcMembers public class TestClass: NSObject {
     public func getSomeValue() -> String {

@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.xcodeconfig
+package io.github.frankois944.spmForKmp.config
 
 import java.io.File
 

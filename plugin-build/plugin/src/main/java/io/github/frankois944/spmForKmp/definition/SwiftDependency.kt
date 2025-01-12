@@ -82,12 +82,17 @@ public sealed interface SwiftDependency : Serializable {
          * Represents a local Swift package dependency.
          *
          * @property path The local file URL (file://...) to the local Swift package folder.
-         * @property packageName The name of the package.
+         * @property packageName The name of the package, by default base of the url.
          * @property products A list of the product's package used during dependency configuration.
          */
         public data class Local(
             val path: String,
-            override val packageName: String = products.first().name,
+            override val packageName: String =
+                products
+                    .first()
+                    .names
+                    .first()
+                    .name,
             override val products: List<ProductPackageConfig>,
         ) : Package
 
@@ -100,7 +105,7 @@ public sealed interface SwiftDependency : Serializable {
              *
              * @property url The URL of the remote Git repository where the package is hosted.
              * @property products A list of the product's package used during dependency configuration.
-             * @property packageName The name of the package.
+             * @property packageName The name of the package, by default base of the url.
              * @property version The specific version of the Swift package to be imported.
              */
             public data class Version(
@@ -115,7 +120,7 @@ public sealed interface SwiftDependency : Serializable {
              *
              * @property url The URL of the remote Git repository where the package is hosted.
              * @property products A list of the product's package used during dependency configuration.
-             * @property packageName The name of the package.
+             * @property packageName The name of the package, by default base of the url.
              * @property branch The branch name of the remote Git repository used for the dependency.
              */
             public data class Branch(
@@ -130,7 +135,7 @@ public sealed interface SwiftDependency : Serializable {
              *
              * @property url The URL of the remote Git repository where the package is hosted.
              * @property products A list of the product's package used during dependency configuration.
-             * @property packageName The name of the package.
+             * @property packageName The name of the package, by default base of the url.
              * @property revision A specific commit hash representing the dependency version.
              */
             public data class Commit(

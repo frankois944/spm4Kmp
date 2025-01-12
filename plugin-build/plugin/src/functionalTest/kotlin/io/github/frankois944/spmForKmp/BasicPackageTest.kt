@@ -80,7 +80,7 @@ class BasicPackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "LocalSourceDummyFramework",
+                                            "LocalSourceDummyFramework",
                                             exportToKotlin = true,
                                         ),
                                     ),

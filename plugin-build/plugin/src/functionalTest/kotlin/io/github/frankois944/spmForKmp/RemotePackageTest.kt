@@ -29,7 +29,7 @@ class RemotePackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "CryptoSwift",
+                                            "CryptoSwift",
                                         ),
                                     ),
                             ),
@@ -83,7 +83,7 @@ class RemotePackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "CryptoSwift",
+                                            "CryptoSwift",
                                         ),
                                     ),
                             ),
@@ -137,7 +137,7 @@ class RemotePackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "CryptoSwift",
+                                            "CryptoSwift",
                                         ),
                                     ),
                             ),
@@ -192,16 +192,13 @@ class RemotePackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "FirebaseCore",
+                                            "FirebaseCore",
+                                            "FirebaseAnalytics",
                                             exportToKotlin = true,
                                         ),
                                         ProductPackageConfig(
-                                            name = "FirebaseAnalytics",
-                                            exportToKotlin = true,
-                                        ),
-                                        ProductPackageConfig(
-                                            name = "FirebaseCrashlytics",
-                                            exportToKotlin = true,
+                                            "FirebaseCrashlytics",
+                                            exportToKotlin = false,
                                         ),
                                     ),
                             ),
@@ -213,7 +210,6 @@ class RemotePackageTest : BaseTest() {
                             """
                             package com.example
                             import FirebaseCore.FIRApp
-                            import FirebaseCrashlytics.FIRCrashlyticsMeta
                             import FirebaseAnalytics.FIRConsentStatusGranted
                             """.trimIndent(),
                     ),

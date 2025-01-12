@@ -1,12 +1,13 @@
 package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.config.ModuleConfig
+import io.github.frankois944.spmForKmp.definition.ProductName
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.utils.md5
-import io.github.frankois944.spmForKmp.xcodeconfig.ModuleConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -66,7 +67,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         getBuildDirectory() // get folders with headers for internal dependencies
             .listFiles { file -> extensions.contains(file.extension) || file.name == "Modules" }
             // remove folder with weird names, cinterop doesn't like module with symbol names like grp-c++
-            // it doesn't matter for the kotlin export.
+            // it doesn't matter for the kotlin export, to be rethinking
             ?.filter { file -> !file.nameWithoutExtension.lowercase().contains("grpc") }
             ?.toList()
             .orEmpty()
@@ -106,14 +107,21 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 packages
                     .get()
                     .filterExportableDependency()
-                    .flatMap {
-                        if (it is SwiftDependency.Package) {
-                            it.products.map { product ->
-                                product.name
-                            }
+                    .also {
+                        logger.debug("Filtered exportable dependency: {}", it)
+                    }.flatMap { dependency ->
+                        if (dependency is SwiftDependency.Package) {
+                            val productList: List<ProductName> =
+                                dependency.products.flatMap { product ->
+                                    product.names
+                                }
+                            val namesList = productList.map { product -> product.name }
+                            namesList
                         } else {
-                            listOf(it.packageName)
+                            listOf(dependency.packageName)
                         }
+                    }.also {
+                        logger.debug("Product names to export: {}", it)
                     },
             )
         }.distinct()

@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
+import io.github.frankois944.spmForKmp.definition.ProductName
 import io.github.frankois944.spmForKmp.definition.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
@@ -27,11 +28,10 @@ class ImplicitDepPackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "GoogleSignIn",
+                                            "GoogleSignIn",
                                             exportToKotlin = true,
                                         ),
                                     ),
-                                packageName = "GoogleSignIn-iOS",
                                 version = "8.0.0",
                             ),
                         )
@@ -77,16 +77,17 @@ class ImplicitDepPackageTest : BaseTest() {
                                 products =
                                     listOf(
                                         ProductPackageConfig(
-                                            name = "FirebaseAppDistribution",
+                                            ProductName(
+                                                name = "FirebaseAppDistribution",
+                                                alias = "FirebaseAppDistribution-Beta",
+                                            ),
                                             exportToKotlin = true,
-                                            alias = "FirebaseAppDistribution-Beta",
                                         ),
                                         ProductPackageConfig(
-                                            name = "FirebaseStorage",
+                                            "FirebaseStorage",
                                             exportToKotlin = true,
                                         ),
                                     ),
-                                packageName = "firebase-ios-sdk",
                                 version = "11.6.0",
                             ),
                         )

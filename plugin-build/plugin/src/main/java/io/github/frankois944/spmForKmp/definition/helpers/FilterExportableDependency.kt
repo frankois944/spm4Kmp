@@ -9,9 +9,11 @@ internal fun List<SwiftDependency>.filterExportableDependency(): List<SwiftDepen
                 is SwiftDependency.Binary -> {
                     if (swiftDependency.exportToKotlin) add(swiftDependency)
                 }
+
                 is SwiftDependency.Package.Local -> {
                     add(swiftDependency.copy(products = swiftDependency.products.filter { it.exportToKotlin }))
                 }
+
                 is SwiftDependency.Package.Remote -> {
                     addFilteredRemotePackage(swiftDependency)
                 }
