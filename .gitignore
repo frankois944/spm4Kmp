@@ -16,3 +16,4 @@ example/iosApp/iosApp.xcodeproj/xcuserdata
 example/exportedNativeShared
 example/iosApp/spm
 plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework/.build
+example/iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved

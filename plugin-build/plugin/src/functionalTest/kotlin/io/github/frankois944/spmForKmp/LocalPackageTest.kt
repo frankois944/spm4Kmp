@@ -40,6 +40,7 @@ class LocalPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
+                                packageName = "",
                                 products =
                                     listOf(
                                         ProductPackageConfig(

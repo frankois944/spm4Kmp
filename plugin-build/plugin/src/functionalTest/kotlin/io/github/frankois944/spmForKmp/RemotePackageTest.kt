@@ -189,6 +189,7 @@ class RemotePackageTest : BaseTest() {
                             SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                                 version = "11.6.0",
+                                packageName = "",
                                 products =
                                     listOf(
                                         ProductPackageConfig(

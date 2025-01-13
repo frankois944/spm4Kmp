@@ -212,7 +212,7 @@ linkerOpts = ${getExtraLinkers()} -framework "${moduleConfig.buildDir.nameWithou
                             .getPackageImplicitDependencies(
                                 workingDir = manifestFile.asFile.get().parentFile,
                                 scratchPath = scratchDir.get(),
-                            ).getFolders("Public")
+                            ).getFolders()
                     val headersBuildPath =
                         buildList {
                             addAll(getBuildDirectoriesContent("build"))

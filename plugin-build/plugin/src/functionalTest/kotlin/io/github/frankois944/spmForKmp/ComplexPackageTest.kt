@@ -28,6 +28,7 @@ class ComplexPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                                packageName = "",
                                 products =
                                     listOf(
                                         ProductPackageConfig(

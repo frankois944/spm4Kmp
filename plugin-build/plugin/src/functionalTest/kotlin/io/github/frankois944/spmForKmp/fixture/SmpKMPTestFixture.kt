@@ -58,11 +58,11 @@ org.gradle.caching=true
         if (jacocoDestfile != null) {
             content +=
                 """
-                # code coverage
-                systemProp.jacoco-agent.destfile=$jacocoDestfile
-                systemProp.jacoco-agent.append=true
-                systemProp.jacoco-agent.dumponexit=false
-                systemProp.jacoco-agent.jmx=true
+# code coverage
+systemProp.jacoco-agent.destfile=$jacocoDestfile
+systemProp.jacoco-agent.append=true
+systemProp.jacoco-agent.dumponexit=false
+systemProp.jacoco-agent.jmx=true
                 """.trimIndent()
         }
         withFile(
@@ -142,22 +142,15 @@ swiftPackageConfig {
                 extension.sharedSecurityPath?.let {
                     append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
                 }
-                /*
- ProductPackageConfig(
-            ProductName(
-                name = "FirebaseAppDistribution",
-                alias = "FirebaseAppDistribution-Beta",
-            ),
-            exportToKotlin = true,
-        ),
-                 */
                 extension.packages.forEach { definition ->
                     appendLine("    dependency(     ")
                     when (definition) {
                         is SwiftDependency.Package.Local -> {
-                            append("SwiftDependency.Package.Local(")
+                            appendLine("SwiftDependency.Package.Local(")
                             append("path = \"${definition.path}\",")
-                            append("packageName = \"${definition.packageName}\",")
+                            if (definition.packageName.isNotEmpty()) {
+                                append("packageName = \"${definition.packageName}\",")
+                            }
                             append("products = listOf(")
                             definition.products.forEach { config ->
                                 appendLine("ProductPackageConfig(")
@@ -169,20 +162,23 @@ swiftPackageConfig {
                                     }
                                     appendLine("),")
                                 }
-                                append("exportToKotlin = ${config.exportToKotlin}")
+                                if (config.exportToKotlin) {
+                                    append("exportToKotlin = ${config.exportToKotlin}")
+                                }
                                 appendLine("),")
                             }
                             appendLine("),")
                         }
+
                         is SwiftDependency.Binary.Local -> {
-                            append("SwiftDependency.Binary.Local(")
+                            appendLine("SwiftDependency.Binary.Local(")
                             append("path = \"${definition.path}\",")
                             append("packageName = \"${definition.packageName}\",")
                             append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Binary.Remote -> {
-                            append("SwiftDependency.Binary.Remote(")
+                            appendLine("SwiftDependency.Binary.Remote(")
                             append("url = URI(\"${definition.url}\"),")
                             append("checksum = \"${definition.checksum}\",")
                             append("packageName = \"${definition.packageName}\",")
@@ -190,70 +186,81 @@ swiftPackageConfig {
                         }
 
                         is SwiftDependency.Package.Remote.Branch -> {
-                            append("SwiftDependency.Package.Remote.Branch(")
+                            appendLine("SwiftDependency.Package.Remote.Branch(")
                             append("url = URI(\"${definition.url}\"),")
+                            if (definition.packageName.isNotEmpty()) {
+                                append("packageName = \"${definition.packageName}\",")
+                            }
                             append("products = listOf(")
                             definition.products.forEach { config ->
                                 appendLine("ProductPackageConfig(")
                                 config.names.forEach { name ->
-                                    appendLine("ProductName(")
+                                    append("ProductName(")
                                     append("name = \"${name.name}\"")
                                     name.alias?.let { alias ->
                                         append(", alias = \"$alias\"")
                                     }
                                     appendLine("),")
                                 }
-                                append("exportToKotlin = ${config.exportToKotlin}")
+                                if (config.exportToKotlin) {
+                                    append("exportToKotlin = ${config.exportToKotlin}")
+                                }
                                 appendLine("),")
                             }
                             appendLine("),")
                             append("branch = \"${definition.branch}\"")
-                            // remove packageName for better testing
-                            // append("packageName = \"${definition.packageName}\"")
                         }
 
                         is SwiftDependency.Package.Remote.Commit -> {
-                            append("SwiftDependency.Package.Remote.Commit(")
+                            appendLine("SwiftDependency.Package.Remote.Commit(")
                             append("url = URI(\"${definition.url}\"),")
+                            if (definition.packageName.isNotEmpty()) {
+                                append("packageName = \"${definition.packageName}\",")
+                            }
                             append("products = listOf(")
                             definition.products.forEach { config ->
                                 appendLine("ProductPackageConfig(")
                                 config.names.forEach { name ->
-                                    appendLine("ProductName(")
+                                    append("ProductName(")
                                     append("name = \"${name.name}\"")
                                     name.alias?.let { alias ->
                                         append(", alias = \"$alias\"")
                                     }
                                     appendLine("),")
                                 }
-                                append("exportToKotlin = ${config.exportToKotlin}")
+                                if (config.exportToKotlin) {
+                                    append("exportToKotlin = ${config.exportToKotlin}")
+                                }
                                 appendLine("),")
                             }
                             appendLine("),")
-                            append("revision = \"${definition.revision}\",")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("revision = \"${definition.revision}\"")
                         }
 
                         is SwiftDependency.Package.Remote.Version -> {
-                            append("SwiftDependency.Package.Remote.Version(")
+                            appendLine("SwiftDependency.Package.Remote.Version(")
                             append("url = URI(\"${definition.url}\"),")
-                            append("products = listOf(")
+                            if (definition.packageName.isNotEmpty()) {
+                                append("packageName = \"${definition.packageName}\",")
+                            }
+                            appendLine("products = listOf(")
                             definition.products.forEach { config ->
                                 appendLine("ProductPackageConfig(")
                                 config.names.forEach { name ->
-                                    appendLine("ProductName(")
+                                    append("ProductName(")
                                     append("name = \"${name.name}\"")
                                     name.alias?.let { alias ->
                                         append(", alias = \"$alias\"")
                                     }
                                     appendLine("),")
                                 }
-                                append("exportToKotlin = ${config.exportToKotlin}")
+                                if (config.exportToKotlin) {
+                                    append("exportToKotlin = ${config.exportToKotlin}")
+                                }
                                 appendLine("),")
                             }
                             appendLine("),")
-                            append("version = \"${definition.version}\",")
-                            append("packageName = \"${definition.packageName}\"")
+                            append("version = \"${definition.version}\"")
                         }
                     }
                     appendLine(")\n     )")
@@ -264,43 +271,43 @@ swiftPackageConfig {
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
             """
-            // START enable code-coverage
+// START enable code-coverage
 
-            abstract class JacocoDumper : BuildService<BuildServiceParameters.None>, AutoCloseable {
-                override fun close() {
-                    val mBeanServer = ManagementFactory.getPlatformMBeanServer()
-                    val jacocoObjectName = ObjectName.getInstance("org.jacoco:type=Runtime")
-                    if (mBeanServer.isRegistered(jacocoObjectName)) {
-                        mBeanServer.invoke(jacocoObjectName, "dump", arrayOf(true), arrayOf("boolean"))
-                    }
-                }
-            }
-            val jacocoDumper = gradle.sharedServices.registerIfAbsent("jacocoDumper", JacocoDumper::class) {}
-            jacocoDumper.get()
-            gradle.allprojects {
-                tasks.configureEach {
-                    usesService(jacocoDumper)
-                }
-            }
+abstract class JacocoDumper : BuildService<BuildServiceParameters.None>, AutoCloseable {
+    override fun close() {
+        val mBeanServer = ManagementFactory.getPlatformMBeanServer()
+        val jacocoObjectName = ObjectName.getInstance("org.jacoco:type=Runtime")
+        if (mBeanServer.isRegistered(jacocoObjectName)) {
+            mBeanServer.invoke(jacocoObjectName, "dump", arrayOf(true), arrayOf("boolean"))
+        }
+    }
+}
+val jacocoDumper = gradle.sharedServices.registerIfAbsent("jacocoDumper", JacocoDumper::class) {}
+jacocoDumper.get()
+gradle.allprojects {
+    tasks.configureEach {
+        usesService(jacocoDumper)
+    }
+}
 
-            // END enable code-coverage
+// END enable code-coverage
 
-            kotlin {
-                listOf(
-                   $targets
-                ).forEach {
-                    it.compilations {
-                        val main by getting {
-                            cinterops.create("${configuration.cinteropsName}")
-                        }
-                    }
-                    it.binaries.framework {
-                        baseName = "shared"
-                        isStatic = true
-                    }
-                }
+kotlin {
+    listOf(
+       $targets
+    ).forEach {
+        it.compilations {
+            val main by getting {
+                cinterops.create("${configuration.cinteropsName}")
             }
-            $pluginBlock
+        }
+        it.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
+}
+$pluginBlock
             """.trimIndent()
         logger.debug(script)
         return script
