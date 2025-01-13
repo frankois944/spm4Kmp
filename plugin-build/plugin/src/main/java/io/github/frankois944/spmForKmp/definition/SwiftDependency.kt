@@ -1,5 +1,7 @@
 package io.github.frankois944.spmForKmp.definition
 
+import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfig
+import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfigImpl
 import java.io.Serializable
 import java.net.URI
 
@@ -75,8 +77,10 @@ public sealed interface SwiftDependency : Serializable {
         ) : Binary
     }
 
-    public sealed interface Package : SwiftDependency {
-        public val products: List<ProductPackageConfig>
+    public sealed class Package : SwiftDependency {
+        public var productsConfig: ProductPackageConfig = ProductPackageConfigImpl()
+            internal set
+        internal abstract val products: ProductPackageConfig.() -> Unit
 
         /**
          * Represents a local Swift package dependency.
@@ -87,17 +91,24 @@ public sealed interface SwiftDependency : Serializable {
          */
         public data class Local(
             val path: String,
-            override val packageName: String =
-                products
-                    .first()
-                    .names
-                    .first()
-                    .name,
-            override val products: List<ProductPackageConfig>,
-        ) : Package
+            override var packageName: String = "",
+            override val products: ProductPackageConfig.() -> Unit,
+        ) : Package() {
+            init {
+                productsConfig.apply(products)
+                if (packageName.isEmpty()) {
+                    packageName =
+                        productsConfig.productPackages
+                            .firstOrNull()
+                            ?.products
+                            ?.firstOrNull()
+                            ?.name ?: throw RuntimeException("No package found in local package $path")
+                }
+            }
+        }
 
-        public sealed interface Remote : Package {
-            public val url: URI
+        public sealed class Remote : Package() {
+            public open val url: URI = URI("")
 
             /**
              * Represents a specific version of a remote Swift package to be used
@@ -110,10 +121,14 @@ public sealed interface SwiftDependency : Serializable {
              */
             public data class Version(
                 public override val url: URI,
-                public override val products: List<ProductPackageConfig>,
                 public override val packageName: String = buildPackageName(url),
                 public val version: String,
-            ) : Remote
+                public override val products: ProductPackageConfig.() -> Unit,
+            ) : Remote() {
+                init {
+                    productsConfig.apply(products)
+                }
+            }
 
             /**
              * Represents a branch-based remote Swift dependency in a Kotlin Multiplatform project.
@@ -125,10 +140,14 @@ public sealed interface SwiftDependency : Serializable {
              */
             public data class Branch(
                 public override val url: URI,
-                public override val products: List<ProductPackageConfig>,
                 public override val packageName: String = buildPackageName(url),
                 public val branch: String,
-            ) : Remote
+                override val products: ProductPackageConfig.() -> Unit,
+            ) : Remote() {
+                init {
+                    productsConfig.apply(products)
+                }
+            }
 
             /**
              * Represents a specific remote commit dependency for a Swift Package.
@@ -140,10 +159,14 @@ public sealed interface SwiftDependency : Serializable {
              */
             public data class Commit(
                 public override val url: URI,
-                public override val products: List<ProductPackageConfig>,
                 public override val packageName: String = buildPackageName(url),
                 public val revision: String,
-            ) : Remote
+                override val products: ProductPackageConfig.() -> Unit,
+            ) : Remote() {
+                init {
+                    productsConfig.apply(products)
+                }
+            }
         }
     }
 }

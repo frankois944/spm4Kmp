@@ -1,6 +1,6 @@
 
-import io.github.frankois944.spmForKmp.definition.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
 
@@ -92,19 +92,12 @@ swiftPackageConfig {
                 // Repository URL
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
-                products =
-                    listOf(
-                        ProductPackageConfig(
-                            "FirebaseCore",
-                            "FirebaseAnalytics",
-                            exportToKotlin = true,
-                        ),
-                        // add FirebaseDatabase to your own swift code but don't export it
-                        ProductPackageConfig(
-                            "FirebaseDatabase",
-                            exportToKotlin = false,
-                        ),
-                    ),
+                products = {
+                    // Export to Kotlin for use in shared Kotlin code
+                    add("FirebaseCore", "FirebaseAnalytics", exportToKotlin = true)
+                    // add FirebaseDatabase to your own swift code but don't export it
+                    add(ProductName("FirebaseDatabase"))
+                },
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
@@ -117,25 +110,19 @@ swiftPackageConfig {
             ),
             SwiftDependency.Package.Local(
                 path = "$testRessources/LocalSourceDummyFramework",
-                products =
-                    listOf(
-                        // Export to Kotlin for use in shared Kotlin code, false by default
-                        ProductPackageConfig(
-                            "LocalSourceDummyFramework",
-                            exportToKotlin = true,
-                        ),
-                    ),
+                packageName = "LocalSourceDummyFramework",
+                products = {
+                    // Export to Kotlin for use in shared Kotlin code, false by default
+                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                },
             ),
             SwiftDependency.Package.Remote.Version(
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 version = "1.8.1",
-                products =
-                    listOf(
-                        // Can be only used in your "src/swift" code.
-                        ProductPackageConfig(
-                            "CryptoSwift",
-                        ),
-                    ),
+                products = {
+                    // Can be only used in your "src/swift" code.
+                    add("CryptoSwift")
+                },
             ),
             // see SwiftDependency class for more use cases
         )

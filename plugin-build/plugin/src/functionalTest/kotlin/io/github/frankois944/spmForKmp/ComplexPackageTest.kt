@@ -2,8 +2,8 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.definition.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
@@ -29,37 +29,30 @@ class ComplexPackageTest : BaseTest() {
                             SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 packageName = "",
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "CryptoSwift",
-                                            exportToKotlin = false,
-                                        ),
-                                    ),
+                                products = {
+                                    add(
+                                        ProductName("CryptoSwift"),
+                                        exportToKotlin = false,
+                                    )
+                                },
                                 version = "1.8.3",
                             ),
                         )
                         add(
                             SwiftDependency.Package.Remote.Branch(
                                 url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "KeychainAccess",
-                                        ),
-                                    ),
+                                products = {
+                                    add("KeychainAccess")
+                                },
                                 branch = "master",
                             ),
                         )
                         add(
                             SwiftDependency.Package.Remote.Commit(
                                 url = URI("https://github.com/square/Valet"),
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "Valet",
-                                        ),
-                                    ),
+                                products = {
+                                    add("Valet")
+                                },
                                 revision = "e900692d551b1986fc80aa3968d40e7af3b1e858",
                             ),
                         )
@@ -67,13 +60,9 @@ class ComplexPackageTest : BaseTest() {
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
                                 packageName = "LocalSourceDummyFramework",
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "LocalSourceDummyFramework",
-                                            exportToKotlin = true,
-                                        ),
-                                    ),
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
                             ),
                         )
                         add(
@@ -86,14 +75,9 @@ class ComplexPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "FirebaseCore",
-                                            "FirebaseAnalytics",
-                                            "FirebaseCrashlytics",
-                                        ),
-                                    ),
+                                products = {
+                                    add("FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics")
+                                },
                                 version = "11.6.0",
                                 packageName = "firebase-ios-sdk",
                             ),

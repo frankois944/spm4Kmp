@@ -2,9 +2,9 @@ package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
-import io.github.frankois944.spmForKmp.definition.ProductName
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.utils.md5
@@ -112,8 +112,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     }.flatMap { dependency ->
                         if (dependency is SwiftDependency.Package) {
                             val productList: List<ProductName> =
-                                dependency.products.flatMap { product ->
-                                    product.names
+                                @Suppress("RedundantHigherOrderMapUsage")
+                                dependency.productsConfig.productPackages.flatMap { product ->
+                                    product.products.map { it }
                                 }
                             val namesList = productList.map { product -> product.name }
                             namesList

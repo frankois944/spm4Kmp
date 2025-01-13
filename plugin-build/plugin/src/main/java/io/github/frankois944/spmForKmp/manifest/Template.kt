@@ -100,9 +100,9 @@ private fun getDependenciesTargets(dependencies: List<SwiftDependency>): String 
                 if (dependency.isBinaryDependency) {
                     add("\"${dependency.packageName}\"")
                 } else if (dependency is SwiftDependency.Package) {
-                    dependency.products.forEach { library ->
+                    dependency.productsConfig.productPackages.forEach { config ->
                         @Suppress("MaxLineLength")
-                        library.names.forEach { product ->
+                        config.products.forEach { product ->
                             add(".product(name: \"${product.alias ?: product.name}\", package: \"${dependency.packageName}\")")
                         }
                     }

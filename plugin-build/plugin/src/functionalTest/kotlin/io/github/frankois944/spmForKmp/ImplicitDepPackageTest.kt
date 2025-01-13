@@ -2,9 +2,8 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.definition.ProductName
-import io.github.frankois944.spmForKmp.definition.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
@@ -25,13 +24,9 @@ class ImplicitDepPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/google/GoogleSignIn-iOS"),
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "GoogleSignIn",
-                                            exportToKotlin = true,
-                                        ),
-                                    ),
+                                products = {
+                                    add("GoogleSignIn", exportToKotlin = true)
+                                },
                                 version = "8.0.0",
                             ),
                         )
@@ -74,20 +69,21 @@ class ImplicitDepPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            ProductName(
-                                                name = "FirebaseAppDistribution",
-                                                alias = "FirebaseAppDistribution-Beta",
-                                            ),
-                                            exportToKotlin = true,
+                                products = {
+                                    add(
+                                        ProductName(
+                                            name = "FirebaseAppDistribution",
+                                            alias = "FirebaseAppDistribution-Beta",
                                         ),
-                                        ProductPackageConfig(
+                                        exportToKotlin = true,
+                                    )
+                                    add(
+                                        ProductName(
                                             "FirebaseStorage",
-                                            exportToKotlin = true,
                                         ),
-                                    ),
+                                        exportToKotlin = true,
+                                    )
+                                },
                                 version = "11.6.0",
                             ),
                         )

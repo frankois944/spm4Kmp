@@ -2,8 +2,8 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.definition.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
@@ -77,13 +77,12 @@ class BasicPackageTest : BaseTest() {
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
                                 packageName = "LocalSourceDummyFramework",
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "LocalSourceDummyFramework",
-                                            exportToKotlin = true,
-                                        ),
-                                    ),
+                                products = {
+                                    add(
+                                        ProductName("LocalSourceDummyFramework"),
+                                        exportToKotlin = true,
+                                    )
+                                },
                             ),
                         )
                     },

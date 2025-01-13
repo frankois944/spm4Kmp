@@ -1,10 +1,9 @@
 package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
-import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.definition.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
@@ -26,12 +25,9 @@ class RemotePackageTest : BaseTest() {
                             SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 version = "1.8.3",
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "CryptoSwift",
-                                        ),
-                                    ),
+                                products = {
+                                    add("CryptoSwift")
+                                },
                             ),
                         )
                     },
@@ -80,12 +76,9 @@ class RemotePackageTest : BaseTest() {
                             SwiftDependency.Package.Remote.Branch(
                                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 branch = "main",
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "CryptoSwift",
-                                        ),
-                                    ),
+                                products = {
+                                    add("CryptoSwift")
+                                },
                             ),
                         )
                     },
@@ -134,12 +127,9 @@ class RemotePackageTest : BaseTest() {
                             SwiftDependency.Package.Remote.Commit(
                                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "CryptoSwift",
-                                        ),
-                                    ),
+                                products = {
+                                    add("CryptoSwift")
+                                },
                             ),
                         )
                     },
@@ -190,18 +180,10 @@ class RemotePackageTest : BaseTest() {
                                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                                 version = "11.6.0",
                                 packageName = "",
-                                products =
-                                    listOf(
-                                        ProductPackageConfig(
-                                            "FirebaseCore",
-                                            "FirebaseAnalytics",
-                                            exportToKotlin = true,
-                                        ),
-                                        ProductPackageConfig(
-                                            "FirebaseCrashlytics",
-                                            exportToKotlin = false,
-                                        ),
-                                    ),
+                                products = {
+                                    add(ProductName("FirebaseCore"), ProductName("FirebaseAnalytics"), exportToKotlin = true)
+                                    add("FirebaseCrashlytics")
+                                },
                             ),
                         )
                     },
