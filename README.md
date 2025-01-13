@@ -147,9 +147,9 @@ swiftPackageConfig {
         dependency(
             SwiftDependency.Package.Remote.Version(
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                products = listOf(
-                    ProductPackageConfig("CryptoSwift")
-                ),                           
+                products = {
+                    add("CryptoSwift")
+                },                           
                 version = "1.8.4",                                         
             )
         )
@@ -182,14 +182,9 @@ swiftPackageConfig {
         dependency(
             SwiftDependency.Binary.Local(
                 path = "path/to/DummyFramework.xcframework.zip",
-                products =
-                    listOf(
-                        // Export to Kotlin for use in shared Kotlin code, false by default
-                        ProductPackageConfig(
-                            "LocalSourceDummyFramework",
-                            exportToKotlin = true,
-                        ),
-                    ),
+                products = {
+                     add("DummyFramework", exportToKotlin = true)
+                }
             ),
         )
     }
