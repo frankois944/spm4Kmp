@@ -1,12 +1,13 @@
 package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
-import io.github.frankois944.spmForKmp.operations.getXcodeVersion
 import io.github.frankois944.spmForKmp.utils.md5
-import io.github.frankois944.spmForKmp.xcodeconfig.ModuleConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -66,7 +67,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         getBuildDirectory() // get folders with headers for internal dependencies
             .listFiles { file -> extensions.contains(file.extension) || file.name == "Modules" }
             // remove folder with weird names, cinterop doesn't like module with symbol names like grp-c++
-            // it doesn't matter for the kotlin export.
+            // it doesn't matter for the kotlin export, to be rethinking
             ?.filter { file -> !file.nameWithoutExtension.lowercase().contains("grpc") }
             ?.toList()
             .orEmpty()
@@ -105,14 +106,23 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             addAll(
                 packages
                     .get()
-                    .filter {
-                        it.exportToKotlin
-                    }.flatMap {
-                        if (it is SwiftDependency.Package.Remote) {
-                            it.names
+                    .filterExportableDependency()
+                    .also {
+                        logger.debug("Filtered exportable dependency: {}", it)
+                    }.flatMap { dependency ->
+                        if (dependency is SwiftDependency.Package) {
+                            val productList: List<ProductName> =
+                                @Suppress("RedundantHigherOrderMapUsage")
+                                dependency.productsConfig.productPackages.flatMap { product ->
+                                    product.products.map { it }
+                                }
+                            val namesList = productList.map { product -> product.name }
+                            namesList
                         } else {
-                            listOf(it.packageName)
+                            listOf(dependency.packageName)
                         }
+                    }.also {
+                        logger.debug("Product names to export: {}", it)
                     },
             )
         }.distinct()
@@ -128,20 +138,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
      */
     private fun getExtraLinkers(): String {
         val xcodeDevPath = project.getXcodeDevPath()
-
-        val linkerPlatformVersion =
-            @Suppress("MagicNumber")
-            if (project.getXcodeVersion().toDouble() >= 15) {
-                target.get().linkerPlatformVersionName()
-            } else {
-                target.get().linkerMinOsVersionName()
-            }
         return buildList {
-            // add("-$linkerPlatformVersion")
-            // add(osVersion.get())
-            // add(osVersion.get())
-            // add("-rpath")
-            // add("/usr/lib/swift")
             add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
         }.joinToString(" ")
     }
@@ -165,10 +162,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 logger.debug("LOOKING for module dir {}", moduleName)
                 getBuildDirectoriesContent("build", "framework")
                     .find {
-                        // removing -beta is a quickfix for firebase who use package alias
-                        // the relationship can be found in Package.swift of firebase
-                        val reference = moduleName.lowercase().replace("-beta", "")
-                        it.nameWithoutExtension.lowercase() == reference
+                        it.nameWithoutExtension.lowercase() == moduleName.lowercase()
                     }?.let { buildDir ->
                         logger.debug("Found dir {} for {}", buildDir, moduleName)
                         moduleConfigs.add(
@@ -219,7 +213,7 @@ linkerOpts = ${getExtraLinkers()} -framework "${moduleConfig.buildDir.nameWithou
                             .getPackageImplicitDependencies(
                                 workingDir = manifestFile.asFile.get().parentFile,
                                 scratchPath = scratchDir.get(),
-                            ).getFolders("Public")
+                            ).getFolders()
                     val headersBuildPath =
                         buildList {
                             addAll(getBuildDirectoriesContent("build"))

@@ -1,5 +1,8 @@
+
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.net.URI
 
 plugins {
     alias(libs.plugins.androidLibrary)
@@ -87,19 +90,18 @@ swiftPackageConfig {
         dependency(
             SwiftDependency.Package.Remote.Version(
                 // Repository URL
-                url = "https://github.com/firebase/firebase-ios-sdk.git",
+                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
-                names =
-                    listOf(
-                        "FirebaseCore",
-                        "FirebaseAnalytics",
-                    ),
+                products = {
+                    // Export to Kotlin for use in shared Kotlin code
+                    add("FirebaseCore", "FirebaseAnalytics", exportToKotlin = true)
+                    // add FirebaseDatabase to your own swift code but don't export it
+                    add(ProductName("FirebaseDatabase"))
+                },
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
                 version = "11.6.0",
-                // Export to Kotlin for use in shared Kotlin code, false by default
-                exportToKotlin = true,
             ),
             SwiftDependency.Binary.Local(
                 path = "$testRessources/DummyFramework.xcframework.zip",
@@ -109,12 +111,18 @@ swiftPackageConfig {
             SwiftDependency.Package.Local(
                 path = "$testRessources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
-                exportToKotlin = true,
+                products = {
+                    // Export to Kotlin for use in shared Kotlin code, false by default
+                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                },
             ),
             SwiftDependency.Package.Remote.Version(
-                url = "https://github.com/krzyzanowskim/CryptoSwift.git",
-                names = listOf("CryptoSwift"),
+                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 version = "1.8.1",
+                products = {
+                    // Can be only used in your "src/swift" code.
+                    add("CryptoSwift")
+                },
             ),
             // see SwiftDependency class for more use cases
         )

@@ -9,6 +9,8 @@ import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductConfig
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.gradle.internal.cc.base.logger
 
 abstract class SmpKMPTestFixture private constructor(
@@ -33,9 +35,9 @@ abstract class SmpKMPTestFixture private constructor(
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
         val packages: List<SwiftDependency> = emptyList(),
-        val sharedCachePath: String? = "/tmp/spm4Ktm/sharedCachePath",
-        val sharedConfigPath: String? = "/tmp/spm4Ktm/sharedConfigPath",
-        val sharedSecurityPath: String? = "/tmp/spm4Ktm/sharedSecurityPath",
+        val sharedCachePath: String? = null,
+        val sharedConfigPath: String? = null,
+        val sharedSecurityPath: String? = null,
     )
 
     protected abstract fun createProject(): GradleProject
@@ -87,7 +89,7 @@ org.gradle.caching=true
                 Source
                     .kotlin(source.content)
                     .withPath(source.packageName, source.className)
-                    .withSourceSet("iosMain")
+                    .withSourceSet("appleMain")
                     .build(),
             )
         }
@@ -95,7 +97,14 @@ org.gradle.caching=true
 
     private fun Subproject.Builder.setupGradleConfig(extension: TestConfiguration) {
         withBuildScript {
-            imports = Imports.of("io.github.frankois944.spmForKmp.definition.SwiftDependency")
+            imports =
+                Imports.of(
+                    "io.github.frankois944.spmForKmp.definition.SwiftDependency",
+                    "java.net.URI",
+                    "java.lang.management.ManagementFactory",
+                    "javax.management.ObjectName",
+                    "io.github.frankois944.spmForKmp.definition.product.ProductName",
+                )
             plugins(
                 Plugin(
                     "org.jetbrains.kotlin.multiplatform",
@@ -134,69 +143,138 @@ swiftPackageConfig {
                 extension.sharedSecurityPath?.let {
                     append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
                 }
-                extension.packages.forEach { definition ->
-                    append("    dependency(\n     ")
-                    when (definition) {
-                        is SwiftDependency.Package.Local -> {
-                            append("SwiftDependency.Package.Local(")
-                            append("path = \"${definition.path}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
-                            append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
-                        }
 
+                fun buildProductBlock(
+                    name: ProductName,
+                    isLast: Boolean,
+                ): String =
+                    buildString {
+                        append("ProductName(")
+                        append("name = \"${name.name}\"")
+                        name.alias?.let { alias ->
+                            append(", alias = \"$alias\"")
+                        }
+                        appendLine(")")
+                        if (!isLast) {
+                            appendLine(",")
+                        }
+                    }
+
+                fun buildPackageBlock(config: ProductConfig): String =
+                    buildString {
+                        appendLine("add(")
+                        config.products.forEachIndexed { index, name ->
+                            append(
+                                buildProductBlock(
+                                    name = name,
+                                    isLast = name == config.products.last(),
+                                ),
+                            )
+                        }
+                        if (config.exportToKotlin) {
+                            appendLine(", exportToKotlin = ${config.exportToKotlin}")
+                        }
+                        appendLine(")")
+                    }
+
+                extension.packages.forEach { definition ->
+                    appendLine("    dependency(     ")
+                    when (definition) {
                         is SwiftDependency.Binary.Local -> {
-                            append("SwiftDependency.Binary.Local(")
+                            appendLine("SwiftDependency.Binary.Local(")
                             append("path = \"${definition.path}\",")
                             append("packageName = \"${definition.packageName}\",")
                             append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
                         is SwiftDependency.Binary.Remote -> {
-                            append("SwiftDependency.Binary.Remote(")
-                            append("url = \"${definition.url}\",")
+                            appendLine("SwiftDependency.Binary.Remote(")
+                            append("url = URI(\"${definition.url}\"),")
                             append("checksum = \"${definition.checksum}\",")
                             append("packageName = \"${definition.packageName}\",")
                             append("exportToKotlin = ${definition.exportToKotlin}")
                         }
 
+                        is SwiftDependency.Package.Local -> {
+                            appendLine("SwiftDependency.Package.Local(")
+                            append("path = \"${definition.path}\",")
+                            if (definition.packageName.isNotEmpty()) {
+                                appendLine("packageName = \"${definition.packageName}\",")
+                            }
+                            appendLine("products = {")
+                            definition.productsConfig.productPackages.forEach { config ->
+                                append(
+                                    buildPackageBlock(
+                                        config = config,
+                                    ),
+                                )
+                            }
+                            appendLine("}")
+                        }
+
                         is SwiftDependency.Package.Remote.Branch -> {
-                            append("SwiftDependency.Package.Remote.Branch(")
-                            append("url = \"${definition.url}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
-                            append("branch = \"${definition.branch}\",")
-                            append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
+                            appendLine("SwiftDependency.Package.Remote.Branch(")
+                            appendLine("branch = \"${definition.branch}\",")
+                            appendLine("url = URI(\"${definition.url}\"),")
+                            if (definition.packageName.isNotEmpty()) {
+                                appendLine("packageName = \"${definition.packageName}\",")
+                            }
+                            appendLine("products = {")
+                            definition.productsConfig.productPackages.forEach { config ->
+                                append(
+                                    buildPackageBlock(
+                                        config = config,
+                                    ),
+                                )
+                            }
+                            appendLine("}")
                         }
 
                         is SwiftDependency.Package.Remote.Commit -> {
-                            append("SwiftDependency.Package.Remote.Commit(")
-                            append("url = \"${definition.url}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
-                            append("revision = \"${definition.revision}\",")
-                            append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
+                            appendLine("SwiftDependency.Package.Remote.Commit(")
+                            appendLine("revision = \"${definition.revision}\",")
+                            appendLine("url = URI(\"${definition.url}\"),")
+                            if (definition.packageName.isNotEmpty()) {
+                                appendLine("packageName = \"${definition.packageName}\",")
+                            }
+                            appendLine("products = {")
+                            definition.productsConfig.productPackages.forEach { config ->
+                                append(
+                                    buildPackageBlock(
+                                        config = config,
+                                    ),
+                                )
+                            }
+                            appendLine("}")
                         }
 
                         is SwiftDependency.Package.Remote.Version -> {
-                            append("SwiftDependency.Package.Remote.Version(")
-                            append("url = \"${definition.url}\",")
-                            append("names = listOf(\"${definition.names.joinToString(separator = "\", \"")}\"),")
-                            append("version = \"${definition.version}\",")
-                            append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
+                            appendLine("SwiftDependency.Package.Remote.Version(")
+                            appendLine("version = \"${definition.version}\",")
+                            appendLine("url = URI(\"${definition.url}\"),")
+                            if (definition.packageName.isNotEmpty()) {
+                                appendLine("packageName = \"${definition.packageName}\",")
+                            }
+                            appendLine("products = {")
+                            definition.productsConfig.productPackages.forEach { config ->
+                                append(
+                                    buildPackageBlock(
+                                        config = config,
+                                    ),
+                                )
+                            }
+                            appendLine("}")
                         }
                     }
-                    append(")\n     )\n")
+                    appendLine(")\n     )")
                 }
-                append("}\n}\n")
+                appendLine("}")
+                appendLine("}")
             }
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
             """
             // START enable code-coverage
-            import java.lang.management.ManagementFactory
-            import javax.management.ObjectName
 
             abstract class JacocoDumper : BuildService<BuildServiceParameters.None>, AutoCloseable {
                 override fun close() {

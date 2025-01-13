@@ -19,15 +19,30 @@ class LocalPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withTargets(
-                    CompileTarget.macosArm64,
-                ).withDependencies(
+                .also {
+                    if (isCI) {
+                        it.withTargets(
+                            CompileTarget.macosArm64,
+                            CompileTarget.watchosArm64,
+                            CompileTarget.watchosSimulatorArm64,
+                            CompileTarget.tvosArm64,
+                            CompileTarget.tvosSimulatorArm64,
+                            CompileTarget.iosArm64,
+                        )
+                    } else {
+                        it.withTargets(
+                            CompileTarget.macosArm64,
+                        )
+                    }
+                }.withDependencies(
                     buildList {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
-                                packageName = "LocalSourceDummyFramework",
-                                exportToKotlin = true,
+                                packageName = "",
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
                             ),
                         )
                     },
@@ -36,7 +51,7 @@ class LocalPackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import LocalDummyFramework.LocalSourceDummy
+                            import LocalSourceDummyFramework.LocalSourceDummy
                             """.trimIndent(),
                     ),
                 ).withSwiftSources(
@@ -76,7 +91,9 @@ class LocalPackageTest : BaseTest() {
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
                                 packageName = "LocalSourceDummyFramework",
-                                exportToKotlin = true,
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
                             ),
                         )
                     },

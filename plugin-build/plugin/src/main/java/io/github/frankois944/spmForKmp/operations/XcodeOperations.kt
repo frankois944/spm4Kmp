@@ -60,40 +60,6 @@ internal fun Project.resolvePackage(
         }
 }
 
-internal fun Project.getXcodeVersion(): String {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
-    val args =
-        listOf(
-            "--sdk",
-            "macosx",
-            "xcodebuild",
-            "-version",
-        )
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "xcrun"
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "getXcodeVersion",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
-    val regex = """Xcode\s(\d+\.\d+)""".toRegex()
-    val match = regex.find(standardOutput.toString())
-    return match?.groups?.get(1)?.value
-        ?: throw RuntimeException("Can't find Xcode version with output $standardOutput")
-}
-
 internal fun Project.getXcodeDevPath(): String {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =

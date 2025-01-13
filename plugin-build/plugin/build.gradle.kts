@@ -24,6 +24,8 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation(libs.jackson.module.kotlin)
 
+    testImplementation(kotlin("test"))
+
     functionalTestImplementation(libs.junit.jupiter)
     functionalTestRuntimeOnly(libs.junit.jupiter.engine)
     functionalTestRuntimeOnly(libs.junit.platform.launcher)

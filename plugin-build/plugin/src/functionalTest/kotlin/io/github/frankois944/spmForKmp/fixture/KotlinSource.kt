@@ -19,7 +19,7 @@ class KotlinSource private constructor(
                 content =
                     """
                     package com.example
-                    class Test
+                    class EmptyTest
                     """.trimIndent(),
             )
     }

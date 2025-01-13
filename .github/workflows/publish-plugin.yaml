@@ -26,12 +26,6 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
-      - name: Cache example scratch directory
-        id: cache-example-scratch
-        uses: actions/cache@v4
-        with:
-          path: /Users/runner/work/spm4Kmp/spm4Kmp/example/build/spmKmpPlugin/input/scratch
-          key: ${{ runner.os }}-example-scratch
       - name: Publish on Plugin Portal
         run: ./gradlew :plugin-build:plugin:setupPluginUploadFromEnvironment :plugin-build:plugin:publishPlugins
         if: success()

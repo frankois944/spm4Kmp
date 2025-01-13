@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
 
 open class BaseTest {
+    val isCI = System.getenv("GITHUB_ACTIONS") == "true"
     val jacocoAgentJar: String? get() = System.getProperty("jacocoAgentJar")
     var folderTopOpen: String? = null
 

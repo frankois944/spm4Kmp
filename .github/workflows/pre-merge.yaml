@@ -41,13 +41,13 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
-      - name: Cache example scratch directory
+      - name: Cache example
         id: cache-example-scratch
         uses: actions/cache@v4
         with:
           path: |
             example/build/spmKmpPlugin/scratch
-            example/build/spmKmpPlugin/Package.resolved
+            example/iosApp/spm
             example/iosApp/build
             example/iosApp/spm
           key: ${{ runner.os }}-example-scratch
@@ -62,14 +62,11 @@ jobs:
           name: test-pre-merge-report
           path: plugin-build/plugin/build/reports/
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v5
+        uses: test-summary/action@v2
         if: ${{ !cancelled() }}
         with:
-          report_paths: '**/build/test-results/**/TEST-*.xml'
-          include_passed: true
-      - name: build iosExampleApp
-        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" build
-        working-directory: "example/iosApp"
+          paths: '**/build/test-results/**/TEST-*.xml'
+          show: 'all'
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/codecov-action@v5

@@ -3,11 +3,13 @@ package io.github.frankois944.spmForKmp
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
+import java.net.URI
 
 class ImplicitDepPackageTest : BaseTest() {
     @Test
@@ -21,11 +23,11 @@ class ImplicitDepPackageTest : BaseTest() {
                     buildList {
                         add(
                             SwiftDependency.Package.Remote.Version(
-                                url = "https://github.com/google/GoogleSignIn-iOS",
-                                names = listOf("GoogleSignIn"),
-                                packageName = "GoogleSignIn-iOS",
+                                url = URI("https://github.com/google/GoogleSignIn-iOS"),
+                                products = {
+                                    add("GoogleSignIn", exportToKotlin = true)
+                                },
                                 version = "8.0.0",
-                                exportToKotlin = true,
                             ),
                         )
                     },
@@ -66,11 +68,23 @@ class ImplicitDepPackageTest : BaseTest() {
                     buildList {
                         add(
                             SwiftDependency.Package.Remote.Version(
-                                url = "https://github.com/firebase/firebase-ios-sdk.git",
-                                names = listOf("FirebaseAppDistribution-Beta", "FirebaseStorage"),
-                                packageName = "firebase-ios-sdk",
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                                products = {
+                                    add(
+                                        ProductName(
+                                            name = "FirebaseAppDistribution",
+                                            alias = "FirebaseAppDistribution-Beta",
+                                        ),
+                                        exportToKotlin = true,
+                                    )
+                                    add(
+                                        ProductName(
+                                            "FirebaseStorage",
+                                        ),
+                                        exportToKotlin = true,
+                                    )
+                                },
                                 version = "11.6.0",
-                                exportToKotlin = true,
                             ),
                         )
                     },
@@ -79,7 +93,7 @@ class ImplicitDepPackageTest : BaseTest() {
                         content =
                             """
                             package com.example
-                            import `FirebaseAppDistribution-Beta`.FIRAppDistribution
+                            import FirebaseAppDistribution.FIRAppDistribution
                             import FirebaseStorage.FIRStorage
                             """.trimIndent(),
                     ),

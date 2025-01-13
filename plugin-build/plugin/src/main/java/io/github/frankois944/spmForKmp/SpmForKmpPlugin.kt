@@ -3,6 +3,7 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
+import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.GenerateExportableManifestTask
@@ -30,14 +31,6 @@ internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportabl
 
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
-    private fun Project.resolvePath(destination: File): File =
-        if (destination.isAbsolute) {
-            destination
-        } else {
-            project.layout.projectDirectory.asFile
-                .resolve(destination)
-        }
-
     @Suppress("LongMethod", "CyclomaticComplexMethod")
     override fun apply(target: Project): Unit =
         with(target) {
@@ -61,10 +54,10 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     typeOf<NamedDomainObjectContainer<PackageRootDefinitionExtension>>().javaType,
                 )
 
-            project.extensions.add(type, EXTENSION_NAME, swiftPackageEntries)
+            extensions.add(type, EXTENSION_NAME, swiftPackageEntries)
 
             val kotlinExtension =
-                project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
+                extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
             val sourcePackageDir =
                 layout.buildDirectory.asFile
@@ -81,9 +74,17 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         it.mkdirs()
                     }
             afterEvaluate {
-                val extension = swiftPackageEntries.first()
+                val extension =
+                    swiftPackageEntries.firstOrNull()
+                        ?: throw RuntimeException(
+                            "No swiftPackageConfig found, " +
+                                "please declare at least one configuration",
+                        )
                 if (swiftPackageEntries.size > 1) {
-                    logger.warn("Only the first entry is currently supported, the other will be ignored")
+                    logger.warn(
+                        "Only the first entry of swiftPackageConfig is currently supported, " +
+                            "the next will be ignored",
+                    )
                 }
 
                 val sharedCacheDir: File? =
@@ -138,11 +139,9 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             manifest.sharedSecurityDir.set(sharedSecurityDir)
                         }
                 val exportablePackage =
-                    extension.packageDependencies.filter { product ->
-                        product.exportToKotlin
-                    }
+                    extension.packageDependencies.filterExportableDependency()
                 val manifestDir =
-                    project.layout.projectDirectory.asFile
+                    layout.projectDirectory.asFile
                         .resolve("exported${extension.name.capitalized()}")
                 val task4: TaskProvider<GenerateExportableManifestTask>? =
                     if (exportablePackage.isNotEmpty()) {
@@ -296,5 +295,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
     ): String =
         buildString {
             append("cinterop${name.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}")
+        }
+
+    private fun Project.resolvePath(destination: File): File =
+        if (destination.isAbsolute) {
+            destination
+        } else {
+            layout.projectDirectory.asFile
+                .resolve(destination)
         }
 }
