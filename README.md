@@ -19,6 +19,9 @@ This project greatly needs feedback and information about the edge case for prog
 - **Import Swift compatible code to Kotlin**: Enable **SPM dependencies** and your **own Swift code** to be exposed directly in your Kotlin code (if compatible).
 - **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages with dependencies.
 
+> [!WARNING]  
+> Pure Swift packages can't be exported to Kotlin; creating a bridge with this plugin is a solution for avoiding this issue.
+
 ---
 
 ## Getting Started
