@@ -33,7 +33,7 @@ Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("io.github.frankois944.spmForKmp").version("0.0.5") // Apply the spmForKmp plugin
+    id("io.github.frankois944.spmForKmp").version("0.0.6") // Apply the spmForKmp plugin
 }
 ```
 
@@ -64,23 +64,43 @@ kotlin {
 
 swiftPackageConfig {
     create("nativeExample") { // same name as the one in `cinterops.create("...")`
-        // add your own swift code and/or your external dependencies, it's optional
+        // add your embedded swift code and/or your external dependencies, it's optional
         dependency(
-            // available only in your own Swift code
             SwiftDependency.Package.Remote.Version(
-                url = "https://github.com/krzyzanowskim/CryptoSwift.git",   // Repository URL
-                names = listOf("CryptoSwift"),                              // Library names
-                version = "1.8.4",                                          // Package version
-            )
-        )
-        dependency(
-            // available in the Swift and Kolin code
+                // Repository URL
+                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                // Libraries from the package
+                products =
+                    listOf(
+                        // FirebaseCore/FirebaseAnalytics is availble on your own&application Swift and Kotlin
+                        ProductPackageConfig(
+                            "FirebaseCore",
+                            "FirebaseAnalytics",
+                            exportToKotlin = true,
+                        ),
+                        ProductPackageConfig(
+                            //Customizable's product configuration
+                            ProductName(name = "FirebaseAppDistribution", // the product name
+                                        alias = "FirebaseAppDistribution-Beta"), // sometimes, the product uses an alias
+                            exportToKotlin = true
+                        ),
+                        // FirebaseDatabase is availble only in your embedded swift code
+                        ProductPackageConfig(
+                            "FirebaseDatabase",
+                            exportToKotlin = false,
+                        ),
+                    ),
+                // (Optional) Package name, can be required in some cases, by default the last element of the url
+                packageName = "firebase-ios-sdk",
+                // Package version
+                version = "11.6.0",
+            ),
             SwiftDependency.Package.Remote.Version(
-                url = "https://github.com/firebase/firebase-ios-sdk.git", // Repository URL
-                names = listOf("FirebaseAnalytics", "FirebaseCore"),     // Libraries from the package
-                packageName = "firebase-ios-sdk",                        // (Optional) Package name, can be required in some cases
-                version = "11.6.0",                                      // Package version
-                exportToKotlin = true                                    // Export to Kotlin for usage in shared Kotlin code
+                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                products = listOf(
+                    ProductPackageConfig("CryptoSwift")
+                ),                           
+                version = "1.8.4",                                         
             )
         )
     }
@@ -99,9 +119,9 @@ For more information, refer to the [SwiftDependency](https://github.com/frankois
 
 ---
 
-### 3. Add your own Swift code
+### 3. Add your embedded Swift code
 
-You can now add your own Swift code in the `src/swift` folder.
+You can now add your embedded Swift code in the `src/swift` folder.
 
 > [!IMPORTANT]
 > Your swift code need to be mark as [@objc/@objcMembers](https://akdebuging.com/posts/what-is-objc-and-objcmember/) and the visibility set as `public`
@@ -125,9 +145,11 @@ swiftPackageConfig {
     create("dummy") {
         dependency(
             SwiftDependency.Package.Remote.Version(
-                url = "https://github.com/krzyzanowskim/CryptoSwift.git",
-                names = listOf("CryptoSwift"),
-                version = "1.8.4",
+                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                products = listOf(
+                    ProductPackageConfig("CryptoSwift")
+                ),                           
+                version = "1.8.4",                                         
             )
         )
     }
@@ -159,8 +181,14 @@ swiftPackageConfig {
         dependency(
             SwiftDependency.Binary.Local(
                 path = "path/to/DummyFramework.xcframework.zip",
-                packageName = "DummyFramework",
-                exportToKotlin = true, // by default false
+                products =
+                    listOf(
+                        // Export to Kotlin for use in shared Kotlin code, false by default
+                        ProductPackageConfig(
+                            "LocalSourceDummyFramework",
+                            exportToKotlin = true,
+                        ),
+                    ),
             ),
         )
     }
