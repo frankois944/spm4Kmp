@@ -35,7 +35,9 @@ public sealed interface SwiftDependency : Serializable {
                 .replace(".git", "")
     }
 
-    public sealed interface Binary : SwiftDependency {
+    public sealed interface Binary :
+        SwiftDependency,
+        Serializable {
         /**
          * Indicates whether this product should be exposed and made available for usage
          * in Kotlin code. Defaults to `false`.
@@ -77,7 +79,9 @@ public sealed interface SwiftDependency : Serializable {
         ) : Binary
     }
 
-    public sealed class Package : SwiftDependency {
+    public sealed class Package :
+        SwiftDependency,
+        Serializable {
         public var productsConfig: ProductPackageConfig = ProductPackageConfigImpl()
             internal set
         internal abstract val products: ProductPackageConfig.() -> Unit
@@ -107,7 +111,9 @@ public sealed interface SwiftDependency : Serializable {
             }
         }
 
-        public sealed class Remote : Package() {
+        public sealed class Remote :
+            Package(),
+            Serializable {
             public open val url: URI = URI("")
 
             /**
@@ -167,6 +173,14 @@ public sealed interface SwiftDependency : Serializable {
                     productsConfig.apply(products)
                 }
             }
+
+            internal companion object {
+                private const val serialVersionUID: Long = 1
+            }
+        }
+
+        internal companion object {
+            private const val serialVersionUID: Long = 1
         }
     }
 }
