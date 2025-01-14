@@ -19,6 +19,9 @@ This project greatly needs feedback and information about the edge case for prog
 - **Import Swift compatible code to Kotlin**: Enable **SPM dependencies** and your **own Swift code** to be exposed directly in your Kotlin code (if compatible).
 - **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages with dependencies.
 
+> [!WARNING]  
+> Pure Swift packages can't be exported to Kotlin; creating a bridge with this plugin is a solution for avoiding this issue.
+
 ---
 
 ## Getting Started
@@ -65,43 +68,44 @@ kotlin {
 swiftPackageConfig {
     create("nativeExample") { // same name as the one in `cinterops.create("...")`
         // add your embedded swift code and/or your external dependencies, it's optional
-        dependency(
+         dependency(
             SwiftDependency.Package.Remote.Version(
                 // Repository URL
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
-                products =
-                    listOf(
-                        // FirebaseCore/FirebaseAnalytics is availble on your own&application Swift and Kotlin
-                        ProductPackageConfig(
-                            "FirebaseCore",
-                            "FirebaseAnalytics",
-                            exportToKotlin = true,
-                        ),
-                        ProductPackageConfig(
-                            //Customizable's product configuration
-                            ProductName(name = "FirebaseAppDistribution", // the product name
-                                        alias = "FirebaseAppDistribution-Beta"), // sometimes, the product uses an alias
-                            exportToKotlin = true
-                        ),
-                        // FirebaseDatabase is availble only in your embedded swift code
-                        ProductPackageConfig(
-                            "FirebaseDatabase",
-                            exportToKotlin = false,
-                        ),
-                    ),
-                // (Optional) Package name, can be required in some cases, by default the last element of the url
+                products = {
+                    // Export to Kotlin for use in shared Kotlin code and use it in your swift code
+                    add("FirebaseCore", "FirebaseAnalytics", exportToKotlin = true)
+                    // Add FirebaseDatabase to your swift code but don't export it
+                    add(ProductName("FirebaseDatabase"))
+                },
+                // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
                 version = "11.6.0",
             ),
+            SwiftDependency.Binary.Local(
+                path = "$testRessources/DummyFramework.xcframework.zip",
+                packageName = "DummyFramework",
+                exportToKotlin = true,
+            ),
+            SwiftDependency.Package.Local(
+                path = "$testRessources/LocalSourceDummyFramework",
+                packageName = "LocalSourceDummyFramework",
+                products = {
+                    // Export to Kotlin for use in shared Kotlin code, false by default
+                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                },
+            ),
             SwiftDependency.Package.Remote.Version(
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                products = listOf(
-                    ProductPackageConfig("CryptoSwift")
-                ),                           
-                version = "1.8.4",                                         
-            )
+                version = "1.8.1",
+                products = {
+                    // Can be only used in your "src/swift" code.
+                    add("CryptoSwift")
+                },
+            ),
+            // see SwiftDependency class for more use cases
         )
     }
 }
@@ -146,9 +150,9 @@ swiftPackageConfig {
         dependency(
             SwiftDependency.Package.Remote.Version(
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                products = listOf(
-                    ProductPackageConfig("CryptoSwift")
-                ),                           
+                products = {
+                    add("CryptoSwift")
+                },                           
                 version = "1.8.4",                                         
             )
         )
@@ -181,14 +185,9 @@ swiftPackageConfig {
         dependency(
             SwiftDependency.Binary.Local(
                 path = "path/to/DummyFramework.xcframework.zip",
-                products =
-                    listOf(
-                        // Export to Kotlin for use in shared Kotlin code, false by default
-                        ProductPackageConfig(
-                            "LocalSourceDummyFramework",
-                            exportToKotlin = true,
-                        ),
-                    ),
+                products = {
+                     add("DummyFramework", exportToKotlin = true)
+                }
             ),
         )
     }
