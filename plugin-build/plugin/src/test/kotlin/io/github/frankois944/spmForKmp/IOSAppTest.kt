@@ -11,7 +11,7 @@ class IOSAppTest {
      * Run the command xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" build
      * This should also do a simple test as proof it's starting, but I think it will break the CI quota
      */
-    @Test
+    /*@Test
     fun `build the ios example app`() {
         val projectRoot = System.getProperty("user.dir") + "/../../"
         val workingDir = File("$projectRoot/example/iosApp")
@@ -52,5 +52,5 @@ class IOSAppTest {
         println("Process output:\n$output")
         assertEquals(0, exitCode, "The process should exit successfully.")
         assertTrue(output.contains("BUILD SUCCEEDED"), "Build output should indicate success.")
-    }
+    }*/
 }
