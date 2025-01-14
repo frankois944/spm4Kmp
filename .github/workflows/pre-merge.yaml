@@ -18,7 +18,7 @@ jobs:
   gradle:
     strategy:
       matrix:
-        os: [ macos-latest-large ]
+        os: [ macos-15 ]
     runs-on: ${{ matrix.os }}
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
