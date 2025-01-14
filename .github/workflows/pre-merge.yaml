@@ -18,7 +18,7 @@ jobs:
   gradle:
     strategy:
       matrix:
-        os: [ macos-15 ]
+        os: [ macos-latest ]
     runs-on: ${{ matrix.os }}
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
@@ -46,7 +46,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            example/build/spmKmpPlugin/scratch
             example/iosApp/spm
             example/iosApp/build
           key: ${{ runner.os }}-example-scratch
