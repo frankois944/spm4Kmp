@@ -2,10 +2,12 @@ package io.github.frankois944.spmForKmp.definition.product.dsl
 
 import io.github.frankois944.spmForKmp.definition.product.ProductConfig
 import io.github.frankois944.spmForKmp.definition.product.ProductName
+import java.io.Serializable
 
-internal class ProductPackageConfigImpl(
+internal data class ProductPackageConfigImpl(
     override var productPackages: MutableList<ProductConfig> = mutableListOf(),
-) : ProductPackageConfig {
+) : ProductPackageConfig,
+    Serializable {
     override fun add(
         vararg products: ProductName,
         exportToKotlin: Boolean,
@@ -28,5 +30,9 @@ internal class ProductPackageConfigImpl(
                 exportToKotlin = exportToKotlin,
             ),
         )
+    }
+
+    internal companion object {
+        private const val serialVersionUID: Long = 1
     }
 }
