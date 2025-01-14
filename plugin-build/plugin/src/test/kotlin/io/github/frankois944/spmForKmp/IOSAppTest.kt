@@ -33,6 +33,7 @@ class IOSAppTest {
                 derivedDataPath.path,
                 "-clonedSourcePackagesDirPath",
                 clonedSourcePackagesDirPath.path,
+                "clean",
                 "build",
             )
 
