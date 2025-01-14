@@ -46,6 +46,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
+            example/build/spmKmpPlugin/scratch
             example/iosApp/spm
             example/iosApp/build
           key: ${{ runner.os }}-example-scratch
@@ -53,6 +54,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Run Gradle tasks
         run: ./gradlew :preMerge :plugin-build:plugin:jacocoTestReport --continue
+      - name: build iosExampleApp
+        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" build
+        working-directory: "example/iosApp"
       - name: Archive test results
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
