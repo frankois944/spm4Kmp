@@ -13,7 +13,7 @@ internal fun List<SwiftDependency>.filterExportableDependency(): List<SwiftDepen
 
                 is SwiftDependency.Package.Local -> {
                     val filteredProducts = swiftDependency.productsConfig.productPackages.filter { it.exportToKotlin }
-                    if (filteredProducts.toMutableList().isNotEmpty()) {
+                    if (filteredProducts.isNotEmpty()) {
                         val newConfig = ProductPackageConfigImpl(filteredProducts.toMutableList())
                         add(swiftDependency.copy().also { it.productsConfig = newConfig })
                     }
@@ -28,14 +28,13 @@ internal fun List<SwiftDependency>.filterExportableDependency(): List<SwiftDepen
 
 private fun MutableList<SwiftDependency>.addFilteredRemotePackage(remotePackage: SwiftDependency.Package.Remote) {
     val filteredProducts = remotePackage.productsConfig.productPackages.filter { it.exportToKotlin }
-    if (filteredProducts.toMutableList().isNotEmpty()) {
+    if (filteredProducts.isNotEmpty()) {
         val newConfig = ProductPackageConfigImpl(filteredProducts.toMutableList())
         when (remotePackage) {
             is SwiftDependency.Package.Remote.Version ->
                 add(
                     remotePackage.copy().also { it.productsConfig = newConfig },
                 )
-
             is SwiftDependency.Package.Remote.Branch -> add(remotePackage.copy().also { it.productsConfig = newConfig })
             is SwiftDependency.Package.Remote.Commit -> add(remotePackage.copy().also { it.productsConfig = newConfig })
         }
