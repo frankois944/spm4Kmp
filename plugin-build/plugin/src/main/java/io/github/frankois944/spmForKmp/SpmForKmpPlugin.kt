@@ -60,239 +60,227 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
             afterEvaluate {
-                val extension =
-                    swiftPackageEntries.firstOrNull()
-                        ?: throw RuntimeException(
-                            "No swiftPackageConfig found, " +
-                                "please declare at least one configuration",
-                        )
-                if (swiftPackageEntries.size > 1) {
-                    logger.warn(
-                        "Only the first entry of swiftPackageConfig is currently supported, " +
-                            "the next will be ignored",
-                    )
-                }
+                val taskGroup = mutableMapOf<CompileTarget, Task>()
+                val dependencyTaskNames = mutableMapOf<String, File>()
+                swiftPackageEntries.forEach { extension ->
 
-                val sourcePackageDir =
-                    layout.buildDirectory.asFile
-                        .get()
-                        .resolve("spmKmpPlugin")
-                        .resolve(extension.name)
-                        .also {
-                            it.mkdirs()
+                    val sourcePackageDir =
+                        layout.buildDirectory.asFile
+                            .get()
+                            .resolve("spmKmpPlugin")
+                            .resolve(extension.name)
+                            .also {
+                                it.mkdirs()
+                            }
+
+                    val packageScratchDir =
+                        resolvePath(sourcePackageDir)
+                            .resolve("scratch")
+                            .also {
+                                it.mkdirs()
+                            }
+
+                    val sharedCacheDir: File? =
+                        extension.sharedCachePath?.run {
+                            resolvePath(File(this))
+                                .also { dir ->
+                                    dir.mkdirs()
+                                }
                         }
 
-                val packageScratchDir =
-                    resolvePath(sourcePackageDir)
-                        .resolve("scratch")
-                        .also {
-                            it.mkdirs()
+                    val sharedConfigDir: File? =
+                        extension.sharedConfigPath?.run {
+                            resolvePath(File(this))
+                                .also { dir ->
+                                    dir.mkdirs()
+                                }
                         }
 
-                val sharedCacheDir: File? =
-                    extension.sharedCachePath?.run {
-                        resolvePath(File(this))
+                    val sharedSecurityDir: File? =
+                        extension.sharedSecurityPath?.run {
+                            resolvePath(File(this))
+                                .also { dir ->
+                                    dir.mkdirs()
+                                }
+                        }
+
+                    val userSourcePackageDir =
+                        resolvePath(File(extension.customPackageSourcePath))
+                            .resolve(extension.name)
                             .also { dir ->
                                 dir.mkdirs()
                             }
-                    }
 
-                val sharedConfigDir: File? =
-                    extension.sharedConfigPath?.run {
-                        resolvePath(File(this))
-                            .also { dir ->
-                                dir.mkdirs()
-                            }
-                    }
-
-                val sharedSecurityDir: File? =
-                    extension.sharedSecurityPath?.run {
-                        resolvePath(File(this))
-                            .also { dir ->
-                                dir.mkdirs()
-                            }
-                    }
-
-                val userSourcePackageDir =
-                    resolvePath(File(extension.customPackageSourcePath))
-                        .also { dir ->
-                            dir.mkdirs()
-                        }
-
-                val manifestTask =
-                    tasks
-                        .register(
-                            // name =
-                            getTaskName(TASK_GENERATE_MANIFEST, extension.name),
-                            // type =
-                            GenerateManifestTask::class.java,
-                        ) { manifest ->
-                            manifest.packageDependencies.set(extension.packageDependencies)
-                            manifest.packageName.set(extension.name)
-                            manifest.minIos.set(extension.minIos)
-                            manifest.minTvos.set(extension.minTvos)
-                            manifest.minMacos.set(extension.minMacos)
-                            manifest.minWatchos.set(extension.minWatchos)
-                            manifest.toolsVersion.set(extension.toolsVersion)
-                            manifest.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
-                            manifest.packageScratchDir.set(packageScratchDir)
-                            manifest.sharedCacheDir.set(sharedCacheDir)
-                            manifest.sharedConfigDir.set(sharedConfigDir)
-                            manifest.sharedSecurityDir.set(sharedSecurityDir)
-                        }
-                val exportablePackage =
-                    extension.packageDependencies.filterExportableDependency()
-                val manifestDir =
-                    layout.projectDirectory.asFile
-                        .resolve("exported${extension.name.capitalized()}")
-                val exportedManifestTask: TaskProvider<GenerateExportableManifestTask>? =
-                    if (exportablePackage.isNotEmpty()) {
+                    val manifestTask =
                         tasks
                             .register(
                                 // name =
-                                getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, extension.name),
+                                getTaskName(TASK_GENERATE_MANIFEST, extension.name),
                                 // type =
-                                GenerateExportableManifestTask::class.java,
+                                GenerateManifestTask::class.java,
                             ) { manifest ->
-                                manifest.packageDependencies.set(exportablePackage)
-                                manifest.packageName.set("exported${extension.name.capitalized()}")
+                                manifest.packageDependencies.set(extension.packageDependencies)
+                                manifest.packageName.set(extension.name)
                                 manifest.minIos.set(extension.minIos)
                                 manifest.minTvos.set(extension.minTvos)
                                 manifest.minMacos.set(extension.minMacos)
                                 manifest.minWatchos.set(extension.minWatchos)
                                 manifest.toolsVersion.set(extension.toolsVersion)
-                                manifestDir.mkdirs()
-                                manifest.manifestFile.set(manifestDir.resolve("Package.swift"))
-                                logger.warn(
-                                    "Spm4Kmp: A local Swift package has been generated in $manifestDir",
-                                )
-                                logger.warn(
-                                    "Please add it to your xcode project as a local package dependency.",
-                                )
+                                manifest.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
+                                manifest.packageScratchDir.set(packageScratchDir)
+                                manifest.sharedCacheDir.set(sharedCacheDir)
+                                manifest.sharedConfigDir.set(sharedConfigDir)
+                                manifest.sharedSecurityDir.set(sharedSecurityDir)
                             }
-                    } else {
-                        manifestDir.deleteRecursively()
-                        null
-                    }
-
-                val taskGroup = mutableMapOf<CompileTarget, Task>()
-                val dependencyTaskNames = mutableMapOf<String, File>()
-
-                val allTargets =
-                    tasks
-                        .withType(CInteropProcess::class.java)
-                        .filter {
-                            it.name.startsWith("cinterop" + extension.name.capitalized())
-                        }.mapNotNull { CompileTarget.byKonanName(it.konanTarget.name) }
-
-                allTargets.forEach { cinteropTarget ->
-                    logger.warn("SETUP $cinteropTarget for ${extension.name}")
-                    val targetBuildDir =
-                        packageScratchDir
-                            .resolve(cinteropTarget.getPackageBuildDir())
-                            .resolve(if (extension.debug) "debug" else "release")
-
-                    val compileTask =
-                        tasks
-                            .register(
-                                // name =
-                                getTaskName(
-                                    TASK_COMPILE_PACKAGE,
-                                    extension.name,
-                                    cinteropTarget,
-                                ),
-                                // type =
-                                CompileSwiftPackageTask::class.java,
-                            ) {
-                                it.manifestFile.set(File(sourcePackageDir, "Package.swift"))
-                                it.target.set(cinteropTarget)
-                                it.debugMode.set(extension.debug)
-                                it.packageScratchDir.set(packageScratchDir)
-                                it.compiledTargetDir.set(targetBuildDir)
-                                it.customSourcePackage.set(userSourcePackageDir)
-                                it.osVersion.set(
-                                    cinteropTarget.getOsVersion(
-                                        minIos = extension.minIos,
-                                        minWatchos = extension.minWatchos,
-                                        minTvos = extension.minTvos,
-                                        minMacos = extension.minMacos,
-                                    ),
-                                )
-                                it.sharedCacheDir.set(sharedCacheDir)
-                                it.sharedConfigDir.set(sharedConfigDir)
-                                it.sharedSecurityDir.set(sharedSecurityDir)
-                            }
-
-                    val definitionTask =
-                        tasks
-                            .register(
-                                // name =
-                                getTaskName(
-                                    task = TASK_GENERATE_CINTEROP_DEF,
-                                    extension = extension.name,
-                                    cinteropTarget = cinteropTarget,
-                                ),
-                                // type =
-                                GenerateCInteropDefinitionTask::class.java,
-                            ) {
-                                it.compiledBinary.set(targetBuildDir.resolve("lib${extension.name}.a"))
-                                it.target.set(cinteropTarget)
-                                it.productName.set(extension.name)
-                                it.packages.set(extension.packageDependencies)
-                                it.debugMode.set(extension.debug)
-                                it.osVersion.set(
-                                    cinteropTarget.getOsVersion(
-                                        minIos = extension.minIos,
-                                        minWatchos = extension.minWatchos,
-                                        minTvos = extension.minTvos,
-                                        minMacos = extension.minMacos,
-                                    ),
-                                )
-                                it.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
-                                it.scratchDir.set(packageScratchDir)
-                            }
-
-                    val dependenciesFiles = definitionTask.get().outputFiles
-                    if (dependenciesFiles.isNotEmpty()) {
-                        val ktTarget =
-                            kotlinExtension.targets.findByName(cinteropTarget.name) as? KotlinNativeTarget
-                        if (ktTarget != null) {
-                            val mainCompilation = ktTarget.compilations.getByName("main")
-                            dependenciesFiles.forEachIndexed { index, file ->
-                                val fullTaskName =
-                                    if (index > 0) {
-                                        val cinteropName = file.nameWithoutExtension + extension.name.capitalized()
-                                        // create cinterop tasks for the dependencies
-                                        mainCompilation.cinterops.create(
-                                            cinteropName,
-                                        ) { settings ->
-                                            settings.definitionFile.set(file)
-                                        }
-                                        getCInteropTaskName(cinteropName, cinteropTarget)
-                                    } else {
-                                        getCInteropTaskName(file.nameWithoutExtension, cinteropTarget)
-                                    }
-                                // store the cinterop task name for retrieving the file later
-                                dependencyTaskNames[fullTaskName] = file
-                            }
+                    val exportablePackage =
+                        extension.packageDependencies.filterExportableDependency()
+                    val manifestDir =
+                        layout.projectDirectory.asFile
+                            .resolve("exported${extension.name.capitalized()}")
+                    val exportedManifestTask: TaskProvider<GenerateExportableManifestTask>? =
+                        if (exportablePackage.isNotEmpty()) {
+                            tasks
+                                .register(
+                                    // name =
+                                    getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, extension.name),
+                                    // type =
+                                    GenerateExportableManifestTask::class.java,
+                                ) { manifest ->
+                                    manifest.packageDependencies.set(exportablePackage)
+                                    manifest.packageName.set("exported${extension.name.capitalized()}")
+                                    manifest.minIos.set(extension.minIos)
+                                    manifest.minTvos.set(extension.minTvos)
+                                    manifest.minMacos.set(extension.minMacos)
+                                    manifest.minWatchos.set(extension.minWatchos)
+                                    manifest.toolsVersion.set(extension.toolsVersion)
+                                    manifestDir.mkdirs()
+                                    manifest.manifestFile.set(manifestDir.resolve("Package.swift"))
+                                    logger.warn(
+                                        "Spm4Kmp: A local Swift package has been generated in $manifestDir",
+                                    )
+                                    logger.warn(
+                                        "Please add it to your xcode project as a local package dependency.",
+                                    )
+                                }
+                        } else {
+                            manifestDir.deleteRecursively()
+                            null
                         }
 
-                        taskGroup[cinteropTarget] =
-                            definitionTask
-                                .get()
-                                .dependsOn(
-                                    compileTask
-                                        .get()
-                                        .dependsOn(
-                                            listOfNotNull(
-                                                manifestTask.get(),
-                                                exportedManifestTask?.get(),
-                                            ),
+                    val allTargets =
+                        tasks
+                            .withType(CInteropProcess::class.java)
+                            .filter {
+                                it.name.startsWith("cinterop" + extension.name.capitalized())
+                            }.mapNotNull { CompileTarget.byKonanName(it.konanTarget.name) }
+
+                    allTargets.forEach { cinteropTarget ->
+                        val targetBuildDir =
+                            packageScratchDir
+                                .resolve(cinteropTarget.getPackageBuildDir())
+                                .resolve(if (extension.debug) "debug" else "release")
+
+                        val compileTask =
+                            tasks
+                                .register(
+                                    // name =
+                                    getTaskName(
+                                        TASK_COMPILE_PACKAGE,
+                                        extension.name,
+                                        cinteropTarget,
+                                    ),
+                                    // type =
+                                    CompileSwiftPackageTask::class.java,
+                                ) {
+                                    it.manifestFile.set(File(sourcePackageDir, "Package.swift"))
+                                    it.target.set(cinteropTarget)
+                                    it.debugMode.set(extension.debug)
+                                    it.packageScratchDir.set(packageScratchDir)
+                                    it.compiledTargetDir.set(targetBuildDir)
+                                    it.customSourcePackage.set(userSourcePackageDir)
+                                    it.osVersion.set(
+                                        cinteropTarget.getOsVersion(
+                                            minIos = extension.minIos,
+                                            minWatchos = extension.minWatchos,
+                                            minTvos = extension.minTvos,
+                                            minMacos = extension.minMacos,
                                         ),
-                                )
+                                    )
+                                    it.sharedCacheDir.set(sharedCacheDir)
+                                    it.sharedConfigDir.set(sharedConfigDir)
+                                    it.sharedSecurityDir.set(sharedSecurityDir)
+                                }
+
+                        val definitionTask =
+                            tasks
+                                .register(
+                                    // name =
+                                    getTaskName(
+                                        task = TASK_GENERATE_CINTEROP_DEF,
+                                        extension = extension.name,
+                                        cinteropTarget = cinteropTarget,
+                                    ),
+                                    // type =
+                                    GenerateCInteropDefinitionTask::class.java,
+                                ) {
+                                    it.compiledBinary.set(targetBuildDir.resolve("lib${extension.name}.a"))
+                                    it.target.set(cinteropTarget)
+                                    it.productName.set(extension.name)
+                                    it.packages.set(extension.packageDependencies)
+                                    it.debugMode.set(extension.debug)
+                                    it.osVersion.set(
+                                        cinteropTarget.getOsVersion(
+                                            minIos = extension.minIos,
+                                            minWatchos = extension.minWatchos,
+                                            minTvos = extension.minTvos,
+                                            minMacos = extension.minMacos,
+                                        ),
+                                    )
+                                    it.manifestFile.set(sourcePackageDir.resolve("Package.swift"))
+                                    it.scratchDir.set(packageScratchDir)
+                                }
+
+                        val dependenciesFiles = definitionTask.get().outputFiles
+                        if (dependenciesFiles.isNotEmpty()) {
+                            val ktTarget =
+                                kotlinExtension.targets.findByName(cinteropTarget.name) as? KotlinNativeTarget
+                            if (ktTarget != null) {
+                                val mainCompilation = ktTarget.compilations.getByName("main")
+                                dependenciesFiles.forEachIndexed { index, file ->
+                                    val fullTaskName =
+                                        if (index > 0) {
+                                            val cinteropName = file.nameWithoutExtension + extension.name.capitalized()
+                                            // create cinterop tasks for the dependencies
+                                            mainCompilation.cinterops.create(
+                                                cinteropName,
+                                            ) { settings ->
+                                                settings.definitionFile.set(file)
+                                            }
+                                            getCInteropTaskName(cinteropName, cinteropTarget)
+                                        } else {
+                                            getCInteropTaskName(file.nameWithoutExtension, cinteropTarget)
+                                        }
+                                    // store the cinterop task name for retrieving the file later
+                                    dependencyTaskNames[fullTaskName] = file
+                                }
+                            }
+
+                            taskGroup[cinteropTarget] =
+                                definitionTask
+                                    .get()
+                                    .dependsOn(
+                                        compileTask
+                                            .get()
+                                            .dependsOn(
+                                                listOfNotNull(
+                                                    manifestTask.get(),
+                                                    exportedManifestTask?.get(),
+                                                ),
+                                            ),
+                                    )
+                        }
                     }
                 }
-
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
                     cinterop.onlyIf {

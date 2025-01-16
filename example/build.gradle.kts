@@ -30,7 +30,21 @@ kotlin {
         }
         it.compilations {
             val main by getting {
-                cinterops.create("nativeShared")
+                cinterops.create("nativeIosShared")
+            }
+        }
+    }
+
+    listOf(
+        macosArm64(),
+    ).forEach {
+        it.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        it.compilations {
+            val main by getting {
+                cinterops.create("nativeMacosShared")
             }
         }
     }
@@ -72,7 +86,7 @@ android {
 }
 val testRessources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
-    create("nativeShared") {
+    create("nativeIosShared") {
         // optional parameters
         // the ios minimal version
         // minIos = "12.0"
@@ -126,8 +140,8 @@ swiftPackageConfig {
             // see SwiftDependency class for more use cases
         )
     }
-    /*create("nativeSimulatorShared") {
-        dependency(
+    create("nativeMacosShared") {
+        /*dependency(
             SwiftDependency.Package.Local(
                 path = "$testRessources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
@@ -136,6 +150,6 @@ swiftPackageConfig {
                     add("LocalSourceDummyFramework", exportToKotlin = false)
                 },
             ),
-        )
-    }*/
+        )*/
+    }
 }
