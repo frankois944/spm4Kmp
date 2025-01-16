@@ -46,7 +46,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            example/build/spmKmpPlugin/scratch
+            example/build/spmKmpPlugin
             example/iosApp/spm
             example/iosApp/build
           key: ${{ runner.os }}-example-scratch

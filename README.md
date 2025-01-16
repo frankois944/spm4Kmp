@@ -36,7 +36,7 @@ Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("io.github.frankois944.spmForKmp").version("0.0.6") // Apply the spmForKmp plugin
+    id("io.github.frankois944.spmForKmp").version("0.0.8") // Apply the spmForKmp plugin
 }
 ```
 
@@ -101,7 +101,7 @@ swiftPackageConfig {
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 version = "1.8.1",
                 products = {
-                    // Can be only used in your "src/swift" code.
+                    // Can be only used in your "src/swift/nativeExample" code.
                     add("CryptoSwift")
                 },
             ),
@@ -125,7 +125,7 @@ For more information, refer to the [SwiftDependency](https://github.com/frankois
 
 ### 3. Add your embedded Swift code
 
-You can now add your embedded Swift code in the `src/swift` folder.
+You can now add your embedded Swift code in the `src/swift/[cinteropname]` folder.
 
 > [!IMPORTANT]
 > Your swift code need to be mark as [@objc/@objcMembers](https://akdebuging.com/posts/what-is-objc-and-objcmember/) and the visibility set as `public`
@@ -163,7 +163,7 @@ swiftPackageConfig {
 ```swift
 import Foundation
 import CryptoSwift
-// inside the folder src/swift
+// inside the folder src/swift/dummy
 // the class will be automatically accessible from your Kotlin code
 @objcMembers public class MySwiftDummyClassWithDependencies: NSObject {
     public func toMD5(value: String) -> String {
@@ -204,6 +204,44 @@ swiftPackageConfig {
 > ```
 > Add the folder to your project as a Local package, that's all.
 
+
+### 4. Configuration by target
+
+You can set a different configuration for each each target you manage.
+
+```kotlin
+listOf(
+    iosX64(),
+    iosSimulatorArm64(),
+).forEach {
+    it.compilations {
+        val main by getting {
+            cinterops.create("nativeIosShared") // a config for iOS
+        }
+    }
+}
+
+listOf(
+    macosArm64(),
+).forEach {
+    it.compilations {
+        val main by getting {
+            cinterops.create("nativeMacosShared") // a config for macos
+        }
+    }
+}
+
+swiftPackageConfig {
+    create("nativeIosShared") {
+        // your embedded swift is inside the folder src/swift/nativeIosShared
+        // your config for iOS
+    }
+    create("nativeMacosShared") {
+        // your embedded swift is inside the folder src/swift/nativeMacosShared
+        // your config for macOS
+    }
+}
+```
 
 ---
 
