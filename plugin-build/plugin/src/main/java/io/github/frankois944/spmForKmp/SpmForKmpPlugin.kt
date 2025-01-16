@@ -59,20 +59,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
             val kotlinExtension =
                 extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
-            val sourcePackageDir =
-                layout.buildDirectory.asFile
-                    .get()
-                    .resolve("spmKmpPlugin")
-                    .also {
-                        it.mkdirs()
-                    }
-
-            val packageScratchDir =
-                resolvePath(sourcePackageDir)
-                    .resolve("scratch")
-                    .also {
-                        it.mkdirs()
-                    }
             afterEvaluate {
                 val extension =
                     swiftPackageEntries.firstOrNull()
@@ -86,6 +72,22 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             "the next will be ignored",
                     )
                 }
+
+                val sourcePackageDir =
+                    layout.buildDirectory.asFile
+                        .get()
+                        .resolve("spmKmpPlugin")
+                        .resolve(extension.name)
+                        .also {
+                            it.mkdirs()
+                        }
+
+                val packageScratchDir =
+                    resolvePath(sourcePackageDir)
+                        .resolve("scratch")
+                        .also {
+                            it.mkdirs()
+                        }
 
                 val sharedCacheDir: File? =
                     extension.sharedCachePath?.run {
@@ -179,7 +181,9 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val allTargets =
                     tasks
                         .withType(CInteropProcess::class.java)
-                        .mapNotNull { CompileTarget.byKonanName(it.konanTarget.name) }
+                        .filter {
+                            it.name.startsWith("cinterop" + extension.name.capitalized())
+                        }.mapNotNull { CompileTarget.byKonanName(it.konanTarget.name) }
 
                 allTargets.forEach { cinteropTarget ->
                     logger.warn("SETUP $cinteropTarget for ${extension.name}")

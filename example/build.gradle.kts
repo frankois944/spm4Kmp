@@ -1,4 +1,3 @@
-
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -22,7 +21,7 @@ kotlin {
     }
 
     listOf(
-        // iosArm64(),
+        iosX64(),
         iosSimulatorArm64(),
     ).forEach {
         it.binaries.framework {
@@ -127,4 +126,16 @@ swiftPackageConfig {
             // see SwiftDependency class for more use cases
         )
     }
+    /*create("nativeSimulatorShared") {
+        dependency(
+            SwiftDependency.Package.Local(
+                path = "$testRessources/LocalSourceDummyFramework",
+                packageName = "LocalSourceDummyFramework",
+                products = {
+                    // Export to Kotlin for use in shared Kotlin code, false by default
+                    add("LocalSourceDummyFramework", exportToKotlin = false)
+                },
+            ),
+        )
+    }*/
 }
