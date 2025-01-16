@@ -101,7 +101,7 @@ swiftPackageConfig {
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 version = "1.8.1",
                 products = {
-                    // Can be only used in your "src/swift" code.
+                    // Can be only used in your "src/swift/nativeExample" code.
                     add("CryptoSwift")
                 },
             ),
@@ -125,7 +125,7 @@ For more information, refer to the [SwiftDependency](https://github.com/frankois
 
 ### 3. Add your embedded Swift code
 
-You can now add your embedded Swift code in the `src/swift` folder.
+You can now add your embedded Swift code in the `src/swift/[cinteropname]` folder.
 
 > [!IMPORTANT]
 > Your swift code need to be mark as [@objc/@objcMembers](https://akdebuging.com/posts/what-is-objc-and-objcmember/) and the visibility set as `public`
@@ -163,7 +163,7 @@ swiftPackageConfig {
 ```swift
 import Foundation
 import CryptoSwift
-// inside the folder src/swift
+// inside the folder src/swift/dummy
 // the class will be automatically accessible from your Kotlin code
 @objcMembers public class MySwiftDummyClassWithDependencies: NSObject {
     public func toMD5(value: String) -> String {
@@ -233,10 +233,12 @@ listOf(
 
 swiftPackageConfig {
     create("nativeIosShared") {
-        // your config
+        // your embedded is inside the folder src/swift/nativeIosShared
+        // your config for iOS
     }
     create("nativeMacosShared") {
-        // your config
+        // your embedded is inside the folder src/swift/nativeMacosShared
+        // your config for macOS
     }
 }
 ```
