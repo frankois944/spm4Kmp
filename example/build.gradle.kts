@@ -141,7 +141,7 @@ swiftPackageConfig {
         )
     }
     create("nativeMacosShared") {
-        /*dependency(
+        dependency(
             SwiftDependency.Package.Local(
                 path = "$testRessources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
@@ -150,6 +150,6 @@ swiftPackageConfig {
                     add("LocalSourceDummyFramework", exportToKotlin = false)
                 },
             ),
-        )*/
+        )
     }
 }
