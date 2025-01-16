@@ -4,7 +4,7 @@ package com.example
 
 import FirebaseAnalytics.FIRConsentStatusGranted
 import kotlinx.cinterop.BetaInteropApi
-import nativeShared.TestClass
+import nativeIosShared.TestClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

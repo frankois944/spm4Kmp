@@ -1,4 +1,3 @@
-
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -22,7 +21,7 @@ kotlin {
     }
 
     listOf(
-        // iosArm64(),
+        iosX64(),
         iosSimulatorArm64(),
     ).forEach {
         it.binaries.framework {
@@ -31,7 +30,21 @@ kotlin {
         }
         it.compilations {
             val main by getting {
-                cinterops.create("nativeShared")
+                cinterops.create("nativeIosShared")
+            }
+        }
+    }
+
+    listOf(
+        macosArm64(),
+    ).forEach {
+        it.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        it.compilations {
+            val main by getting {
+                cinterops.create("nativeMacosShared")
             }
         }
     }
@@ -73,7 +86,7 @@ android {
 }
 val testRessources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
-    create("nativeShared") {
+    create("nativeIosShared") {
         // optional parameters
         // the ios minimal version
         // minIos = "12.0"
@@ -126,5 +139,17 @@ swiftPackageConfig {
             ),
             // see SwiftDependency class for more use cases
         )
+    }
+    create("nativeMacosShared") {
+        /*dependency(
+            SwiftDependency.Package.Local(
+                path = "$testRessources/LocalSourceDummyFramework",
+                packageName = "LocalSourceDummyFramework",
+                products = {
+                    // Export to Kotlin for use in shared Kotlin code, false by default
+                    add("LocalSourceDummyFramework", exportToKotlin = false)
+                },
+            ),
+        )*/
     }
 }

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.publish) apply false
     alias(libs.plugins.androidLibrary) apply false
+    id("com.dorongold.task-tree").version("4.0.0")
 }
 
 subprojects {

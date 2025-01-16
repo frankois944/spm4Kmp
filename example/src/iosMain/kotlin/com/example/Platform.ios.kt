@@ -5,8 +5,8 @@ package com.example
 import FirebaseAnalytics.FIRConsentStatusGranted
 import FirebaseCore.FIRApp
 import kotlinx.cinterop.ExperimentalForeignApi
-import nativeShared.MySwiftDummyClass
-import nativeShared.TestClass
+import nativeIosShared.MySwiftDummyClass
+import nativeIosShared.TestClass
 import platform.UIKit.UIDevice
 
 class IOSPlatform : Platform {
