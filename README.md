@@ -205,6 +205,42 @@ swiftPackageConfig {
 > Add the folder to your project as a Local package, that's all.
 
 
+### 4. Configuration by target
+
+You can set a different configuration for each each target you manage.
+
+```kotlin
+listOf(
+    iosX64(),
+    iosSimulatorArm64(),
+).forEach {
+    it.compilations {
+        val main by getting {
+            cinterops.create("nativeIosShared") // a config for iOS
+        }
+    }
+}
+
+listOf(
+    macosArm64(),
+).forEach {
+    it.compilations {
+        val main by getting {
+            cinterops.create("nativeMacosShared") // a config for macos
+        }
+    }
+}
+
+swiftPackageConfig {
+    create("nativeIosShared") {
+        // your config
+    }
+    create("nativeMacosShared") {
+        // your config
+    }
+}
+```
+
 ---
 
 ## License
