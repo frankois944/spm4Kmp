@@ -233,11 +233,11 @@ listOf(
 
 swiftPackageConfig {
     create("nativeIosShared") {
-        // your embedded is inside the folder src/swift/nativeIosShared
+        // your embedded swift is inside the folder src/swift/nativeIosShared
         // your config for iOS
     }
     create("nativeMacosShared") {
-        // your embedded is inside the folder src/swift/nativeMacosShared
+        // your embedded swift is inside the folder src/swift/nativeMacosShared
         // your config for macOS
     }
 }
