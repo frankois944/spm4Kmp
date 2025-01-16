@@ -117,7 +117,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             dir.mkdirs()
                         }
 
-                val task1 =
+                val manifestTask =
                     tasks
                         .register(
                             // name =
@@ -143,7 +143,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val manifestDir =
                     layout.projectDirectory.asFile
                         .resolve("exported${extension.name.capitalized()}")
-                val task4: TaskProvider<GenerateExportableManifestTask>? =
+                val exportedManifestTask: TaskProvider<GenerateExportableManifestTask>? =
                     if (exportablePackage.isNotEmpty()) {
                         tasks
                             .register(
@@ -176,13 +176,19 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val taskGroup = mutableMapOf<CompileTarget, Task>()
                 val dependencyTaskNames = mutableMapOf<String, File>()
 
-                CompileTarget.entries.forEach { cinteropTarget ->
+                val allTargets =
+                    tasks
+                        .withType(CInteropProcess::class.java)
+                        .mapNotNull { CompileTarget.byKonanName(it.konanTarget.name) }
+
+                allTargets.forEach { cinteropTarget ->
+                    logger.warn("SETUP $cinteropTarget for ${extension.name}")
                     val targetBuildDir =
                         packageScratchDir
                             .resolve(cinteropTarget.getPackageBuildDir())
                             .resolve(if (extension.debug) "debug" else "release")
 
-                    val task2 =
+                    val compileTask =
                         tasks
                             .register(
                                 // name =
@@ -209,7 +215,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 it.sharedSecurityDir.set(sharedSecurityDir)
                             }
 
-                    val task3 =
+                    val definitionTask =
                         tasks
                             .register(
                                 // name =
@@ -234,7 +240,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 it.scratchDir.set(packageScratchDir)
                             }
 
-                    val dependenciesFiles = task3.get().outputFiles
+                    val dependenciesFiles = definitionTask.get().outputFiles
                     if (dependenciesFiles.isNotEmpty()) {
                         val ktTarget =
                             kotlinExtension.targets.findByName(cinteropTarget.name) as? KotlinNativeTarget
@@ -257,12 +263,17 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         }
 
                         taskGroup[cinteropTarget] =
-                            task3
+                            definitionTask
                                 .get()
                                 .dependsOn(
-                                    task2
+                                    compileTask
                                         .get()
-                                        .dependsOn(listOfNotNull(task1.get(), task4?.get())),
+                                        .dependsOn(
+                                            listOfNotNull(
+                                                manifestTask.get(),
+                                                exportedManifestTask?.get(),
+                                            ),
+                                        ),
                                 )
                     }
                 }
@@ -276,6 +287,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         CompileTarget.byKonanName(cinterop.konanTarget.name)
                             ?: return@configureEach
                     cinterop.dependsOn(taskGroup[cinteropTarget])
+                    cinterop.mustRunAfter(taskGroup[cinteropTarget])
                     val definitionFile = dependencyTaskNames[cinterop.name]
                     cinterop.settings.definitionFile.set(definitionFile)
                 }
