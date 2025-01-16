@@ -47,7 +47,7 @@ abstract class SmpKMPTestFixture private constructor(
             .withRootProject {
                 setupProperties()
             }.withSubproject("library") {
-                setupSources()
+                setupSources(extension.cinteropsName)
                 setupGradleConfig(extension)
             }.write()
 
@@ -73,10 +73,10 @@ org.gradle.caching=true
         )
     }
 
-    private fun Subproject.Builder.setupSources() {
+    private fun Subproject.Builder.setupSources(cinteropsName: String) {
         configuration.swiftSources.forEach { source ->
             withFile(
-                "src/swift/${source.filename}",
+                "src/swift/$cinteropsName/${source.filename}",
                 source.content,
             )
         }
