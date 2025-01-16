@@ -23,7 +23,7 @@ import java.io.File
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
 
-internal const val EXTENSION_NAME: String = "swiftPackageConfig"
+internal const val PLUGIN_NAME: String = "swiftPackageConfig"
 internal const val TASK_GENERATE_MANIFEST: String = "generateSwiftPackage"
 internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
@@ -54,7 +54,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     typeOf<NamedDomainObjectContainer<PackageRootDefinitionExtension>>().javaType,
                 )
 
-            extensions.add(type, EXTENSION_NAME, swiftPackageEntries)
+            extensions.add(type, PLUGIN_NAME, swiftPackageEntries)
 
             val kotlinExtension =
                 extensions.getByName("kotlin") as KotlinMultiplatformExtension
@@ -123,7 +123,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     tasks
                         .register(
                             // name =
-                            getTaskName(TASK_GENERATE_MANIFEST),
+                            getTaskName(TASK_GENERATE_MANIFEST, extension.name),
                             // type =
                             GenerateManifestTask::class.java,
                         ) { manifest ->
@@ -150,7 +150,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         tasks
                             .register(
                                 // name =
-                                getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE),
+                                getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, extension.name),
                                 // type =
                                 GenerateExportableManifestTask::class.java,
                             ) { manifest ->
@@ -196,7 +196,11 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         tasks
                             .register(
                                 // name =
-                                getTaskName(TASK_COMPILE_PACKAGE, cinteropTarget),
+                                getTaskName(
+                                    TASK_COMPILE_PACKAGE,
+                                    extension.name,
+                                    cinteropTarget,
+                                ),
                                 // type =
                                 CompileSwiftPackageTask::class.java,
                             ) {
@@ -223,7 +227,11 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         tasks
                             .register(
                                 // name =
-                                getTaskName(TASK_GENERATE_CINTEROP_DEF, cinteropTarget),
+                                getTaskName(
+                                    task = TASK_GENERATE_CINTEROP_DEF,
+                                    extension = extension.name,
+                                    cinteropTarget = cinteropTarget,
+                                ),
                                 // type =
                                 GenerateCInteropDefinitionTask::class.java,
                             ) {
@@ -251,17 +259,20 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         if (ktTarget != null) {
                             val mainCompilation = ktTarget.compilations.getByName("main")
                             dependenciesFiles.forEachIndexed { index, file ->
-                                if (index > 0) {
-                                    // create cinterop tasks for the dependencies
-                                    mainCompilation.cinterops.create(
-                                        file.nameWithoutExtension,
-                                    ) { settings ->
-                                        settings.definitionFile.set(file)
-                                    }
-                                }
-                                // store the cinterop task name for retrieving the file later
                                 val fullTaskName =
-                                    getCInteropTaskName(file.nameWithoutExtension, cinteropTarget)
+                                    if (index > 0) {
+                                        val cinteropName = file.nameWithoutExtension + extension.name.capitalized()
+                                        // create cinterop tasks for the dependencies
+                                        mainCompilation.cinterops.create(
+                                            cinteropName,
+                                        ) { settings ->
+                                            settings.definitionFile.set(file)
+                                        }
+                                        getCInteropTaskName(cinteropName, cinteropTarget)
+                                    } else {
+                                        getCInteropTaskName(file.nameWithoutExtension, cinteropTarget)
+                                    }
+                                // store the cinterop task name for retrieving the file later
                                 dependencyTaskNames[fullTaskName] = file
                             }
                         }
@@ -300,18 +311,16 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
     private fun getTaskName(
         task: String,
+        extension: String,
         cinteropTarget: CompileTarget? = null,
-    ) = "${EXTENSION_NAME.capitalized()}${task.capitalized()}${
+    ) = "${PLUGIN_NAME.capitalized()}${extension.capitalized()}${task.capitalized()}${
         cinteropTarget?.name?.capitalized().orEmpty()
     }"
 
     private fun getCInteropTaskName(
         name: String,
         cinteropTarget: CompileTarget?,
-    ): String =
-        buildString {
-            append("cinterop${name.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}")
-        }
+    ): String = "cinterop${name.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}"
 
     private fun Project.resolvePath(destination: File): File =
         if (destination.isAbsolute) {
