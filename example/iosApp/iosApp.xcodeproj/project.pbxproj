@@ -10,9 +10,7 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		071933DE2D3008430094EBEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 071933DD2D3008420094EBEA /* GoogleService-Info.plist */; };
-		0761297D2D367C4700EF3B7A /* exportedNativeShared in Frameworks */ = {isa = PBXBuildFile; productRef = 0761297C2D367C4700EF3B7A /* exportedNativeShared */; };
 		078D6ADA2D394DD700DB6AA1 /* exportedNativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = 078D6AD92D394DD700DB6AA1 /* exportedNativeIosShared */; };
-		07F159482D34340E0047AB80 /* exportedNativeShared in Frameworks */ = {isa = PBXBuildFile; productRef = 07F159472D34340E0047AB80 /* exportedNativeShared */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -32,9 +30,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07F159482D34340E0047AB80 /* exportedNativeShared in Frameworks */,
 				078D6ADA2D394DD700DB6AA1 /* exportedNativeIosShared in Frameworks */,
-				0761297D2D367C4700EF3B7A /* exportedNativeShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,17 +390,9 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0761297C2D367C4700EF3B7A /* exportedNativeShared */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = exportedNativeShared;
-		};
 		078D6AD92D394DD700DB6AA1 /* exportedNativeIosShared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = exportedNativeIosShared;
-		};
-		07F159472D34340E0047AB80 /* exportedNativeShared */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = exportedNativeShared;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
