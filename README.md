@@ -28,7 +28,7 @@ This project greatly needs feedback and information about the edge case for prog
 
 ## Getting Started
 
-A fully working sample is [available](https://github.com/frankois944/spm4Kmp/tree/main/example) as a playground.
+A fully working sample is [available](https://github.com/frankois944/spm4Kmp/tree/main/example) as a playground and an sample with CMP/Firebase [here](https://github.com/frankois944/FirebaseKmpDemo).
 
 ### 1. Apply the Plugin
 
