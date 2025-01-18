@@ -12,11 +12,18 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
+    init {
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
+
     @get:InputFile
     abstract val manifestFile: Property<File>
 

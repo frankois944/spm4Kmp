@@ -2,6 +2,7 @@
 
 package io.github.frankois944.spmForKmp
 
+import io.github.frankois944.spmForKmp.config.getAndCreateFakeDefinitionFile
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
@@ -176,7 +177,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
                         val outputFiles = definitionTask.get().outputFiles
 
-                        if (outputFiles.isNotEmpty()) {
+                        if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
                             val ktTarget =
                                 kotlinExtension.targets.findByName(cinteropTarget.name) as KotlinNativeTarget
                             val mainCompilation = ktTarget.compilations.getByName("main")
@@ -216,16 +217,21 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 }
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
-                    cinterop.onlyIf {
-                        plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")
+                    if (HostManager.hostIsMac) {
+                        val cinteropTarget =
+                            CompileTarget.byKonanName(cinterop.konanTarget.name)
+                                ?: return@configureEach
+                        cinterop.dependsOn(taskGroup[cinteropTarget])
+                        cinterop.mustRunAfter(taskGroup[cinteropTarget])
+                        val definitionFile = dependencyTaskNames[cinterop.name]
+                        cinterop.settings.definitionFile.set(definitionFile)
+                    } else {
+                        // the KMP plugin is expected a def file.
+                        // for cheating with it, using a empty one should be fine.
+                        // as it's no use with other plateform than macos
+                        val fakeDefFile = getAndCreateFakeDefinitionFile()
+                        cinterop.settings.definitionFile.set(fakeDefFile)
                     }
-                    val cinteropTarget =
-                        CompileTarget.byKonanName(cinterop.konanTarget.name)
-                            ?: return@configureEach
-                    cinterop.dependsOn(taskGroup[cinteropTarget])
-                    cinterop.mustRunAfter(taskGroup[cinteropTarget])
-                    val definitionFile = dependencyTaskNames[cinterop.name]
-                    cinterop.settings.definitionFile.set(definitionFile)
                 }
             }
         }

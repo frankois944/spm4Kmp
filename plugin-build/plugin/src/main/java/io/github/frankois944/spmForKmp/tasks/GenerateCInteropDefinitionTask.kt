@@ -16,9 +16,16 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
+    init {
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
+
     @get:Input
     abstract val target: Property<CompileTarget>
 

@@ -13,10 +13,17 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
+    init {
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
+
     @get:Input
     abstract val packageDependencies: ListProperty<SwiftDependency>
 
