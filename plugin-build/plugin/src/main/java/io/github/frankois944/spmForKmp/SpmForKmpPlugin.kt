@@ -61,55 +61,25 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
             afterEvaluate {
                 val taskGroup = mutableMapOf<CompileTarget, Task>()
+                val exportManifestTask = mutableMapOf<String, Task>()
                 val dependencyTaskNames = mutableMapOf<String, File>()
                 swiftPackageEntries.forEach { extension ->
 
                     val sourcePackageDir =
-                        layout.buildDirectory.asFile
-                            .get()
-                            .resolve("spmKmpPlugin")
-                            .resolve(extension.name)
-                            .also {
-                                it.mkdirs()
-                            }
+                        resolveAndCreateDir(
+                            layout.buildDirectory.asFile.get(),
+                            "spmKmpPlugin/${extension.name}",
+                        )
 
-                    val packageScratchDir =
-                        resolvePath(sourcePackageDir)
-                            .resolve("scratch")
-                            .also {
-                                it.mkdirs()
-                            }
-
-                    val sharedCacheDir: File? =
-                        extension.sharedCachePath?.run {
-                            resolvePath(File(this))
-                                .also { dir ->
-                                    dir.mkdirs()
-                                }
-                        }
-
-                    val sharedConfigDir: File? =
-                        extension.sharedConfigPath?.run {
-                            resolvePath(File(this))
-                                .also { dir ->
-                                    dir.mkdirs()
-                                }
-                        }
-
-                    val sharedSecurityDir: File? =
-                        extension.sharedSecurityPath?.run {
-                            resolvePath(File(this))
-                                .also { dir ->
-                                    dir.mkdirs()
-                                }
-                        }
-
+                    val packageScratchDir = resolveAndCreateDir(sourcePackageDir, "scratch")
+                    val sharedCacheDir: File? = extension.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
+                    val sharedConfigDir: File? = extension.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
+                    val sharedSecurityDir: File? = extension.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
                     val userSourcePackageDir =
-                        resolvePath(File(extension.customPackageSourcePath))
-                            .resolve(extension.name)
-                            .also { dir ->
-                                dir.mkdirs()
-                            }
+                        resolveAndCreateDir(
+                            File(extension.customPackageSourcePath),
+                            extension.name,
+                        )
 
                     val manifestTask =
                         tasks
@@ -317,4 +287,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
             layout.projectDirectory.asFile
                 .resolve(destination)
         }
+
+    private fun Project.resolveAndCreateDir(
+        base: File,
+        nestedPath: String? = null,
+    ): File {
+        val resolved = resolvePath(base).let { if (nestedPath != null) it.resolve(nestedPath) else it }
+        resolved.mkdirs()
+        return resolved
+    }
 }
