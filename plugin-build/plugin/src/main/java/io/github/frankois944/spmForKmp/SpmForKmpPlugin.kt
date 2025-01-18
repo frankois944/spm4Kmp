@@ -54,10 +54,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
             afterEvaluate {
-                if (!HostManager.hostIsMac) {
-                    logger.error("The plugin SPMKMPPlugin can only run on macos")
-                    return@afterEvaluate
-                }
                 val taskGroup = mutableMapOf<CompileTarget, Task>()
                 val dependencyTaskNames = mutableMapOf<String, File>()
                 swiftPackageEntries.forEach { extension ->
