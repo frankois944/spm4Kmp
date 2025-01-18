@@ -86,7 +86,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             configureManifestTask(
                                 taskConfig = taskConfig,
                                 extension = extension,
-                                manifestFile = sourcePackageDir.resolve("Package.swift"),
+                                manifestFile = sourcePackageDir.resolve(SWIFT_PACKAGE_NAME),
                                 packageScratchDir = packageScratchDir,
                                 sharedCacheDir = sharedCacheDir,
                                 sharedConfigDir = sharedConfigDir,
@@ -111,7 +111,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                     taskConfig,
                                     exportableDependencies,
                                     extension,
-                                    "exported$extensionNameCapitalized",
+                                    exportedManifestDirectory.name,
                                     exportedManifestDirectory,
                                 )
                             }
@@ -227,8 +227,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         cinterop.settings.definitionFile.set(definitionFile)
                     } else {
                         // the KMP plugin is expected a def file.
-                        // for cheating with it, using a empty one should be fine.
-                        // as it's no use with other plateform than macos
+                        // for cheating with it, using an empty one should be fine.
+                        // as it's no use with other platform than macOS
                         val fakeDefFile = getAndCreateFakeDefinitionFile()
                         cinterop.settings.definitionFile.set(fakeDefFile)
                     }
