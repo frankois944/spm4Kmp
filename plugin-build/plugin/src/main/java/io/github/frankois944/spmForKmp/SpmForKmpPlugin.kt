@@ -54,8 +54,10 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 extensions.getByName("kotlin") as KotlinMultiplatformExtension
 
             afterEvaluate {
+                // Contains the group of task (with their dependency) by target
                 val taskGroup = mutableMapOf<CompileTarget, Task>()
-                val dependencyTaskNames = mutableMapOf<String, File>()
+                // Contains the cinterop .def file linked with the task name
+                val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
                 swiftPackageEntries.forEach { extension ->
 
                     val sourcePackageDir =
@@ -185,17 +187,17 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                     } else {
                                         file.nameWithoutExtension
                                     }
-                                val fullTaskName =
-                                    if (index > 0) {
-                                        createCInteropTask(mainCompilation, cinteropName, file)
-                                        getCInteropTaskName(cinteropName, cinteropTarget)
-                                    } else {
-                                        getCInteropTaskName(cinteropName, cinteropTarget)
-                                    }
-                                dependencyTaskNames[fullTaskName] = file
+
+                                if (index > 0) {
+                                    createCInteropTask(mainCompilation, cinteropName, file)
+                                }
+
+                                val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
+                                cInteropTaskNamesWithDefFile[cinteropTaskName] = file
                             }
                         }
 
+                        // Explicitly create the dependency tree for the target
                         taskGroup[cinteropTarget] =
                             definitionTask
                                 .get()
@@ -217,12 +219,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         val cinteropTarget =
                             CompileTarget.byKonanName(cinterop.konanTarget.name)
                                 ?: return@configureEach
+                        // The cinterop task needs to run the requirement tasks before getting the .def file
                         cinterop.dependsOn(taskGroup[cinteropTarget])
                         cinterop.mustRunAfter(taskGroup[cinteropTarget])
-                        val definitionFile = dependencyTaskNames[cinterop.name]
+                        val definitionFile = cInteropTaskNamesWithDefFile[cinterop.name]
                         cinterop.settings.definitionFile.set(definitionFile)
                     } else {
-                        // the KMP plugin is expected a def file.
+                        // the KMP plugin is expecting a def file.
                         // for cheating with it, using an empty one should be fine.
                         // as it's no use with other platform than macOS
                         val fakeDefFile = getAndCreateFakeDefinitionFile()
