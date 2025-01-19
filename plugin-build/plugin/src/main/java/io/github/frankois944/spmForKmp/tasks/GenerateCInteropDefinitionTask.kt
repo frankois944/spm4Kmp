@@ -190,86 +190,102 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         )
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
-            var definition = ""
             try {
                 val libName = compiledBinary.asFile.get().name
                 val checksum = compiledBinary.asFile.get().md5()
-                if (moduleConfig.isFramework) {
-                    val mapFile = moduleConfig.buildDir.resolve("Modules").resolve("module.modulemap")
-                    val moduleName =
-                        extractModuleNameFromModuleMap(mapFile.readText())
-                            ?: throw Exception("No module name from ${moduleConfig.name} in mapFile")
-                    definition = """
-language = Objective-C
-modules = $moduleName
-package = ${moduleConfig.name}
-# Set a checksum for avoid build cache
-# checkum: $checksum
-libraryPaths = "${getBuildDirectory().path}"
-compilerOpts = -fmodules -framework "${moduleConfig.buildDir.nameWithoutExtension}" -F"${getBuildDirectory().path}"
-linkerOpts = ${getExtraLinkers()} -framework "${moduleConfig.buildDir.nameWithoutExtension}" -F"${getBuildDirectory().path}"
-                        """
-                } else {
-                    val mapFile = moduleConfig.buildDir.resolve("module.modulemap")
-                    val mapFileContent = mapFile.readText()
-                    val moduleName =
-                        extractModuleNameFromModuleMap(mapFileContent)
-                            ?: throw RuntimeException("No module name from ${moduleConfig.name} in mapFile")
-                    val implicitDependencies =
-                        project
-                            .getPackageImplicitDependencies(
-                                workingDir = manifestFile.asFile.get().parentFile,
-                                scratchPath = scratchDir.get(),
-                            ).getFolders()
-                    val headersBuildPath =
-                        buildList {
-                            addAll(getBuildDirectoriesContent("build"))
-                            addAll(implicitDependencies)
-                            extractHeaderPathFromModuleMap(mapFileContent)?.let {
-                                add(it)
-                            }
-                        }.joinToString(" ") { "-I\"${it}\"" }
-                    definition =
-                        """
-language = Objective-C
-modules = $moduleName
-package = ${moduleConfig.name}
-# Set a checksum for avoid build cache
-# checkum: $checksum
-libraryPaths = "${getBuildDirectory().path}"
-compilerOpts = -fmodules $headersBuildPath -F"${getBuildDirectory().path}"
-linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
-                        """
-                }
-                if (index == 0) {
-                    definition = """
-$definition
-staticLibraries = $libName
-                            """
-                }
+                val mapFile =
+                    moduleConfig.buildDir.resolve(
+                        if (moduleConfig.isFramework) "Modules/module.modulemap" else "module.modulemap",
+                    )
+                val mapFileContent = mapFile.readText()
+                val moduleName =
+                    extractModuleNameFromModuleMap(mapFileContent)
+                        ?: throw Exception("No module name for ${moduleConfig.name} in mapFile")
+
+                val definition =
+                    if (moduleConfig.isFramework) {
+                        generateFrameworkDefinition(moduleName, checksum, moduleConfig)
+                    } else {
+                        generateNonFrameworkDefinition(moduleName, checksum, mapFileContent, moduleConfig)
+                    }.let { def ->
+                        // Append staticLibraries for the first index
+                        if (index == 0) "$def\nstaticLibraries = $libName" else def
+                    }
                 if (definition.isNotEmpty()) {
                     moduleConfig.definitionFile.writeText(definition.trimIndent())
+                } else {
+                    throw RuntimeException("Can't generate defintion file")
                 }
                 logger.debug(
                     """
                     ######
                     Definition File : ${moduleConfig.definitionFile.name}
                     At Path: ${moduleConfig.definitionFile.path}
-                    ${moduleConfig.definitionFile.readText()}moduleConfig.definitionFile.readText()}
+                    ${moduleConfig.definitionFile.readText()}
                     ######
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {
                 logger.error(
                     """
-                    Can't generate definition for ${moduleConfig.name}")
-                    Expected file ${moduleConfig.definitionFile.path}
-                    CONTENT ${moduleConfig.definitionFile.readText()}
+                    Can't generate definition for ${moduleConfig.name}
+                    Expected file: ${moduleConfig.definitionFile.path}
+                    Config: $moduleConfig
                     -> Set the `export` parameter to `false` to ignore this module
                     """.trimIndent(),
                     ex,
                 )
             }
         }
+    }
+
+    private fun generateFrameworkDefinition(
+        moduleName: String,
+        checksum: String,
+        moduleConfig: ModuleConfig,
+    ): String {
+        val frameworkName = moduleConfig.buildDir.nameWithoutExtension
+        return """
+        language = Objective-C
+        modules = $moduleName
+        package = ${moduleConfig.name}
+        # Set a checksum to avoid build cache
+        # checksum: $checksum
+        libraryPaths = "${getBuildDirectory().path}"
+        compilerOpts = -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
+        linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
+    """
+    }
+
+    private fun generateNonFrameworkDefinition(
+        moduleName: String,
+        checksum: String,
+        mapFileContent: String,
+        moduleConfig: ModuleConfig,
+    ): String {
+        val implicitDependencies =
+            project
+                .getPackageImplicitDependencies(
+                    workingDir = manifestFile.asFile.get().parentFile,
+                    scratchPath = scratchDir.get(),
+                ).getFolders()
+
+        val headerSearchPaths =
+            buildList {
+                addAll(getBuildDirectoriesContent("build"))
+                addAll(implicitDependencies)
+                extractHeaderPathFromModuleMap(mapFileContent)?.let { add(it) }
+            }.joinToString(" ") { "-I\"$it\"" }
+
+        return """
+        language = Objective-C
+        modules = $moduleName
+        package = ${moduleConfig.name}
+        # Set a checksum to avoid build cache
+        # checksum: $checksum
+        libraryPaths = "${getBuildDirectory().path}"
+        compilerOpts = -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
+        linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+    """
     }
 }

@@ -40,7 +40,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     abstract val packageScratchDir: Property<File>
 
     @get:InputDirectory
-    abstract val customSourcePackage: Property<File>
+    abstract val sourcePackage: Property<File>
 
     @get:Input
     abstract val osVersion: Property<String>
@@ -72,21 +72,20 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             sourceDir.deleteRecursively()
         }
         sourceDir.mkdirs()
-        if (customSourcePackage.get().list()?.isNotEmpty() == true) {
+        if (sourcePackage.get().list()?.isNotEmpty() == true) {
             logger.debug(
                 """
                 Copy User Swift files to directory $sourceDir
-                ${customSourcePackage.get().list()?.toList()}
+                ${sourcePackage.get().list()?.toList()}
                 """.trimIndent(),
             )
-            customSourcePackage.get().copyRecursively(sourceDir)
+            sourcePackage.get().copyRecursively(sourceDir)
         } else {
             logger.debug(
                 """
                 Copy Dummy swift file to directory $sourceDir
                 """.trimIndent(),
             )
-            sourceDir.resolve("DummySPMFile.swift").createNewFile()
             sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
         }
         return workingDir

@@ -70,7 +70,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     val sharedCacheDir: File? = extension.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
                     val sharedConfigDir: File? = extension.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
                     val sharedSecurityDir: File? = extension.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
-                    val userSourcePackageDir =
+                    val swiftSourcePackageDir =
                         resolveAndCreateDir(
                             File(extension.customPackageSourcePath),
                             extension.name,
@@ -140,7 +140,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 compileTaskConfig.debugMode.set(extension.debug)
                                 compileTaskConfig.packageScratchDir.set(packageScratchDir)
                                 compileTaskConfig.compiledTargetDir.set(targetBuildDir)
-                                compileTaskConfig.customSourcePackage.set(userSourcePackageDir)
+                                compileTaskConfig.sourcePackage.set(swiftSourcePackageDir)
 
                                 compileTaskConfig.osVersion.set(
                                     computeOsVersion(cinteropTarget, extension),

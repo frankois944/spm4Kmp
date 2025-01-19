@@ -56,7 +56,6 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 .parentFile
                 .resolve("Sources")
                 .also { it.mkdirs() }
-        sourceDir.resolve("DummySPMFile.swift").createNewFile()
         sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
     }
 
