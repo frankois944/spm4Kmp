@@ -5,7 +5,6 @@ package io.github.frankois944.spmForKmp
 import io.github.frankois944.spmForKmp.config.getAndCreateFakeDefinitionFile
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.GenerateExportableManifestTask
@@ -92,7 +91,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             )
                         }
 
-                    val exportableDependencies = extension.packageDependencies.filterExportableDependency()
                     val extensionNameCapitalized = extension.name.capitalized()
                     val exportedManifestDirectory =
                         layout.projectDirectory
@@ -100,14 +98,14 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             .resolve("exported$extensionNameCapitalized")
 
                     val exportedManifestTask: TaskProvider<GenerateExportableManifestTask>? =
-                        if (exportableDependencies.isNotEmpty()) {
+                        if (extension.packageDependencies.isNotEmpty()) {
                             tasks.register(
                                 getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, extension.name),
                                 GenerateExportableManifestTask::class.java,
                             ) { taskConfig ->
                                 configureExportableManifestTask(
                                     taskConfig,
-                                    exportableDependencies,
+                                    extension.packageDependencies,
                                     extension,
                                     exportedManifestDirectory.name,
                                     exportedManifestDirectory,
@@ -307,8 +305,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         taskConfig.toolsVersion.set(extension.toolsVersion)
         manifestDir.mkdirs()
         taskConfig.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
-        logger.warn("Spm4Kmp: A local Swift package has been generated in $manifestDir")
-        logger.warn("Please add it to your xcode project as a local package dependency.")
     }
 
     @Suppress("LongParameterList")

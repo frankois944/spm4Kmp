@@ -55,8 +55,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 .asFile
                 .parentFile
                 .resolve("Sources")
-                .also { it.mkdirs() }
-        sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
+                .takeIf { !it.exists() }
+                ?.also { it.mkdirs() }
+        sourceDir?.resolve("DummySPMFile.swift")?.writeText("import Foundation")
     }
 
     @TaskAction
@@ -82,6 +83,13 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             project.swiftFormat(
                 manifestFile.asFile.get(),
             )
+            logger.warn("Spm4Kmp: A local Swift package has been generated at")
+            logger.warn(
+                manifestFile
+                    .get()
+                    .asFile.parentFile.path,
+            )
+            logger.warn("Please add it to your xcode project as a local package dependency.")
         } catch (ex: Exception) {
             logger.error(
                 """
