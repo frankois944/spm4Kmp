@@ -21,7 +21,7 @@ This project greatly needs feedback and information about the edge case for prog
 - **Import Swift compatible code to Kotlin**: Enable **SPM dependencies** and your **own Swift code** to be exposed directly in your Kotlin code (if compatible).
 - **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages with dependencies.
 
-> [!WARNING]  
+> [!WARNING]
 > Pure Swift packages can't be exported to Kotlin; creating a bridge with this plugin is a solution for avoiding this issue.
 
 ---
@@ -38,7 +38,7 @@ Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("io.github.frankois944.spmForKmp").version("0.0.8") // Apply the spmForKmp plugin
+    id("io.github.frankois944.spmForKmp").version("0.0.9") // Apply the spmForKmp plugin
 }
 ```
 
@@ -155,7 +155,7 @@ The Plug-in is reproducing the CocoaPods plugin behavior with the same kind of i
 > Add the folder to your project as a Local package, that's all.
 >
 > Note : When updating your configuration, reset the package cache to apply the modification.
-> 
+>
 
 
 ### 4.1. Using inside your bridge
@@ -172,8 +172,8 @@ swiftPackageConfig {
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 products = {
                     add("CryptoSwift")
-                },                           
-                version = "1.8.4",                                         
+                },
+                version = "1.8.4",
             )
         )
     }
