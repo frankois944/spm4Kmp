@@ -21,7 +21,7 @@ This project greatly needs feedback and information about the edge case for prog
 - **Import Swift compatible code to Kotlin**: Enable **SPM dependencies** and your **own Swift code** to be exposed directly in your Kotlin code (if compatible).
 - **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages with dependencies.
 
-> [!WARNING]  
+> [!WARNING]
 > Pure Swift packages can't be exported to Kotlin; creating a bridge with this plugin is a solution for avoiding this issue.
 
 ---
@@ -38,7 +38,7 @@ Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("io.github.frankois944.spmForKmp").version("0.0.8") // Apply the spmForKmp plugin
+    id("io.github.frankois944.spmForKmp").version("0.0.9") // Apply the spmForKmp plugin
 }
 ```
 
@@ -127,9 +127,9 @@ For more information, refer to the [SwiftDependency](https://github.com/frankois
 
 ### 3. Add your embedded Swift code
 
-You can now add your embedded Swift code in the `src/swift/[cinteropname]` folder.
+You can now add your embedded Swift code in the `src/swift/[cinteropname]` folder; it will be your bridge between Swift and Kotlin.
 
-> [!IMPORTANT]
+> [!TIP]
 > Your swift code need to be mark as [@objc/@objcMembers](https://akdebuging.com/posts/what-is-objc-and-objcmember/) and the visibility set as `public`
 > or it won't be exported and available from your Kotlin code
 > ```swift
@@ -140,7 +140,25 @@ You can now add your embedded Swift code in the `src/swift/[cinteropname]` folde
 > }
 > ```
 
-### 3.1. With external dependencies
+### 4. Add external dependencies
+
+The Plug-in is reproducing the CocoaPods plugin behavior with the same kind of issues about third-party dependency but less intrusively.
+
+> [!IMPORTANT]
+>
+> A local swift package is being generated during the build and this message diplayed
+> ```
+> Spm4Kmp: A local Swift package has been generated at
+> /path/to/the/local/package
+> Please add it to your xcode project as a local package dependency.
+> ```
+> Add the folder to your project as a Local package, that's all.
+>
+> Note : When updating your configuration, reset the package cache to apply the modification.
+>
+
+
+### 4.1. Using inside your bridge
 
 You can also use the dependency you have added in the `swiftPackageConfig` block in your Swift code.
 
@@ -154,8 +172,8 @@ swiftPackageConfig {
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 products = {
                     add("CryptoSwift")
-                },                           
-                version = "1.8.4",                                         
+                },
+                version = "1.8.4",
             )
         )
     }
@@ -174,12 +192,9 @@ import CryptoSwift
 }
 ```
 
-### 3.2. Export your dependency directly to your Kotlin Code
+### 4.2. Using inside your Kotlin
 
-You can also use the dependency you have added in the `swiftPackageConfig` in your Kotlin and Swift applications.
-
-> [!WARNING]
-> This feature is highly experimental
+You can also use the dependency you have added in the `swiftPackageConfig` in your Kotlin applications.
 
 ```kotlin
 swiftPackageConfig {
@@ -196,18 +211,8 @@ swiftPackageConfig {
 }
 ```
 
-> [!IMPORTANT]
-> When exporting dependency, some configuration need to be added to your xcode project.
->
-> A local swift package is being generated during the build and this message diplayed
-> ```
-> Spm4Kmp: A local Swift package has been generated in /path/to/the/local/package
-> Please add it to your project as a local package dependency.
-> ```
-> Add the folder to your project as a Local package, that's all.
 
-
-### 4. Configuration by target
+### 5. Configuration by target
 
 You can set a different configuration for each each target you manage.
 

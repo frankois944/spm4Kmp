@@ -15,15 +15,17 @@ let package = Package(
     .package(
       path:
         "/Users/francoisdabonot/DEV/spm-kmp-plugin/example/../plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework"
-    ),
+    ), .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", exact: "1.8.1"),
   ],
   targets: [
     .target(
       name: "exportedNativeIosShared",
       dependencies: [
         .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
-        .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"), "DummyFramework",
+        .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
+        .product(name: "FirebaseDatabase", package: "firebase-ios-sdk"), "DummyFramework",
         .product(name: "LocalSourceDummyFramework", package: "LocalSourceDummyFramework"),
+        .product(name: "CryptoSwift", package: "CryptoSwift"),
       ],
       path: "Sources"),
     .binaryTarget(

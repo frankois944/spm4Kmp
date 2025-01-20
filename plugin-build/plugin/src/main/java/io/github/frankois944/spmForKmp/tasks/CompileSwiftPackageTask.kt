@@ -12,11 +12,18 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
+    init {
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
+
     @get:InputFile
     abstract val manifestFile: Property<File>
 
@@ -33,7 +40,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     abstract val packageScratchDir: Property<File>
 
     @get:InputDirectory
-    abstract val customSourcePackage: Property<File>
+    abstract val sourcePackage: Property<File>
 
     @get:Input
     abstract val osVersion: Property<String>
@@ -65,21 +72,20 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             sourceDir.deleteRecursively()
         }
         sourceDir.mkdirs()
-        if (customSourcePackage.get().list()?.isNotEmpty() == true) {
+        if (sourcePackage.get().list()?.isNotEmpty() == true) {
             logger.debug(
                 """
                 Copy User Swift files to directory $sourceDir
-                ${customSourcePackage.get().list()?.toList()}
+                ${sourcePackage.get().list()?.toList()}
                 """.trimIndent(),
             )
-            customSourcePackage.get().copyRecursively(sourceDir)
+            sourcePackage.get().copyRecursively(sourceDir)
         } else {
             logger.debug(
                 """
                 Copy Dummy swift file to directory $sourceDir
                 """.trimIndent(),
             )
-            sourceDir.resolve("DummySPMFile.swift").createNewFile()
             sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
         }
         return workingDir
