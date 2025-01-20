@@ -15,6 +15,8 @@ Also, You can **embed your own Swift code** for a direct import to your Kotlin l
 
 This project greatly needs feedback and information about the edge case for progressing; the discussion tab is welcomed.
 
+### [Let's poll](https://github.com/frankois944/spm4Kmp/discussions/45) 
+
 ## Features
 
 - **Create a bridge easily**: Import your own Swift code for functionality can't be done in Kotlin for example.
