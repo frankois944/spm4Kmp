@@ -84,7 +84,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-val testRessources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
+val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
     create("nativeIosShared") {
         // optional parameters
@@ -117,12 +117,12 @@ swiftPackageConfig {
                 version = "11.6.0",
             ),
             SwiftDependency.Binary.Local(
-                path = "$testRessources/DummyFramework.xcframework.zip",
+                path = "$testResources/DummyFramework.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
             ),
             SwiftDependency.Package.Local(
-                path = "$testRessources/LocalSourceDummyFramework",
+                path = "$testResources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
                 products = {
                     // Export to Kotlin for use in shared Kotlin code, false by default
@@ -143,7 +143,7 @@ swiftPackageConfig {
     create("nativeMacosShared") {
         dependency(
             SwiftDependency.Package.Local(
-                path = "$testRessources/LocalSourceDummyFramework",
+                path = "$testResources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
                 products = {
                     // Export to Kotlin for use in shared Kotlin code, false by default
