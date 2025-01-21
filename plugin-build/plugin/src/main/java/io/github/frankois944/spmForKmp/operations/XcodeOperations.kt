@@ -25,6 +25,8 @@ internal fun Project.resolvePackage(
             "resolve",
             "--scratch-path",
             scratchPath.path,
+            "--jobs",
+            getNbJobs(),
         )
     sharedCachePath?.let {
         args.add("--cache-path")
@@ -192,6 +194,35 @@ internal fun Project.swiftFormat(file: File) {
                 errorOutput,
             )
         }
+}
+
+internal fun Project.getNbJobs(): String {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
+    val args =
+        listOf(
+            "-n",
+            "hw.ncpu",
+        )
+
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
+    operation.execOps
+        .exec {
+            it.executable = "sysctl"
+            it.args = args
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "getNbJobs",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
+    return standardOutput.toString().trim()
 }
 
 @Suppress("LongParameterList")

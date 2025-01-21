@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.operations.getNbJobs
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import org.gradle.api.DefaultTask
@@ -111,6 +112,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 packageScratchDir.get().path,
                 "-c",
                 if (debugMode.get()) "debug" else "release",
+                "--jobs",
+                project.getNbJobs(),
             )
         sharedCacheDir.orNull?.let {
             args.add("--cache-path")
