@@ -107,7 +107,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             ?.trim()
             ?.let { File(it) }
             ?.also {
-                logger.debug("HEADER FOUND $it")
+                logger.debug("HEADER FOUND {}", it)
             }.toSetOrEmpty()
     }
 
