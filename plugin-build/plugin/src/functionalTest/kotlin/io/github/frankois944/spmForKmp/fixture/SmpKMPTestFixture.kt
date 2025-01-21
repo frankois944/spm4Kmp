@@ -39,6 +39,7 @@ abstract class SmpKMPTestFixture private constructor(
         val sharedConfigPath: String? = null,
         val sharedSecurityPath: String? = null,
         val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
+        val rawPluginConfiguration: List<KotlinSource> = emptyList(),
     )
 
     protected abstract fun createProject(): GradleProject
@@ -128,9 +129,16 @@ org.gradle.caching=true
 
     private fun createPluginBlock(extension: TestConfiguration): String {
         val pluginBlock =
-            buildString {
-                append(
-                    """
+            if (extension.rawPluginConfiguration.isNotEmpty()) {
+                extension.rawPluginConfiguration.forEach {
+                    buildString {
+                        appendLine(it)
+                    }
+                }
+            } else {
+                buildString {
+                    append(
+                        """
 swiftPackageConfig {
     create("${extension.cinteropsName}") {
     customPackageSourcePath = "${extension.customPackageSourcePath}"
@@ -140,152 +148,153 @@ swiftPackageConfig {
     minTvos = "${extension.minTvos}"
     minWatchos = "${extension.minWatchos}"
 """,
-                )
-                extension.sharedCachePath?.let {
-                    append("sharedCachePath = \"${extension.sharedCachePath}\"\n")
-                }
-                extension.sharedConfigPath?.let {
-                    append("sharedConfigPath = \"${extension.sharedConfigPath}\"\n")
-                }
-                extension.sharedSecurityPath?.let {
-                    append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
-                }
-
-                fun buildProductBlock(
-                    name: ProductName,
-                    isLast: Boolean,
-                ): String =
-                    buildString {
-                        append("ProductName(")
-                        append("name = \"${name.name}\"")
-                        name.alias?.let { alias ->
-                            append(", alias = \"$alias\"")
-                        }
-                        appendLine(")")
-                        if (!isLast) {
-                            appendLine(",")
-                        }
+                    )
+                    extension.sharedCachePath?.let {
+                        append("sharedCachePath = \"${extension.sharedCachePath}\"\n")
+                    }
+                    extension.sharedConfigPath?.let {
+                        append("sharedConfigPath = \"${extension.sharedConfigPath}\"\n")
+                    }
+                    extension.sharedSecurityPath?.let {
+                        append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
                     }
 
-                fun buildPackageBlock(config: ProductConfig): String =
-                    buildString {
-                        appendLine("add(")
-                        config.products.forEachIndexed { index, name ->
-                            append(
-                                buildProductBlock(
-                                    name = name,
-                                    isLast = name == config.products.last(),
-                                ),
-                            )
+                    fun buildProductBlock(
+                        name: ProductName,
+                        isLast: Boolean,
+                    ): String =
+                        buildString {
+                            append("ProductName(")
+                            append("name = \"${name.name}\"")
+                            name.alias?.let { alias ->
+                                append(", alias = \"$alias\"")
+                            }
+                            appendLine(")")
+                            if (!isLast) {
+                                appendLine(",")
+                            }
                         }
-                        if (config.exportToKotlin) {
-                            appendLine(", exportToKotlin = ${config.exportToKotlin}")
+
+                    fun buildPackageBlock(config: ProductConfig): String =
+                        buildString {
+                            appendLine("add(")
+                            config.products.forEachIndexed { index, name ->
+                                append(
+                                    buildProductBlock(
+                                        name = name,
+                                        isLast = name == config.products.last(),
+                                    ),
+                                )
+                            }
+                            if (config.exportToKotlin) {
+                                appendLine(", exportToKotlin = ${config.exportToKotlin}")
+                            }
+                            appendLine(")")
                         }
-                        appendLine(")")
+
+                    appendLine("    dependency(     ")
+                    extension.rawDependencyConfiguration.forEach { rawDependency ->
+                        appendLine(rawDependency.content + ",")
                     }
+                    extension.packages.forEach { definition ->
+                        when (definition) {
+                            is SwiftDependency.Binary.Local -> {
+                                appendLine("SwiftDependency.Binary.Local(")
+                                append("path = \"${definition.path}\",")
+                                append("packageName = \"${definition.packageName}\",")
+                                append("exportToKotlin = ${definition.exportToKotlin}")
+                                append("),")
+                            }
 
-                appendLine("    dependency(     ")
-                extension.rawDependencyConfiguration.forEach { rawDependency ->
-                    appendLine(rawDependency.content + ",")
-                }
-                extension.packages.forEach { definition ->
-                    when (definition) {
-                        is SwiftDependency.Binary.Local -> {
-                            appendLine("SwiftDependency.Binary.Local(")
-                            append("path = \"${definition.path}\",")
-                            append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
-                            append("),")
-                        }
+                            is SwiftDependency.Binary.Remote -> {
+                                appendLine("SwiftDependency.Binary.Remote(")
+                                append("url = URI(\"${definition.url}\"),")
+                                append("checksum = \"${definition.checksum}\",")
+                                append("packageName = \"${definition.packageName}\",")
+                                append("exportToKotlin = ${definition.exportToKotlin}")
+                                append("),")
+                            }
 
-                        is SwiftDependency.Binary.Remote -> {
-                            appendLine("SwiftDependency.Binary.Remote(")
-                            append("url = URI(\"${definition.url}\"),")
-                            append("checksum = \"${definition.checksum}\",")
-                            append("packageName = \"${definition.packageName}\",")
-                            append("exportToKotlin = ${definition.exportToKotlin}")
-                            append("),")
-                        }
+                            is SwiftDependency.Package.Local -> {
+                                appendLine("SwiftDependency.Package.Local(")
+                                append("path = \"${definition.path}\",")
+                                if (definition.packageName.isNotEmpty()) {
+                                    appendLine("packageName = \"${definition.packageName}\",")
+                                }
+                                appendLine("products = {")
+                                definition.productsConfig.productPackages.forEach { config ->
+                                    append(
+                                        buildPackageBlock(
+                                            config = config,
+                                        ),
+                                    )
+                                }
+                                appendLine("}")
+                                append("),")
+                            }
 
-                        is SwiftDependency.Package.Local -> {
-                            appendLine("SwiftDependency.Package.Local(")
-                            append("path = \"${definition.path}\",")
-                            if (definition.packageName.isNotEmpty()) {
-                                appendLine("packageName = \"${definition.packageName}\",")
+                            is SwiftDependency.Package.Remote.Branch -> {
+                                appendLine("SwiftDependency.Package.Remote.Branch(")
+                                appendLine("branch = \"${definition.branch}\",")
+                                appendLine("url = URI(\"${definition.url}\"),")
+                                if (definition.packageName.isNotEmpty()) {
+                                    appendLine("packageName = \"${definition.packageName}\",")
+                                }
+                                appendLine("products = {")
+                                definition.productsConfig.productPackages.forEach { config ->
+                                    append(
+                                        buildPackageBlock(
+                                            config = config,
+                                        ),
+                                    )
+                                }
+                                appendLine("}")
+                                append("),")
                             }
-                            appendLine("products = {")
-                            definition.productsConfig.productPackages.forEach { config ->
-                                append(
-                                    buildPackageBlock(
-                                        config = config,
-                                    ),
-                                )
-                            }
-                            appendLine("}")
-                            append("),")
-                        }
 
-                        is SwiftDependency.Package.Remote.Branch -> {
-                            appendLine("SwiftDependency.Package.Remote.Branch(")
-                            appendLine("branch = \"${definition.branch}\",")
-                            appendLine("url = URI(\"${definition.url}\"),")
-                            if (definition.packageName.isNotEmpty()) {
-                                appendLine("packageName = \"${definition.packageName}\",")
+                            is SwiftDependency.Package.Remote.Commit -> {
+                                appendLine("SwiftDependency.Package.Remote.Commit(")
+                                appendLine("revision = \"${definition.revision}\",")
+                                appendLine("url = URI(\"${definition.url}\"),")
+                                if (definition.packageName.isNotEmpty()) {
+                                    appendLine("packageName = \"${definition.packageName}\",")
+                                }
+                                appendLine("products = {")
+                                definition.productsConfig.productPackages.forEach { config ->
+                                    append(
+                                        buildPackageBlock(
+                                            config = config,
+                                        ),
+                                    )
+                                }
+                                appendLine("}")
+                                append("),")
                             }
-                            appendLine("products = {")
-                            definition.productsConfig.productPackages.forEach { config ->
-                                append(
-                                    buildPackageBlock(
-                                        config = config,
-                                    ),
-                                )
-                            }
-                            appendLine("}")
-                            append("),")
-                        }
 
-                        is SwiftDependency.Package.Remote.Commit -> {
-                            appendLine("SwiftDependency.Package.Remote.Commit(")
-                            appendLine("revision = \"${definition.revision}\",")
-                            appendLine("url = URI(\"${definition.url}\"),")
-                            if (definition.packageName.isNotEmpty()) {
-                                appendLine("packageName = \"${definition.packageName}\",")
+                            is SwiftDependency.Package.Remote.Version -> {
+                                appendLine("SwiftDependency.Package.Remote.Version(")
+                                appendLine("version = \"${definition.version}\",")
+                                appendLine("url = URI(\"${definition.url}\"),")
+                                if (definition.packageName.isNotEmpty()) {
+                                    appendLine("packageName = \"${definition.packageName}\",")
+                                }
+                                appendLine("products = {")
+                                definition.productsConfig.productPackages.forEach { config ->
+                                    append(
+                                        buildPackageBlock(
+                                            config = config,
+                                        ),
+                                    )
+                                }
+                                appendLine("}")
+                                append("),")
                             }
-                            appendLine("products = {")
-                            definition.productsConfig.productPackages.forEach { config ->
-                                append(
-                                    buildPackageBlock(
-                                        config = config,
-                                    ),
-                                )
-                            }
-                            appendLine("}")
-                            append("),")
-                        }
-
-                        is SwiftDependency.Package.Remote.Version -> {
-                            appendLine("SwiftDependency.Package.Remote.Version(")
-                            appendLine("version = \"${definition.version}\",")
-                            appendLine("url = URI(\"${definition.url}\"),")
-                            if (definition.packageName.isNotEmpty()) {
-                                appendLine("packageName = \"${definition.packageName}\",")
-                            }
-                            appendLine("products = {")
-                            definition.productsConfig.productPackages.forEach { config ->
-                                append(
-                                    buildPackageBlock(
-                                        config = config,
-                                    ),
-                                )
-                            }
-                            appendLine("}")
-                            append("),")
                         }
                     }
+                    appendLine(")")
+                    appendLine("}")
+                    appendLine("}")
                 }
-                appendLine(")")
-                appendLine("}")
-                appendLine("}")
             }
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
         val script =
@@ -378,6 +387,11 @@ swiftPackageConfig {
         fun withRawDependencies(vararg sources: KotlinSource) =
             apply {
                 config = config.copy(rawDependencyConfiguration = sources.toList())
+            }
+
+        fun withRawPluginConfiguration(vararg sources: KotlinSource) =
+            apply {
+                config = config.copy(rawPluginConfiguration = sources.toList())
             }
 
         fun build(): SmpKMPTestFixture =

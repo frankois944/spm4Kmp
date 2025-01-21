@@ -119,7 +119,7 @@ class ComplexPackageTest : BaseTest() {
                             import FirebaseAnalytics
                             import FirebaseCrashlytics
                             import Static
-                            import Bugsnag
+                            import JAYSON
 
                             @objc public class MySwiftClassEmbedded: NSObject {
                                 @objc public func toMD5(value: String) -> String {
