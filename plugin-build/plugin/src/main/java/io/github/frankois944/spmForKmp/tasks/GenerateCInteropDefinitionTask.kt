@@ -127,7 +127,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     if (path != null) {
                         packageDir.resolve(path)
                     } else {
-                        packageDir.resolve("Sources").resolve(name ?: "")
+                        packageDir.resolve("Sources").resolve(name.orEmpty())
                     }
                 if (publicHeadersPath != null) {
                     includeDir = includeDir.resolve(publicHeadersPath)
