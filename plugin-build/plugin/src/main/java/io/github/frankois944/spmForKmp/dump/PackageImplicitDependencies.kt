@@ -32,25 +32,22 @@ internal data class PackageImplicitDependencies(
             )
     }
 
-    fun getFolders(vararg names: String = arrayOf("Public")): Set<File> =
+    fun getFolders(): Set<File> =
         searchInFolder(
             dependencies = this.dependencies,
-            names = names,
         ).distinct()
             .toSet()
 
-    private fun searchInFolder(
-        dependencies: List<PackageImplicitDependencies>?,
-        vararg names: String = arrayOf("Public"),
-    ): Set<File> {
+    private fun searchInFolder(dependencies: List<PackageImplicitDependencies>?): Set<File> {
+        val names = arrayOf("Public")
         val results = mutableSetOf<File>()
         dependencies?.forEach { dependency ->
             dependency.dependencies?.forEach { subDep ->
                 subDep.path?.let { path ->
-                    val found = walkFolder(path, *names)
+                    val found = walkFolder(path, names = names)
                     results.addAll(found)
                 }
-                results.addAll(searchInFolder(subDep.dependencies, names = names))
+                results.addAll(searchInFolder(subDep.dependencies))
             }
         }
         return results
