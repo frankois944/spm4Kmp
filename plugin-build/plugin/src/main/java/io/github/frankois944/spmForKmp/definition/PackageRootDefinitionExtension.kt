@@ -103,7 +103,7 @@ public abstract class PackageRootDefinitionExtension
          *
          * Default value: `false`
          */
-        public var debug: Boolean = true
+        public var debug: Boolean = false
 
         /**
          * Internal list used to store Swift package dependencies.
