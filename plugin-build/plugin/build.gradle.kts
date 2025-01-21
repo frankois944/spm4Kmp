@@ -131,7 +131,7 @@ tasks.named<Test>("functionalTest") {
 // https://github.com/gradle/gradle/issues/1465
 // https://github.com/tomkoptel/jacoco-gradle-testkit/blob/develop/build.gradle.kts
 val disableFix: String? by project
-val shouldDisableFix = disableFix?.toBoolean() == true
+val shouldDisableFix = disableFix?.toBoolean() ?: false
 if (!shouldDisableFix) {
     val jacocoAnt by configurations.existing
     tasks.pluginUnderTestMetadata {

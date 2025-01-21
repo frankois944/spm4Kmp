@@ -16,6 +16,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.gradle.utils.toSetOrEmpty
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
@@ -92,7 +93,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             ?.trim()
     }
 
-    private fun extractHeaderPathFromModuleMap(module: String): File? {
+    private fun extractHeaderPathFromModuleMap(module: String): Set<File> {
         /*
          * find a better regex to extract the header value
          */
@@ -105,6 +106,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             ?.replace("\"", "")
             ?.trim()
             ?.let { File(it) }
+            ?.also {
+                logger.debug("HEADER FOUND $it")
+            }.toSetOrEmpty()
     }
 
     private fun getModuleNames(): List<String> =
@@ -274,7 +278,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             buildList {
                 addAll(getBuildDirectoriesContent("build"))
                 addAll(implicitDependencies)
-                extractHeaderPathFromModuleMap(mapFileContent)?.let { add(it) }
+                addAll(extractHeaderPathFromModuleMap(mapFileContent))
             }.joinToString(" ") { "-I\"$it\"" }
 
         return """

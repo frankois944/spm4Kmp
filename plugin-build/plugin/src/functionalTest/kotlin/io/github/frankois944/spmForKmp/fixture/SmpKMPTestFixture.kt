@@ -184,20 +184,18 @@ swiftPackageConfig {
                         appendLine(")")
                     }
 
+                appendLine("    dependency(     ")
                 extension.rawDependencyConfiguration.forEach { rawDependency ->
-                    appendLine("    dependency(     ")
-                    appendLine(rawDependency.content)
-                    appendLine(")")
+                    appendLine(rawDependency.content + ",")
                 }
-
                 extension.packages.forEach { definition ->
-                    appendLine("    dependency(     ")
                     when (definition) {
                         is SwiftDependency.Binary.Local -> {
                             appendLine("SwiftDependency.Binary.Local(")
                             append("path = \"${definition.path}\",")
                             append("packageName = \"${definition.packageName}\",")
                             append("exportToKotlin = ${definition.exportToKotlin}")
+                            append("),")
                         }
 
                         is SwiftDependency.Binary.Remote -> {
@@ -206,6 +204,7 @@ swiftPackageConfig {
                             append("checksum = \"${definition.checksum}\",")
                             append("packageName = \"${definition.packageName}\",")
                             append("exportToKotlin = ${definition.exportToKotlin}")
+                            append("),")
                         }
 
                         is SwiftDependency.Package.Local -> {
@@ -223,6 +222,7 @@ swiftPackageConfig {
                                 )
                             }
                             appendLine("}")
+                            append("),")
                         }
 
                         is SwiftDependency.Package.Remote.Branch -> {
@@ -241,6 +241,7 @@ swiftPackageConfig {
                                 )
                             }
                             appendLine("}")
+                            append("),")
                         }
 
                         is SwiftDependency.Package.Remote.Commit -> {
@@ -259,6 +260,7 @@ swiftPackageConfig {
                                 )
                             }
                             appendLine("}")
+                            append("),")
                         }
 
                         is SwiftDependency.Package.Remote.Version -> {
@@ -277,10 +279,11 @@ swiftPackageConfig {
                                 )
                             }
                             appendLine("}")
+                            append("),")
                         }
                     }
-                    appendLine(")\n     )")
                 }
+                appendLine(")")
                 appendLine("}")
                 appendLine("}")
             }
