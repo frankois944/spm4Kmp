@@ -1,6 +1,6 @@
 # The Swift Package Manager for Kotlin multiplatform Plugin
 
-[![GitHub Release](https://img.shields.io/github/v/release/frankois944/spm4Kmp)](https://github.com/frankois944/spm4Kmp/releases/)
+[![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://github.com/frankois944/spm4Kmp/releases/)
 [![build&tests](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg)](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml)
 [![codecov](https://codecov.io/gh/frankois944/spm4Kmp/graph/badge.svg?token=OXEHFLQG1I)](https://codecov.io/gh/frankois944/spm4Kmp)
 [![GitHub License](https://img.shields.io/github/license/frankois944/spm4kmp)](https://github.com/frankois944/spm4Kmp/blob/main/LICENSE)
@@ -15,7 +15,7 @@ Also, You can **embed your own Swift code** for a direct import to your Kotlin l
 
 This project greatly needs feedback and information about the edge case for progressing; the discussion tab is welcomed.
 
-### [Let's poll](https://github.com/frankois944/spm4Kmp/discussions/45) 
+### [Let's poll](https://github.com/frankois944/spm4Kmp/discussions/45)
 
 ## Features
 
@@ -36,7 +36,7 @@ A fully working sample is [available](https://github.com/frankois944/spm4Kmp/tre
 
 Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `plugins` block:
 
-[![GitHub Release](https://img.shields.io/github/v/release/frankois944/spm4Kmp)](https://github.com/frankois944/spm4Kmp/releases/)
+[![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://github.com/frankois944/spm4Kmp/releases/)
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
