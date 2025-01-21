@@ -122,6 +122,7 @@ class ImplicitDepPackageTest : BaseTest() {
                                 products = {
                                     add(
                                         "Bugsnag",
+                                        "BugsnagNetworkRequestPlugin",
                                         exportToKotlin = true,
                                     )
                                 },
@@ -135,6 +136,7 @@ class ImplicitDepPackageTest : BaseTest() {
                             """
                             import Foundation
                             import Bugsnag
+                            import BugsnagNetworkRequestPlugin
                             """.trimIndent(),
                     ),
                 ).build()

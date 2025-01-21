@@ -96,7 +96,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     private fun extractPublicHeaderFromCheckout(module: ModuleConfig): Set<File> {
-        logger.warn("Loocking for public header for ${module.name}")
+        logger.debug("Loocking for public header for ${module.name}")
         val packageDir =
             scratchDir
                 .get()
@@ -134,8 +134,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 }
                 if (includeDir.exists()) {
                     result.add(includeDir)
-                } else {
-                    logger.error("No header found at ${manifest.path}")
                 }
             }
         } else {
@@ -230,7 +228,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     .find {
                         it.nameWithoutExtension.lowercase() == moduleName.name.lowercase()
                     }?.let { buildDir ->
-                        logger.warn("debug dir {} for {}", buildDir, moduleName)
+                        logger.debug("build dir {} for {}", buildDir, moduleName)
                         moduleConfigs.add(
                             ModuleConfig(
                                 isFramework = buildDir.extension == "framework",
