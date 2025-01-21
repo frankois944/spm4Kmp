@@ -107,4 +107,44 @@ class ImplicitDepPackageTest : BaseTest() {
         // Then
         assertThat(result).task(":library:build").succeeded()
     }
+
+    @Test
+    fun `build with custom public header`() {
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Remote.Version(
+                                url = URI("https://github.com/bugsnag/bugsnag-cocoa"),
+                                products = {
+                                    add(
+                                        "Bugsnag",
+                                        exportToKotlin = true,
+                                    )
+                                },
+                                version = "6.31.0",
+                            ),
+                        )
+                    },
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import Bugsnag
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
 }

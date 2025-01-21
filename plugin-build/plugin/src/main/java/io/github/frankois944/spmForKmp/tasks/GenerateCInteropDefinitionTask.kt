@@ -2,11 +2,13 @@ package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.CompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
+import io.github.frankois944.spmForKmp.config.ModuleInfo
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
+import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
 import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -61,7 +63,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         get() =
             buildList {
                 getModuleNames().forEach { moduleName ->
-                    add(getBuildDirectory().resolve("$moduleName.def"))
+                    add(getBuildDirectory().resolve("${moduleName.name}.def"))
                 }
             }
 
@@ -93,6 +95,55 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             ?.trim()
     }
 
+    private fun extractPublicHeaderFromCheckout(module: ModuleConfig): Set<File> {
+        logger.warn("Loocking for public header for ${module.name}")
+        val packageDir =
+            scratchDir
+                .get()
+                .resolve("checkouts")
+                .resolve(module.packageName)
+        val manifest = packageDir.resolve("Package.swift")
+        val result = mutableSetOf<File>()
+        if (manifest.exists()) {
+            val content = manifest.readText()
+            val targets = extractTargetBlocks(content)
+            targets.forEach { target ->
+                val path =
+                    Regex("""path:\s*"([^"]+)"""")
+                        .findAll(target)
+                        .mapNotNull { it.groupValues.elementAtOrNull(1) }
+                        .firstOrNull()
+                val publicHeadersPath =
+                    Regex("""publicHeadersPath:\s*"([^"]+)"""")
+                        .findAll(target)
+                        .mapNotNull { it.groupValues.elementAtOrNull(1) }
+                        .firstOrNull()
+                val name =
+                    Regex("""name:\s*"([^"]+)"""")
+                        .findAll(target)
+                        .mapNotNull { it.groupValues.elementAtOrNull(1) }
+                        .firstOrNull()
+                var includeDir =
+                    if (path != null) {
+                        packageDir.resolve(path)
+                    } else {
+                        packageDir.resolve("Sources").resolve(name ?: "")
+                    }
+                if (publicHeadersPath != null) {
+                    includeDir = includeDir.resolve(publicHeadersPath)
+                }
+                if (includeDir.exists()) {
+                    result.add(includeDir)
+                } else {
+                    logger.error("No header found at ${manifest.path}")
+                }
+            }
+        } else {
+            logger.debug("No manifest found at ${manifest.path}")
+        }
+        return result
+    }
+
     private fun extractHeaderPathFromModuleMap(module: String): Set<File> {
         /*
          * find a better regex to extract the header value
@@ -111,9 +162,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             }.toSetOrEmpty()
     }
 
-    private fun getModuleNames(): List<String> =
+    private fun getModuleNames(): List<ModuleInfo> =
         buildList {
-            add(productName.get()) // the first item must be the product name
+            add(ModuleInfo(productName.get())) // the first item must be the product name
             addAll(
                 packages
                     .get()
@@ -127,16 +178,20 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 dependency.productsConfig.productPackages.flatMap { product ->
                                     product.products.map { it }
                                 }
-                            val namesList = productList.map { product -> product.name }
+                            val namesList =
+                                productList.map { product ->
+                                    ModuleInfo(product.name, dependency.packageName)
+                                }
                             namesList
                         } else {
-                            listOf(dependency.packageName)
+                            listOf(ModuleInfo(dependency.packageName))
                         }
-                    }.also {
-                        logger.debug("Product names to export: {}", it)
                     },
             )
-        }.distinct()
+        }.distinctBy { it.name }
+            .also {
+                logger.debug("Product names to export: {}", it)
+            }
 
     /**
      * Constructs and returns a string of linker flags and options specific to the build configuration.
@@ -173,15 +228,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 logger.debug("LOOKING for module dir {}", moduleName)
                 getBuildDirectoriesContent("build", "framework")
                     .find {
-                        it.nameWithoutExtension.lowercase() == moduleName.lowercase()
+                        it.nameWithoutExtension.lowercase() == moduleName.name.lowercase()
                     }?.let { buildDir ->
-                        logger.debug("Found dir {} for {}", buildDir, moduleName)
+                        logger.warn("debug dir {} for {}", buildDir, moduleName)
                         moduleConfigs.add(
                             ModuleConfig(
                                 isFramework = buildDir.extension == "framework",
-                                name = moduleName,
+                                name = moduleName.name,
                                 buildDir = buildDir,
-                                definitionFile = getBuildDirectory().resolve("$moduleName.def"),
+                                packageName = moduleName.packageName,
+                                definitionFile = getBuildDirectory().resolve("${moduleName.name}.def"),
                             ),
                         )
                     }
@@ -276,6 +332,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
         val headerSearchPaths =
             buildList {
+                addAll(extractPublicHeaderFromCheckout(moduleConfig))
                 addAll(getBuildDirectoriesContent("build"))
                 addAll(implicitDependencies)
                 addAll(extractHeaderPathFromModuleMap(mapFileContent))
