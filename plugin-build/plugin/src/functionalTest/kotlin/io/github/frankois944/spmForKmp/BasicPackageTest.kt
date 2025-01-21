@@ -29,10 +29,9 @@ class BasicPackageTest : BaseTest() {
                     ),
                 ).withKotlinSources(
                     KotlinSource.of(
+                        imports = listOf("dummy.TestView"),
                         content =
                             """
-                            package com.example
-                            import dummy.TestView
                             @kotlinx.cinterop.ExperimentalForeignApi
                             val view = TestView()
                             """.trimIndent(),

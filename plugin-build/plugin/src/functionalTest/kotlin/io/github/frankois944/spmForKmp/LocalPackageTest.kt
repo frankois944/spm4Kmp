@@ -48,11 +48,7 @@ class LocalPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import LocalSourceDummyFramework.LocalSourceDummy
-                            """.trimIndent(),
+                        imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -99,11 +95,7 @@ class LocalPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import LocalSourceDummyFramework.LocalSourceDummy
-                            """.trimIndent(),
+                        imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),
                     ),
                 ).build()
 

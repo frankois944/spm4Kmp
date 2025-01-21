@@ -1,7 +1,6 @@
 package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
-import com.autonomousapps.kit.GradleBuilder.build
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
@@ -38,11 +37,7 @@ class BinaryPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import DummyFramework.DummyFrameworkVersionNumber
-                            """.trimIndent(),
+                        imports = listOf("DummyFramework.DummyFrameworkVersionNumber"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -85,11 +80,7 @@ class BinaryPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import DummyFramework.DummyFrameworkVersionNumber
-                            """.trimIndent(),
+                        imports = listOf("DummyFramework.DummyFrameworkVersionNumber"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(

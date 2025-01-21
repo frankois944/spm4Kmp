@@ -85,13 +85,7 @@ class ComplexPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import dummy.MySwiftClassEmbedded
-                            import LocalSourceDummyFramework.LocalSourceDummy
-
-                            """.trimIndent(),
+                        imports = listOf("dummy.MySwiftClassEmbedded", "LocalSourceDummyFramework.LocalSourceDummy"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(

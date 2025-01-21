@@ -33,11 +33,7 @@ class RemotePackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import dummy.MySwiftClass
-                            """.trimIndent(),
+                        imports = listOf("dummy.MySwiftClass"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -84,11 +80,7 @@ class RemotePackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import dummy.MySwiftClass
-                            """.trimIndent(),
+                        imports = listOf("dummy.MySwiftClass"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -135,11 +127,7 @@ class RemotePackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import dummy.MySwiftClass
-                            """.trimIndent(),
+                        imports = listOf("dummy.MySwiftClass"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -189,12 +177,7 @@ class RemotePackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import FirebaseCore.FIRApp
-                            import FirebaseAnalytics.FIRConsentStatusGranted
-                            """.trimIndent(),
+                        imports = listOf("FirebaseCore.FIRApp", "FirebaseAnalytics.FIRConsentStatusGranted"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(

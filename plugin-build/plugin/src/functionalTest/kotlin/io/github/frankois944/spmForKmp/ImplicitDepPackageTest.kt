@@ -33,11 +33,7 @@ class ImplicitDepPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import GoogleSignIn.GIDSignIn
-                            """.trimIndent(),
+                        imports = listOf("GoogleSignIn.GIDSignIn"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -90,12 +86,7 @@ class ImplicitDepPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import FirebaseAppDistribution.FIRAppDistribution
-                            import FirebaseStorage.FIRStorage
-                            """.trimIndent(),
+                        imports = listOf("FirebaseAppDistribution.FIRAppDistribution", "FirebaseStorage.FIRStorage"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
