@@ -49,6 +49,70 @@ class BasicPackageTest : BaseTest() {
     }
 
     @Test
+    fun `build with alternative declaration of dependency`() {
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+                            SwiftDependency.Package.Local(
+                                path = "${localPackageDirectory.absolutePath}",
+                                packageName = "LocalSourceDummyFramework",
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
+                            )
+                            """.trimIndent(),
+                    ),
+                    KotlinSource.of(
+                        content =
+                            """
+                            SwiftDependency.Package.Remote.Version(
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                                version = "1.8.3",
+                                products = {
+                                    add("CryptoSwift")
+                                },
+                            )
+                            """.trimIndent(),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import UIKit
+                            import LocalSourceDummyFramework
+                            import CryptoSwift
+                            @objc public class TestView: UIView {}
+                            """.trimIndent(),
+                    ),
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        imports = listOf("dummy.TestView"),
+                        content =
+                            """
+                            @kotlinx.cinterop.ExperimentalForeignApi
+                            val view = TestView()
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        // When
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
+
+    @Test
     fun `build with custom cache path`() {
         val cache = File("/tmp/spm4kmp/cache").also { it.deleteRecursively() }
         val security = File("/tmp/spm4kmp/security").also { it.deleteRecursively() }
@@ -85,13 +149,6 @@ class BasicPackageTest : BaseTest() {
                             ),
                         )
                     },
-                ).withKotlinSources(
-                    KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            """.trimIndent(),
-                    ),
                 ).build()
 
         // When

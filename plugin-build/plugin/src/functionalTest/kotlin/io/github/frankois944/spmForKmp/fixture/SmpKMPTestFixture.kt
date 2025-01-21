@@ -38,6 +38,7 @@ abstract class SmpKMPTestFixture private constructor(
         val sharedCachePath: String? = null,
         val sharedConfigPath: String? = null,
         val sharedSecurityPath: String? = null,
+        val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
     )
 
     protected abstract fun createProject(): GradleProject
@@ -182,6 +183,12 @@ swiftPackageConfig {
                         }
                         appendLine(")")
                     }
+
+                extension.rawDependencyConfiguration.forEach { rawDependency ->
+                    appendLine("    dependency(     ")
+                    appendLine(rawDependency.content)
+                    appendLine(")")
+                }
 
                 extension.packages.forEach { definition ->
                     appendLine("    dependency(     ")
@@ -363,6 +370,11 @@ $pluginBlock
         fun withSecurity(path: String) =
             apply {
                 config = config.copy(sharedSecurityPath = path)
+            }
+
+        fun withRawDependencies(vararg sources: KotlinSource) =
+            apply {
+                config = config.copy(rawDependencyConfiguration = sources.toList())
             }
 
         fun build(): SmpKMPTestFixture =
