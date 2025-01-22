@@ -7,7 +7,7 @@ import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
-import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.config.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductConfig
 import io.github.frankois944.spmForKmp.definition.product.ProductName
@@ -31,6 +31,7 @@ abstract class SmpKMPTestFixture private constructor(
         var minTvos: String = "12.0",
         var minWatchos: String = "4.0",
         var toolsVersion: String = "5.9",
+        var packageDependencyPrefix: String? = null,
         var targets: List<CompileTarget> = listOf(CompileTarget.iosSimulatorArm64),
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
@@ -149,6 +150,9 @@ swiftPackageConfig {
     minWatchos = "${extension.minWatchos}"
 """,
                     )
+                    extension.packageDependencyPrefix?.let {
+                        append("packageDependencyPrefix = \"${extension.packageDependencyPrefix}\"\n")
+                    }
                     extension.sharedCachePath?.let {
                         append("sharedCachePath = \"${extension.sharedCachePath}\"\n")
                     }
@@ -392,6 +396,11 @@ swiftPackageConfig {
         fun withRawPluginConfiguration(vararg sources: KotlinSource) =
             apply {
                 config = config.copy(rawPluginConfiguration = sources.toList())
+            }
+
+        fun withPackageDependencyPrefix(prefix: String?) =
+            apply {
+                config = config.copy(packageDependencyPrefix = prefix)
             }
 
         fun build(): SmpKMPTestFixture =
