@@ -157,7 +157,8 @@ The Plug-in is reproducing the CocoaPods plugin behavior with the same kind of i
 > Add the folder to your project as a Local package, that's all.
 >
 > Note : When updating your configuration, reset the package cache to apply the modification.
->
+
+Note: If your package doesn't work with the plugin, please create an issue.
 
 
 ### 4.1. Using inside your bridge
