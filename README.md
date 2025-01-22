@@ -1,6 +1,6 @@
 # The Swift Package Manager for Kotlin multiplatform Plugin
 
-[![GitHub Release](https://img.shields.io/github/v/release/frankois944/spm4Kmp)](https://github.com/frankois944/spm4Kmp/releases/)
+[![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp)
 [![build&tests](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg)](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml)
 [![codecov](https://codecov.io/gh/frankois944/spm4Kmp/graph/badge.svg?token=OXEHFLQG1I)](https://codecov.io/gh/frankois944/spm4Kmp)
 [![GitHub License](https://img.shields.io/github/license/frankois944/spm4kmp)](https://github.com/frankois944/spm4Kmp/blob/main/LICENSE)
@@ -15,11 +15,11 @@ Also, You can **embed your own Swift code** for a direct import to your Kotlin l
 
 This project greatly needs feedback and information about the edge case for progressing; the discussion tab is welcomed.
 
-### [Let's poll](https://github.com/frankois944/spm4Kmp/discussions/45) 
+### [Let's poll](https://github.com/frankois944/spm4Kmp/discussions/45)
 
 ## Features
 
-- **Create a bridge easily**: Import your own Swift code for functionality can't be done in Kotlin for example.
+- **Create a bridge easily**: Import your own Swift code for functionality can't be done in Kotlin.
 - **Import Swift compatible code to Kotlin**: Enable **SPM dependencies** and your **own Swift code** to be exposed directly in your Kotlin code (if compatible).
 - **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages with dependencies.
 
@@ -36,11 +36,11 @@ A fully working sample is [available](https://github.com/frankois944/spm4Kmp/tre
 
 Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `plugins` block:
 
-[![GitHub Release](https://img.shields.io/github/v/release/frankois944/spm4Kmp)](https://github.com/frankois944/spm4Kmp/releases/)
+[![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp)
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("io.github.frankois944.spmForKmp").version("0.0.9") // Apply the spmForKmp plugin
+    id("io.github.frankois944.spmForKmp").version("0.1.0") // Apply the spmForKmp plugin
 }
 ```
 
@@ -157,12 +157,13 @@ The Plug-in is reproducing the CocoaPods plugin behavior with the same kind of i
 > Add the folder to your project as a Local package, that's all.
 >
 > Note : When updating your configuration, reset the package cache to apply the modification.
->
+
+Note: If your package doesn't work with the plugin, please create an issue.
 
 
 ### 4.1. Using inside your bridge
 
-You can also use the dependency you have added in the `swiftPackageConfig` block in your Swift code.
+You can use the dependency you have added in the `swiftPackageConfig` block in your Swift code.
 
 For example, `CryptoSwift` is not a library that can be used directly in Kotlin code, but you can create a bridge in your Swift code.
 
@@ -196,7 +197,7 @@ import CryptoSwift
 
 ### 4.2. Using inside your Kotlin
 
-You can also use the dependency you have added in the `swiftPackageConfig` in your Kotlin applications.
+You can use the dependency you have added in the `swiftPackageConfig` in your Kotlin applications.
 
 ```kotlin
 swiftPackageConfig {

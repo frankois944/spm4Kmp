@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="premerge" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Linter" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -12,7 +12,6 @@
         <list>
           <option value=":plugin-build:plugin:ktlintFunctionalTestSourceSetCheck" />
           <option value=":plugin-build:plugin:detektMain" />
-          <option value=":preMerge" />
         </list>
       </option>
       <option name="vmOptions" />

@@ -99,9 +99,11 @@ public abstract class PackageRootDefinitionExtension
          * If set to `true`, the package is being built with debug configuration. This can be useful for
          * testing or development purposes where debug symbols and additional information are required.
          *
-         * Set to `false` for release builds.
+         * Note: release build are faster
+         *
+         * Default value: `false`
          */
-        public var debug: Boolean = true
+        public var debug: Boolean = false
 
         /**
          * Internal list used to store Swift package dependencies.

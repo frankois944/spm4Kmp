@@ -33,11 +33,7 @@ class ImplicitDepPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import GoogleSignIn.GIDSignIn
-                            """.trimIndent(),
+                        imports = listOf("GoogleSignIn.GIDSignIn"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -90,12 +86,7 @@ class ImplicitDepPackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        content =
-                            """
-                            package com.example
-                            import FirebaseAppDistribution.FIRAppDistribution
-                            import FirebaseStorage.FIRStorage
-                            """.trimIndent(),
+                        imports = listOf("FirebaseAppDistribution.FIRAppDistribution", "FirebaseStorage.FIRStorage"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -104,6 +95,48 @@ class ImplicitDepPackageTest : BaseTest() {
                             import Foundation
                             import FirebaseAppDistribution
                             import FirebaseStorage
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
+
+    @Test
+    fun `build with custom public header`() {
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Remote.Version(
+                                url = URI("https://github.com/bugsnag/bugsnag-cocoa"),
+                                products = {
+                                    add(
+                                        "Bugsnag",
+                                        "BugsnagNetworkRequestPlugin",
+                                        exportToKotlin = true,
+                                    )
+                                },
+                                version = "6.31.0",
+                            ),
+                        )
+                    },
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import Bugsnag
+                            import BugsnagNetworkRequestPlugin
                             """.trimIndent(),
                     ),
                 ).build()
