@@ -23,6 +23,7 @@ let package = Package(
       dependencies: [
         .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
         .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
+        .product(name: "FirebasePerformance", package: "firebase-ios-sdk"),
         .product(name: "FirebaseDatabase", package: "firebase-ios-sdk"), "DummyFramework",
         .product(name: "LocalSourceDummyFramework", package: "LocalSourceDummyFramework"),
         .product(name: "CryptoSwift", package: "CryptoSwift"),

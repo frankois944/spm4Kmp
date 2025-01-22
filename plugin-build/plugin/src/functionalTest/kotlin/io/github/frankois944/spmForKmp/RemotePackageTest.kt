@@ -169,7 +169,12 @@ class RemotePackageTest : BaseTest() {
                                 version = "11.6.0",
                                 packageName = "",
                                 products = {
-                                    add(ProductName("FirebaseCore"), ProductName("FirebaseAnalytics"), exportToKotlin = true)
+                                    add(
+                                        ProductName("FirebaseCore"),
+                                        ProductName("FirebaseAnalytics"),
+                                        exportToKotlin = true,
+                                    )
+                                    add("FirebasePerformance", exportToKotlin = true)
                                     add("FirebaseCrashlytics")
                                 },
                             ),
@@ -177,7 +182,12 @@ class RemotePackageTest : BaseTest() {
                     },
                 ).withKotlinSources(
                     KotlinSource.of(
-                        imports = listOf("FirebaseCore.FIRApp", "FirebaseAnalytics.FIRConsentStatusGranted"),
+                        imports =
+                            listOf(
+                                "FirebaseCore.FIRApp",
+                                "FirebaseAnalytics.FIRConsentStatusGranted",
+                                "FirebasePerformance.FIRPerformance",
+                            ),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -187,6 +197,7 @@ class RemotePackageTest : BaseTest() {
                             import FirebaseCore
                             import FirebaseAnalytics
                             import FirebaseCrashlytics
+                            import FirebasePerformance
 
                             @objc public class MySwiftClass: NSObject {
                             }

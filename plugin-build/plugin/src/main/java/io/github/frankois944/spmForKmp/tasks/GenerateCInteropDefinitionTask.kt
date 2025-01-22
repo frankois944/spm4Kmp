@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.gradle.utils.toSetOrEmpty
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
+@Suppress("TooManyFunctions")
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     init {
         onlyIf {
@@ -82,77 +83,76 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             ?.toList()
             .orEmpty()
 
+    private fun extractPublicHeaderFromCheckout(module: ModuleConfig): Set<File> {
+        logger.debug("Looking for public header for ${module.name}")
+
+        val checkoutsDir = "checkouts"
+        val packageSwift = "Package.swift"
+        val sourcesDir = "Sources"
+
+        val packageDir = scratchDir.get().resolve(checkoutsDir).resolve(module.packageName)
+        val manifestFile = packageDir.resolve(packageSwift)
+        val result = mutableSetOf<File>()
+
+        if (!manifestFile.exists()) {
+            logger.debug("No manifest found at ${manifestFile.path}")
+            return result
+        }
+
+        val content = manifestFile.readText()
+        val targets = extractTargetBlocks(content)
+
+        targets.forEach { target ->
+            val name = extractFirstMatch(target, """name:\s*"([^"]+)"""")
+            val targetPath = extractFirstMatch(target, """path:\s*"([^"]+)"""")
+            logger.debug("targetPath: $targetPath")
+            val publicHeadersPath = extractFirstMatch(target, """publicHeadersPath:\s*"([^"]+)"""")
+            logger.debug("publicHeadersPath: $publicHeadersPath")
+            var resolvedIncludeDir =
+                if (targetPath != null) {
+                    packageDir.resolve(targetPath)
+                } else {
+                    packageDir.resolve(sourcesDir).resolve(name ?: module.name)
+                }
+
+            if (publicHeadersPath != null) {
+                resolvedIncludeDir = resolvedIncludeDir.resolve(publicHeadersPath)
+            }
+
+            logger.debug("resolvedIncludeDir: {}", resolvedIncludeDir)
+            if (resolvedIncludeDir.exists()) {
+                result.add(resolvedIncludeDir)
+            } else {
+                logger.debug("PUBLIC HEADER NOT FOUND AT: {} FOR : {}", resolvedIncludeDir, module.name)
+            }
+        }
+        return result
+    }
+
+    private fun extractFirstMatch(
+        input: String,
+        pattern: String,
+    ): String? = Regex(pattern).find(input)?.groupValues?.getOrNull(1)
+
     private fun extractModuleNameFromModuleMap(module: String): String? {
-        /*
-         * find a better regex to extract the module value
-         */
-        val regex = """module\s+(\w+)""".toRegex()
+        val regex = """module\s+\S+\s+""".toRegex()
         return regex
             .find(module)
             ?.groupValues
             ?.firstOrNull()
             ?.replace("module", "")
             ?.trim()
-    }
-
-    private fun extractPublicHeaderFromCheckout(module: ModuleConfig): Set<File> {
-        logger.debug("Loocking for public header for ${module.name}")
-        val packageDir =
-            scratchDir
-                .get()
-                .resolve("checkouts")
-                .resolve(module.packageName)
-        val manifest = packageDir.resolve("Package.swift")
-        val result = mutableSetOf<File>()
-        if (manifest.exists()) {
-            val content = manifest.readText()
-            val targets = extractTargetBlocks(content)
-            targets.forEach { target ->
-                val path =
-                    Regex("""path:\s*"([^"]+)"""")
-                        .findAll(target)
-                        .mapNotNull { it.groupValues.elementAtOrNull(1) }
-                        .firstOrNull()
-                val publicHeadersPath =
-                    Regex("""publicHeadersPath:\s*"([^"]+)"""")
-                        .findAll(target)
-                        .mapNotNull { it.groupValues.elementAtOrNull(1) }
-                        .firstOrNull()
-                val name =
-                    Regex("""name:\s*"([^"]+)"""")
-                        .findAll(target)
-                        .mapNotNull { it.groupValues.elementAtOrNull(1) }
-                        .firstOrNull()
-                var includeDir =
-                    if (path != null) {
-                        packageDir.resolve(path)
-                    } else {
-                        packageDir.resolve("Sources").resolve(name.orEmpty())
-                    }
-                if (publicHeadersPath != null) {
-                    includeDir = includeDir.resolve(publicHeadersPath)
-                }
-                if (includeDir.exists()) {
-                    result.add(includeDir)
-                }
+            ?.also {
+                logger.debug("MODULE FOUND {}", it)
             }
-        } else {
-            logger.debug("No manifest found at ${manifest.path}")
-        }
-        return result
     }
 
     private fun extractHeaderPathFromModuleMap(module: String): Set<File> {
-        /*
-         * find a better regex to extract the header value
-         */
         val regex = """header\s+"([^"]+)"""".toRegex()
         return regex
             .find(module)
             ?.groupValues
-            ?.firstOrNull()
-            ?.replace("header", "")
-            ?.replace("\"", "")
+            ?.elementAtOrNull(1)
             ?.trim()
             ?.let { File(it) }
             ?.also {
@@ -262,12 +262,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
                 val definition =
                     if (moduleConfig.isFramework) {
-                        generateFrameworkDefinition(moduleName, checksum, moduleConfig)
+                        generateFrameworkDefinition(moduleName, moduleConfig)
                     } else {
-                        generateNonFrameworkDefinition(moduleName, checksum, mapFileContent, moduleConfig)
+                        generateNonFrameworkDefinition(moduleName, mapFileContent, moduleConfig)
                     }.let { def ->
                         // Append staticLibraries for the first index
-                        if (index == 0) "$def\nstaticLibraries = $libName" else def
+                        val md5 = "#checksum: $checksum"
+                        if (index == 0) "$def\n$md5\nstaticLibraries = $libName" else def
                     }
                 if (definition.isNotEmpty()) {
                     moduleConfig.definitionFile.writeText(definition.trimIndent())
@@ -299,7 +300,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     private fun generateFrameworkDefinition(
         moduleName: String,
-        checksum: String,
         moduleConfig: ModuleConfig,
     ): String {
         val frameworkName = moduleConfig.buildDir.nameWithoutExtension
@@ -307,8 +307,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         language = Objective-C
         modules = $moduleName
         package = ${moduleConfig.name}
-        # Set a checksum to avoid build cache
-        # checksum: $checksum
         libraryPaths = "${getBuildDirectory().path}"
         compilerOpts = -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
         linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
@@ -317,7 +315,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     private fun generateNonFrameworkDefinition(
         moduleName: String,
-        checksum: String,
         mapFileContent: String,
         moduleConfig: ModuleConfig,
     ): String {
@@ -330,18 +327,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
         val headerSearchPaths =
             buildList {
+                addAll(extractHeaderPathFromModuleMap(mapFileContent))
                 addAll(extractPublicHeaderFromCheckout(moduleConfig))
                 addAll(getBuildDirectoriesContent("build"))
                 addAll(implicitDependencies)
-                addAll(extractHeaderPathFromModuleMap(mapFileContent))
             }.joinToString(" ") { "-I\"$it\"" }
 
         return """
         language = Objective-C
         modules = $moduleName
         package = ${moduleConfig.name}
-        # Set a checksum to avoid build cache
-        # checksum: $checksum
         libraryPaths = "${getBuildDirectory().path}"
         compilerOpts = -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
         linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
