@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp
+package io.github.frankois944.spmForKmp.config
 
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.Serializable
@@ -116,7 +116,7 @@ public enum class CompileTarget : Serializable {
         }
 
     /**
-     * @see [KonanTarget](https://github.com/JetBrains/kotlin/blob/v2.1.0/native/utils/src/org/jetbrains/kotlin/konan/target/KonanTarget.kt)
+     * @see [org.jetbrains.kotlin.konan.target.KonanTarget](https://github.com/JetBrains/kotlin/blob/v2.1.0/native/utils/src/org/jetbrains/kotlin/konan/target/KonanTarget.kt)
      */
     internal companion object {
         fun byKonanName(konanName: String): CompileTarget? =

@@ -1,6 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks
 
-import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.config.CompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.config.ModuleInfo
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
@@ -16,6 +16,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.utils.toSetOrEmpty
@@ -53,6 +54,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:Input
     abstract val scratchDir: Property<File>
+
+    @get:Input
+    @get:Optional
+    abstract val packageDependencyPrefix: Property<String?>
 
     init {
         description = "Generate the cinterop definitions files"
@@ -303,10 +308,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfig: ModuleConfig,
     ): String {
         val frameworkName = moduleConfig.buildDir.nameWithoutExtension
+        val packageName =
+            packageDependencyPrefix.orNull?.let {
+                "$it.${moduleConfig.name}"
+            } ?: moduleConfig.name
         return """
         language = Objective-C
         modules = $moduleName
-        package = ${moduleConfig.name}
+        package = $packageName
         libraryPaths = "${getBuildDirectory().path}"
         compilerOpts = -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
         linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
@@ -333,10 +342,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 addAll(implicitDependencies)
             }.joinToString(" ") { "-I\"$it\"" }
 
+        val packageName =
+            packageDependencyPrefix.orNull?.let {
+                "$it.${moduleConfig.name}"
+            } ?: moduleConfig.name
         return """
         language = Objective-C
         modules = $moduleName
-        package = ${moduleConfig.name}
+        package = $packageName
         libraryPaths = "${getBuildDirectory().path}"
         compilerOpts = -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
         linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"

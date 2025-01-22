@@ -2,7 +2,7 @@
 
 package io.github.frankois944.spmForKmp
 
-import io.github.frankois944.spmForKmp.config.getAndCreateFakeDefinitionFile
+import io.github.frankois944.spmForKmp.config.CompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.tasks.CompileSwiftPackageTask
@@ -222,12 +222,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         cinterop.mustRunAfter(taskGroup[cinteropTarget])
                         val definitionFile = cInteropTaskNamesWithDefFile[cinterop.name]
                         cinterop.settings.definitionFile.set(definitionFile)
-                    } else {
-                        // the KMP plugin is expecting a def file.
-                        // for cheating with it, using an empty one should be fine.
-                        // as it's no use with other platform than macOS
-                        val fakeDefFile = getAndCreateFakeDefinitionFile()
-                        cinterop.settings.definitionFile.set(fakeDefFile)
                     }
                 }
             }
@@ -327,6 +321,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         )
         task.manifestFile.set(sourcePackageDir.resolve(SWIFT_PACKAGE_NAME))
         task.scratchDir.set(packageScratchDir)
+        task.packageDependencyPrefix.set(extension.packageDependencyPrefix)
     }
 
     private fun computeOsVersion(

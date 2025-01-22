@@ -1,6 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks
 
-import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.config.CompileTarget
 import io.github.frankois944.spmForKmp.operations.getNbJobs
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs

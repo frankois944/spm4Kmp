@@ -1,6 +1,6 @@
 package io.github.frankois944.spmForKmp.operations
 
-import io.github.frankois944.spmForKmp.CompileTarget
+import io.github.frankois944.spmForKmp.config.CompileTarget
 import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.utils.InjectedExecOps
 import org.gradle.api.Project

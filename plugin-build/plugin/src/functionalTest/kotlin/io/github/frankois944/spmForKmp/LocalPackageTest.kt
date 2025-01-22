@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
+import io.github.frankois944.spmForKmp.config.CompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
@@ -96,6 +97,42 @@ class LocalPackageTest : BaseTest() {
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),
+                    ),
+                ).build()
+
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
+
+    @Test
+    fun `build with local packages and custom depenency prefix`() {
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withPackageDependencyPrefix("custom")
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Local(
+                                path = localPackageDirectory.absolutePath,
+                                packageName = "LocalSourceDummyFramework",
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
+                            ),
+                        )
+                    },
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        imports = listOf("custom.LocalSourceDummyFramework.LocalSourceDummy"),
                     ),
                 ).build()
 

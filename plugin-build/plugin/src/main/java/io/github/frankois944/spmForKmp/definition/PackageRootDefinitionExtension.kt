@@ -106,6 +106,15 @@ public abstract class PackageRootDefinitionExtension
         public var debug: Boolean = false
 
         /**
+         * Represents a prefix used for resolving conflicts or distinguishing between multiple
+         * package dependencies within a Kotlin Multiplatform project.
+         * This variable can be utilized to customize or uniquely identify package names or references when required.
+         *
+         * It is nullable and, when set, the prefix will be applied to all dependencies.
+         */
+        public var packageDependencyPrefix: String? = null
+
+        /**
          * Internal list used to store Swift package dependencies.
          *
          * This property is mutable and holds a list of [SwiftDependency] instances. It is used to accumulate and manage
