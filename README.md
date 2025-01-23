@@ -24,7 +24,7 @@ This project greatly needs feedback and information about the edge case for prog
 - **Automatic CInterop Configuration**: Simplify the process of creating native CInterop definitions for your Swift packages with dependencies.
 
 > [!WARNING]
-> Pure Swift packages can't be exported to Kotlin; creating a bridge with this plugin is a solution for avoiding this issue.
+> [Pure Swift packages can't be exported to Kotlin](https://kotlinlang.org/docs/native-objc-interop.html#importing-swift-objective-c-libraries-to-kotlin); creating a bridge with this plugin is a solution for avoiding this issue.
 
 ---
 
