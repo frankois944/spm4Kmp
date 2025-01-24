@@ -236,12 +236,12 @@ internal fun Project.printExecLogs(
     if (isError) {
         logger.error(
             """
-            ERROR FOUND WHEN EXEC
-            RUN $action
-            ARGS xcrun ${args.joinToString(" ")}
-            ERROR $errorOutput
-            OUTPUT $standardOutput
-            ###
+ERROR FOUND WHEN EXEC
+RUN $action
+ARGS xcrun ${args.joinToString(" ")}
+ERROR $errorOutput
+OUTPUT $standardOutput
+###
             """.trimMargin(),
         )
         throw RuntimeException(
@@ -250,10 +250,10 @@ internal fun Project.printExecLogs(
     } else {
         logger.debug(
             """
-            RUN $action
-            ARGS xcrun ${args.joinToString(" ")}
-            OUTPUT $standardOutput
-            ###
+RUN $action
+ARGS xcrun ${args.joinToString(" ")}
+OUTPUT $standardOutput
+###
             """.trimMargin(),
         )
     }

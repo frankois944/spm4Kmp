@@ -30,6 +30,5 @@ internal fun SwiftDependency.toDependencyDeclaration(): String? =
             .package(url: "$url", branch: "$branch")
             """.trimIndent()
 
-        is SwiftDependency.Binary.Local -> null
-        is SwiftDependency.Binary.Remote -> null
+        else -> null
     }
