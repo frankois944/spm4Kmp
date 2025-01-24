@@ -283,7 +283,7 @@ Config: $moduleConfig
         val frameworkName = moduleConfig.buildDir.nameWithoutExtension
         val packageName =
             packageDependencyPrefix.orNull?.let {
-                "${it}_${moduleConfig.name}"
+                "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
         return """
         language = Objective-C
@@ -315,7 +315,7 @@ Config: $moduleConfig
 
         val packageName =
             packageDependencyPrefix.orNull?.let {
-                "${it}_${moduleConfig.name}"
+                "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
         return """
         language = Objective-C
