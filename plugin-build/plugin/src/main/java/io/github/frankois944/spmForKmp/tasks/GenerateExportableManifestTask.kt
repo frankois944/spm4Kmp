@@ -93,9 +93,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
         } catch (ex: Exception) {
             logger.error(
                 """
-Manifest file generated :
-${manifestFile.get().asFile}
-${manifestFile.get().asFile.readText()}
+                Manifest file generated :
+                ${manifestFile.get().asFile}manifestFile.get().asFile}
+                ${manifestFile.get().asFile.readText()}manifestFile.get().asFile.readText()}
                 """.trimIndent(),
             )
             throw ex

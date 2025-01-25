@@ -76,8 +76,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         if (sourcePackage.get().list()?.isNotEmpty() == true) {
             logger.debug(
                 """
-Copy User Swift files to directory $sourceDir
-${sourcePackage.get().list()?.toList()}
+                Copy User Swift files to directory $sourceDir
+                ${sourcePackage.get().list()?.toList()}sourcePackage.get().list()?.toList()}
                 """.trimIndent(),
             )
             sourcePackage.get().copyRecursively(sourceDir)
