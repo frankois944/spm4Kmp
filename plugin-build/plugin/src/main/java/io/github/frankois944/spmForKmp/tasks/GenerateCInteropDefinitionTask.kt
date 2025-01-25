@@ -193,7 +193,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         logger.debug(
             """
             moduleNames
-            $moduleNamesmoduleNames
+            $moduleNames
             """.trimIndent(),
         )
 
