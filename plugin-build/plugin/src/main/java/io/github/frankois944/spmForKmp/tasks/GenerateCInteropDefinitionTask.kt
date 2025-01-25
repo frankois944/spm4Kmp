@@ -220,7 +220,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         logger.debug(
             """
             modulesConfigs found
-            $moduleConfigsmoduleConfigs
+            $moduleConfigs
             """.trimIndent(),
         )
         moduleConfigs.forEachIndexed { index, moduleConfig ->
