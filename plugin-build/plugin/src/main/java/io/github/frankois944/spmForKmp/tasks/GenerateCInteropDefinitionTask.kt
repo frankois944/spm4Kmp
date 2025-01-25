@@ -286,12 +286,12 @@ Config: $moduleConfig
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
         return """
-        language = Objective-C
-        modules = $moduleName
-        package = $packageName
-        libraryPaths = "${getBuildDirectory().path}"
-        compilerOpts = -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
-        linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
+language = Objective-C
+modules = $moduleName
+package = $packageName
+libraryPaths = "${getBuildDirectory().path}"
+compilerOpts = -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
     """
     }
 
@@ -318,12 +318,12 @@ Config: $moduleConfig
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
         return """
-        language = Objective-C
-        modules = $moduleName
-        package = $packageName
-        libraryPaths = "${getBuildDirectory().path}"
-        compilerOpts = -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
-        linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+language = Objective-C
+modules = $moduleName
+package = $packageName
+libraryPaths = "${getBuildDirectory().path}"
+compilerOpts = -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
     """
     }
 }
