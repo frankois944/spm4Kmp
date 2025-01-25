@@ -160,6 +160,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         logger.debug("Filtered exportable dependency: {}", it)
                     }.flatMap { dependency ->
                         if (dependency is SwiftDependency.Package) {
+                            @Suppress("RedundantHigherOrderMapUsage")
                             dependency.productsConfig.productPackages
                                 .flatMap { product ->
                                     product.products.map { it }
