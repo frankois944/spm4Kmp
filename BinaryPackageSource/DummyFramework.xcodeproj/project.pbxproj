@@ -6,11 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		07FED3DB2D44B8FD00304BB6 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 07FED3DA2D44B8FD00304BB6 /* CryptoSwift */; };
-		07FED3DE2D44BDA600304BB6 /* LaunchDarkly in Frameworks */ = {isa = PBXBuildFile; productRef = 07FED3DD2D44BDA600304BB6 /* LaunchDarkly */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		07F1B0412CDB717E00279900 /* DummyFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DummyFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -41,8 +36,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07FED3DE2D44BDA600304BB6 /* LaunchDarkly in Frameworks */,
-				07FED3DB2D44B8FD00304BB6 /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,8 +89,6 @@
 			);
 			name = DummyFramework;
 			packageProductDependencies = (
-				07FED3DA2D44B8FD00304BB6 /* CryptoSwift */,
-				07FED3DD2D44BDA600304BB6 /* LaunchDarkly */,
 			);
 			productName = DummyFramework;
 			productReference = 07F1B0412CDB717E00279900 /* DummyFramework.framework */;
@@ -128,8 +119,6 @@
 			mainGroup = 07F1B0372CDB717E00279900;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				07FED3D92D44B8FC00304BB6 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
-				07FED3DC2D44BDA600304BB6 /* XCRemoteSwiftPackageReference "ios-client-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 07F1B0422CDB717E00279900 /* Products */;
@@ -403,38 +392,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		07FED3D92D44B8FC00304BB6 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.8.4;
-			};
-		};
-		07FED3DC2D44BDA600304BB6 /* XCRemoteSwiftPackageReference "ios-client-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/launchdarkly/ios-client-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.12.2;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		07FED3DA2D44B8FD00304BB6 /* CryptoSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 07FED3D92D44B8FC00304BB6 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
-			productName = CryptoSwift;
-		};
-		07FED3DD2D44BDA600304BB6 /* LaunchDarkly */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 07FED3DC2D44BDA600304BB6 /* XCRemoteSwiftPackageReference "ios-client-sdk" */;
-			productName = LaunchDarkly;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 07F1B0382CDB717E00279900 /* Project object */;
 }

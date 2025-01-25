@@ -6,8 +6,6 @@
 //
 
 import Foundation
-internal import CryptoSwift
-internal import LaunchDarkly
 
 @objc public class MyDummyFramework: NSObject {
     
