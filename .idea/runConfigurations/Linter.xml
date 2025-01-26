@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":plugin-build:plugin:ktlintFunctionalTestSourceSetCheck" />
+          <option value=":plugin-build:plugin:ktlintCheck" />
           <option value=":plugin-build:plugin:detektMain" />
         </list>
       </option>

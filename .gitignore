@@ -18,3 +18,7 @@ plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework/.buil
 example/iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 example/exportedNativeShared/.swiftpm/xcode/xcuserdata
 example/exportedNativeIosShared/.swiftpm/xcode/xcuserdata
+BinaryPackageSource/DummyFramework.xcodeproj/project.xcworkspace/xcuserdata
+BinaryPackageSource/DummyFramework.xcodeproj/xcuserdata
+BinaryPackageSource/archives
+.scannerwork

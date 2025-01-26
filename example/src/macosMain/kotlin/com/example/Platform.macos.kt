@@ -1,6 +1,6 @@
 package com.example
 
-class MacosPlatform : com.example.Platform {
+class MacosPlatform : Platform {
     override val name: String = "MacOS"
 }
 

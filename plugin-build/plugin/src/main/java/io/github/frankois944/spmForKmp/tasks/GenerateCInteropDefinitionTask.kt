@@ -5,7 +5,6 @@ import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.config.ModuleInfo
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
-import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
@@ -19,11 +18,9 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.kotlin.gradle.utils.toSetOrEmpty
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
-@Suppress("TooManyFunctions")
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     init {
         onlyIf {
@@ -152,19 +149,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             }
     }
 
-    private fun extractHeaderPathFromModuleMap(module: String): Set<File> {
-        val regex = """header\s+"([^"]+)"""".toRegex()
-        return regex
-            .find(module)
-            ?.groupValues
-            ?.elementAtOrNull(1)
-            ?.trim()
-            ?.let { File(it) }
-            ?.also {
-                logger.debug("HEADER FOUND {}", it)
-            }.toSetOrEmpty()
-    }
-
     private fun getModuleNames(): List<ModuleInfo> =
         buildList {
             add(ModuleInfo(productName.get())) // the first item must be the product name
@@ -176,16 +160,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         logger.debug("Filtered exportable dependency: {}", it)
                     }.flatMap { dependency ->
                         if (dependency is SwiftDependency.Package) {
-                            val productList: List<ProductName> =
-                                @Suppress("RedundantHigherOrderMapUsage")
-                                dependency.productsConfig.productPackages.flatMap { product ->
+                            @Suppress("RedundantHigherOrderMapUsage")
+                            dependency.productsConfig.productPackages
+                                .flatMap { product ->
                                     product.products.map { it }
-                                }
-                            val namesList =
-                                productList.map { product ->
+                                }.map { product ->
                                     ModuleInfo(product.name, dependency.packageName)
                                 }
-                            namesList
                         } else {
                             listOf(ModuleInfo(dependency.packageName))
                         }
@@ -196,15 +177,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 logger.debug("Product names to export: {}", it)
             }
 
-    /**
-     * Constructs and returns a string of linker flags and options specific to the build configuration.
-     *
-     * The method determines the appropriate linker platform version name or minimum OS version name
-     * based on the Xcode version. It combines various flags such as platform version, OS version,
-     * runtime path, and library path for the generated binary.
-     *
-     * @return A string of linker flags and options constructed based on the build configuration.
-     */
     private fun getExtraLinkers(): String {
         val xcodeDevPath = project.getXcodeDevPath()
         return buildList {
@@ -269,9 +241,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     if (moduleConfig.isFramework) {
                         generateFrameworkDefinition(moduleName, moduleConfig)
                     } else {
-                        generateNonFrameworkDefinition(moduleName, mapFileContent, moduleConfig)
+                        generateNonFrameworkDefinition(moduleName, moduleConfig)
                     }.let { def ->
-                        // Append staticLibraries for the first index
+                        // Append staticLibraries for the first index which is the bridge
                         val md5 = "#checksum: $checksum"
                         if (index == 0) "$def\n$md5\nstaticLibraries = $libName" else def
                     }
@@ -285,17 +257,19 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     ######
                     Definition File : ${moduleConfig.definitionFile.name}
                     At Path: ${moduleConfig.definitionFile.path}
-                    ${moduleConfig.definitionFile.readText()}
+                    ${moduleConfig.definitionFile.readText()}moduleConfig.definitionFile.readText()}
                     ######
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {
                 logger.error(
                     """
+                    ######
                     Can't generate definition for ${moduleConfig.name}
                     Expected file: ${moduleConfig.definitionFile.path}
                     Config: $moduleConfig
                     -> Set the `export` parameter to `false` to ignore this module
+                    ######
                     """.trimIndent(),
                     ex,
                 )
@@ -313,18 +287,17 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
         return """
-        language = Objective-C
-        modules = $moduleName
-        package = $packageName
-        libraryPaths = "${getBuildDirectory().path}"
-        compilerOpts = -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
-        linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
+language = Objective-C
+modules = $moduleName
+package = $packageName
+libraryPaths = "${getBuildDirectory().path}"
+compilerOpts = -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
     """
     }
 
     private fun generateNonFrameworkDefinition(
         moduleName: String,
-        mapFileContent: String,
         moduleConfig: ModuleConfig,
     ): String {
         val implicitDependencies =
@@ -336,7 +309,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
         val headerSearchPaths =
             buildList {
-                addAll(extractHeaderPathFromModuleMap(mapFileContent))
                 addAll(extractPublicHeaderFromCheckout(moduleConfig))
                 addAll(getBuildDirectoriesContent("build"))
                 addAll(implicitDependencies)
@@ -347,12 +319,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
         return """
-        language = Objective-C
-        modules = $moduleName
-        package = $packageName
-        libraryPaths = "${getBuildDirectory().path}"
-        compilerOpts = -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
-        linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+language = Objective-C
+modules = $moduleName
+package = $packageName
+libraryPaths = "${getBuildDirectory().path}"
+compilerOpts = -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
     """
     }
 }

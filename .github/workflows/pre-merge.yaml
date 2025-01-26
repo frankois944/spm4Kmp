@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -71,9 +73,11 @@ jobs:
         with:
           paths: '**/build/test-results/**/TEST-*.xml'
           show: 'all'
-      - name: Upload coverage to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+      - name: SonarQubeScan
+        uses: SonarSource/sonarqube-scan-action@v4.2.1
+        with:
+          args: >
+            -Dsonar.organization=frankois944
+            -Dsonar.projectKey=frankois944_spm4Kmp
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

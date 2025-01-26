@@ -94,8 +94,8 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             logger.error(
                 """
                 Manifest file generated :
-                ${manifestFile.get().asFile}
-                ${manifestFile.get().asFile.readText()}
+                ${manifestFile.get().asFile}manifestFile.get().asFile}
+                ${manifestFile.get().asFile.readText()}manifestFile.get().asFile.readText()}
                 """.trimIndent(),
             )
             throw ex

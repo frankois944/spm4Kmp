@@ -77,16 +77,12 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             logger.debug(
                 """
                 Copy User Swift files to directory $sourceDir
-                ${sourcePackage.get().list()?.toList()}
+                ${sourcePackage.get().list()?.toList()}sourcePackage.get().list()?.toList()}
                 """.trimIndent(),
             )
             sourcePackage.get().copyRecursively(sourceDir)
         } else {
-            logger.debug(
-                """
-                Copy Dummy swift file to directory $sourceDir
-                """.trimIndent(),
-            )
+            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
             sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
         }
         return workingDir
