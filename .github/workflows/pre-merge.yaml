@@ -75,5 +75,9 @@ jobs:
           show: 'all'
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
+        with:
+          args: >
+            -Dsonar.organization=frankois944
+            -Dsonar.projectKey=frankois944_spm4Kmp
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
