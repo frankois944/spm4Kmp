@@ -2,6 +2,13 @@
 <project version="4">
   <component name="SonarLintProjectSettings">
     <option name="bindingEnabled" value="true" />
+    <option name="fileExclusions">
+      <list>
+        <option value="DIRECTORY:BinaryPackageSource" />
+        <option value="DIRECTORY:example" />
+        <option value="DIRECTORY:plugin-build/plugin/src/functionalTest" />
+      </list>
+    </option>
     <option name="projectKey" value="frankois944_spm4Kmp" />
     <option name="serverId" value="spm4kmp" />
   </component>
