@@ -75,10 +75,5 @@ jobs:
           show: 'all'
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
-        with:
-          args: >
-            -Dsonar.organization=frankois944
-            -Dsonar.projectKey=frankois944_spm4Kmp
-            -Dsonar.coverage.jacoco.xmlReportPaths=plugin-build/plugin/build/reports/jacoco/test/jacocoTestReport.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

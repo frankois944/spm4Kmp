@@ -1,4 +1,5 @@
 import io.gitlab.arturbosch.detekt.Detekt
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     alias(libs.plugins.kotlin) apply false
@@ -28,12 +29,13 @@ allprojects {
     }
 
     ktlint {
-        debug.set(false)
-        verbose.set(true)
         android.set(false)
-        outputToConsole.set(true)
-        ignoreFailures.set(false)
+        outputToConsole.set(false)
+        ignoreFailures.set(true)
         enableExperimentalRules.set(true)
+        reporters {
+            reporter(ReporterType.JSON)
+        }
         filter {
             exclude("**/generated/**")
             include("**/kotlin/**")
