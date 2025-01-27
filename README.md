@@ -41,7 +41,7 @@ Add the plugin to your `build.gradle.kts` or the appropriate Gradle module’s `
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("io.github.frankois944.spmForKmp").version("0.1.1") // Apply the spmForKmp plugin
+    id("io.github.frankois944.spmForKmp").version("0.2.0") // Apply the spmForKmp plugin
 }
 ```
 
