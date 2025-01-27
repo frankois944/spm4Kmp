@@ -2,15 +2,15 @@ name: Build and Tests
 
 on:
   push:
-    paths-ignore:
-      - 'README.md'
     branches:
       - main
-  pull_request:
     paths-ignore:
       - 'README.md'
+  pull_request:
     branches:
       - '*'
+    paths-ignore:
+      - 'README.md'
 
 concurrency:
   # Use a unique identifier for the workflow cancellation group.
