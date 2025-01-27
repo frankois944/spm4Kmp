@@ -100,6 +100,11 @@ swiftPackageConfig {
         // customPackageSourcePath = "{buildDir}/src/swift"
         // the swift code is built in debug by default
         // debug = false :
+        // add a prefix to the dependencies package names
+        // ei :
+        //  - packageDependencyPrefix = "customName"
+        //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
+        // packageDependencyPrefix = null // default null
         dependency(
             SwiftDependency.Package.Remote.Version(
                 // Repository URL
