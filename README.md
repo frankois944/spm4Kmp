@@ -126,6 +126,8 @@ The plugin supports the following configurations :
 
 For more information, refer to the [SwiftDependency](https://github.com/frankois944/spm4Kmp/blob/main/plugin-build/plugin/src/main/java/io/github/frankois944/spmForKmp/definition/SwiftDependency.kt) file.
 
+A sample of how to make a Binary xcFramework compatible ObjC can be found [here](https://github.com/frankois944/spm4Kmp/tree/main/BinaryPackageSource).
+
 ---
 
 ### 3. Add your embedded Swift code
