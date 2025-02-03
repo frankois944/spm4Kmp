@@ -1,7 +1,10 @@
 ---
 name: Bug report
 about: Create a report to help us improve
+assignees: frankois944
 ---
+
+Before creating an issue, please test on the [example project](https://github.com/frankois944/spm4Kmp/tree/main/example), as it's the reference for the development of this project.
 
 ## 🐛 Describe the bug
 <!-- A clear and concise description of what the bug is. -->
@@ -21,4 +24,7 @@ about: Create a report to help us improve
 ## 📱 Tech info
  - Device: <!-- e.g. Nexus One -->
  - OS: <!-- e.g. 7.1.1 -->
- - Library/App version: <!-- e.g. 1.0.0 -->
+ - Library: <!-- e.g. 1.0.0 -->
+ - Gradle: <!-- e.g. 8.12 -->
+ - Android Gradle Plugin: <!-- e.g. 8.0.0 -->
+ - Kotlin: <!-- e.g. 2.1.0 -->
