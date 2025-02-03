@@ -239,8 +239,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 buildDir = buildDir,
                                 packageName = moduleName.packageName,
                                 definitionFile = getBuildDirectory().resolve("${moduleName.name}.def"),
-                                linkerOpts = emptyList(),
-                                compilerOpts = emptyList(),
+                                linkerOpts = moduleName.linkerOpts,
+                                compilerOpts = moduleName.compilerOpts,
                             ),
                         )
                     }
