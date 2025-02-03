@@ -115,6 +115,16 @@ public abstract class PackageRootDefinitionExtension
         public var packageDependencyPrefix: String? = null
 
         /**
+         *  Add custom linker flag when exporting the product to kotlin
+         */
+        public val linkerOpts: List<String> = emptyList()
+
+        /**
+         *  Add custom compiler flag when exporting the product to kotlin
+         */
+        public val compilerOpts: List<String> = emptyList()
+
+        /**
          * Internal list used to store Swift package dependencies.
          *
          * This property is mutable and holds a list of [SwiftDependency] instances. It is used to accumulate and manage

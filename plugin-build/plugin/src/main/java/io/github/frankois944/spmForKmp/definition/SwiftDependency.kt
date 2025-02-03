@@ -44,6 +44,16 @@ public sealed interface SwiftDependency : Serializable {
          */
         public val exportToKotlin: Boolean
 
+        /**
+         *  Add custom linker flag when exporting the product to kotlin
+         */
+        public val linkerOpts: List<String>
+
+        /**
+         *  Add custom compiler flag when exporting the product to kotlin
+         */
+        public val compilerOpts: List<String>
+
         @Suppress("MaxLineLength")
         /**
          * Represents a local binary dependency in the Kotlin Multiplatform project.
@@ -58,6 +68,8 @@ public sealed interface SwiftDependency : Serializable {
             val path: String,
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
+            override val linkerOpts: List<String> = emptyList(),
+            override val compilerOpts: List<String> = emptyList(),
         ) : Binary
 
         @Suppress("MaxLineLength")
@@ -76,6 +88,8 @@ public sealed interface SwiftDependency : Serializable {
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
             val checksum: String,
+            override val linkerOpts: List<String> = emptyList(),
+            override val compilerOpts: List<String> = emptyList(),
         ) : Binary
     }
 
@@ -175,12 +189,12 @@ public sealed interface SwiftDependency : Serializable {
             }
 
             internal companion object {
-                private const val serialVersionUID: Long = 1
+                private const val serialVersionUID: Long = 2
             }
         }
 
         internal companion object {
-            private const val serialVersionUID: Long = 1
+            private const val serialVersionUID: Long = 2
         }
     }
 }
