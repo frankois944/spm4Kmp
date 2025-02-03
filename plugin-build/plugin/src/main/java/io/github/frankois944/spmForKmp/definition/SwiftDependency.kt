@@ -47,12 +47,12 @@ public sealed interface SwiftDependency : Serializable {
         /**
          *  Add custom linker flag when exporting the product to kotlin
          */
-        public val linkerOpts: List<String>
+        public var linkerOpts: List<String>
 
         /**
          *  Add custom compiler flag when exporting the product to kotlin
          */
-        public val compilerOpts: List<String>
+        public var compilerOpts: List<String>
 
         @Suppress("MaxLineLength")
         /**
@@ -68,8 +68,8 @@ public sealed interface SwiftDependency : Serializable {
             val path: String,
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
-            override val linkerOpts: List<String> = emptyList(),
-            override val compilerOpts: List<String> = emptyList(),
+            override var linkerOpts: List<String> = emptyList(),
+            override var compilerOpts: List<String> = emptyList(),
         ) : Binary
 
         @Suppress("MaxLineLength")
@@ -88,8 +88,8 @@ public sealed interface SwiftDependency : Serializable {
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
             val checksum: String,
-            override val linkerOpts: List<String> = emptyList(),
-            override val compilerOpts: List<String> = emptyList(),
+            override var linkerOpts: List<String> = emptyList(),
+            override var compilerOpts: List<String> = emptyList(),
         ) : Binary
     }
 

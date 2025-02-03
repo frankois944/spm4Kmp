@@ -16,8 +16,8 @@ import java.io.Serializable
 public data class ProductName(
     val name: String,
     val alias: String? = null,
-    val linkerOpts: List<String> = emptyList(),
-    val compilerOpts: List<String> = emptyList(),
+    var linkerOpts: List<String> = emptyList(),
+    var compilerOpts: List<String> = emptyList(),
 ) : Serializable {
     internal companion object {
         private const val serialVersionUID: Long = 2

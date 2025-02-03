@@ -117,12 +117,12 @@ public abstract class PackageRootDefinitionExtension
         /**
          *  Add custom linker flag when exporting the product to kotlin
          */
-        public val linkerOpts: List<String> = emptyList()
+        public var linkerOpts: List<String> = emptyList()
 
         /**
          *  Add custom compiler flag when exporting the product to kotlin
          */
-        public val compilerOpts: List<String> = emptyList()
+        public var compilerOpts: List<String> = emptyList()
 
         /**
          * Internal list used to store Swift package dependencies.
