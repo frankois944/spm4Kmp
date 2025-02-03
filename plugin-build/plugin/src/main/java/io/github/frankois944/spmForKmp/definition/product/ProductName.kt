@@ -9,18 +9,17 @@ import java.io.Serializable
  * identification and resolution of the dependency.
  * @property alias An optional alias that can be used as an alternate reference to the product.
  * Some Package use indirect name for a product.
+ * @property linkerOpts Add custom linker flag when exporting the product to kotlin
+ * @property compilerOpts Add custom compiler flag when exporting the product to kotlin
  *
- * For example:
- *
- * - Name : FirebaseAppDistribution
- * - Alias : FirebaseAppDistribution-Beta
  */
 public data class ProductName(
     val name: String,
     val alias: String? = null,
-    // more to come
+    val linkerOpts: List<String> = emptyList(),
+    val compilerOpts: List<String> = emptyList(),
 ) : Serializable {
     internal companion object {
-        private const val serialVersionUID: Long = 1
+        private const val serialVersionUID: Long = 2
     }
 }

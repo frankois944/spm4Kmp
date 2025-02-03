@@ -77,7 +77,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             logger.debug(
                 """
                 Copy User Swift files to directory $sourceDir
-                ${sourcePackage.get().list()?.toList()}sourcePackage.get().list()?.toList()}
+                ${sourcePackage.get().list()?.toList()}
                 """.trimIndent(),
             )
             sourcePackage.get().copyRecursively(sourceDir)
