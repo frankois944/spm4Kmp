@@ -134,18 +134,6 @@ public var linkerOpts: List<String> = emptyList()
 public var compilerOpts: List<String> = emptyList()
 ```
 
-### packageDependencies
-
-``` kotlin
-/**
- * Internal list used to store Swift package dependencies.
- *
- * This property is mutable and holds a list of [SwiftDependency] instances. It is used to accumulate and manage
- * dependencies added through the `dependency` method in the containing class.
- */
-internal val packageDependencies: MutableList<SwiftDependency> = mutableListOf()
-```
-
 ### dependency
 
 ``` kotlin
@@ -158,9 +146,7 @@ internal val packageDependencies: MutableList<SwiftDependency> = mutableListOf()
  * It supports different dependency models such as local, versioned
  * remote, branch-based remote, or commit-based remote dependencies.
  */
-public fun dependency(vararg dependency: SwiftDependency) {
-    packageDependencies.addAll(dependency)
-}
+public fun dependency(vararg dependency: SwiftDependency)
 ```
 
 ### sharedCachePath
