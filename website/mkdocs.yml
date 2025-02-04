@@ -1,0 +1,4 @@
+site_name: SPM For Kmp documentation
+theme:
+  name: readthedocs
+  color_mode: auto
