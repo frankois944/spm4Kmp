@@ -388,6 +388,16 @@ swiftPackageConfig {
                 config = config.copy(sharedSecurityPath = path)
             }
 
+        fun withMacos(minMacos: String) =
+            apply {
+                config = config.copy(minMacos = minMacos)
+            }
+
+        fun withMinIos(minIos: String) =
+            apply {
+                config = config.copy(minIos = minIos)
+            }
+
         fun withRawDependencies(vararg sources: KotlinSource) =
             apply {
                 config = config.copy(rawDependencyConfiguration = sources.toList())
