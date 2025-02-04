@@ -1,4 +1,4 @@
-# Setup
+# Getting started
 
 ## Requirement
 
@@ -41,13 +41,14 @@ kotlin {
         }
     }
 }
+```
 
+[swiftPackageConfig reference](./references/swiftPackageConfig.md)
+``` kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") { // must match with cinterops.create name
     }
 }
 ```
-
-## swiftPackageConfig
 
 

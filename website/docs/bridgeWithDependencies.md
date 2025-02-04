@@ -4,8 +4,9 @@ On completion with the [basic configuration](bridge.md), it's possible to use ex
 
 The Plug-in reproduces the CocoaPods plugin behavior with the same kind of issues about third-party dependency but less intrusively.
 
-Note: If your package doesn't work with the plugin, please create an [issue](https://github.com/frankois944/spm4Kmp/issues).
+!!! note
 
+    If your package doesn't work with the plugin, please create an [issue](https://github.com/frankois944/spm4Kmp/issues).
 
 ## Gradle
 
@@ -131,6 +132,8 @@ The plugin supports the following configurations :
         packageName = "RemoteBinaryFramework",
     )
     ```
+
+[SwiftDependency reference](./references/swiftDependency.md)
 
 !!! note
 

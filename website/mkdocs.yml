@@ -10,6 +10,10 @@ nav:
   - bridgeWithDependencies.md
   - exportingDependencies.md
   - multiTarget.md
+  - distribution.md
+  - References:
+    - references/swiftDependency.md
+    - references/swiftPackageConfig.md
   - license.md
 markdown_extensions:
   - admonition
@@ -44,6 +48,7 @@ theme:
     - content.tabs.link
     - content.code.annotate
     - navigation.top
+    - navigation.instant
   palette:
     # Palette toggle for light mode
     - scheme: default

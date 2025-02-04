@@ -36,4 +36,3 @@ import [cinteropname].MySwiftBridge
 val contentFromSwift = MySwiftBridge().exportedMethod()
 
 ```
-
