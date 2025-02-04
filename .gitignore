@@ -23,3 +23,4 @@ BinaryPackageSource/DummyFramework.xcodeproj/xcuserdata
 BinaryPackageSource/archives
 .scannerwork
 website/site
+website/.cache

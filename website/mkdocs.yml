@@ -1,4 +1,59 @@
 site_name: SPM For Kmp documentation
+repo_url: https://github.com/frankois944/spm4Kmp
+site_author: François Dabonot
+site_description: Documentation for the plugin spmForKmp (Swift Package Manager For Kotlin Multiplatform), which helps to integrate Swift Package into a KMP project by importing his content or using a bridge.
+site_url: https://github.com/frankois944/spm4Kmp
+nav:
+  - index.md
+  - setup.md
+  - bridge.md
+  - bridgeWithDependencies.md
+  - exportingDependencies.md
+  - multiTarget.md
+  - license.md
+markdown_extensions:
+  - admonition
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - pymdownx.highlight:
+        anchor_linenums: true
+        line_spans: __span
+        pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+plugins:
+  - search
+  - social
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
 theme:
-  name: readthedocs
-  color_mode: auto
+  name: material
+  features:
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - content.code.annotate
+    - navigation.top
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
