@@ -322,6 +322,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         task.manifestFile.set(sourcePackageDir.resolve(SWIFT_PACKAGE_NAME))
         task.scratchDir.set(packageScratchDir)
         task.packageDependencyPrefix.set(extension.packageDependencyPrefix)
+        task.compilerOpts.set(extension.compilerOpts)
+        task.linkerOpts.set(extension.linkerOpts)
     }
 
     private fun computeOsVersion(

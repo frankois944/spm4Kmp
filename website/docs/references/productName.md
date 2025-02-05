@@ -1,7 +1,8 @@
-package io.github.frankois944.spmForKmp.definition.product
+# ProductName
 
-import java.io.Serializable
+## ProductName
 
+``` Kotlin
 /**
  * Represents the name of a product, with an optional alias and more to come.
  *
@@ -18,8 +19,5 @@ public data class ProductName(
     val alias: String? = null,
     var linkerOpts: List<String> = emptyList(),
     var compilerOpts: List<String> = emptyList(),
-) : Serializable {
-    internal companion object {
-        private const val serialVersionUID: Long = 2
-    }
-}
+) : Serializable
+```
