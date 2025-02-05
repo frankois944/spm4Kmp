@@ -135,9 +135,10 @@ The plugin supports the following configurations :
 
 [SwiftDependency reference](./references/swiftDependency.md)
 
-!!! note
+## XcFramework
 
-    Using Local/Remote binary require some [knowledge](https://www.avanderlee.com/swift/binary-targets-swift-package-manager).
+The xcFramework are used for Local/Remote Binary, learn [more](https://www.avanderlee.com/swift/binary-targets-swift-package-manager).
+
+An example is [available](https://github.com/frankois944/spm4Kmp/tree/main/BinaryPackageSource).
 
 
-##

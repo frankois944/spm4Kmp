@@ -12,23 +12,24 @@ nav:
   - multiTarget.md
   - distribution.md
   - References:
-    - references/swiftDependency.md
-    - references/swiftPackageConfig.md
+      - references/swiftDependency.md
+      - references/swiftPackageConfig.md
   - license.md
 markdown_extensions:
   - admonition
   - footnotes
   - pymdownx.details
-  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
   - attr_list
   - pymdownx.highlight:
-        anchor_linenums: true
-        line_spans: __span
-        pygments_lang_class: true
+      use_pygments: true
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - pymdownx.superfences
 plugins:
   - search
   - social
@@ -44,21 +45,29 @@ theme:
     - search.highlight
     - search.share
     - content.code.copy
-    - content.code.select
     - content.tabs.link
     - content.code.annotate
     - navigation.top
     - navigation.instant
   palette:
-    # Palette toggle for light mode
-    - scheme: default
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      primary: deep purple
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+      # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
       primary: deep purple
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+
     # Palette toggle for dark mode
-    - scheme: slate
+    - media: "(prefers-color-scheme: dark)"
       primary: deep purple
+      scheme: slate
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Switch to system preference
