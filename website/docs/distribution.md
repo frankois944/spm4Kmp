@@ -13,7 +13,9 @@ The user must :
 
 It will fix issues with linking, missing resources, App Store compliance, and more.
 
-Also, the user **doesn't have access** to the Kotlin library source code, which is great!
+!!! note
+
+    The user **doesn't have access** to the Kotlin library source code, which is great!
 
 ## Example
 
@@ -26,6 +28,18 @@ public expect fun KmpPlayer(modifier: Modifier = Modifier, url: String)
 
 ### Android
 For Android, it uses [Exoplyer](https://github.com/google/ExoPlayer).
+
+#### Gradle
+
+``` Kotlin title="library/build.gradle.kts"
+androidMain.dependencies {
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.dash)
+    implementation(libs.media3.ui)
+}
+```
+
+#### AndroidMain
 
 ``` Kotlin title="androidMain/kotlin/KmpPlayer.kt"
 @Composable
@@ -69,6 +83,30 @@ public actual fun KmpPlayer(modifier: Modifier, url: String) {
 
 For iOS, it uses [KSPlayer](https://github.com/kingslay/KSPlayer), it's a pure Swift library.
 
+#### Gradle
+
+``` Kotlin title="library/build.gradle.kts"
+swiftPackageConfig {
+    create("appleDeps") {
+        minIos = "13.0"
+        minMacos = "10.15"
+        minTvos = "13.0"
+        minWatchos = "2.0"
+        dependency(
+            SwiftDependency.Package.Remote.Branch(
+                url = URI("https://github.com/kingslay/KSPlayer"),
+                products = {
+                    add("KSPlayer")
+                },
+                branch = "main"
+            ),
+        )
+    }
+}
+```
+
+#### Bridge
+
 ``` Swift title="src/swift/appleDeps/MEPlayerController.swift"
 import Foundation
 import KSPlayer
@@ -101,6 +139,8 @@ import KSPlayer
     }
 }
 ```
+
+#### IOSMain
 
 ``` Kotlin title="iosMain/kotlin/KmpPlayer.kt"
 import appleDeps.MEPlayerController

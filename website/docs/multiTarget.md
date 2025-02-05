@@ -1,4 +1,4 @@
-# Multi target configuration
+# Multi Target Configuration
 
 
 ## Configuration by target

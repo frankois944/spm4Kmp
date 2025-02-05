@@ -1,4 +1,4 @@
-# Basic configuration
+# Basic Configuration
 
 ## Gradle
 

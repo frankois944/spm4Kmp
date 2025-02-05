@@ -1,4 +1,4 @@
-# Export Dependencies to Kotlin
+# Export Dependencies To Kotlin
 
 On completion with [using external dependencies](bridgeWithDependencies.md), it's possible to export them to Kotlin, if they are compatible.
 
