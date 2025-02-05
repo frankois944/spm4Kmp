@@ -17,6 +17,7 @@ It allows you to (almost) effortlessly configure and use Swift packages in your 
 ## Features
 
 - **Create a Swift<->Kotlin bridge**: Use your own Swift code for functionality that can't be done in Kotlin.
+- **Use SPM third-Party Dependency**: Add external dependency in your bridge
 - **Import Swift-compatible code to Kotlin**: Enable SPM dependencies and your own Swift code to be exposed directly in your Kotlin code (if compatible).
 ## Feedback
 
