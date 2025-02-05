@@ -12,8 +12,10 @@ nav:
   - multiTarget.md
   - distribution.md
   - References:
-      - references/swiftDependency.md
       - references/swiftPackageConfig.md
+      - references/swiftDependency.md
+      - references/productPackageConfig.md
+      - references/productName.md
   - license.md
 markdown_extensions:
   - admonition

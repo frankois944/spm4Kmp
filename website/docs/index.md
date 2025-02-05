@@ -23,6 +23,6 @@ It allows you to (almost) effortlessly configure and use Swift packages in your 
 
 This project greatly needs feedback, feature requests, and information about the edge case for progressing; let's [talk](https://github.com/frankois944/spm4Kmp/discussions).
 
-## Full example
+## Example
 
-A [full example](https://github.com/frankois944/spm4Kmp/tree/main/example) is available for people wanted to see the usage.
+A [sample](https://github.com/frankois944/spm4Kmp/tree/main/example) is available for people wanted to see the usage.
