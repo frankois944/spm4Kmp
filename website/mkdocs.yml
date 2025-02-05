@@ -1,0 +1,75 @@
+site_name: SPM For Kmp documentation
+repo_url: https://github.com/frankois944/spm4Kmp
+site_author: François Dabonot
+site_description: Documentation for the plugin spmForKmp (Swift Package Manager For Kotlin Multiplatform), which helps to integrate Swift Package into a KMP project by importing his content or using a bridge.
+site_url: https://github.com/frankois944/spm4Kmp
+nav:
+  - index.md
+  - setup.md
+  - bridge.md
+  - bridgeWithDependencies.md
+  - exportingDependencies.md
+  - multiTarget.md
+  - distribution.md
+  - References:
+      - references/swiftPackageConfig.md
+      - references/swiftDependency.md
+      - references/productPackageConfig.md
+      - references/productName.md
+  - license.md
+markdown_extensions:
+  - admonition
+  - footnotes
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - pymdownx.highlight:
+      use_pygments: true
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+plugins:
+  - search
+  - social
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+theme:
+  name: material
+  features:
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.tabs.link
+    - content.code.annotate
+    - navigation.top
+    - navigation.instant
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      primary: deep purple
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+      # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: deep purple
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference

@@ -35,6 +35,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     abstract val productName: Property<String>
 
     @get:Input
+    abstract val linkerOpts: ListProperty<String>
+
+    @get:Input
+    abstract val compilerOpts: ListProperty<String>
+
+    @get:Input
     abstract val packages: ListProperty<SwiftDependency>
 
     @get:Input
@@ -151,7 +157,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     private fun getModuleNames(): List<ModuleInfo> =
         buildList {
-            add(ModuleInfo(productName.get())) // the first item must be the product name
+            // the first item must be the product name
+            add(
+                ModuleInfo(
+                    name = productName.get(),
+                    compilerOpts = compilerOpts.get(),
+                    linkerOpts = linkerOpts.get(),
+                ),
+            )
             addAll(
                 packages
                     .get()
@@ -165,10 +178,23 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 .flatMap { product ->
                                     product.products.map { it }
                                 }.map { product ->
-                                    ModuleInfo(product.name, dependency.packageName)
+                                    ModuleInfo(
+                                        name = product.name,
+                                        packageName = dependency.packageName,
+                                        linkerOpts = product.linkerOpts,
+                                        compilerOpts = product.compilerOpts,
+                                    )
                                 }
+                        } else if (dependency is SwiftDependency.Binary) {
+                            listOf(
+                                ModuleInfo(
+                                    name = dependency.packageName,
+                                    linkerOpts = dependency.linkerOpts,
+                                    compilerOpts = dependency.compilerOpts,
+                                ),
+                            )
                         } else {
-                            listOf(ModuleInfo(dependency.packageName))
+                            listOf(ModuleInfo(name = dependency.packageName))
                         }
                     },
             )
@@ -213,6 +239,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 buildDir = buildDir,
                                 packageName = moduleName.packageName,
                                 definitionFile = getBuildDirectory().resolve("${moduleName.name}.def"),
+                                linkerOpts = moduleName.linkerOpts,
+                                compilerOpts = moduleName.compilerOpts,
                             ),
                         )
                     }
@@ -250,14 +278,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 if (definition.isNotEmpty()) {
                     moduleConfig.definitionFile.writeText(definition.trimIndent())
                 } else {
-                    throw RuntimeException("Can't generate defintion file")
+                    throw RuntimeException("Can't generate definition file")
                 }
                 logger.debug(
                     """
                     ######
                     Definition File : ${moduleConfig.definitionFile.name}
                     At Path: ${moduleConfig.definitionFile.path}
-                    ${moduleConfig.definitionFile.readText()}moduleConfig.definitionFile.readText()}
+                    ${moduleConfig.definitionFile.readText()}
                     ######
                     """.trimIndent(),
                 )
@@ -286,13 +314,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             packageDependencyPrefix.orNull?.let {
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
+        val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
+        val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
         return """
 language = Objective-C
 modules = $moduleName
 package = $packageName
 libraryPaths = "${getBuildDirectory().path}"
-compilerOpts = -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
-linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
+compilerOpts = $compilerOpts -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
+linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
     """
     }
 
@@ -318,13 +348,15 @@ linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirec
             packageDependencyPrefix.orNull?.let {
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
+        val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
+        val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
         return """
 language = Objective-C
 modules = $moduleName
 package = $packageName
 libraryPaths = "${getBuildDirectory().path}"
-compilerOpts = -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
-linkerOpts = ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
+linkerOpts = $linkerOps ${getExtraLinkers()} -F"${getBuildDirectory().path}"
     """
     }
 }

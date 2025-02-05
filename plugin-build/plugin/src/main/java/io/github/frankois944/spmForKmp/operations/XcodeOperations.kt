@@ -244,9 +244,11 @@ OUTPUT $standardOutput
 ###
             """.trimMargin(),
         )
-        throw RuntimeException(
-            "RUN CMD $action failed",
-        )
+        if (!errorOutput.toString().contains("unexpected binary framework")) {
+            throw RuntimeException(
+                "RUN CMD $action failed",
+            )
+        }
     } else {
         logger.debug(
             """
