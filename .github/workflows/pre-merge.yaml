@@ -6,11 +6,13 @@ on:
       - main
     paths-ignore:
       - 'README.md'
+      - 'website/'
   pull_request:
     branches:
       - '*'
     paths-ignore:
       - 'README.md'
+      - 'website/'
 
 concurrency:
   # Use a unique identifier for the workflow cancellation group.

@@ -1,4 +1,4 @@
-# The Swift Package Manager for Kotlin multiplatform Plugin
+# Swift Package Manager for Kotlin Multiplatform
 
 [![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp)
 [![build&tests](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg)](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml)
@@ -10,6 +10,19 @@ The Swift Package Manager for Kotlin Multiplatform Plugin, aka `spmForKmp` Gradl
 
 It allows you to (almost) effortlessly configure and use Swift packages in your Kotlin projects targeting Apple platforms, such as iOS.
 
-# [DOCUMENTATION](https://frankois944.github.io/spm4Kmp/)
+!!! warning "Please Be Aware"
 
-For additional help or detailed documentation, refer to the official repository or contact the plugin maintainers. Happy coding! 🎉
+    [Pure Swift packages can't be exported to Kotlin](https://kotlinlang.org/docs/native-objc-interop.html#importing-swift-objective-c-libraries-to-kotlin); creating a bridge with this plugin is a solution to bypass this issue.
+
+## Features
+
+- **Create a Swift<->Kotlin bridge**: Use your own Swift code for functionality that can't be done in Kotlin.
+- **Use SPM third-Party Dependency**: Add external dependency in your bridge
+- **Import Swift-compatible code to Kotlin**: Enable SPM dependencies and your own Swift code to be exposed directly in your Kotlin code (if compatible).
+## Feedback
+
+This project greatly needs feedback, feature requests, and information about the edge case for progressing; let's [talk](https://github.com/frankois944/spm4Kmp/discussions).
+
+## Example
+
+A [sample](https://github.com/frankois944/spm4Kmp/tree/main/example) is available for people wanted to see the usage.
