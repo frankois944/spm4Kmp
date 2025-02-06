@@ -54,6 +54,17 @@ public enum class CompileTarget : Serializable {
             macosX64, macosArm64 -> "macosx"
         }
 
+    internal fun xcFrameworkArchName(): String =
+        when (this) {
+            iosArm64 -> "ios-arm64"
+            iosX64, iosSimulatorArm64 -> "ios-arm64_x86_64-simulator"
+            watchosArm64 -> "watchos-arm64_arm64_32_armv7k"
+            watchosX64, watchosSimulatorArm64 -> "watchos-arm64_x86_64-simulator"
+            tvosArm64 -> "tvos-arm64"
+            tvosX64, tvosSimulatorArm64 -> "tvos-arm64_x86_64-simulator"
+            macosX64, macosArm64 -> "macos-arm64_x86_64"
+        }
+
     internal fun sdk() =
         when (this) {
             iosArm64 -> "iphoneos"
