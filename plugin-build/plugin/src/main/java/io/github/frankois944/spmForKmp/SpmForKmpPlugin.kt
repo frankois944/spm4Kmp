@@ -149,7 +149,12 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                                 compileTaskConfig.sharedSecurityDir.set(sharedSecurityDir)
                             }
 
-                        val compiledBinaryName = "lib${extension.name}.a"
+                        val compiledBinaryName =
+                            if (extension.isStatic) {
+                                "lib${extension.name}.a"
+                            } else {
+                                "lib${extension.name}.dylib"
+                            }
 
                         val definitionTask =
                             tasks.register(
@@ -280,6 +285,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
             this.sharedCacheDir.set(sharedCacheDir)
             this.sharedConfigDir.set(sharedConfigDir)
             this.sharedSecurityDir.set(sharedSecurityDir)
+            taskConfig.staticLibrary.set(extension.isStatic)
         }
     }
 
@@ -299,6 +305,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         taskConfig.toolsVersion.set(extension.toolsVersion)
         manifestDir.mkdirs()
         taskConfig.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
+        taskConfig.staticLibrary.set(extension.isStatic)
     }
 
     @Suppress("LongParameterList")
@@ -324,6 +331,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         task.packageDependencyPrefix.set(extension.packageDependencyPrefix)
         task.compilerOpts.set(extension.compilerOpts)
         task.linkerOpts.set(extension.linkerOpts)
+        task.staticLibrary.set(extension.isStatic)
     }
 
     private fun computeOsVersion(

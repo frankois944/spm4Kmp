@@ -7,7 +7,7 @@ let package = Package(
   products: [
     .library(
       name: "exportedNativeIosShared",
-      type: .static,
+      type: .dynamic,
       targets: ["exportedNativeIosShared", "DummyFramework"])
   ],
   dependencies: [

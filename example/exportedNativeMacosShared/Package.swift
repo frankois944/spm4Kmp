@@ -7,7 +7,7 @@ let package = Package(
   products: [
     .library(
       name: "exportedNativeMacosShared",
-      type: .static,
+      type: .dynamic,
       targets: ["exportedNativeMacosShared"])
   ],
   dependencies: [

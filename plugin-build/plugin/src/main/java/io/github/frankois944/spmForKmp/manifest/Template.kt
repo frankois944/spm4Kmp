@@ -14,6 +14,7 @@ internal fun generateManifest(
     minTvos: String,
     minWatchos: String,
     toolsVersion: String,
+    staticLibrary: Boolean,
 ): String {
     var binaryDependencies =
         listOfNotNull(
@@ -23,6 +24,18 @@ internal fun generateManifest(
     if (binaryDependencies.isNotEmpty()) {
         binaryDependencies = ",$binaryDependencies"
     }
+
+    /*
+    if dynalic add this linker flag
+    linkerSettings: [
+                .linkedLibrary("dlib"),
+                .linkedFramework("Accelerate", .when(platforms: [.iOS])),
+
+                // The error is caused by this line
+                .unsafeFlags(["-LLibraries/dlib/lib/arm64"], .when(platforms: [.iOS])),
+            ]
+
+     */
 
     return """
         // swift-tools-version: $toolsVersion
@@ -34,7 +47,7 @@ internal fun generateManifest(
             products: [
                 .library(
                     name: "$productName",
-                    type: .static,
+                    type: ${if (staticLibrary) ".static" else ".dynamic" },
                     targets: [${getProductsTargets(productName, dependencies)}])
             ],
             dependencies: [

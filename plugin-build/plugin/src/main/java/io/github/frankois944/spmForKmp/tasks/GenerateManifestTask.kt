@@ -63,6 +63,9 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:OutputFile
     abstract val manifestFile: RegularFileProperty
 
+    @get:Input
+    abstract val staticLibrary: Property<Boolean>
+
     init {
         description = "Generate a Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -84,6 +87,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 minTvos = minTvos.get(),
                 minWatchos = minWatchos.get(),
                 toolsVersion = toolsVersion.get(),
+                staticLibrary = staticLibrary.get(),
             )
         manifestFile.asFile.get().writeText(manifest)
         try {

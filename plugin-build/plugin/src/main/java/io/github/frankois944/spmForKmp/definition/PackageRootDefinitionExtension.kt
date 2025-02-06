@@ -125,6 +125,13 @@ public abstract class PackageRootDefinitionExtension
         public var compilerOpts: List<String> = emptyList()
 
         /**
+         *  If true build the generated bridge in a static library or false in a dynamic library
+         *
+         *  Default value: `false`
+         */
+        public var isStatic: Boolean = false
+
+        /**
          * Internal list used to store Swift package dependencies.
          *
          * This property is mutable and holds a list of [SwiftDependency] instances. It is used to accumulate and manage

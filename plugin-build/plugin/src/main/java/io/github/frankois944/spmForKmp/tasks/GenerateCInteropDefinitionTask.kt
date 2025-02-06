@@ -59,6 +59,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     abstract val scratchDir: Property<File>
 
     @get:Input
+    abstract val staticLibrary: Property<Boolean>
+
+    @get:Input
     @get:Optional
     abstract val packageDependencyPrefix: Property<String?>
 
