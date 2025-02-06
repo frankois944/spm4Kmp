@@ -4,7 +4,7 @@
 
 - Macos With Xcode 16 and later
 - Kotlin : **2.1.0 and later**
-- Gradle : **8.12 recommended**
+- Gradle : **8.10 and later**
 
 ## Plugins
 
