@@ -1,4 +1,4 @@
-# Using External Dependencies
+# Use External Dependencies
 
 On completion with the [basic configuration](bridge.md), it's possible to use external dependency with your bridge.
 
