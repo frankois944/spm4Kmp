@@ -1,16 +1,19 @@
-package io.github.frankois944.spmForKmp.tasks
+package io.github.frankois944.spmForKmp.tasks.apple
 
-import io.github.frankois944.spmForKmp.config.CompileTarget
+import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.operations.getNbJobs
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -18,6 +21,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
+@CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
     init {
         onlyIf {
@@ -26,10 +30,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     }
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: Property<File>
 
     @get:Input
-    abstract val target: Property<CompileTarget>
+    abstract val target: Property<AppleCompileTarget>
 
     @get:Input
     abstract val debugMode: Property<Boolean>
@@ -41,6 +46,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     abstract val packageScratchDir: Property<File>
 
     @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val sourcePackage: Property<File>
 
     @get:Input

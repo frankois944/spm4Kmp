@@ -27,7 +27,7 @@ import java.io.Serializable
  * in the context of building, linking, or generating compiler-specific configurations.
  */
 @Suppress("EnumEntryName", "EnumNaming")
-public enum class CompileTarget : Serializable {
+public enum class AppleCompileTarget : Serializable {
     iosX64,
     iosArm64,
     iosSimulatorArm64,
@@ -132,7 +132,7 @@ public enum class CompileTarget : Serializable {
      * @see [org.jetbrains.kotlin.konan.target.KonanTarget](https://github.com/JetBrains/kotlin/blob/v2.1.0/native/utils/src/org/jetbrains/kotlin/konan/target/KonanTarget.kt)
      */
     internal companion object {
-        fun byKonanName(konanName: String): CompileTarget? =
+        fun byKonanName(konanName: String): AppleCompileTarget? =
             when (konanName) {
                 KonanTarget.IOS_X64.name -> iosX64
                 KonanTarget.IOS_ARM64.name -> iosArm64

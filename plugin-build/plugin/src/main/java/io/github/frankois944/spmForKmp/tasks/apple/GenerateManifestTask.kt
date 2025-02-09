@@ -1,18 +1,23 @@
-package io.github.frankois944.spmForKmp.tasks
+package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.manifest.generateManifest
+import io.github.frankois944.spmForKmp.operations.resolvePackage
 import io.github.frankois944.spmForKmp.operations.swiftFormat
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
+import java.io.File
 
-internal abstract class GenerateExportableManifestTask : DefaultTask() {
+@CacheableTask
+internal abstract class GenerateManifestTask : DefaultTask() {
     init {
         onlyIf {
             HostManager.hostIsMac
@@ -40,29 +45,31 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     @get:Input
     abstract val toolsVersion: Property<String>
 
+    @get:Input
+    abstract val packageScratchDir: Property<File>
+
+    @get:Input
+    @get:Optional
+    abstract val sharedCacheDir: Property<File?>
+
+    @get:Input
+    @get:Optional
+    abstract val sharedConfigDir: Property<File?>
+
+    @get:Input
+    @get:Optional
+    abstract val sharedSecurityDir: Property<File?>
+
     @get:OutputFile
     abstract val manifestFile: RegularFileProperty
 
     init {
-        description = "Generate a Swift Package manifest with exported product"
+        description = "Generate a Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
-    }
-
-    private fun prepareExportableDir() {
-        val sourceDir =
-            manifestFile
-                .get()
-                .asFile
-                .parentFile
-                .resolve("Sources")
-                .takeIf { !it.exists() }
-                ?.also { it.mkdirs() }
-        sourceDir?.resolve("DummySPMFile.swift")?.writeText("import Foundation")
     }
 
     @TaskAction
     fun generateFile() {
-        prepareExportableDir()
         val manifest =
             generateManifest(
                 packageDependencies.get(),
@@ -83,19 +90,19 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             project.swiftFormat(
                 manifestFile.asFile.get(),
             )
-            logger.warn("Spm4Kmp: A local Swift package has been generated at")
-            logger.warn(
-                manifestFile
-                    .get()
-                    .asFile.parentFile.path,
+            project.resolvePackage(
+                workingDir = manifestFile.asFile.get().parentFile,
+                scratchPath = packageScratchDir.get(),
+                sharedCachePath = sharedCacheDir.orNull,
+                sharedConfigPath = sharedConfigDir.orNull,
+                sharedSecurityPath = sharedSecurityDir.orNull,
             )
-            logger.warn("Please add it to your xcode project as a local package dependency.")
         } catch (ex: Exception) {
             logger.error(
                 """
                 Manifest file generated :
-                ${manifestFile.get().asFile}manifestFile.get().asFile}
-                ${manifestFile.get().asFile.readText()}manifestFile.get().asFile.readText()}
+                ${manifestFile.get().asFile}
+                ${manifestFile.get().asFile.readText()}
                 """.trimIndent(),
             )
             throw ex

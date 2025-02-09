@@ -2,7 +2,7 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.config.CompileTarget
+import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
@@ -125,7 +125,7 @@ class BasicPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withTargets(CompileTarget.macosX64)
+                .withTargets(AppleCompileTarget.macosX64)
                 .withCache(cache.path)
                 .withSecurity(security.path)
                 .withConfig(config.path)

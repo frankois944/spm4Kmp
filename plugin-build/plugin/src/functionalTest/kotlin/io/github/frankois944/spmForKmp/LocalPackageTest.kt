@@ -2,7 +2,7 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.config.CompileTarget
+import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
@@ -23,16 +23,16 @@ class LocalPackageTest : BaseTest() {
                 .also {
                     if (isCI) {
                         it.withTargets(
-                            CompileTarget.macosArm64,
-                            CompileTarget.watchosArm64,
-                            CompileTarget.watchosSimulatorArm64,
-                            CompileTarget.tvosArm64,
-                            CompileTarget.tvosSimulatorArm64,
-                            CompileTarget.iosArm64,
+                            AppleCompileTarget.macosArm64,
+                            AppleCompileTarget.watchosArm64,
+                            AppleCompileTarget.watchosSimulatorArm64,
+                            AppleCompileTarget.tvosArm64,
+                            AppleCompileTarget.tvosSimulatorArm64,
+                            AppleCompileTarget.iosArm64,
                         )
                     } else {
                         it.withTargets(
-                            CompileTarget.macosArm64,
+                            AppleCompileTarget.macosArm64,
                         )
                     }
                 }.withDependencies(
@@ -81,7 +81,7 @@ class LocalPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withTargets(CompileTarget.iosSimulatorArm64)
+                .withTargets(AppleCompileTarget.iosSimulatorArm64)
                 .withDependencies(
                     buildList {
                         add(

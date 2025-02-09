@@ -1,6 +1,6 @@
-package io.github.frankois944.spmForKmp.tasks
+package io.github.frankois944.spmForKmp.tasks.apple
 
-import io.github.frankois944.spmForKmp.config.CompileTarget
+import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.config.ModuleInfo
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
@@ -16,14 +16,18 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
+@CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     init {
         onlyIf {
@@ -32,7 +36,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     @get:Input
-    abstract val target: Property<CompileTarget>
+    abstract val target: Property<AppleCompileTarget>
 
     @get:Input
     abstract val productName: Property<String>
@@ -53,9 +57,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     abstract val osVersion: Property<String>
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val compiledBinary: RegularFileProperty
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: RegularFileProperty
 
     @get:Input

@@ -1,6 +1,6 @@
 package io.github.frankois944.spmForKmp.operations
 
-import io.github.frankois944.spmForKmp.config.CompileTarget
+import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.utils.InjectedExecOps
 import org.gradle.api.Project
@@ -93,7 +93,7 @@ internal fun Project.getXcodeDevPath(): String {
     return standardOutput.toString().trim()
 }
 
-internal fun Project.getSDKPath(target: CompileTarget): String {
+internal fun Project.getSDKPath(target: AppleCompileTarget): String {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
