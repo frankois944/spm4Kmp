@@ -18,6 +18,6 @@ or
 [project]/build/spmKmpPlugin/[cinteropName]/scratch/release/[product].framework/Modules/module.modulemap
 ```
 
-This header contains every available ObjC code inside the Package.
+This module contains every available ObjC header inside the Package.
 
 A Pure Swift package has only generic content like `SWIFT_TYPEDEFS`.
