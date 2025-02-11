@@ -279,7 +279,7 @@ private fun getTaskName(
     task: String,
     extension: String,
     cinteropTarget: AppleCompileTarget? = null,
-) = "${PLUGIN_NAME.capitalized()}Apple${extension.capitalized()}${task.capitalized()}${
+) = "${PLUGIN_NAME.capitalized()}${extension.capitalized()}${task.capitalized()}${
     cinteropTarget?.name?.capitalized().orEmpty()
 }"
 

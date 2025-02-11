@@ -3,8 +3,10 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.config.LinuxCompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.apple.configAppleTargets
+import io.github.frankois944.spmForKmp.tasks.linux.configLinuxTargets
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -72,12 +74,23 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         sharedSecurityDir = sharedSecurityDir,
                         swiftSourcePackageDir = swiftSourcePackageDir,
                     )
+                    configLinuxTargets(
+                        taskGroup = taskGroup,
+                        cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
+                        extension = extension,
+                        sourcePackageDir = sourcePackageDir,
+                        packageScratchDir = packageScratchDir,
+                        sharedCacheDir = sharedCacheDir,
+                        sharedConfigDir = sharedConfigDir,
+                        sharedSecurityDir = sharedSecurityDir,
+                        swiftSourcePackageDir = swiftSourcePackageDir,
+                    )
                 }
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
                     val cinteropTarget =
                         AppleCompileTarget.byKonanName(cinterop.konanTarget.name)
-                            ?: return@configureEach
+                            ?: LinuxCompileTarget.byKonanName(cinterop.konanTarget.name) ?: return@configureEach
                     // The cinterop task needs to run the requirement tasks before getting the .def file
                     cinterop.dependsOn(taskGroup[cinteropTarget])
                     cinterop.mustRunAfter(taskGroup[cinteropTarget])

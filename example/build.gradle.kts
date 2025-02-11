@@ -1,5 +1,4 @@
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
 
@@ -31,6 +30,17 @@ kotlin {
         it.compilations {
             val main by getting {
                 cinterops.create("nativeIosShared")
+            }
+        }
+    }
+
+    listOf(
+        linuxArm64(),
+        linuxX64(),
+    ).forEach {
+        it.compilations {
+            val main by getting {
+                cinterops.create("nativeLinuxShared")
             }
         }
     }
@@ -96,6 +106,7 @@ swiftPackageConfig {
         // minWatchos = "12.0"
         // the macos minimal version
         minMacos = "10.15"
+        minIos = "14.0"
         // the directory where your own swift code is located
         // customPackageSourcePath = "{buildDir}/src/swift"
         // the swift code is built in debug by default
@@ -106,21 +117,6 @@ swiftPackageConfig {
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
         dependency(
-            SwiftDependency.Package.Remote.Version(
-                // Repository URL
-                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-                // Libraries from the package
-                products = {
-                    // Export to Kotlin for use in shared Kotlin code
-                    add("FirebaseCore", "FirebaseAnalytics", exportToKotlin = true)
-                    // add FirebaseDatabase to your own swift code but don't export it
-                    add(ProductName("FirebaseDatabase"))
-                },
-                // (Optional) Package name, can be required in some cases
-                packageName = "firebase-ios-sdk",
-                // Package version
-                version = "11.6.0",
-            ),
             SwiftDependency.Binary.Local(
                 path = "$testResources/DummyFramework.xcframework.zip",
                 packageName = "DummyFramework",
@@ -153,6 +149,19 @@ swiftPackageConfig {
                 products = {
                     // Export to Kotlin for use in shared Kotlin code, false by default
                     add("LocalSourceDummyFramework", exportToKotlin = false)
+                },
+            ),
+        )
+    }
+
+    create("nativeLinuxShared") {
+        dependency(
+            SwiftDependency.Package.Remote.Branch(
+                url = URI("https://github.com/apple/example-package-dealer.git"),
+                packageName = "dealer",
+                branch = "main",
+                products = {
+                    add("dealer")
                 },
             ),
         )
