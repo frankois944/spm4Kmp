@@ -1,20 +1,15 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
-import io.github.frankois944.spmForKmp.PLUGIN_NAME
-import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
-import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
-import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
-import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
-import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
+import io.github.frankois944.spmForKmp.*
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.tasks.utils.*
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -22,7 +17,7 @@ import java.io.File
 
 @Suppress("LongMethod", "LongParameterList")
 internal fun Project.configAppleTargets(
-    taskGroup: MutableMap<AppleCompileTarget, Task>,
+    taskGroup: MutableMap<String, Task>,
     cInteropTaskNamesWithDefFile: MutableMap<String, File>,
     extension: PackageRootDefinitionExtension,
     sourcePackageDir: File,
@@ -38,6 +33,10 @@ internal fun Project.configAppleTargets(
             .filter {
                 it.name.startsWith("cinterop" + extension.name.capitalized())
             }.mapNotNull { AppleCompileTarget.byKonanName(it.konanTarget.name) }
+
+    if (allTargets.isEmpty()) {
+        return
+    }
 
     val kotlinExtension =
         extensions.getByName("kotlin") as KotlinMultiplatformExtension
@@ -90,7 +89,7 @@ internal fun Project.configAppleTargets(
 
         val compileTask =
             tasks.register(
-                getTaskName(TASK_COMPILE_PACKAGE, extension.name, cinteropTarget),
+                getTaskName(TASK_COMPILE_PACKAGE, extension.name, cinteropTarget.name),
                 CompileSwiftPackageTask::class.java,
             ) { compileTaskConfig ->
                 compileTaskConfig.manifestFile.set(File(sourcePackageDir, SWIFT_PACKAGE_NAME))
@@ -116,7 +115,7 @@ internal fun Project.configAppleTargets(
                 getTaskName(
                     TASK_GENERATE_CINTEROP_DEF,
                     extension.name,
-                    cinteropTarget,
+                    cinteropTarget.name,
                 ),
                 GenerateCInteropDefinitionTask::class.java,
             ) {
@@ -150,13 +149,13 @@ internal fun Project.configAppleTargets(
                     createCInteropTask(mainCompilation, cinteropName, file)
                 }
 
-                val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
+                val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget.name)
                 cInteropTaskNamesWithDefFile[cinteropTaskName] = file
             }
         }
 
         // Explicitly create the dependency tree for the target
-        taskGroup[cinteropTarget] =
+        taskGroup[cinteropTarget.name] =
             definitionTask
                 .get()
                 .dependsOn(
@@ -198,7 +197,7 @@ private fun configureManifestTask(
     }
 }
 
-private fun Project.configureExportableManifestTask(
+private fun configureExportableManifestTask(
     taskConfig: GenerateExportableManifestTask,
     dependencies: List<SwiftDependency>,
     extension: PackageRootDefinitionExtension,
@@ -252,38 +251,7 @@ private fun computeOsVersion(
         minMacos = extension.minMacos,
     )
 
-@Suppress("MaxLineLength")
-private fun getBuildMode(extension: PackageRootDefinitionExtension): String = if (extension.debug) "debug" else "release"
 
-private fun getTargetBuildDirectory(
-    packageScratchDir: File,
-    cinteropTarget: AppleCompileTarget,
-    buildMode: String,
-): File =
-    packageScratchDir
-        .resolve(cinteropTarget.getPackageBuildDir())
-        .resolve(buildMode)
 
-// Extracted function to create cinterop tasks
-private fun createCInteropTask(
-    mainCompilation: KotlinNativeCompilation,
-    cinteropName: String,
-    file: File,
-) {
-    mainCompilation.cinterops.create(cinteropName) { settings ->
-        settings.definitionFile.set(file)
-    }
-}
 
-private fun getTaskName(
-    task: String,
-    extension: String,
-    cinteropTarget: AppleCompileTarget? = null,
-) = "${PLUGIN_NAME.capitalized()}${extension.capitalized()}${task.capitalized()}${
-    cinteropTarget?.name?.capitalized().orEmpty()
-}"
 
-private fun getCInteropTaskName(
-    name: String,
-    cinteropTarget: AppleCompileTarget?,
-): String = "cinterop${name.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}"

@@ -2,12 +2,12 @@ package io.github.frankois944.spmForKmp.tasks.utils
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
-import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
+import org.gradle.api.DefaultTask
 import java.io.File
 
-internal fun GenerateCInteropDefinitionTask.findHeadersModule(
+internal fun findHeadersModule(
     path: File,
     forTarget: AppleCompileTarget,
 ): List<File> =
@@ -19,7 +19,7 @@ internal fun GenerateCInteropDefinitionTask.findHeadersModule(
         withDirectory = true,
     )
 
-internal fun GenerateCInteropDefinitionTask.getBuildDirectoriesContent(
+internal fun getBuildDirectoriesContent(
     buildDir: File,
     vararg extensions: String,
 ): List<File> =
@@ -31,9 +31,9 @@ internal fun GenerateCInteropDefinitionTask.getBuildDirectoriesContent(
         ?.toList()
         .orEmpty()
 
-internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
+internal fun DefaultTask.extractPublicHeaderFromCheckout(
     fromDir: File,
-    module: ModuleConfig,
+    module: ModuleConfig
 ): Set<File> {
     logger.debug("Looking for public header for ${module.name}")
 
@@ -80,12 +80,12 @@ internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
     return result
 }
 
-internal fun GenerateCInteropDefinitionTask.extractFirstMatch(
+internal fun extractFirstMatch(
     input: String,
     pattern: String,
 ): String? = Regex(pattern).find(input)?.groupValues?.getOrNull(1)
 
-internal fun GenerateCInteropDefinitionTask.extractModuleNameFromModuleMap(module: String): String? {
+internal fun DefaultTask.extractModuleNameFromModuleMap(module: String): String? {
     val regex = """module\s+\S+\s+""".toRegex()
     return regex
         .find(module)

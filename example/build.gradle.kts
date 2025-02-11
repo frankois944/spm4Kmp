@@ -35,7 +35,7 @@ kotlin {
     }
 
     listOf(
-        linuxArm64(),
+     //   linuxArm64(),
         linuxX64(),
     ).forEach {
         it.compilations {
@@ -156,12 +156,11 @@ swiftPackageConfig {
 
     create("nativeLinuxShared") {
         dependency(
-            SwiftDependency.Package.Remote.Branch(
-                url = URI("https://github.com/apple/example-package-dealer.git"),
-                packageName = "dealer",
-                branch = "main",
+            SwiftDependency.Package.Remote.Version(
+                url = URI("https://github.com/apple/swift-crypto"),
+                version = "3.10.2",
                 products = {
-                    add("dealer")
+                    add("Crypto")
                 },
             ),
         )

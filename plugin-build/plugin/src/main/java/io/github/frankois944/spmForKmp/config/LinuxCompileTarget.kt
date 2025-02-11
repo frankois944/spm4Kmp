@@ -9,18 +9,13 @@ public enum class LinuxCompileTarget : Serializable {
     linuxArm64,
     ;
 
-    internal fun getTriple(version: String): String = "${this.arch()}-linux-${this.osCompiler()}$version}"
+    internal fun getTriple(): String = "${this.arch()}-unknown-linux-${this.osCompiler()}"
 
     internal fun getPackageBuildDir(): String = "${this.arch()}-linux-${this.osCompiler()}"
 
     private fun osCompiler(): String =
         when (this) {
-            linuxX64, linuxArm64 -> "linux"
-        }
-
-    internal fun sdk() =
-        when (this) {
-            linuxX64, linuxArm64 -> "linux"
+            linuxX64, linuxArm64 -> "gnu"
         }
 
     private fun arch() =

@@ -13,6 +13,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
@@ -24,6 +25,7 @@ internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
 internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
 
+@OptIn(ExperimentalStdlibApi::class)
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
     @Suppress("LongMethod")
@@ -43,7 +45,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
             afterEvaluate {
                 // Contains the group of task (with their dependency) by target
-                val taskGroup = mutableMapOf<AppleCompileTarget, Task>()
+                val taskGroup = mutableMapOf<String, Task>()
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
                 swiftPackageEntries.forEach { extension ->
@@ -88,14 +90,24 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 }
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
-                    val cinteropTarget =
-                        AppleCompileTarget.byKonanName(cinterop.konanTarget.name)
-                            ?: LinuxCompileTarget.byKonanName(cinterop.konanTarget.name) ?: return@configureEach
-                    // The cinterop task needs to run the requirement tasks before getting the .def file
-                    cinterop.dependsOn(taskGroup[cinteropTarget])
-                    cinterop.mustRunAfter(taskGroup[cinteropTarget])
-                    val definitionFile = cInteropTaskNamesWithDefFile[cinterop.name]
-                    cinterop.settings.definitionFile.set(definitionFile)
+                    val cinteropTarget = if (HostManager.hostIsMac) {
+                        AppleCompileTarget.byKonanName(cinterop.konanTarget.name)?.name
+                    } else if (HostManager.hostIsLinux) {
+                        LinuxCompileTarget.byKonanName(cinterop.konanTarget.name)?.name
+                    } else {
+                        null
+                    }
+                    cinteropTarget?.let {
+                        // The cinterop task needs to run the requirement tasks before getting the .def file
+                        taskGroup[cinteropTarget]?.let { task ->
+                            cinterop.dependsOn(task)
+                            cinterop.mustRunAfter(task)
+                        }
+                        cinterop.settings.definitionFile.set(cInteropTaskNamesWithDefFile[cinterop.name])
+                    } ?: run {
+                        val fakeDefFile = getAndCreateFakeDefinitionFile()
+                        cinterop.settings.definitionFile.set(fakeDefFile)
+                    }
                 }
             }
         }
@@ -116,4 +128,24 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         resolved.mkdirs()
         return resolved
     }
+}
+
+
+internal fun Project.getAndCreateFakeDefinitionFile(): File {
+    val content =
+        """
+        # Dummy Definition File
+        # This file does nothing but is syntactically valid for cinterop.
+        name = DummyLibrary
+        headers =
+        compilerOpts =
+        linkerOpts =
+        package = com.example.dummy
+        """.trimIndent()
+    val pathToFile =
+        layout.buildDirectory.asFile
+            .get()
+            .resolve("spmKmpPlugin/dummy.def")
+    pathToFile.writeText(content)
+    return pathToFile
 }

@@ -4,6 +4,7 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.utils.InjectedExecOps
 import org.gradle.api.Project
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -16,7 +17,7 @@ internal fun Project.resolvePackage(
     sharedSecurityPath: File?,
 ) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
-    val args =
+    val args = if (HostManager.hostIsMac) {
         mutableListOf(
             "--sdk",
             "macosx",
@@ -28,6 +29,14 @@ internal fun Project.resolvePackage(
             "--jobs",
             getNbJobs(),
         )
+    } else {
+        mutableListOf(
+            "package",
+            "resolve",
+            "--scratch-path",
+            scratchPath.path,
+        )
+    }
     sharedCachePath?.let {
         args.add("--cache-path")
         args.add(it.path)
@@ -45,7 +54,7 @@ internal fun Project.resolvePackage(
     val errorOutput = ByteArrayOutputStream()
     operation.execOps
         .exec {
-            it.executable = "xcrun"
+            it.executable = if (HostManager.hostIsMac) "xcrun" else "swift"
             it.args = args
             it.workingDir = workingDir
             it.standardOutput = standardOutput
@@ -130,7 +139,7 @@ internal fun Project.getPackageImplicitDependencies(
     scratchPath: File,
 ): PackageImplicitDependencies {
     val operation = objects.newInstance(InjectedExecOps::class.java)
-    val args =
+    val args = if (HostManager.hostIsMac) {
         listOf(
             "--sdk",
             "macosx",
@@ -142,12 +151,22 @@ internal fun Project.getPackageImplicitDependencies(
             "--format",
             "json",
         )
+    } else {
+        listOf(
+            "package",
+            "show-dependencies",
+            "--scratch-path",
+            scratchPath.path,
+            "--format",
+            "json",
+        )
+    }
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
     operation.execOps
         .exec {
-            it.executable = "xcrun"
+            it.executable = if (HostManager.hostIsMac) "xcrun" else "swift"
             it.workingDir = workingDir
             it.args = args
             it.standardOutput = standardOutput
@@ -167,7 +186,7 @@ internal fun Project.getPackageImplicitDependencies(
 
 internal fun Project.swiftFormat(file: File) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
-    val args =
+    val args = if (HostManager.hostIsMac) {
         listOf(
             "--sdk",
             "macosx",
@@ -175,12 +194,18 @@ internal fun Project.swiftFormat(file: File) {
             "-i",
             file.path,
         )
+    } else {
+        listOf(
+            "-i",
+            file.path,
+        )
+    }
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
     operation.execOps
         .exec {
-            it.executable = "xcrun"
+            it.executable = if (HostManager.hostIsMac) "xcrun" else "swift-format"
             it.args = args
             it.standardOutput = standardOutput
             it.errorOutput = errorOutput
@@ -238,7 +263,7 @@ internal fun Project.printExecLogs(
             """
 ERROR FOUND WHEN EXEC
 RUN $action
-ARGS xcrun ${args.joinToString(" ")}
+ARGS xcrun/swift ${args.joinToString(" ")}
 ERROR $errorOutput
 OUTPUT $standardOutput
 ###
@@ -253,7 +278,7 @@ OUTPUT $standardOutput
         logger.debug(
             """
 RUN $action
-ARGS xcrun ${args.joinToString(" ")}
+ARGS xcrun/swift ${args.joinToString(" ")}
 OUTPUT $standardOutput
 ###
             """.trimMargin(),
