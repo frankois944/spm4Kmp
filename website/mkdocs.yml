@@ -11,6 +11,7 @@ nav:
   - exportingDependencies.md
   - multiTarget.md
   - distribution.md
+  - largebridge.md
   - faq.md
   - References:
       - references/swiftPackageConfig.md
