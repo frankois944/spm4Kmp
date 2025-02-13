@@ -80,7 +80,7 @@ import StripePaymentSheet
     private let backendCheckoutUrl = URL(string: "Your backend endpoint/payment-sheet")
 
     public init(paymentIntentClientSecret: String) {
-        self.paymentIntentClientSecret = apiKey
+        self.paymentIntentClientSecret = paymentIntentClientSecret
     }
 
     public func doStripeJob() {
@@ -121,6 +121,6 @@ swiftPackageConfig {
 
 !!! warning "The local package source is visible"
 
-    If you share this package, don't put sensitive data inside, as it needs to be added to the xCode project of the final application.
+    If you share this package, don't put sensitive data inside, as it needs to be [added to the xCode project](https://frankois944.github.io/spm4Kmp/bridgeWithDependencies/#gradle).
 
 You can use the default plugin's bridge if needed, as it's not visible from the application or your shared Kotlin library.
