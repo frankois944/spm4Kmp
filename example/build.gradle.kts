@@ -157,10 +157,11 @@ swiftPackageConfig {
     create("nativeLinuxShared") {
         dependency(
             SwiftDependency.Package.Remote.Version(
-                url = URI("https://github.com/apple/swift-crypto"),
-                version = "3.10.2",
+                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                version = "1.8.4",
                 products = {
-                    add("Crypto")
+                    // Can be only used in your "src/swift" code.
+                    add("CryptoSwift")
                 },
             ),
         )

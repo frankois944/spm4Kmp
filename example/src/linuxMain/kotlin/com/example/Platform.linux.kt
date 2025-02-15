@@ -11,5 +11,3 @@ class IOSPlatform : Platform {
 
 actual fun getPlatform(): Platform = IOSPlatform()
 
-@OptIn(ExperimentalForeignApi::class)
-val test = nativeLinuxShared.mySwiftDummyFunction()?.toKString()

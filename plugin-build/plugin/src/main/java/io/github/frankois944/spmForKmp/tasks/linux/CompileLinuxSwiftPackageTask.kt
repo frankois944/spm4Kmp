@@ -92,8 +92,6 @@ internal abstract class CompileLinuxSwiftPackageTask : DefaultTask() {
 
         val args = mutableListOf(
             "build",
-            "--triple",
-            target.get().getTriple(),
             "--scratch-path",
             packageScratchDir.get().path,
             "-c",

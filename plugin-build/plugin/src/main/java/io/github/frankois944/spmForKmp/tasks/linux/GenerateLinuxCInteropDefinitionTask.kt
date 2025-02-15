@@ -92,8 +92,38 @@ internal abstract class GenerateLinuxCInteropDefinitionTask : DefaultTask() {
 
 
     private fun getExtraLinkers(): String {
+        /*val libDir1 = File("/home/frankois/swift/swift-6.0.3/usr/lib/swift/linux").listFiles { file ->
+            file.extension == "so"
+        }?.map { it.nameWithoutExtension.replace("lib", "-l") }.orEmpty()
+        val libDir2 = File("/home/frankois/swift/swift-6.0.3/usr/lib").listFiles { file ->
+            file.extension == "so"
+        }?.map { it.nameWithoutExtension.replace("lib", "-l") }.orEmpty()*/
         return buildList {
-            add("")
+            add("-L/home/frankois/swift/swift-6.0.3/usr/lib/swift/linux/")
+            add("-L/home/linuxbrew/.linuxbrew/Cellar/libobjc2/2.2.1/lib/")
+            addAll(
+                listOf(
+                    "-lobjc",
+                    "-lBlocksRuntime",
+                    "-lswift_Concurrency",
+                    "-lswift_StringProcessing",
+                    "-lswiftDistributed",
+                    "-lswiftSwiftOnoneSupport",
+                    "-lswiftSynchronization",
+                    "-lswiftCxx",
+                    "-lFoundation",
+                    "-lFoundationNetworking",
+                    "-lFoundationXML",
+                    "-lFoundationInternationalization",
+                    "-lswiftCore",
+                    "-ldispatch",
+                    "-lFoundationEssentials",
+                    "-lswiftDispatch",
+                    "-lBlocksRuntime"
+                )
+            )
+            add("-L/usr/lib")
+            add("-lgnustep-base")
         }.joinToString(" ")
     }
 
@@ -171,11 +201,13 @@ ${moduleConfig.definitionFile.readText()}
             } ?: moduleConfig.name
         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
-        val headers = getBuildDirectory().listFiles { file -> file.extension == "h" } ?: emptyList<File>()
+        val headers = swiftSourceDir.get().asFile.listFiles { file -> file.extension == "h" }
+            ?.joinToString(" ") { it.name }
+            .orEmpty()
         return """
 package = $packageName
 libraryPaths = "${getBuildDirectory().path}"
-headers = "LinuxSwiftSource.h"
+headers = $headers
 compilerOpts = -I"${swiftSourceDir.get().asFile.absolutePath}" $compilerOpts
 linkerOpts = $linkerOps ${getExtraLinkers()}
     """

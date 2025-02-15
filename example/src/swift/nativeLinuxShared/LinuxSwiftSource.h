@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 char *mySwiftDummyFunction();
+char *getValueFromCrypt();
 
 #ifdef __cplusplus
 }

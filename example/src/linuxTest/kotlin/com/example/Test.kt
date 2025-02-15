@@ -13,4 +13,10 @@ class Test {
     fun exampleTest() {
         assertEquals("Hello from Linux Swift!", nativeLinuxShared.mySwiftDummyFunction()?.toKString())
     }
+
+    @Test
+    fun exampleTest2() {
+        assertEquals("202cb962ac59075b964b07152d234b70", nativeLinuxShared.getValueFromCrypt()?.toKString())
+    }
+
 }
