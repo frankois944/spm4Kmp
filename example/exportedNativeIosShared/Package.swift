@@ -14,7 +14,7 @@ let package = Package(
     .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "11.6.0"),
     .package(
       path:
-        "/Users/francoisdabonot/DEV/spm-kmp-plugin/example/../plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework"
+        "/Users/francoisdabonot/devs/spm4Kmp/example/../plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework"
     ), .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", exact: "1.8.1"),
   ],
   targets: [

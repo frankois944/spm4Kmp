@@ -81,7 +81,9 @@ tasks.named("check").configure {
     )
 }
 
-tasks.create("setupPluginUploadFromEnvironment") {
+tasks.register("setupPluginUploadFromEnvironment") {
+    description = "Setup the 'pluginUpload' credentials from environment variables"
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
     doLast {
         val key = System.getenv("GRADLE_PUBLISH_KEY")
         val secret = System.getenv("GRADLE_PUBLISH_SECRET")
