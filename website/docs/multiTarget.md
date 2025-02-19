@@ -1,7 +1,7 @@
 # Multi Target Configuration
 
 
-## Configuration by target
+## Configuration By Target
 
 You can set a different configuration for each target you manage.
 

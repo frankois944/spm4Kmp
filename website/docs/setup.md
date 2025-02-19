@@ -24,7 +24,7 @@ kotlin.mpp.enableCInteropCommonization=true
 ```
 
 
-## Initial configuration
+## Initial Configuration
 
 ``` kotlin title="build.gradle.kts"
 kotlin {

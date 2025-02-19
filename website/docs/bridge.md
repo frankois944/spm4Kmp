@@ -19,7 +19,7 @@ The content of this folder is your bridge between Swift and Kotlin, it can conta
 
 !!! warning "Make your Swift code compatible with Kotlin."
 
-    Your Swift code needs to be marked as [@objc/@objcMembers](https://akdebuging.com/posts/what-is-objc-and-objcmember/) and the visibility set as `public`
+    Your Swift code needs to be marked as [@objc/@objcMembers](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and the visibility set as `public`
     or it won't be exported and available from your Kotlin code.
 
 ``` swift title="src/swift/[cinteropname]/mySwiftFile.swift"

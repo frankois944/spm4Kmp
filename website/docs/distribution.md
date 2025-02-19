@@ -1,6 +1,6 @@
 # Distribute Kotlin Library
 
-## Release a library using the plugin
+## Release A Library Using The Plugin
 
 We can distribute to other users a Kotlin library using native or third-party dependency, some requirements are necessary for Apple targets.
 

@@ -6,12 +6,12 @@ The solution is to work with a **local package** you will add to your plugin con
 
 **The big advantage is that you can test your code before adding it to your KMP project**.
 
-## Create a local package
+## Create A Local Package
 
 - From command line : `swift package init --name YouPackageName`
 - From Xcode : File -> New -> Package -> Library
 
-## Choose your Editor
+## Choose Your Editor
 
 You can either use **Xcode** or **VSCode with the Swift Plugin**; both are fine.
 
@@ -64,7 +64,7 @@ Usually located at `Sources/[packageName]`, it has the same requirement as the p
 
 !!! warning "Make your Swift code compatible with Kotlin."
 
-    Your Swift code needs to be marked as [@objc/@objcMembers](https://akdebuging.com/posts/what-is-objc-and-objcmember/) and the visibility set as `public`
+    Your Swift code needs to be marked as [@objc/@objcMembers](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and the visibility set as `public`
     or it won't be exported and available from your Kotlin code.
 
 ### Example
@@ -117,10 +117,10 @@ swiftPackageConfig {
 }
 ```
 
-## Don't store sensitive data
+## Don't Store Sensitive Data
 
 !!! warning "The local package source is visible"
 
-    If you share this package, don't put sensitive data inside, as it needs to be [added to the xCode project](https://frankois944.github.io/spm4Kmp/bridgeWithDependencies/#gradle).
+    If you share this package, don't put sensitive data inside, as it needs to be [added to the Xcode project](https://frankois944.github.io/spm4Kmp/bridgeWithDependencies/#gradle).
 
 You can use the default plugin's bridge if needed, as it's not visible from the application or your shared Kotlin library.

@@ -1,4 +1,4 @@
-# Swift Package Manager for Kotlin Multiplatform
+# Swift Package Manager For Kotlin Multiplatform
 
 [![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp)
 [![build&tests](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg)](https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml)
@@ -14,7 +14,7 @@ The plugin uses the embedded Swift Package Manager, so **no third-party dependen
 
 !!! warning "Please Be Aware"
 
-    [Pure Swift packages can't be exported to Kotlin](https://kotlinlang.org/docs/native-objc-interop.html#importing-swift-objective-c-libraries-to-kotlin); the plugin will help you to create a bridge to bypass this issue.
+    [Pure Swift packages can't be exported to Kotlin](faq.md#whats-a-pure-swift-package); the plugin will help you to create a bridge to bypass this issue.
 
     It's a manual job, but until the Swift-import is (not currently planned) available in KMP, it's the only way.
 
