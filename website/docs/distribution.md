@@ -27,7 +27,7 @@ public expect fun KmpPlayer(modifier: Modifier = Modifier, url: String)
 ```
 
 ### Android
-For Android, it uses [Exoplyer](https://github.com/google/ExoPlayer).
+For Android, it uses [Exoplayer](https://github.com/google/ExoPlayer).
 
 #### Gradle
 

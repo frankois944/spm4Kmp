@@ -1,8 +1,8 @@
-# Basic Configuration
+# Bridge The Native API
 
 ## Gradle
 
-The following configuration is a simple bridge between Kotlin and Swift.
+The following configuration is a simple bridge between Kotlin and the Swift Apple SDK.
 
 ``` kotlin title="build.gradle.kts"
 swiftPackageConfig {
@@ -23,9 +23,14 @@ The content of this folder is your bridge between Swift and Kotlin, it can conta
     or it won't be exported and available from your Kotlin code.
 
 ``` swift title="src/swift/[cinteropname]/mySwiftFile.swift"
+import UIKit
+
 @objcMembers public class MySwiftBridge: NSObject {
     public func exportedMethod() -> String {
         return "value"
+    }
+    public func exportedView() -> NSObject {
+        return UIView()
     }
 }
 ```
@@ -34,5 +39,7 @@ The content of this folder is your bridge between Swift and Kotlin, it can conta
 import [cinteropname].MySwiftBridge
 
 val contentFromSwift = MySwiftBridge().exportedMethod()
+
+val aView = MySwiftBridge().exportedView() as UIView
 
 ```
