@@ -105,6 +105,7 @@ swiftPackageConfig {
         //  - packageDependencyPrefix = "customName"
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
+        spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         dependency(
             SwiftDependency.Package.Remote.Version(
                 // Repository URL
