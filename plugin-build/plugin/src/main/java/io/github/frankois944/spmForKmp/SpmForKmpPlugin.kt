@@ -48,8 +48,10 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
                     val sourcePackageDir =
                         resolveAndCreateDir(
-                            layout.buildDirectory.asFile.get(),
-                            "spmKmpPlugin/${extension.name}",
+                            extension.spmWorkingPath?.let { File(it) }
+                                ?: layout.buildDirectory.asFile.get(),
+                            "spmKmpPlugin",
+                            extension.name
                         )
 
                     val packageScratchDir = resolveAndCreateDir(sourcePackageDir, "scratch")
@@ -97,9 +99,10 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
     private fun Project.resolveAndCreateDir(
         base: File,
-        nestedPath: String? = null,
+        vararg nestedPath: String = emptyArray(),
     ): File {
-        val resolved = resolvePath(base).let { if (nestedPath != null) it.resolve(nestedPath) else it }
+        var resolved = resolvePath(base)
+        nestedPath.forEach { resolved = resolved.resolve(it) }
         resolved.mkdirs()
         return resolved
     }

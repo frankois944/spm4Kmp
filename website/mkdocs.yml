@@ -13,6 +13,7 @@ nav:
   - distribution.md
   - largebridge.md
   - faq.md
+  - tips.md
   - References:
       - references/swiftPackageConfig.md
       - references/swiftDependency.md

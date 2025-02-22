@@ -2,7 +2,7 @@
 
 ## Gradle
 
-The following configuration is a simple bridge between Kotlin and the Swift Apple SDK.
+The following configuration is a simple bridge between Kotlin and the Swift Apple Native SDK.
 
 ``` kotlin title="build.gradle.kts"
 swiftPackageConfig {

@@ -39,6 +39,7 @@ abstract class SmpKMPTestFixture private constructor(
         val sharedCachePath: String? = null,
         val sharedConfigPath: String? = null,
         val sharedSecurityPath: String? = null,
+        val customSPMPath: String? = null,
         val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
     )
@@ -161,6 +162,9 @@ swiftPackageConfig {
                     }
                     extension.sharedSecurityPath?.let {
                         append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
+                    }
+                    extension.customSPMPath?.let {
+                        append("spmWorkingPath = \"${extension.customSPMPath}\"\n")
                     }
 
                     fun buildProductBlock(
@@ -386,6 +390,11 @@ swiftPackageConfig {
         fun withSecurity(path: String) =
             apply {
                 config = config.copy(sharedSecurityPath = path)
+            }
+
+        fun withSPMPath(path: String) =
+            apply {
+                config = config.copy(customSPMPath = path)
             }
 
         fun withMacos(minMacos: String) =
