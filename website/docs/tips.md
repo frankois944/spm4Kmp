@@ -6,7 +6,7 @@
 
 [spmWorkingPath](references/swiftPackageConfig.md#spmworkingpath) has been added to change the path to Swift Package working file.
 
-By settings [spmWorkingPath](references/swiftPackageConfig.md#spmworkingpath) outside the build folder, the working files won't be removed if you clean the project.
+By setting [spmWorkingPath](https://github.com/frankois944/spm4Kmp/blob/cf80e65b3076d9e0bcd94a847e1209d4b9b91141/example/build.gradle.kts#L108C1-L108C104) outside the build folder, the working files won't be removed if you clean the project.
 
 Swift Package Manager has its own cache, so it's fined to detach it from the Kotlin build folder.
 
