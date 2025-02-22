@@ -1,7 +1,7 @@
 site_name: SPM For KMP documentation
 repo_url: https://github.com/frankois944/spm4Kmp
 site_author: François Dabonot
-site_description: Documentation for the plugin spmForKmp (Swift Package Manager For Kotlin Multiplatform), which helps to integrate Swift Package into a KMP project by importing his content or using a bridge.
+site_description: An alternative to the dying CocoaPods with custom Kotlin/Swift bridge for KMP.
 site_url: https://frankois944.github.io/spm4Kmp/
 nav:
   - index.md

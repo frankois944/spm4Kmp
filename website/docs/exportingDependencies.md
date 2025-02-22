@@ -25,7 +25,9 @@ swiftPackageConfig {
                     add("FirebaseCore") // non-exported
                 },
                 version = "11.8.0",
-            )
+            ),
+            // Another SwiftDependency
+            // ...
         )
     }
 }

@@ -120,7 +120,7 @@ swiftPackageConfig {
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
-                version = "11.6.0",
+                version = "11.8.1",
             ),
             SwiftDependency.Binary.Local(
                 path = "$testResources/DummyFramework.xcframework.zip",

@@ -21,7 +21,9 @@ swiftPackageConfig {
                     add("CryptoSwift")
                 },
                 version = "1.8.4",
-            )
+            ),
+            // Another SwiftDependency
+            // ...
         )
     }
 }

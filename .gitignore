@@ -25,3 +25,4 @@ BinaryPackageSource/archives
 website/site
 website/.cache
 example/SPM
+secret-key.gpg

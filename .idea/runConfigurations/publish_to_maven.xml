@@ -10,7 +10,8 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":plugin-build:plugin:publishAllPublicationsToMavenCentralRepository" />
+          <option value=":plugin-build:plugin:setupPluginUploadFromEnvironment" />
+          <option value=":plugin-build:plugin:publishAndReleaseToMavenCentral" />
         </list>
       </option>
       <option name="vmOptions" />

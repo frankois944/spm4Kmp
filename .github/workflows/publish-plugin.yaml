@@ -27,5 +27,5 @@ jobs:
           path: ~/.konan
           key: ${{ runner.os }}-konan
       - name: Publish on Plugin Portal
-        run: ./gradlew :plugin-build:plugin:setupPluginUploadFromEnvironment :plugin-build:plugin:publishPlugins
+        run: ./gradlew :plugin-build:plugin:setupPluginUploadFromEnvironment :plugin-build:plugin:publishAndReleaseToMavenCentral --no-configuration-cache
         if: success()
