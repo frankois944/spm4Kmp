@@ -1,21 +1,18 @@
-import com.vanniktech.maven.publish.GradlePublishPlugin
-import com.vanniktech.maven.publish.SonatypeHost
+
 import org.gradle.plugin.devel.tasks.PluginUnderTestMetadata.IMPLEMENTATION_CLASSPATH_PROP_KEY
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.Serializable
 import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
-import java.util.*
+import java.util.Properties
 
 plugins {
     kotlin("jvm")
     `java-gradle-plugin`
     alias(libs.plugins.pluginPublish)
     alias(libs.plugins.autonomousapps.testkit)
-    alias(libs.plugins.publish)
     jacoco
-    signing
 }
 
 val jacocoAgentJar: Configuration by configurations.creating
@@ -58,8 +55,6 @@ tasks.withType<KotlinCompile> {
 }
 
 gradlePlugin {
-    website.set(property("WEBSITE").toString())
-    vcsUrl.set(property("VCS_URL").toString())
     plugins {
         create(property("ID").toString()) {
             id = property("ID").toString()
@@ -73,54 +68,9 @@ gradlePlugin {
     }
 }
 
-mavenPublishing {
-
-    configure(GradlePublishPlugin())
-
-    coordinates(
-        property("GROUP").toString(),
-        property("ARTIFACT_ID").toString(),
-        property("VERSION").toString()
-    )
-
-    pom {
-        name.set(property("DISPLAY_NAME").toString())
-        description.set(property("DESCRIPTION").toString())
-        inceptionYear.set("2025")
-        url.set(property("WEBSITE").toString())
-        licenses {
-            license {
-                name.set("The MIT License")
-                url.set("https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/LICENSE")
-                distribution.set("https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/LICENSE")
-            }
-        }
-        developers {
-            developer {
-                id.set("frankois944")
-                name.set("dabonot.francois@gmail.com")
-                url.set("https://github.com/frankois944/")
-            }
-        }
-        scm {
-            url.set(property("VCS_URL").toString())
-        }
-    }
-
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-    signAllPublications()
-}
-
-tasks.withType<PublishToMavenRepository> {
-    onlyIf {
-        !name.contains("TestKit")
-    }
-}
-
-tasks.withType<Sign> {
-    onlyIf {
-        !name.contains("TestKit")
-    }
+gradlePlugin {
+    website.set(property("WEBSITE").toString())
+    vcsUrl.set(property("VCS_URL").toString())
 }
 
 // Use Detekt with type resolution for check
@@ -132,32 +82,18 @@ tasks.named("check").configure {
     )
 }
 
-tasks.register("setupsPluginUploadFromEnvironment") {
+tasks.register("setupPluginUploadFromEnvironment") {
     description = "Setup the 'pluginUpload' credentials from environment variables"
     group = JavaBasePlugin.DOCUMENTATION_GROUP
     doLast {
-        val mavenCentralUsername = System.getenv("ORG_GRADLE_PROJECT_mavenCentralUsername")
-        val mavenCentralPassword = System.getenv("ORG_GRADLE_PROJECT_mavenCentralPassword")
-        val signingInMemoryKeyId = System.getenv("ORG_GRADLE_PROJECT_signingInMemoryKeyId")
-        val signingInMemoryKeyPassword = System.getenv("ORG_GRADLE_PROJECT_signingInMemoryKeyPassword")
-        val signingInMemoryKey = System.getenv("ORG_GRADLE_PROJECT_signingInMemoryKey")
-        if (mavenCentralUsername == null
-            || mavenCentralPassword == null
-            || signingInMemoryKeyId == null
-            || signingInMemoryKeyPassword == null
-        ) {
-            throw GradleException("Maven publish are not defined environment variables")
+        val key = System.getenv("GRADLE_PUBLISH_KEY")
+        val secret = System.getenv("GRADLE_PUBLISH_SECRET")
+
+        if (key == null || secret == null) {
+            throw GradleException("gradlePublishKey and/or gradlePublishSecret are not defined environment variables")
         }
-        System.setProperty("mavenCentralUsername", mavenCentralUsername)
-        System.setProperty("mavenCentralPassword", mavenCentralPassword)
-        System.setProperty("signing.keyId", signingInMemoryKeyId)
-        System.setProperty("signing.password", signingInMemoryKeyPassword)
-        signingInMemoryKey?.let {
-            System.setProperty("signing.signingInMemoryKey", signingInMemoryKey)
-        }
-        if (projectDir.resolve("secret-key.gpg").exists()) {
-            System.setProperty("signing.secretKeyRingFile", "${projectDir.resolve("secret-key.gpg")}")
-        }
+        System.setProperty("gradle.publish.key", key)
+        System.setProperty("gradle.publish.secret", secret)
     }
 }
 
