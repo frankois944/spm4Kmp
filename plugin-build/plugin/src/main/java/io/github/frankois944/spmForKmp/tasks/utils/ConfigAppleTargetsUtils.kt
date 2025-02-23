@@ -21,7 +21,6 @@ internal fun getCInteropTaskName(
 
 internal fun getBuildMode(extension: PackageRootDefinitionExtension) = if (extension.debug) "debug" else "release"
 
-
 internal fun computeOsVersion(
     target: AppleCompileTarget,
     extension: PackageRootDefinitionExtension,
@@ -41,4 +40,3 @@ internal fun getTargetBuildDirectory(
     packageScratchDir
         .resolve(cinteropTarget.getPackageBuildDir())
         .resolve(buildMode)
-

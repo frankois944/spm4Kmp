@@ -1,6 +1,5 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
-import io.github.frankois944.spmForKmp.PLUGIN_NAME
 import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
@@ -89,23 +88,24 @@ internal fun Project.configAppleTargets(
         val buildMode = getBuildMode(extension)
         val targetBuildDir = getTargetBuildDirectory(packageScratchDir, cinteropTarget, buildMode)
 
-        val compileTask = tasks.register(
-            getTaskName(TASK_COMPILE_PACKAGE, extension.name, cinteropTarget),
-            CompileSwiftPackageTask::class.java
-        ) { taskConfig -> // Rename parameter for brevity
-            configureCompileTask(
-                taskConfig,
-                File(sourcePackageDir, SWIFT_PACKAGE_NAME),
-                cinteropTarget,
-                extension,
-                packageScratchDir,
-                targetBuildDir,
-                swiftSourcePackageDir,
-                sharedCacheDir,
-                sharedConfigDir,
-                sharedSecurityDir
-            )
-        }
+        val compileTask =
+            tasks.register(
+                getTaskName(TASK_COMPILE_PACKAGE, extension.name, cinteropTarget),
+                CompileSwiftPackageTask::class.java,
+            ) { taskConfig -> // Rename parameter for brevity
+                configureCompileTask(
+                    taskConfig,
+                    File(sourcePackageDir, SWIFT_PACKAGE_NAME),
+                    cinteropTarget,
+                    extension,
+                    packageScratchDir,
+                    targetBuildDir,
+                    swiftSourcePackageDir,
+                    sharedCacheDir,
+                    sharedConfigDir,
+                    sharedSecurityDir,
+                )
+            }
 
         val definitionTask =
             tasks.register(
@@ -225,7 +225,7 @@ private fun configureCompileTask(
     sourcePackageDir: File?,
     cacheDir: File?,
     configDir: File?,
-    securityDir: File?
+    securityDir: File?,
 ) {
     taskConfig.apply {
         this.manifestFile.set(manifestFile)

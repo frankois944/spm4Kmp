@@ -147,7 +147,7 @@ class BasicPackageTest : BaseTest() {
                                 products = {
                                     add("CryptoSwift")
                                 },
-                            )
+                            ),
                         )
                         add(
                             SwiftDependency.Package.Local(
@@ -175,10 +175,11 @@ class BasicPackageTest : BaseTest() {
         assert(cache.listFiles()?.isNotEmpty() == true)
         assert(config.exists())
         assert(security.exists())
-        val scratchDir = customSPMPath
-            .resolve("spmKmpPlugin")
-            .resolve("dummy")
-            .resolve("scratch")
+        val scratchDir =
+            customSPMPath
+                .resolve("spmKmpPlugin")
+                .resolve("dummy")
+                .resolve("scratch")
         assert(scratchDir.listFiles().isNullOrEmpty() == false)
         cache.deleteRecursively()
         config.deleteRecursively()

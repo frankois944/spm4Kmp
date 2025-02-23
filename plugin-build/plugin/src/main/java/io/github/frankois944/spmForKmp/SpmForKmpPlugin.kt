@@ -51,7 +51,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             extension.spmWorkingPath?.let { File(it) }
                                 ?: layout.buildDirectory.asFile.get(),
                             "spmKmpPlugin",
-                            extension.name
+                            extension.name,
                         )
 
                     val packageScratchDir = resolveAndCreateDir(sourcePackageDir, "scratch")

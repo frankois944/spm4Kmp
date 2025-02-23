@@ -218,11 +218,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 }
                 logger.debug(
                     """
-######
-Definition File : ${moduleConfig.definitionFile.name}
-At Path: ${moduleConfig.definitionFile.path}
-${moduleConfig.definitionFile.readText()}
-######
+                    ######
+                    Definition File : ${moduleConfig.definitionFile.name}
+                    At Path: ${moduleConfig.definitionFile.path}
+                    ${moduleConfig.definitionFile.readText()}
+                    ######
                     """.trimIndent(),
                 )
             } catch (ex: Exception) {

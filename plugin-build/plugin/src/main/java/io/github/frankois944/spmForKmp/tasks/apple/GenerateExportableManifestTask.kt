@@ -85,19 +85,19 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             project.swiftFormat(
                 manifestFile.asFile.get(),
             )
-            logger.warn("Spm4Kmp: A local Swift package has been generated at")
-            logger.warn(
+            logger.lifecycle("Spm4Kmp: A local Swift package has been generated at")
+            logger.lifecycle(
                 manifestFile
                     .get()
                     .asFile.parentFile.path,
             )
-            logger.warn("Please add it to your xcode project as a local package dependency.")
+            logger.lifecycle("Please add it to your xcode project as a local package dependency.")
         } catch (ex: Exception) {
             logger.error(
                 """
                 Manifest file generated :
-                ${manifestFile.get().asFile}manifestFile.get().asFile}
-                ${manifestFile.get().asFile.readText()}manifestFile.get().asFile.readText()}
+                ${manifestFile.get().asFile}
+                ${manifestFile.get().asFile.readText()}
                 """.trimIndent(),
             )
             throw ex

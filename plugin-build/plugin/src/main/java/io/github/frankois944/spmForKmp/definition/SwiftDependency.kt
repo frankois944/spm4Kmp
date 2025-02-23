@@ -104,7 +104,7 @@ public sealed interface SwiftDependency : Serializable {
          * Represents a local Swift package dependency.
          *
          * @property path The local file URL (file://...) to the local Swift package folder.
-         * @property packageName The name of the package, by default base of the url.
+         * @property packageName The name of the package, by default the first product name.
          * @property products A list of the product's package used during dependency configuration.
          */
         public data class Local(
@@ -116,11 +116,7 @@ public sealed interface SwiftDependency : Serializable {
                 productsConfig.apply(products)
                 if (packageName.isEmpty()) {
                     packageName =
-                        productsConfig.productPackages
-                            .firstOrNull()
-                            ?.products
-                            ?.firstOrNull()
-                            ?.name ?: throw RuntimeException("No package found in local package $path")
+                        productsConfig.productPackages.first().products.first().name
                 }
             }
         }

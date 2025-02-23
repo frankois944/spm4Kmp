@@ -40,7 +40,6 @@ class LocalPackageTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
-                                packageName = "",
                                 products = {
                                     add("LocalSourceDummyFramework", exportToKotlin = true)
                                 },
@@ -48,6 +47,68 @@ class LocalPackageTest : BaseTest() {
                         )
                     },
                 ).withKotlinSources(
+                    KotlinSource.of(
+                        imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import LocalSourceDummyFramework
+                            @objc public class MySwiftDummyClass: NSObject {
+                            }
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        // When
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
+
+    @Test
+    fun `build with raw config`() {
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .also {
+                    if (isCI) {
+                        it.withTargets(
+                            AppleCompileTarget.macosArm64,
+                            AppleCompileTarget.watchosArm64,
+                            AppleCompileTarget.watchosSimulatorArm64,
+                            AppleCompileTarget.tvosArm64,
+                            AppleCompileTarget.tvosSimulatorArm64,
+                            AppleCompileTarget.iosArm64,
+                        )
+                    } else {
+                        it.withTargets(
+                            AppleCompileTarget.macosArm64,
+                        )
+                    }
+                }.withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+                            SwiftDependency.Package.Local(
+                                path = "${localPackageDirectory.absolutePath}",
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
+                            )
+                            """.trimIndent(),
+                    ),
+                )
+                .withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),
                     ),
