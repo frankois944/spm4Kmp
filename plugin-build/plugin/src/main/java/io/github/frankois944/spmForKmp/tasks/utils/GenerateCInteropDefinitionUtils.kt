@@ -7,7 +7,7 @@ import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import java.io.File
 
-internal fun GenerateCInteropDefinitionTask.findHeadersModule(
+internal fun findHeadersModule(
     path: File,
     forTarget: AppleCompileTarget,
 ): List<File> =
@@ -19,7 +19,7 @@ internal fun GenerateCInteropDefinitionTask.findHeadersModule(
         withDirectory = true,
     )
 
-internal fun GenerateCInteropDefinitionTask.getBuildDirectoriesContent(
+internal fun getBuildDirectoriesContent(
     buildDir: File,
     vararg extensions: String,
 ): List<File> =
@@ -80,7 +80,7 @@ internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
     return result
 }
 
-internal fun GenerateCInteropDefinitionTask.extractFirstMatch(
+internal fun extractFirstMatch(
     input: String,
     pattern: String,
 ): String? = Regex(pattern).find(input)?.groupValues?.getOrNull(1)

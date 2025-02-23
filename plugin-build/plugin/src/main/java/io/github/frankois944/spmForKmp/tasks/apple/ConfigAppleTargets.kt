@@ -9,6 +9,11 @@ import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.tasks.utils.computeOsVersion
+import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
+import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
+import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
+import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
@@ -261,30 +266,6 @@ private fun configureGenerateCInteropDefinitionTask(
     task.linkerOpts.set(extension.linkerOpts)
 }
 
-private fun computeOsVersion(
-    target: AppleCompileTarget,
-    extension: PackageRootDefinitionExtension,
-): String =
-    target.getOsVersion(
-        minIos = extension.minIos,
-        minWatchos = extension.minWatchos,
-        minTvos = extension.minTvos,
-        minMacos = extension.minMacos,
-    )
-
-@Suppress("MaxLineLength")
-private fun getBuildMode(extension: PackageRootDefinitionExtension): String = if (extension.debug) "debug" else "release"
-
-private fun getTargetBuildDirectory(
-    packageScratchDir: File,
-    cinteropTarget: AppleCompileTarget,
-    buildMode: String,
-): File =
-    packageScratchDir
-        .resolve(cinteropTarget.getPackageBuildDir())
-        .resolve(buildMode)
-
-// Extracted function to create cinterop tasks
 private fun createCInteropTask(
     mainCompilation: KotlinNativeCompilation,
     cinteropName: String,
@@ -294,16 +275,3 @@ private fun createCInteropTask(
         settings.definitionFile.set(file)
     }
 }
-
-private fun getTaskName(
-    task: String,
-    extension: String,
-    cinteropTarget: AppleCompileTarget? = null,
-) = "${PLUGIN_NAME.capitalized()}Apple${extension.capitalized()}${task.capitalized()}${
-    cinteropTarget?.name?.capitalized().orEmpty()
-}"
-
-private fun getCInteropTaskName(
-    name: String,
-    cinteropTarget: AppleCompileTarget?,
-): String = "cinterop${name.capitalized()}${cinteropTarget?.name?.capitalized().orEmpty()}"
