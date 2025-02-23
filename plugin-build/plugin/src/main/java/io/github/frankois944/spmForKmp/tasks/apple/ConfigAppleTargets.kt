@@ -39,9 +39,6 @@ internal fun Project.configAppleTargets(
                 it.name.startsWith("cinterop" + extension.name.capitalized())
             }.mapNotNull { AppleCompileTarget.byKonanName(it.konanTarget.name) }
 
-    val kotlinExtension =
-        extensions.getByName("kotlin") as KotlinMultiplatformExtension
-
     val manifestTask =
         tasks.register(
             getTaskName(TASK_GENERATE_MANIFEST, extension.name),
@@ -58,11 +55,10 @@ internal fun Project.configAppleTargets(
             )
         }
 
-    val extensionNameCapitalized = extension.name.capitalized()
     val exportedManifestDirectory =
         layout.projectDirectory
             .asFile
-            .resolve("exported$extensionNameCapitalized")
+            .resolve("exported${extension.name.capitalized()}")
 
     val exportedManifestTask: TaskProvider<GenerateExportableManifestTask>? =
         if (extension.packageDependencies.isNotEmpty()) {
@@ -88,28 +84,23 @@ internal fun Project.configAppleTargets(
         val buildMode = getBuildMode(extension)
         val targetBuildDir = getTargetBuildDirectory(packageScratchDir, cinteropTarget, buildMode)
 
-        val compileTask =
-            tasks.register(
-                getTaskName(TASK_COMPILE_PACKAGE, extension.name, cinteropTarget),
-                CompileSwiftPackageTask::class.java,
-            ) { compileTaskConfig ->
-                compileTaskConfig.manifestFile.set(File(sourcePackageDir, SWIFT_PACKAGE_NAME))
-                compileTaskConfig.target.set(cinteropTarget)
-                compileTaskConfig.debugMode.set(extension.debug)
-                compileTaskConfig.packageScratchDir.set(packageScratchDir)
-                compileTaskConfig.compiledTargetDir.set(targetBuildDir)
-                compileTaskConfig.sourcePackage.set(swiftSourcePackageDir)
-
-                compileTaskConfig.osVersion.set(
-                    computeOsVersion(cinteropTarget, extension),
-                )
-
-                compileTaskConfig.sharedCacheDir.set(sharedCacheDir)
-                compileTaskConfig.sharedConfigDir.set(sharedConfigDir)
-                compileTaskConfig.sharedSecurityDir.set(sharedSecurityDir)
-            }
-
-        val compiledBinaryName = "lib${extension.name}.a"
+        val compileTask = tasks.register(
+            getTaskName(TASK_COMPILE_PACKAGE, extension.name, cinteropTarget),
+            CompileSwiftPackageTask::class.java
+        ) { taskConfig -> // Rename parameter for brevity
+            configureCompileTask(
+                taskConfig,
+                File(sourcePackageDir, SWIFT_PACKAGE_NAME),
+                cinteropTarget,
+                extension,
+                packageScratchDir,
+                targetBuildDir,
+                swiftSourcePackageDir,
+                sharedCacheDir,
+                sharedConfigDir,
+                sharedSecurityDir
+            )
+        }
 
         val definitionTask =
             tasks.register(
@@ -123,7 +114,7 @@ internal fun Project.configAppleTargets(
                 configureGenerateCInteropDefinitionTask(
                     task = it,
                     targetBuildDir = targetBuildDir,
-                    compiledBinaryName = compiledBinaryName,
+                    compiledBinaryName = "lib${extension.name}.a",
                     cinteropTarget = cinteropTarget,
                     extension = extension,
                     sourcePackageDir = sourcePackageDir,
@@ -135,7 +126,9 @@ internal fun Project.configAppleTargets(
 
         if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
             val ktTarget =
-                kotlinExtension.targets.findByName(cinteropTarget.name) as KotlinNativeTarget
+                extensions.getByType(KotlinMultiplatformExtension::class.java)
+                    .targets
+                    .findByName(cinteropTarget.name) as KotlinNativeTarget
             val mainCompilation = ktTarget.compilations.getByName("main")
 
             outputFiles.forEachIndexed { index, file ->
@@ -198,7 +191,7 @@ private fun configureManifestTask(
     }
 }
 
-private fun Project.configureExportableManifestTask(
+private fun configureExportableManifestTask(
     taskConfig: GenerateExportableManifestTask,
     dependencies: List<SwiftDependency>,
     extension: PackageRootDefinitionExtension,
@@ -214,6 +207,33 @@ private fun Project.configureExportableManifestTask(
     taskConfig.toolsVersion.set(extension.toolsVersion)
     manifestDir.mkdirs()
     taskConfig.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
+}
+
+@Suppress("LongParameterList")
+private fun configureCompileTask(
+    taskConfig: CompileSwiftPackageTask,
+    manifestFile: File,
+    target: AppleCompileTarget,
+    extension: PackageRootDefinitionExtension,
+    scratchDir: File,
+    buildDir: File,
+    sourcePackageDir: File?,
+    cacheDir: File?,
+    configDir: File?,
+    securityDir: File?
+) {
+    taskConfig.apply {
+        this.manifestFile.set(manifestFile)
+        this.target.set(target)
+        this.debugMode.set(extension.debug)
+        this.packageScratchDir.set(scratchDir)
+        this.compiledTargetDir.set(buildDir)
+        this.sourcePackage.set(sourcePackageDir)
+        this.osVersion.set(computeOsVersion(target, extension))
+        this.sharedCacheDir.set(cacheDir)
+        this.sharedConfigDir.set(configDir)
+        this.sharedSecurityDir.set(securityDir)
+    }
 }
 
 @Suppress("LongParameterList")
