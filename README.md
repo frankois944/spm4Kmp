@@ -18,7 +18,7 @@ The plugin uses the embedded Swift Package Manager, so **no third-party dependen
 
 If you find this project useful, please consider giving it a star!  
 
-[![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/YOUR_USERNAME/YOUR_REPO/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp/stargazers)
 
 ---
 
