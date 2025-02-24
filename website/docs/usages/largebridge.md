@@ -94,7 +94,7 @@ import StripePaymentSheet
 
 ## Plugin Configuration
 
-Add your local package to your plugin configuration, follow the [guide](exportingDependencies.md).
+Add your local package to your plugin configuration, follow the [guide](../exportingDependencies.md).
 
 ### Example
 

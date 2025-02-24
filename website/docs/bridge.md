@@ -22,6 +22,8 @@ The content of this folder is your bridge between Swift and Kotlin, it can conta
     Your Swift code needs to be marked as [@objc/@objcMembers](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and the visibility set as `public`
     or it won't be exported and available from your Kotlin code.
 
+Some tips [here](tips.md#working-with-objcnamesclasses-types).
+
 ``` swift title="src/swift/[cinteropname]/mySwiftFile.swift"
 import UIKit
 

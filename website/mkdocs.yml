@@ -4,6 +4,11 @@ site_author: François Dabonot
 site_description: An alternative to the dying CocoaPods with custom Kotlin/Swift bridge for KMP.
 site_url: https://frankois944.github.io/spm4Kmp/
 extra:
+  social:
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/francois-dabonot/
+    - icon: fontawesome/brands/github
+      link: https://github.com/frankois944
   analytics:
     provider: google
     property: G-KKDWJKFYV1
@@ -27,12 +32,13 @@ nav:
   - bridge.md
   - bridgeWithDependencies.md
   - exportingDependencies.md
-  - multiTarget.md
-  - distribution.md
-  - largebridge.md
   - issues.md
   - faq.md
   - tips.md
+  - Usages:
+    - usages/multiTarget.md
+    - usages/distribution.md
+    - usages/largebridge.md
   - References:
       - references/swiftPackageConfig.md
       - references/swiftDependency.md
@@ -73,6 +79,8 @@ theme:
     - content.code.annotate
     - navigation.top
     - navigation.instant
+    - navigation.instant.progress
+    - navigation.expand
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
