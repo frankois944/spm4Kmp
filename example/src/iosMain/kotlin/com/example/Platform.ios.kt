@@ -8,6 +8,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import nativeIosShared.MySwiftDummyClass
 import nativeIosShared.TestClass
 import platform.UIKit.UIDevice
+import platform.UIKit.UIView
 
 class IOSPlatform : Platform {
     override val name: String =
@@ -18,14 +19,18 @@ actual fun getPlatform(): Platform = IOSPlatform()
 
 val myNativeClass = MySwiftDummyClass().mySwiftDummyFunction()
 
-@ExperimentalForeignApi
 val getSwiftValue = TestClass().getSomeValue()
 
-@ExperimentalForeignApi
+fun getView() = TestClass().getView()
+
+fun setView(view: UIView) = TestClass().setViewWithView(view)
+
+fun getView2(): UIView = TestClass().getViewWithNSObject() as UIView
+
+fun setView2(view: UIView) = TestClass().setViewWithNSObjectWithView(view)
+
 fun configureFirebase() = FIRApp.configure()
 
-@ExperimentalForeignApi
 val consentStatusGranted = FIRConsentStatusGranted
 
-@ExperimentalForeignApi
 val localSourceDummyTest = LocalSourceDummyFramework.LocalSourceDummy().test()

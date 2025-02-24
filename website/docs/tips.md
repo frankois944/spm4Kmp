@@ -22,7 +22,7 @@ An [full example](https://github.com/frankois944/FirebaseKmpDemo) of how to impl
 
 ## Working With 'objcnames.classes' Types
 
-For example, when using a UIView (work with any ObjC Types ei: UIViewController,...).
+For example, when using a UIView (work with any ObjC Types, ex: UIViewController...).
 
 ``` swift title="mySwiftBridge.swift"
 
@@ -41,11 +41,26 @@ For example, when using a UIView (work with any ObjC Types ei: UIViewController,
         // store view
     }
 
+    // or if you don't want to declare an extra MyDummyView
+
+    public func getViewWithNSObject() -> NSObject {
+        return UIView()
+    }
+
+    public func setViewWithNSObject(view: NSObject) {
+        // store view
+    }
+
 }
 ```
 ``` kotlin title="iosMain/myKotlinFile.kt"
-val myView: UIView = TestClass().getView()
-```
+fun getView(): UIView = TestClass().getView()
+fun setView(view: UIView) = TestClass().setViewWithView(view)
 
+// or
+
+fun getView(): UIView = TestClass().getViewWithNSObject() as UIView
+fun setView(view: UIView) = TestClass().setViewWithNSObject(view)
+```
 
 
