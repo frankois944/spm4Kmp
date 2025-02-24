@@ -35,6 +35,7 @@ private fun MutableList<SwiftDependency>.addFilteredRemotePackage(remotePackage:
                 add(
                     remotePackage.copy().also { it.productsConfig = newConfig },
                 )
+
             is SwiftDependency.Package.Remote.Branch -> add(remotePackage.copy().also { it.productsConfig = newConfig })
             is SwiftDependency.Package.Remote.Commit -> add(remotePackage.copy().also { it.productsConfig = newConfig })
         }

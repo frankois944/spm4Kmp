@@ -116,7 +116,11 @@ public sealed interface SwiftDependency : Serializable {
                 productsConfig.apply(products)
                 if (packageName.isEmpty()) {
                     packageName =
-                        productsConfig.productPackages.first().products.first().name
+                        productsConfig.productPackages
+                            .first()
+                            .products
+                            .first()
+                            .name
                 }
             }
         }

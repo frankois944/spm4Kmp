@@ -6,7 +6,7 @@
 
 [spmWorkingPath](references/swiftPackageConfig.md#spmworkingpath) has been added to change the path to Swift Package working file.
 
-By setting [spmWorkingPath](https://github.com/frankois944/spm4Kmp/blob/cf80e65b3076d9e0bcd94a847e1209d4b9b91141/example/build.gradle.kts#L108C1-L108C104) outside the build folder, the working files won't be removed if you clean the project.
+By setting [spmWorkingPath](https://github.com/frankois944/spm4Kmp/blob/cf80e65b3076d9e0bcd94a847e1209d4b9b91141/example/build.gradle.kts#L108C1-L108C104) outside the build folder, the working files won't be removed if you clean the project, and you can **exclude** the folder from [indexing](https://www.jetbrains.com/help/idea/indexing.html#exclude).
 
 Swift Package Manager has its own cache, so it's fine to detach it from the Kotlin build folder.
 
@@ -19,3 +19,33 @@ Also, check my [GitHub action workflow](https://github.com/frankois944/spm4Kmp/b
 ## Firebase
 
 An [full example](https://github.com/frankois944/FirebaseKmpDemo) of how to implement Firebase with the plugin
+
+## Working With 'objcnames.classes' Types
+
+For example, when using a UIView (work with any ObjC Types ei: UIViewController,...).
+
+``` swift title="mySwiftBridge.swift"
+
+// Force cinterop to include `platform.UIKit.UIView`
+@objcMembers public class MyDummyView: UIView {}
+
+// Or force by inheritance
+@objcMembers public class TestClass: NSObject /* or UIView */ {
+
+    // return `UIView` is not enough to let cinterop use the correct type
+    public func getView() -> UIView {
+        return UIView()
+    }
+
+    public func setView(view: UIView) {
+        // store view
+    }
+
+}
+```
+``` kotlin title="iosMain/myKotlinFile.kt"
+val myView: UIView = TestClass().getView()
+```
+
+
+

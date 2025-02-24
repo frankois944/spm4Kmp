@@ -92,7 +92,8 @@ internal fun Project.configAppleTargets(
             tasks.register(
                 getTaskName(TASK_COMPILE_PACKAGE, extension.name, cinteropTarget),
                 CompileSwiftPackageTask::class.java,
-            ) { taskConfig -> // Rename parameter for brevity
+            ) { taskConfig ->
+                // Rename parameter for brevity
                 configureCompileTask(
                     taskConfig,
                     File(sourcePackageDir, SWIFT_PACKAGE_NAME),
@@ -131,7 +132,8 @@ internal fun Project.configAppleTargets(
 
         if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
             val ktTarget =
-                extensions.getByType(KotlinMultiplatformExtension::class.java)
+                extensions
+                    .getByType(KotlinMultiplatformExtension::class.java)
                     .targets
                     .findByName(cinteropTarget.name) as KotlinNativeTarget
             val mainCompilation = ktTarget.compilations.getByName("main")
