@@ -1,26 +1,33 @@
-package io.github.frankois944.spmForKmp.tasks
+package io.github.frankois944.spmForKmp.tasks.apple
 
-import io.github.frankois944.spmForKmp.config.CompileTarget
+import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.config.ModuleInfo
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
-import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
+import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
+import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
+import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
+import io.github.frankois944.spmForKmp.tasks.utils.getBuildDirectoriesContent
 import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
+@CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     init {
         onlyIf {
@@ -29,7 +36,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     @get:Input
-    abstract val target: Property<CompileTarget>
+    abstract val target: Property<AppleCompileTarget>
 
     @get:Input
     abstract val productName: Property<String>
@@ -50,9 +57,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     abstract val osVersion: Property<String>
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val compiledBinary: RegularFileProperty
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: RegularFileProperty
 
     @get:Input
@@ -81,79 +90,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             .asFile
             .get()
             .parentFile
-
-    private fun getBuildDirectoriesContent(vararg extensions: String): List<File> =
-        getBuildDirectory() // get folders with headers for internal dependencies
-            .listFiles { file -> extensions.contains(file.extension) || file.name == "Modules" }
-            // remove folder with weird names, cinterop doesn't like module with symbol names like grp-c++
-            // it doesn't matter for the kotlin export, to be rethinking
-            ?.filter { file -> !file.nameWithoutExtension.lowercase().contains("grpc") }
-            ?.toList()
-            .orEmpty()
-
-    private fun extractPublicHeaderFromCheckout(module: ModuleConfig): Set<File> {
-        logger.debug("Looking for public header for ${module.name}")
-
-        val checkoutsDir = "checkouts"
-        val packageSwift = "Package.swift"
-        val sourcesDir = "Sources"
-
-        val packageDir = scratchDir.get().resolve(checkoutsDir).resolve(module.packageName)
-        val manifestFile = packageDir.resolve(packageSwift)
-        val result = mutableSetOf<File>()
-
-        if (!manifestFile.exists()) {
-            logger.debug("No manifest found at ${manifestFile.path}")
-            return result
-        }
-
-        val content = manifestFile.readText()
-        val targets = extractTargetBlocks(content)
-
-        targets.forEach { target ->
-            val name = extractFirstMatch(target, """name:\s*"([^"]+)"""")
-            val targetPath = extractFirstMatch(target, """path:\s*"([^"]+)"""")
-            logger.debug("targetPath: $targetPath")
-            val publicHeadersPath = extractFirstMatch(target, """publicHeadersPath:\s*"([^"]+)"""")
-            logger.debug("publicHeadersPath: $publicHeadersPath")
-            var resolvedIncludeDir =
-                if (targetPath != null) {
-                    packageDir.resolve(targetPath)
-                } else {
-                    packageDir.resolve(sourcesDir).resolve(name ?: module.name)
-                }
-
-            if (publicHeadersPath != null) {
-                resolvedIncludeDir = resolvedIncludeDir.resolve(publicHeadersPath)
-            }
-
-            logger.debug("resolvedIncludeDir: {}", resolvedIncludeDir)
-            if (resolvedIncludeDir.exists()) {
-                result.add(resolvedIncludeDir)
-            } else {
-                logger.debug("PUBLIC HEADER NOT FOUND AT: {} FOR : {}", resolvedIncludeDir, module.name)
-            }
-        }
-        return result
-    }
-
-    private fun extractFirstMatch(
-        input: String,
-        pattern: String,
-    ): String? = Regex(pattern).find(input)?.groupValues?.getOrNull(1)
-
-    private fun extractModuleNameFromModuleMap(module: String): String? {
-        val regex = """module\s+\S+\s+""".toRegex()
-        return regex
-            .find(module)
-            ?.groupValues
-            ?.firstOrNull()
-            ?.replace("module", "")
-            ?.trim()
-            ?.also {
-                logger.debug("MODULE FOUND {}", it)
-            }
-    }
 
     private fun getModuleNames(): List<ModuleInfo> =
         buildList {
@@ -227,7 +163,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleNames
             .forEach { moduleName ->
                 logger.debug("LOOKING for module dir {}", moduleName)
-                getBuildDirectoriesContent("build", "framework")
+                getBuildDirectoriesContent(getBuildDirectory(), "build", "framework")
                     .find {
                         it.nameWithoutExtension.lowercase() == moduleName.name.lowercase()
                     }?.let { buildDir ->
@@ -339,9 +275,10 @@ linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${ge
 
         val headerSearchPaths =
             buildList {
-                addAll(extractPublicHeaderFromCheckout(moduleConfig))
-                addAll(getBuildDirectoriesContent("build"))
+                addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
+                addAll(getBuildDirectoriesContent(getBuildDirectory(), "build"))
                 addAll(implicitDependencies)
+                addAll(findHeadersModule(scratchDir.get().resolve("artifacts"), target.get()))
             }.joinToString(" ") { "-I\"$it\"" }
 
         val packageName =

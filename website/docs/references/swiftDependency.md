@@ -69,7 +69,7 @@ SwiftDependency.Package.Remote.Branch(
  * Represents a local Swift package dependency.
  *
  * @property path The local file URL (file://...) to the local Swift package folder.
- * @property packageName The name of the package, by default base of the url.
+ * @property packageName The name of the package, by default the first product name.
  * @property products A list of the product's package used during dependency configuration.
  */
 SwiftDependency.Package.Local(

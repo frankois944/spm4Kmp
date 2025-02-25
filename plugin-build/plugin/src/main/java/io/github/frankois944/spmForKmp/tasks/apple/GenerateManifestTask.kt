@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.tasks
+package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.manifest.generateManifest

@@ -1,5 +1,5 @@
-
 import org.gradle.plugin.devel.tasks.PluginUnderTestMetadata.IMPLEMENTATION_CLASSPATH_PROP_KEY
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.Serializable
 import java.nio.channels.FileChannel
@@ -48,8 +48,8 @@ kotlin {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
@@ -81,7 +81,9 @@ tasks.named("check").configure {
     )
 }
 
-tasks.create("setupPluginUploadFromEnvironment") {
+tasks.register("setupPluginUploadFromEnvironment") {
+    description = "Setup the 'pluginUpload' credentials from environment variables"
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
     doLast {
         val key = System.getenv("GRADLE_PUBLISH_KEY")
         val secret = System.getenv("GRADLE_PUBLISH_SECRET")

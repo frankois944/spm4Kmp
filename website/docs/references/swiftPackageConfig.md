@@ -187,3 +187,14 @@ public var sharedConfigPath: String? = null
  */
 public var sharedSecurityPath: String? = null
 ```
+
+### spmWorkingPath
+
+``` kotlin
+/**
+ * The path of the directory where working SPM file(s) will be written.
+ *
+ * Default : `build/spmKmpPlugin/`
+ */
+public var spmWorkingPath: String? = null
+```

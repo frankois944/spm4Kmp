@@ -1,6 +1,6 @@
 # Distribute Kotlin Library
 
-## Release a library using the plugin
+## Release A Library Using The Plugin
 
 We can distribute to other users a Kotlin library using native or third-party dependency, some requirements are necessary for Apple targets.
 
@@ -27,7 +27,7 @@ public expect fun KmpPlayer(modifier: Modifier = Modifier, url: String)
 ```
 
 ### Android
-For Android, it uses [Exoplyer](https://github.com/google/ExoPlayer).
+For Android, it uses [Exoplayer](https://github.com/google/ExoPlayer).
 
 #### Gradle
 
@@ -106,6 +106,8 @@ swiftPackageConfig {
 ```
 
 #### Bridge
+
+Some tips [here](../tips.md#working-with-objcnamesclasses-types).
 
 ``` Swift title="src/swift/appleDeps/MEPlayerController.swift"
 import Foundation

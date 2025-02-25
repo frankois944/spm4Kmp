@@ -13,7 +13,7 @@ let package = Package(
   dependencies: [
     .package(
       path:
-        "/Users/francoisdabonot/DEV/spm-kmp-plugin/example/../plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework"
+        "/Users/francoisdabonot/devs/spm4Kmp/example/../plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework"
     )
   ],
   targets: [

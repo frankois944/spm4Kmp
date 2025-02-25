@@ -7,7 +7,7 @@ import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
-import io.github.frankois944.spmForKmp.config.CompileTarget
+import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductConfig
 import io.github.frankois944.spmForKmp.definition.product.ProductName
@@ -32,13 +32,14 @@ abstract class SmpKMPTestFixture private constructor(
         var minWatchos: String = "4.0",
         var toolsVersion: String = "5.9",
         var packageDependencyPrefix: String? = null,
-        var targets: List<CompileTarget> = listOf(CompileTarget.iosSimulatorArm64),
+        var targets: List<AppleCompileTarget> = listOf(AppleCompileTarget.iosSimulatorArm64),
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
         val packages: List<SwiftDependency> = emptyList(),
         val sharedCachePath: String? = null,
         val sharedConfigPath: String? = null,
         val sharedSecurityPath: String? = null,
+        val customSPMPath: String? = null,
         val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
     )
@@ -161,6 +162,9 @@ swiftPackageConfig {
                     }
                     extension.sharedSecurityPath?.let {
                         append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
+                    }
+                    extension.customSPMPath?.let {
+                        append("spmWorkingPath = \"${extension.customSPMPath}\"\n")
                     }
 
                     fun buildProductBlock(
@@ -363,7 +367,7 @@ swiftPackageConfig {
                 config = config.copy(kotlinSources = sources.toList())
             }
 
-        fun withTargets(vararg targets: CompileTarget) =
+        fun withTargets(vararg targets: AppleCompileTarget) =
             apply {
                 config = config.copy(targets = targets.toList())
             }
@@ -386,6 +390,11 @@ swiftPackageConfig {
         fun withSecurity(path: String) =
             apply {
                 config = config.copy(sharedSecurityPath = path)
+            }
+
+        fun withSPMPath(path: String) =
+            apply {
+                config = config.copy(customSPMPath = path)
             }
 
         fun withMacos(minMacos: String) =

@@ -24,3 +24,5 @@ BinaryPackageSource/archives
 .scannerwork
 website/site
 website/.cache
+example/SPM
+secret-key.gpg

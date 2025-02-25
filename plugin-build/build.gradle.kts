@@ -55,6 +55,8 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.register("clean", Delete::class.java) {
+    description = "Cleanup all build files"
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
     delete(rootProject.layout.buildDirectory)
 }
 

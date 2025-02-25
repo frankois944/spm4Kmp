@@ -171,4 +171,11 @@ public abstract class PackageRootDefinitionExtension
          * It is optional and can be set to null if no such shared directory is required or use the default one.
          */
         public var sharedSecurityPath: String? = null
+
+        /**
+         * The path of the directory where working SPM file(s) will be written.
+         *
+         * Default : if null `build/spmKmpPlugin/`
+         */
+        public var spmWorkingPath: String? = null
     }

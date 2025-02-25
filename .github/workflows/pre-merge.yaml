@@ -6,13 +6,17 @@ on:
       - main
     paths-ignore:
       - 'README.md'
-      - 'website/'
+      - 'website/**'
+      - 'BinaryPackageSource/**'
+      - '.idea/**'
   pull_request:
     branches:
       - '*'
     paths-ignore:
       - 'README.md'
-      - 'website/'
+      - 'website/**'
+      - 'BinaryPackageSource/**'
+      - '.idea/**'
 
 concurrency:
   # Use a unique identifier for the workflow cancellation group.
@@ -57,6 +61,7 @@ jobs:
             example/build/spmKmpPlugin
             example/iosApp/spm
             example/iosApp/build
+            example/SPM
           key: ${{ runner.os }}-example-scratch
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
