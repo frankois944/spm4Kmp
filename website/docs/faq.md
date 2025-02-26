@@ -10,7 +10,7 @@ Unlike Kotlin with Java, the interoperability between Swift and ObjC needs to be
 
 Some old libraries, like Firebase, are mainly written in ObjC or a few of them want to have the compatibility with ObjC.
 
-So mainly, Apple targets libraries that are written in Swift; you can check inside their repository, the Languages section to see which language they are using.
+So mainly, Apple's Platforms libraries are written in Swift; you can check inside their repository, the Languages section to see which language they are using.
 
 But sometimes, like [google nearby](https://github.com/frankois944/spm4Kmp/issues/68), a wrapper Swift <- ObjC is made to increase the compatibility with Swift and make it unexportable to Kotlin.
 

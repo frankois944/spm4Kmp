@@ -1,5 +1,7 @@
 # Use External Dependencies
 
+## How It works
+
 On completion with the [basic configuration](bridge.md), it's possible to use external dependency with your bridge.
 
 The Plug-in reproduces the CocoaPods plugin behavior with the same kind of issues about third-party dependency but less intrusively.
@@ -7,6 +9,84 @@ The Plug-in reproduces the CocoaPods plugin behavior with the same kind of issue
 !!! note
 
     If your package doesn't work with the plugin, please create an [issue](https://github.com/frankois944/spm4Kmp/issues).
+
+## Supported Dependency Sources
+
+The plugin supports the following configurations :
+
+=== "Version"
+
+    ``` kotlin
+    SwiftDependency.Package.Remote.Version(
+        url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+        version = "1.8.4",
+        products = {
+            add("CryptoSwift")
+        },
+    )
+    ```
+
+=== "Commit"
+
+    ``` kotlin
+    SwiftDependency.Package.Remote.Commit(
+        url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+        revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
+        products = {
+            add("CryptoSwift")
+        },
+    )
+    ```
+
+=== "Branch"
+
+    ``` kotlin
+    SwiftDependency.Package.Remote.Branch(
+        url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+        branch = "main",
+        products = {
+            add("CryptoSwift")
+        },
+    ),
+    ```
+=== "Local"
+
+    ``` kotlin
+    SwiftDependency.Package.Local(
+        path = "Absolute path to the local package folder",
+        packageName = "LocalSourceDummyFramework",
+        products = {
+            add("LocalSourceDummyFramework")
+        },
+    ),
+    ```
+
+=== "Local Binary"
+
+    ``` kotlin
+    SwiftDependency.Binary.Local(
+        path = "/path/to/LocalFramework.xcframework"
+        packageName = "LocalFramework"
+    ),
+    ```
+
+=== "Remote Binary"
+
+    ``` kotlin
+    SwiftDependency.Binary.Remote(
+        url = URI("https://.../RemoteBinaryFramework.xcframework.zip"),
+        checksum = "[checksum]",
+        packageName = "RemoteBinaryFramework",
+    )
+    ```
+
+[SwiftDependency reference](./references/swiftDependency.md)
+
+### XCFramework
+
+The XCFramework are used for Local/Remote Binary and protecting source code distribution, learn [more](https://www.avanderlee.com/swift/binary-targets-swift-package-manager).
+
+An example is [available](https://github.com/frankois944/spm4Kmp/tree/main/BinaryPackageSource).
 
 ## Gradle
 
@@ -64,82 +144,5 @@ import CryptoSwift
 import [cinteropname].MySwiftBridge
 
 val contentFromSwift = MySwiftBridge().toMD5(value = "someString")
-
 ```
-
-## Supported Dependency Sources
-
-The plugin supports the following configurations :
-
-=== "Version"
-
-    ``` kotlin
-    SwiftDependency.Package.Remote.Version(
-        url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-        version = "1.8.4",
-        products = {
-            add("CryptoSwift")
-        },
-    )
-    ```
-
-=== "Commit"
-
-    ``` kotlin
-    SwiftDependency.Package.Remote.Commit(
-        url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-        revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
-        products = {
-            add("CryptoSwift")
-        },
-    )
-    ```
-
-=== "Branch"
-
-    ``` kotlin
-    SwiftDependency.Package.Remote.Branch(
-        url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-        branch = "main",
-        products = {
-            add("CryptoSwift")
-        },
-    ),
-    ```
-=== "Local"
-    ``` kotlin
-    SwiftDependency.Package.Local(
-        path = "Absolute path to the local package folder",
-        packageName = "LocalSourceDummyFramework",
-        products = {
-            add("LocalSourceDummyFramework")
-        },
-    ),
-    ```
-
-=== "Local Binary"
-    ``` kotlin
-    SwiftDependency.Binary.Local(
-        path = "/path/to/LocalFramework.xcframework"
-        packageName = "LocalFramework"
-    ),
-    ```
-
-=== "Remote Binary"
-    ``` kotlin
-    SwiftDependency.Binary.Remote(
-        url = URI("https://.../RemoteBinaryFramework.xcframework.zip"),
-        checksum = "[checksum]",
-        packageName = "RemoteBinaryFramework",
-    )
-    ```
-
-[SwiftDependency reference](./references/swiftDependency.md)
-
-## XcFramework
-
-The xcFramework are used for Local/Remote Binary, learn [more](https://www.avanderlee.com/swift/binary-targets-swift-package-manager).
-
-An example is [available](https://github.com/frankois944/spm4Kmp/tree/main/BinaryPackageSource).
-
 
