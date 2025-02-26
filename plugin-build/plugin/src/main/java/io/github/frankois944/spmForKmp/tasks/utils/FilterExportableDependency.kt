@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.definition.helpers
+package io.github.frankois944.spmForKmp.tasks.utils
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfigImpl

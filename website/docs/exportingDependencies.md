@@ -1,12 +1,18 @@
 # Export Dependencies To Kotlin
 
-On completion with [using external dependencies](bridgeWithDependencies.md), it's possible to export them to Kotlin, if they are compatible.
+On completion with [using external dependencies](bridgeWithDependencies.md), it's possible to export them to Kotlin, if they are [compatible](faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code).
 
 Exported dependency can be used inside the bridge and the Kotlin app.
 
 !!! note
 
     If your package doesn't work with the plugin, please create an [issue](https://github.com/frankois944/spm4Kmp/issues).
+
+## Bridge Dependencies
+
+In a case the exported dependency is written in [Swift](faq.md), **manual work needs to be done** like [this](bridgeWithDependencies.md#example).
+
+For example, the [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) can't work directly on Kotlin, so the Plugin's bridge is here to fill the hole between Kotlin and Swift.
 
 ## Gradle
 

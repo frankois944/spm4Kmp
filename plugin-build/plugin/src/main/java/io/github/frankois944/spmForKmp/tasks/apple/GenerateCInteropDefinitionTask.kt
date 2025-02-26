@@ -4,11 +4,11 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.config.ModuleInfo
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.definition.helpers.filterExportableDependency
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
 import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
+import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildDirectoriesContent
 import io.github.frankois944.spmForKmp.utils.md5
@@ -80,7 +80,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     val outputFiles: List<File>
         get() =
             buildList {
-                getModuleNames().forEach { moduleName ->
+                getModuleInfos().forEach { moduleName ->
                     add(getBuildDirectory().resolve("${moduleName.name}.def"))
                 }
             }
@@ -91,7 +91,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             .get()
             .parentFile
 
-    private fun getModuleNames(): List<ModuleInfo> =
+    private fun getModuleInfos(): List<ModuleInfo> =
         buildList {
             // the first item must be the product name
             add(
@@ -109,10 +109,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         logger.debug("Filtered exportable dependency: {}", it)
                     }.flatMap { dependency ->
                         if (dependency is SwiftDependency.Package) {
-                            @Suppress("RedundantHigherOrderMapUsage")
                             dependency.productsConfig.productPackages
                                 .flatMap { product ->
-                                    product.products.map { it }
+                                    product.products
                                 }.map { product ->
                                     ModuleInfo(
                                         name = product.name,
@@ -150,33 +149,33 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @TaskAction
     fun generateDefinitions() {
         val moduleConfigs = mutableListOf<ModuleConfig>()
-        val moduleNames = getModuleNames()
+        val moduleInfos = getModuleInfos()
 
         logger.debug(
             """
-            moduleNames
-            $moduleNames
+            moduleInfos
+            $moduleInfos
             """.trimIndent(),
         )
 
         // find the build directory of the declared module in the manifest
-        moduleNames
-            .forEach { moduleName ->
-                logger.debug("LOOKING for module dir {}", moduleName)
+        moduleInfos
+            .forEach { moduleInfo ->
+                logger.debug("LOOKING for module dir {}", moduleInfo)
                 getBuildDirectoriesContent(getBuildDirectory(), "build", "framework")
                     .find {
-                        it.nameWithoutExtension.lowercase() == moduleName.name.lowercase()
+                        it.nameWithoutExtension.lowercase() == moduleInfo.name.lowercase()
                     }?.let { buildDir ->
-                        logger.debug("build dir {} for {}", buildDir, moduleName)
+                        logger.debug("build dir {} for {}", buildDir, moduleInfo)
                         moduleConfigs.add(
                             ModuleConfig(
                                 isFramework = buildDir.extension == "framework",
-                                name = moduleName.name,
+                                name = moduleInfo.name,
                                 buildDir = buildDir,
-                                packageName = moduleName.packageName,
-                                definitionFile = getBuildDirectory().resolve("${moduleName.name}.def"),
-                                linkerOpts = moduleName.linkerOpts,
-                                compilerOpts = moduleName.compilerOpts,
+                                packageName = moduleInfo.packageName,
+                                definitionFile = getBuildDirectory().resolve("${moduleInfo.name}.def"),
+                                linkerOpts = moduleInfo.linkerOpts,
+                                compilerOpts = moduleInfo.compilerOpts,
                             ),
                         )
                     }

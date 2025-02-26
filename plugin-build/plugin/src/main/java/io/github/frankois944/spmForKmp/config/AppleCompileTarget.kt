@@ -92,13 +92,10 @@ public enum class AppleCompileTarget : Serializable {
 
     private fun simulatorSuffix() =
         when (this) {
-            iosArm64 -> ""
             iosX64, iosSimulatorArm64 -> simulatorSuffixValue
-            watchosArm64 -> ""
             watchosX64, watchosSimulatorArm64 -> simulatorSuffixValue
-            tvosArm64 -> ""
             tvosX64, tvosSimulatorArm64 -> simulatorSuffixValue
-            macosX64, macosArm64 -> ""
+            else -> ""
         }
 
     internal fun getOsVersion(

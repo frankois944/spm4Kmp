@@ -41,7 +41,6 @@ swiftPackageConfig {
 
     Note : When updating your configuration, reset the package cache to apply the modification.
 
-
 ## Example
 
 !!! warning "Make your Swift code compatible with Kotlin."

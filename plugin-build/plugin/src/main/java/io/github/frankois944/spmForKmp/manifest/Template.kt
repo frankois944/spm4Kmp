@@ -17,8 +17,8 @@ internal fun generateManifest(
 ): String {
     var binaryDependencies =
         listOfNotNull(
-            buildLocaleBinary(dependencies, generatedPackageDirectory).takeIf { it.isNotEmpty() },
-            buildRemoteBinary(dependencies).takeIf { it.isNotEmpty() },
+            getLocaleBinary(dependencies, generatedPackageDirectory).takeIf { it.isNotEmpty() },
+            getRemoteBinary(dependencies).takeIf { it.isNotEmpty() },
         ).joinToString(",")
     if (binaryDependencies.isNotEmpty()) {
         binaryDependencies = ",$binaryDependencies"
@@ -101,16 +101,16 @@ private fun getDependenciesTargets(dependencies: List<SwiftDependency>): String 
                     add("\"${dependency.packageName}\"")
                 } else if (dependency is SwiftDependency.Package) {
                     dependency.productsConfig.productPackages.forEach { config ->
-                        @Suppress("MaxLineLength")
                         config.products.forEach { product ->
-                            add(".product(name: \"${product.alias ?: product.name}\", package: \"${dependency.packageName}\")")
+                            val name = product.alias ?: product.name
+                            add(".product(name: \"$name\", package: \"${dependency.packageName}\")")
                         }
                     }
                 }
             }
     }.joinToString(",")
 
-private fun buildLocaleBinary(
+private fun getLocaleBinary(
     dependencies: List<SwiftDependency>,
     swiftBuildDir: Path,
 ): String =
@@ -124,7 +124,7 @@ private fun buildLocaleBinary(
             }
     }.joinToString(",")
 
-private fun buildRemoteBinary(dependencies: List<SwiftDependency>): String =
+private fun getRemoteBinary(dependencies: List<SwiftDependency>): String =
     buildList {
         dependencies
             .filterIsInstance<SwiftDependency.Binary.Remote>()
