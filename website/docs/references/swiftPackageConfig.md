@@ -194,7 +194,7 @@ public var sharedSecurityPath: String? = null
 /**
  * The path of the directory where working SPM file(s) will be written.
  *
- * Default : `build/spmKmpPlugin/`
+ * Default : `{buildDirectory}/spmKmpPlugin/`
  */
-public var spmWorkingPath: String? = null
+public var spmWorkingPath: String
 ```
