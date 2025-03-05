@@ -46,7 +46,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
                 swiftPackageEntries.forEach { extension ->
 
-                    val sourcePackageDir =
+                    val spmWorkingDir =
                         resolveAndCreateDir(
                             extension.spmWorkingPath?.let { File(it) }
                                 ?: layout.buildDirectory.asFile.get(),
@@ -54,7 +54,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             extension.name,
                         )
 
-                    val packageScratchDir = resolveAndCreateDir(sourcePackageDir, "scratch")
+                    val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
                     val sharedCacheDir: File? = extension.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
                     val sharedConfigDir: File? = extension.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
                     val sharedSecurityDir: File? = extension.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
@@ -67,7 +67,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         taskGroup = taskGroup,
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
                         extension = extension,
-                        sourcePackageDir = sourcePackageDir,
+                        sourcePackageDir = spmWorkingDir,
                         packageScratchDir = packageScratchDir,
                         sharedCacheDir = sharedCacheDir,
                         sharedConfigDir = sharedConfigDir,

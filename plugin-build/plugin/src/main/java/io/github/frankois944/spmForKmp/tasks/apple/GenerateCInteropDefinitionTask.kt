@@ -2,7 +2,6 @@ package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
-import io.github.frankois944.spmForKmp.config.ModuleInfo
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
@@ -91,11 +90,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             .get()
             .parentFile
 
-    private fun getModuleInfos(): List<ModuleInfo> =
+    private fun getModuleInfos(): List<ModuleConfig> =
         buildList {
             // the first item must be the product name
             add(
-                ModuleInfo(
+                ModuleConfig(
                     name = productName.get(),
                     compilerOpts = compilerOpts.get(),
                     linkerOpts = linkerOpts.get(),
@@ -113,7 +112,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 .flatMap { product ->
                                     product.products
                                 }.map { product ->
-                                    ModuleInfo(
+                                    ModuleConfig(
                                         name = product.name,
                                         packageName = dependency.packageName,
                                         linkerOpts = product.linkerOpts,
@@ -122,14 +121,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 }
                         } else if (dependency is SwiftDependency.Binary) {
                             listOf(
-                                ModuleInfo(
+                                ModuleConfig(
                                     name = dependency.packageName,
                                     linkerOpts = dependency.linkerOpts,
                                     compilerOpts = dependency.compilerOpts,
                                 ),
                             )
                         } else {
-                            listOf(ModuleInfo(name = dependency.packageName))
+                            listOf(ModuleConfig(name = dependency.packageName))
                         }
                     },
             )
@@ -148,41 +147,25 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
-        val moduleConfigs = mutableListOf<ModuleConfig>()
-        val moduleInfos = getModuleInfos()
-
-        logger.debug(
-            """
-            moduleInfos
-            $moduleInfos
-            """.trimIndent(),
-        )
+        val moduleConfigs = getModuleInfos()
 
         // find the build directory of the declared module in the manifest
-        moduleInfos
+        moduleConfigs
             .forEach { moduleInfo ->
-                logger.debug("LOOKING for module dir {}", moduleInfo)
+                logger.debug("LOOKING for module dir {}", moduleInfo.name)
                 getBuildDirectoriesContent(getBuildDirectory(), "build", "framework")
                     .find {
                         it.nameWithoutExtension.lowercase() == moduleInfo.name.lowercase()
                     }?.let { buildDir ->
-                        logger.debug("build dir {} for {}", buildDir, moduleInfo)
-                        moduleConfigs.add(
-                            ModuleConfig(
-                                isFramework = buildDir.extension == "framework",
-                                name = moduleInfo.name,
-                                buildDir = buildDir,
-                                packageName = moduleInfo.packageName,
-                                definitionFile = getBuildDirectory().resolve("${moduleInfo.name}.def"),
-                                linkerOpts = moduleInfo.linkerOpts,
-                                compilerOpts = moduleInfo.compilerOpts,
-                            ),
-                        )
+                        moduleInfo.isFramework = buildDir.extension == "framework"
+                        moduleInfo.buildDir = buildDir
+                        moduleInfo.definitionFile = getBuildDirectory().resolve("${moduleInfo.name}.def")
+                        logger.debug("Setup module DONE: {}", moduleInfo)
                     }
             }
         logger.debug(
             """
-            modulesConfigs found
+            ModulesConfigs found
             $moduleConfigs
             """.trimIndent(),
         )
@@ -258,7 +241,7 @@ package = $packageName
 libraryPaths = "${getBuildDirectory().path}"
 compilerOpts = $compilerOpts -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
 linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
-    """
+            """.trimIndent()
     }
 
     private fun generateNonFrameworkDefinition(
@@ -293,6 +276,6 @@ package = $packageName
 libraryPaths = "${getBuildDirectory().path}"
 compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
 linkerOpts = $linkerOps ${getExtraLinkers()} -F"${getBuildDirectory().path}"
-    """
+            """.trimIndent()
     }
 }
