@@ -1,18 +1,28 @@
 # Export Dependencies To Kotlin
 
-On completion with [using external dependencies](bridgeWithDependencies.md), it's possible to export them to Kotlin, if they are compatible.
+## How It works
 
-Exported dependency can be used inside the bridge and the Kotlin app.
+On completion with [using external dependencies](bridgeWithDependencies.md), it's possible to export them to Kotlin, if they are [compatible](faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code).
+
+Exported dependency can be used inside the bridge, the Swift & Kotlin App.
 
 !!! note
 
     If your package doesn't work with the plugin, please create an [issue](https://github.com/frankois944/spm4Kmp/issues).
 
+### Bridge Incompatible Dependencies
+
+In a case the exported dependency is written in [Swift](faq.md), **manual work needs to be done** like [this](bridgeWithDependencies.md#example).
+
+For example, the [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) can't work directly on Kotlin, so the Plugin's bridge is here to fill the hole between Kotlin and Swift.
+
 ## Gradle
 
 The following configuration export to Kotlin the package [FirebaseAnalytics](https://github.com/firebase/firebase-ios-sdk) which is a ObjC library.
 
-You can try to export a pure Swift library, but only basic ObjC will be available.
+!!! warning "Don't export incompatible library"
+
+    Exporting an incompatible library is useless and will only increase build time.
 
 ``` kotlin title="build.gradle.kts"
 swiftPackageConfig {
