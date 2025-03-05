@@ -48,8 +48,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
                     val spmWorkingDir =
                         resolveAndCreateDir(
-                            extension.spmWorkingPath?.let { File(it) }
-                                ?: layout.buildDirectory.asFile.get(),
+                            File(extension.spmWorkingPath),
                             "spmKmpPlugin",
                             extension.name,
                         )

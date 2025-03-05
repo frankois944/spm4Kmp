@@ -175,7 +175,10 @@ public abstract class PackageRootDefinitionExtension
         /**
          * The path of the directory where working SPM file(s) will be written.
          *
-         * Default : if null `build/spmKmpPlugin/`
+         * Default : `{buildDirectory}/spmKmpPlugin/`
          */
-        public var spmWorkingPath: String? = null
+        public var spmWorkingPath: String =
+            project.layout.buildDirectory.asFile
+                .get()
+                .path
     }
