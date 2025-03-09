@@ -5,16 +5,18 @@ import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.resolvePackage
 import io.github.frankois944.spmForKmp.operations.swiftFormat
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
-import java.io.File
+import kotlin.io.resolve
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
@@ -46,26 +48,31 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     abstract val toolsVersion: Property<String>
 
     @get:Input
-    abstract val packageScratchDir: Property<File>
-
-    @get:Input
     @get:Optional
-    abstract val sharedCacheDir: Property<File?>
-
-    @get:Input
-    @get:Optional
-    abstract val sharedConfigDir: Property<File?>
-
-    @get:Input
-    @get:Optional
-    abstract val sharedSecurityDir: Property<File?>
+    abstract val packageCachePath: Property<String?>
 
     @get:OutputFile
     abstract val manifestFile: RegularFileProperty
 
+    @get:OutputDirectory
+    abstract val clonedSourcePackages: DirectoryProperty
+
     init {
         description = "Generate a Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
+    }
+
+    // create a empty Source Dir for xcode to resolve the package
+    private fun prepareWorkingDir() {
+        val sourceDirectory =
+            manifestFile.asFile
+                .get()
+                .parentFile
+                .resolve("Sources")
+        if (!sourceDirectory.exists()) {
+            sourceDirectory.mkdirs()
+            sourceDirectory.resolve("DummyFile.swift").writeText("import Foundation")
+        }
     }
 
     @TaskAction
@@ -90,12 +97,11 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             project.swiftFormat(
                 manifestFile.asFile.get(),
             )
+            prepareWorkingDir()
             project.resolvePackage(
                 workingDir = manifestFile.asFile.get().parentFile,
-                scratchPath = packageScratchDir.get(),
-                sharedCachePath = sharedCacheDir.orNull,
-                sharedConfigPath = sharedConfigDir.orNull,
-                sharedSecurityPath = sharedSecurityDir.orNull,
+                clonedSourcePackages = clonedSourcePackages.get().asFile,
+                packageCachePath = packageCachePath.orNull,
             )
         } catch (ex: Exception) {
             logger.error(

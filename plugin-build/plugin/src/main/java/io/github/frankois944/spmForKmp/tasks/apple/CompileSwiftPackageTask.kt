@@ -1,16 +1,15 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.operations.getNbJobs
-import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -39,33 +38,22 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Input
     abstract val debugMode: Property<Boolean>
 
-    @get:OutputDirectory
-    abstract val compiledTargetDir: Property<File>
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val clonedSourcePackages: DirectoryProperty
 
-    @get:Input
-    abstract val packageScratchDir: Property<File>
+    @get:OutputDirectory
+    abstract val buildWorkingDir: DirectoryProperty
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val sourcePackage: Property<File>
 
-    @get:Input
-    abstract val osVersion: Property<String>
-
-    @get:Input
-    @get:Optional
-    abstract val sharedCacheDir: Property<File?>
-
-    @get:Input
-    @get:Optional
-    abstract val sharedConfigDir: Property<File?>
-
-    @get:Input
-    @get:Optional
-    abstract val sharedSecurityDir: Property<File?>
-
     @get:Inject
     abstract val operation: ExecOperations
+
+    @get:Input
+    abstract val xcodeBuildArgs: ListProperty<String>
 
     init {
         description = "Compile the Swift Package manifest"
@@ -97,39 +85,26 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @TaskAction
     fun compilePackage() {
         logger.debug("Compile the manifest {}", manifestFile.get().path)
-        val sdkPath = project.getSDKPath(target.get())
         val workingDir = prepareWorkingDir()
 
         val args =
-            mutableListOf(
-                "--sdk",
-                "macosx",
-                "swift",
-                "build",
-                "--sdk",
-                sdkPath,
-                "--triple",
-                target.get().getTriple(osVersion.get()),
-                "--scratch-path",
-                packageScratchDir.get().path,
-                "-c",
-                if (debugMode.get()) "debug" else "release",
-                "--jobs",
-                project.getNbJobs(),
-            )
-        sharedCacheDir.orNull?.let {
-            args.add("--cache-path")
-            args.add(it.path)
-        }
-        sharedConfigDir.orNull?.let {
-            args.add("--config-path")
-            args.add(it.path)
-        }
-        sharedSecurityDir.orNull?.let {
-            args.add("--security-path")
-            args.add(it.path)
-        }
-
+            buildList {
+                add("xcodebuild")
+                add("-scheme")
+                add(manifestFile.get().parentFile.name)
+                add("-derivedDataPath")
+                add(buildWorkingDir.get().asFile.path)
+                add("-clonedSourcePackagesDirPath")
+                add(clonedSourcePackages.get().asFile.path)
+                add("-configuration")
+                add(if (debugMode.get()) "Debug" else "Release")
+                add("-sdk")
+                add(target.get().sdk())
+                add("-destination")
+                add("generic/platform=${target.get().destination()}")
+                addAll(xcodeBuildArgs.get().orEmpty())
+                add("COMPILER_INDEX_STORE_ENABLE=NO")
+            }
         val standardOutput = ByteArrayOutputStream()
         val errorOutput = ByteArrayOutputStream()
         operation

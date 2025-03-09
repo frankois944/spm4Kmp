@@ -4,7 +4,7 @@ package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
-import io.github.frankois944.spmForKmp.tasks.apple.configAppleTargets
+import io.github.frankois944.spmForKmp.tasks.configAppleTargets
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -53,10 +53,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             extension.name,
                         )
 
-                    val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
-                    val sharedCacheDir: File? = extension.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
-                    val sharedConfigDir: File? = extension.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
-                    val sharedSecurityDir: File? = extension.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
                     val swiftSourcePackageDir =
                         resolveAndCreateDir(
                             File(extension.customPackageSourcePath),
@@ -67,10 +63,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
                         extension = extension,
                         sourcePackageDir = spmWorkingDir,
-                        packageScratchDir = packageScratchDir,
-                        sharedCacheDir = sharedCacheDir,
-                        sharedConfigDir = sharedConfigDir,
-                        sharedSecurityDir = sharedSecurityDir,
+                        workingDir = resolveAndCreateDir(spmWorkingDir, "workingDir"),
                         swiftSourcePackageDir = swiftSourcePackageDir,
                     )
                 }
@@ -96,7 +89,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 .resolve(destination)
         }
 
-    private fun Project.resolveAndCreateDir(
+    internal fun Project.resolveAndCreateDir(
         base: File,
         vararg nestedPath: String = emptyArray(),
     ): File {

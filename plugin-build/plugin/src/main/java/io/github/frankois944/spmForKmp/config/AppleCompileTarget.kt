@@ -41,17 +41,25 @@ public enum class AppleCompileTarget : Serializable {
     macosArm64,
     ;
 
-    @Suppress("MaxLineLength")
-    internal fun getTriple(version: String): String = "${this.arch()}-apple-${this.osCompiler()}$version${this.simulatorSuffix()}"
-
     internal fun getPackageBuildDir(): String = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"
 
-    private fun osCompiler(): String =
+    public fun osCompiler(): String =
         when (this) {
             iosX64, iosArm64, iosSimulatorArm64 -> "ios"
             watchosX64, watchosArm64, watchosSimulatorArm64 -> "watchos"
             tvosX64, tvosArm64, tvosSimulatorArm64 -> "tvos"
             macosX64, macosArm64 -> "macosx"
+        }
+
+    public fun destination(): String =
+        when (this) {
+            iosX64, iosArm64 -> "iOS"
+            iosSimulatorArm64 -> "iOS Simulator"
+            watchosX64, watchosArm64 -> "watchOS"
+            watchosSimulatorArm64 -> "watchOS Simulator"
+            tvosX64, tvosArm64 -> "tvOS"
+            tvosSimulatorArm64 -> "tvos Simulator"
+            macosX64, macosArm64 -> "macOS"
         }
 
     internal fun xcFrameworkArchName(): String =
@@ -76,7 +84,7 @@ public enum class AppleCompileTarget : Serializable {
             macosX64, macosArm64 -> "macosx"
         }
 
-    private fun arch() =
+    internal fun arch() =
         when (this) {
             iosX64 -> "x86_64"
             iosArm64, iosSimulatorArm64 -> "arm64"

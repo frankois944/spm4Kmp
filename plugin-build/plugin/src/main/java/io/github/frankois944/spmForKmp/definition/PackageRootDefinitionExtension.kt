@@ -103,7 +103,7 @@ public abstract class PackageRootDefinitionExtension
          *
          * Default value: `false`
          */
-        public var debug: Boolean = false
+        public var debug: Boolean = true
 
         /**
          * Represents a prefix used for resolving conflicts or distinguishing between multiple
@@ -146,33 +146,6 @@ public abstract class PackageRootDefinitionExtension
         }
 
         /**
-         * Represents the file path to the shared cache directory used by the package.
-         * This path is utilized for caching purposes to optimize dependency management,
-         * reducing redundant network calls or disk operations during the build process.
-         * The cache directory can store downloaded Swift package artifacts or other
-         * reusable build-related data.
-         *
-         * If set to `null`, the default cache location will be used, determined
-         * by the underlying build tool configuration or environment settings.
-         */
-        public var sharedCachePath: String? = null
-
-        /**
-         * Represents the file path to the shared configuration directory.
-         *
-         * It is optional and can be set to null if no such shared directory is required or use the default one.
-         *
-         */
-        public var sharedConfigPath: String? = null
-
-        /**
-         * Specifies the shared directory path for security-related resources or configurations.
-         *
-         * It is optional and can be set to null if no such shared directory is required or use the default one.
-         */
-        public var sharedSecurityPath: String? = null
-
-        /**
          * The path of the directory where working SPM file(s) will be written.
          *
          * Default : `{buildDirectory}/spmKmpPlugin/`
@@ -181,4 +154,18 @@ public abstract class PackageRootDefinitionExtension
             project.layout.buildDirectory.asFile
                 .get()
                 .path
+
+        /**
+         * xcodebuild path of caches used for package support
+         *
+         * if null : uses system value
+         */
+        public var packageCachePath: String? = null
+
+        /**
+         * A list of argument to add to xcode when building the package
+         *
+         * Default : emptyList()
+         */
+        public var xcodeBuildArgs: List<String> = emptyList()
     }

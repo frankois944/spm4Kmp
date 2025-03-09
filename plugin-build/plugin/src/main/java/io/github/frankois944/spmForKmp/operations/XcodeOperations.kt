@@ -1,44 +1,28 @@
 package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.utils.InjectedExecOps
 import org.gradle.api.Project
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-@Suppress("LongParameterList")
 internal fun Project.resolvePackage(
     workingDir: File,
-    scratchPath: File,
-    sharedCachePath: File?,
-    sharedConfigPath: File?,
-    sharedSecurityPath: File?,
+    clonedSourcePackages: File,
+    packageCachePath: String?,
 ) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         mutableListOf(
-            "--sdk",
-            "macosx",
-            "swift",
-            "package",
-            "resolve",
-            "--scratch-path",
-            scratchPath.path,
-            "--jobs",
-            getNbJobs(),
+            "xcodebuild",
+            "-resolvePackageDependencies",
+            "-clonedSourcePackagesDirPath",
+            clonedSourcePackages.path,
+            "COMPILER_INDEX_STORE_ENABLE=NO",
         )
-    sharedCachePath?.let {
-        args.add("--cache-path")
-        args.add(it.path)
-    }
-    sharedConfigPath?.let {
-        args.add("--config-path")
-        args.add(it.path)
-    }
-    sharedSecurityPath?.let {
-        args.add("--security-path")
-        args.add(it.path)
+    packageCachePath?.let {
+        args.add("-packageCachePath")
+        args.add(it)
     }
 
     val standardOutput = ByteArrayOutputStream()
@@ -50,6 +34,7 @@ internal fun Project.resolvePackage(
             it.workingDir = workingDir
             it.standardOutput = standardOutput
             it.errorOutput = errorOutput
+            it.environment("COMPILER_INDEX_STORE_ENABLE", "NO")
             it.isIgnoreExitValue = true
         }.also {
             printExecLogs(
@@ -125,46 +110,6 @@ internal fun Project.getSDKPath(target: AppleCompileTarget): String {
     return standardOutput.toString().trim()
 }
 
-internal fun Project.getPackageImplicitDependencies(
-    workingDir: File,
-    scratchPath: File,
-): PackageImplicitDependencies {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
-    val args =
-        listOf(
-            "--sdk",
-            "macosx",
-            "swift",
-            "package",
-            "show-dependencies",
-            "--scratch-path",
-            scratchPath.path,
-            "--format",
-            "json",
-        )
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "xcrun"
-            it.workingDir = workingDir
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "show-dependencies",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
-    return PackageImplicitDependencies.fromString(standardOutput.toString())
-}
-
 internal fun Project.swiftFormat(file: File) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
@@ -194,35 +139,6 @@ internal fun Project.swiftFormat(file: File) {
                 errorOutput,
             )
         }
-}
-
-internal fun Project.getNbJobs(): String {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
-    val args =
-        listOf(
-            "-n",
-            "hw.ncpu",
-        )
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "sysctl"
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "getNbJobs",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
-    return standardOutput.toString().trim()
 }
 
 @Suppress("LongParameterList")
