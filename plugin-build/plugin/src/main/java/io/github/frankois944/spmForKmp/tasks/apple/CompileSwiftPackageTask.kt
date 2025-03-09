@@ -104,6 +104,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 add("generic/platform=${target.get().destination()}")
                 addAll(xcodeBuildArgs.get().orEmpty())
                 add("COMPILER_INDEX_STORE_ENABLE=NO")
+                add("DEFINES_MODULE=YES")
+                add("BUILD_LIBRARY_FOR_DISTRIBUTION=YES")
+                add("CLANG_ENABLE_MODULES=YES")
+                add("ENABLE_MODULES=YES")
+                add("OTHER_CFLAGS=\"-fmodules -fcxx-modules\"")
             }
         val standardOutput = ByteArrayOutputStream()
         val errorOutput = ByteArrayOutputStream()

@@ -210,14 +210,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
                 val definition =
                     """
-                    language = Objective-C
-                    modules = $libName
-                    package = $libName
-                    libraryPaths = ${moduleMapDirectory.pathString} ${productDirectory.pathString}
-                    compilerOpts = -fmodules -fimplicit-module-maps -fprebuilt-module-path="$moduleMapDirectory" -fmodule-map-file=${moduleMapDirectory.resolve(
-                        "$libName.modulemap",
-                    )}
-                    linkerOpts = -l:${finalBinaryFile.path}
+language = Objective-C
+modules = $libName
+package = $libName
+libraryPaths = ${moduleMapDirectory.pathString}
+compilerOpts = -fmodules -I"${moduleMapDirectory.pathString}" -L"${moduleMapDirectory.pathString}" -F"${moduleMapDirectory.pathString}"
+linkerOpts = -l:${finalBinaryFile.path} ${getExtraLinkers()} -L"${moduleMapDirectory.pathString}" -F"${moduleMapDirectory.pathString}"
                     """.trimIndent()
 
                 /* val mapFile =
@@ -240,7 +238,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         if (index == 0) "$def\n$md5\nstaticLibraries = $libName" else def
                     }*/
                 if (definition.isNotEmpty()) {
-                    moduleConfig.definitionFile.writeText(definition.trimIndent())
+                    moduleConfig.definitionFile.writeText(definition)
                 } else {
                     throw RuntimeException("Can't generate definition file")
                 }
