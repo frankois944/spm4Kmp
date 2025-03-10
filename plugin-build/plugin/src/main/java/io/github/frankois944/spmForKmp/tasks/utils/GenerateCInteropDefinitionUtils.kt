@@ -31,12 +31,20 @@ internal fun getBuildDirectoriesContent(
         ?.toList()
         .orEmpty()
 
+internal fun GenerateCInteropDefinitionTask.getDirectories(
+    from: File,
+    vararg names: String,
+): List<File> =
+    findFilesRecursively(
+        directory = from,
+        criteria = { filename -> filename.isDirectory && names.contains(filename.name.lowercase()) },
+        withDirectory = true,
+    )
+
 internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
     fromDir: File,
     module: ModuleConfig,
 ): Set<File> {
-    logger.debug("Looking for public header for ${module.name}")
-
     val checkoutsDir = "checkouts"
     val packageSwift = "Package.swift"
     val sourcesDir = "Sources"

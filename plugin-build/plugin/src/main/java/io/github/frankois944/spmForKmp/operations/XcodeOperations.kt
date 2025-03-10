@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.utils.InjectedExecOps
 import org.gradle.api.Project
 import java.io.ByteArrayOutputStream
@@ -138,6 +139,46 @@ internal fun Project.swiftFormat(file: File) {
                 errorOutput,
             )
         }
+}
+
+internal fun Project.getPackageImplicitDependencies(
+    workingDir: File,
+    clonedSourcePackages: File,
+): PackageImplicitDependencies {
+    val operation = objects.newInstance(InjectedExecOps::class.java)
+    val args =
+        listOf(
+            "--sdk",
+            "macosx",
+            "swift",
+            "package",
+            "show-dependencies",
+            "--scratch-path",
+            clonedSourcePackages.path,
+            "--format",
+            "json",
+        )
+
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
+    operation.execOps
+        .exec {
+            it.executable = "xcrun"
+            it.workingDir = workingDir
+            it.args = args
+            it.standardOutput = standardOutput
+            it.errorOutput = errorOutput
+            it.isIgnoreExitValue = true
+        }.also {
+            printExecLogs(
+                "show-dependencies",
+                args,
+                it.exitValue != 0,
+                standardOutput,
+                errorOutput,
+            )
+        }
+    return PackageImplicitDependencies.fromString(standardOutput.toString())
 }
 
 @Suppress("LongParameterList")

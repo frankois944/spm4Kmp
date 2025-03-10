@@ -117,8 +117,6 @@ class BasicPackageTest : BaseTest() {
     @Test
     fun `build with custom build path`() {
         val cache = File("/tmp/spm4kmp/cache").also { it.deleteRecursively() }
-        val security = File("/tmp/spm4kmp/security").also { it.deleteRecursively() }
-        val config = File("/tmp/spm4kmp/config").also { it.deleteRecursively() }
         val customSPMPath = File("/tmp/spm4kmp/workingFile").also { it.deleteRecursively() }
         val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
 
@@ -127,10 +125,8 @@ class BasicPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withTargets(AppleCompileTarget.macosX64)
+                .withTargets(AppleCompileTarget.macosArm64)
                 .withCache(cache.path)
-                .withSecurity(security.path)
-                .withConfig(config.path)
                 .withSPMPath(customSPMPath.path)
                 .withSwiftSources(
                     SwiftSource.of(
@@ -172,18 +168,13 @@ class BasicPackageTest : BaseTest() {
 
         // Then
         assertThat(result).task(":library:build").succeeded()
-        assert(cache.listFiles()?.isNotEmpty() == true)
-        assert(config.exists())
-        assert(security.exists())
-        val scratchDir =
+        val workingDir =
             customSPMPath
                 .resolve("spmKmpPlugin")
                 .resolve("dummy")
-                .resolve("scratch")
-        assert(scratchDir.listFiles().isNullOrEmpty() == false)
+                .resolve("workingDir")
+        assert(workingDir.listFiles().isNullOrEmpty() == false)
         cache.deleteRecursively()
-        config.deleteRecursively()
-        security.deleteRecursively()
         customSPMPath.deleteRecursively()
     }
 }

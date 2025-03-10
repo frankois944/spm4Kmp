@@ -36,9 +36,7 @@ abstract class SmpKMPTestFixture private constructor(
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
         val packages: List<SwiftDependency> = emptyList(),
-        val sharedCachePath: String? = null,
-        val sharedConfigPath: String? = null,
-        val sharedSecurityPath: String? = null,
+        val packageCachePath: String? = null,
         val customSPMPath: String? = null,
         val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
@@ -154,14 +152,8 @@ swiftPackageConfig {
                     extension.packageDependencyPrefix?.let {
                         append("packageDependencyPrefix = \"${extension.packageDependencyPrefix}\"\n")
                     }
-                    extension.sharedCachePath?.let {
-                        append("sharedCachePath = \"${extension.sharedCachePath}\"\n")
-                    }
-                    extension.sharedConfigPath?.let {
-                        append("sharedConfigPath = \"${extension.sharedConfigPath}\"\n")
-                    }
-                    extension.sharedSecurityPath?.let {
-                        append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
+                    extension.packageCachePath?.let {
+                        append("packageCachePath = \"${extension.packageCachePath}\"\n")
                     }
                     extension.customSPMPath?.let {
                         append("spmWorkingPath = \"${extension.customSPMPath}\"\n")
@@ -379,17 +371,7 @@ swiftPackageConfig {
 
         fun withCache(path: String) =
             apply {
-                config = config.copy(sharedCachePath = path)
-            }
-
-        fun withConfig(path: String) =
-            apply {
-                config = config.copy(sharedConfigPath = path)
-            }
-
-        fun withSecurity(path: String) =
-            apply {
-                config = config.copy(sharedSecurityPath = path)
+                config = config.copy(packageCachePath = path)
             }
 
         fun withSPMPath(path: String) =

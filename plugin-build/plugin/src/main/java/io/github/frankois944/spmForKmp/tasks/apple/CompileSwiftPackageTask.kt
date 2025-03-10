@@ -11,6 +11,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -24,8 +25,8 @@ import javax.inject.Inject
 @CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
     private companion object {
-        const val DEBUG_PREFIX = "Debug-"
-        const val RELEASE_PREFIX = "Release-"
+        const val DEBUG_PREFIX = "Debug"
+        const val RELEASE_PREFIX = "Release"
     }
 
     init {
@@ -53,6 +54,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Internal
     abstract val buildWorkingDir: DirectoryProperty
 
+    @get:Input
+    @get:Optional
+    abstract val packageCachePath: Property<String?>
+
     @get:OutputDirectory
     val productDirectory: File
         get() =
@@ -71,7 +76,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 .get()
                 .resolve("Build")
                 .resolve("Intermediates.noindex")
-                .resolve("GeneratedModuleMaps-${target.get().sdk()}")
+                .resolve(getMapDir())
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -104,12 +109,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 add("-destination")
                 add("generic/platform=${target.get().destination()}")
                 addAll(xcodeBuildArgs.get().orEmpty())
+                packageCachePath.orNull?.let {
+                    add("-packageCachePath")
+                    add(it)
+                }
                 add("COMPILER_INDEX_STORE_ENABLE=NO")
-                add("DEFINES_MODULE=YES")
-                add("BUILD_LIBRARY_FOR_DISTRIBUTION=YES")
-                add("CLANG_ENABLE_MODULES=YES")
-                add("ENABLE_MODULES=YES")
-                add("OTHER_CFLAGS=\"-fmodules -fcxx-modules\"")
             }
         val standardOutput = ByteArrayOutputStream()
         val errorOutput = ByteArrayOutputStream()
@@ -154,8 +158,19 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         return workingDir
     }
 
+    private fun getMapDir(): String =
+        if (!target.get().isMacOS()) {
+            "GeneratedModuleMaps-" + target.get().sdk()
+        } else {
+            "GeneratedModuleMaps"
+        }
+
     private fun getProductSubPath(): String {
         val buildTypePrefix = if (debugMode.get()) DEBUG_PREFIX else RELEASE_PREFIX
-        return buildTypePrefix + target.get().sdk()
+        return if (!target.get().isMacOS()) {
+            buildTypePrefix + "-" + target.get().sdk()
+        } else {
+            buildTypePrefix
+        }
     }
 }

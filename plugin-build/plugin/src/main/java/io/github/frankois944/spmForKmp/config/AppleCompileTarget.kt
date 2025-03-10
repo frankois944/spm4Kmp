@@ -41,6 +41,8 @@ public enum class AppleCompileTarget : Serializable {
     macosArm64,
     ;
 
+    internal fun isMacOS(): Boolean = this == macosX64 || this == macosArm64
+
     internal fun getPackageBuildDir(): String = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"
 
     public fun osCompiler(): String =

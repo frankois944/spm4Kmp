@@ -175,7 +175,7 @@ private fun configureManifestTask(
         this.toolsVersion.set(extension.toolsVersion)
         this.packageCachePath.set(extension.packageCachePath)
         this.manifestFile.set(manifestFile)
-        this.clonedSourcePackages.set(workingDir.resolve("clonedSourcePackages"))
+        this.clonedSourcePackages.set(workingDir.parentFile.resolve("clonedSourcePackages"))
     }
 }
 
@@ -194,7 +194,7 @@ private fun configureExportableManifestTask(
         this.minMacos.set(extension.minMacos)
         this.minWatchos.set(extension.minWatchos)
         this.toolsVersion.set(extension.toolsVersion)
-        manifestDir.mkdirs()
+        // manifestDir.mkdirs()
         this.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
     }
 }
@@ -212,10 +212,11 @@ private fun configureCompileTask(
         this.manifestFile.set(manifestFile)
         this.target.set(target)
         this.debugMode.set(extension.debug)
-        this.clonedSourcePackages.set(workingDir.resolve("clonedSourcePackages"))
+        this.clonedSourcePackages.set(workingDir.parentFile.resolve("clonedSourcePackages"))
         this.buildWorkingDir.set(workingDir)
         this.sourcePackage.set(sourcePackageDir)
         this.xcodeBuildArgs.set(extension.xcodeBuildArgs)
+        this.packageCachePath.set(extension.packageCachePath)
     }
 }
 
@@ -239,6 +240,7 @@ private fun configureGenerateCInteropDefinitionTask(
         this.packageDependencyPrefix.set(extension.packageDependencyPrefix)
         this.compilerOpts.set(extension.compilerOpts)
         this.linkerOpts.set(extension.linkerOpts)
+        this.clonedSourcePackages.set(workingDir.parentFile.resolve("clonedSourcePackages"))
     }
 }
 

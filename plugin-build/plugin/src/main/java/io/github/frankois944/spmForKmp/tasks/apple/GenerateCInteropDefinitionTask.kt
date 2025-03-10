@@ -3,8 +3,11 @@ package io.github.frankois944.spmForKmp.tasks.apple
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
+import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
+import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
+import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
+import io.github.frankois944.spmForKmp.tasks.utils.getDirectories
 import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -35,12 +38,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     private companion object {
-        const val DEBUG_PREFIX = "Debug-"
-        const val RELEASE_PREFIX = "Release-"
+        const val DEBUG_PREFIX = "Debug"
+        const val RELEASE_PREFIX = "Release"
     }
 
     @get:Input
     abstract val target: Property<AppleCompileTarget>
+
+    @get:Internal
+    abstract val clonedSourcePackages: Property<File>
 
     @get:Input
     abstract val productName: Property<String>
@@ -99,9 +105,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs
             .forEach { module ->
                 logger.debug("LOOKING for module dir {}", module.name)
-                // moduleInfo.isFramework = buildDir.extension == "framework"
-                // moduleInfo.buildDir = buildDir
-                copyModuleResources(module)
+                createModuleResources(module)
                 module.definitionFile = definitionDirectoryPath.resolve("${module.name}.def")
                 logger.debug("Setup module DONE: {}", module)
             }
@@ -118,41 +122,48 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 if (!finalBinaryFile.exists()) {
                     throw RuntimeException("Cant find the binary of the bridge ${finalBinaryFile.absolutePath}")
                 }
-                val libName = finalBinaryFile.nameWithoutExtension
-                val checksum = finalBinaryFile.md5()
-
+                // The following methods are dirty hacks for getting the implicit header needed by cinterop
+                // These headers are available in the Swift Package manifest of the dependencies.
+                // but it's very hard to extract them as some packages are highly customized.
+                val implicitDependencies =
+                    project
+                        .getPackageImplicitDependencies(
+                            workingDir = manifestFile.asFile.get().parentFile,
+                            clonedSourcePackages = buildWorkingDir.get(),
+                        ).getFolders()
+                val headerSearchPaths =
+                    buildList {
+                        addAll(extractPublicHeaderFromCheckout(buildWorkingDir.get(), moduleConfig))
+                        addAll(
+                            getDirectories(
+                                buildWorkingDir.get().resolve("checkouts").resolve(moduleConfig.packageName),
+                                "include",
+                                "public",
+                                // and more?
+                            ),
+                        )
+                        addAll(implicitDependencies)
+                        addAll(findHeadersModule(clonedSourcePackages.get().resolve("artifacts"), target.get()))
+                    }.distinct()
+                        .joinToString(" ") { "-I\"$it\"" }
+                val packageName =
+                    packageDependencyPrefix.orNull?.let {
+                        "$it.${moduleConfig.name}"
+                    } ?: moduleConfig.name
+                val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
+                val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
                 var definition =
-"""
+                    """
 language = Objective-C
-modules = $libName
-package = $libName
-libraryPaths = ${cinteropModulePath.path}
-compilerOpts = -fmodules -I"${cinteropModulePath.path}" -F"${cinteropModulePath.path}"
-linkerOpts = -l:${finalBinaryFile.path} ${getExtraLinkers()} -L"${cinteropModulePath.path}" -F"${cinteropModulePath.path}"
+modules = ${moduleConfig.name}
+package = $packageName
+libraryPaths = "${cinteropModulePath.path}"
+compilerOpts = -fmodules $compilerOpts -I"${moduleMapDirectory.path}" -I"${cinteropModulePath.path}" -F"${cinteropModulePath.path}" -F"${productDirectory.path}" $headerSearchPaths
+linkerOpts = ${if (index == 0) "-l:\"${finalBinaryFile.path}\"" else ""} $linkerOps -F"${cinteropModulePath.path}" -I"${cinteropModulePath.path}" -F"${cinteropModulePath.path}" -F"${productDirectory.path}"
 """
                 if (index == 0) {
-                    definition = "$definition\n#checksum: $checksum"
+                    definition += "\n#checksum: ${finalBinaryFile.md5()}"
                 }
-
-                /* val mapFile =
-                     moduleConfig.buildDir.resolve(
-                         if (moduleConfig.isFramework) "Modules/module.modulemap" else "module.modulemap",
-                     )
-                 val mapFileContent = mapFile.readText()
-                 val moduleName =
-                     extractModuleNameFromModuleMap(mapFileContent)
-                         ?: throw Exception("No module name for ${moduleConfig.name} in mapFile")*/
-
-                /*val definition =
-                    if (moduleConfig.isFramework) {
-                        generateFrameworkDefinition(moduleName, moduleConfig)
-                    } else {
-                        generateNonFrameworkDefinition(moduleName, moduleConfig)
-                    }.let { def ->
-                        // Append staticLibraries for the first index which is the bridge
-                        val md5 = "#checksum: $checksum"
-                        if (index == 0) "$def\n$md5\nstaticLibraries = $libName" else def
-                    }*/
                 if (definition.isNotEmpty()) {
                     moduleConfig.definitionFile.writeText(definition)
                 } else {
@@ -183,63 +194,7 @@ linkerOpts = -l:${finalBinaryFile.path} ${getExtraLinkers()} -L"${cinteropModule
         }
     }
 
-    /* private fun generateFrameworkDefinition(
-         moduleName: String,
-         moduleConfig: ModuleConfig,
-     ): String {
-         val frameworkName = moduleConfig.buildDir.nameWithoutExtension
-         val packageName =
-             packageDependencyPrefix.orNull?.let {
-                 "$it.${moduleConfig.name}"
-             } ?: moduleConfig.name
-         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
-         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
-         return """
- language = Objective-C
- modules = $moduleName
- package = $packageName
- libraryPaths = "${getBuildDirectory().path}"
- compilerOpts = $compilerOpts -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
- linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
-             """.trimIndent()
-     }
-
-     private fun generateNonFrameworkDefinition(
-         moduleName: String,
-         moduleConfig: ModuleConfig,
-     ): String {
-         /*val implicitDependencies =
-             project
-                 .getPackageImplicitDependencies(
-                     workingDir = manifestFile.asFile.get().parentFile,
-                     scratchPath = packageWorkingDir.get(),
-                 ).getFolders()*/
-
-         val headerSearchPaths =
-             buildList {
-                 addAll(extractPublicHeaderFromCheckout(packageWorkingDir.get(), moduleConfig))
-                 addAll(getBuildDirectoriesContent(getBuildDirectory(), "build"))
-                 // addAll(implicitDependencies)
-                 addAll(findHeadersModule(packageWorkingDir.get().resolve("artifacts"), target.get()))
-             }.joinToString(" ") { "-I\"$it\"" }
-
-         val packageName =
-             packageDependencyPrefix.orNull?.let {
-                 "$it.${moduleConfig.name}"
-             } ?: moduleConfig.name
-         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
-         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
-         return """
- language = Objective-C
- modules = $moduleName
- package = $packageName
- libraryPaths = "${getBuildDirectory().path}"
- compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
- linkerOpts = $linkerOps ${getExtraLinkers()} -F"${getBuildDirectory().path}"
-             """.trimIndent()
-     }}*/
-
-    private fun copyModuleResources(module: ModuleConfig) {
+    private fun createModuleResources(module: ModuleConfig) {
         val moduleDir = cinteropModulePath.resolve(module.name + ".build")
         if (!moduleDir.exists()) {
             moduleDir.mkdirs()
@@ -306,13 +261,6 @@ linkerOpts = -l:${finalBinaryFile.path} ${getExtraLinkers()} -L"${cinteropModule
                 logger.debug("Product names to export: {}", it)
             }
 
-    private fun getExtraLinkers(): String {
-        val xcodeDevPath = project.getXcodeDevPath()
-        return buildList {
-            add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
-        }.joinToString(" ")
-    }
-
     private val definitionDirectoryPath: File
         get() =
             buildWorkingDir
@@ -334,10 +282,21 @@ linkerOpts = -l:${finalBinaryFile.path} ${getExtraLinkers()} -L"${cinteropModule
                 .get()
                 .resolve("Build")
                 .resolve("Intermediates.noindex")
-                .resolve("GeneratedModuleMaps-${target.get().sdk()}")
+                .resolve(getMapDir())
+
+    private fun getMapDir(): String =
+        if (!target.get().isMacOS()) {
+            "GeneratedModuleMaps-" + target.get().sdk()
+        } else {
+            "GeneratedModuleMaps"
+        }
 
     private fun getProductSubPath(): String {
         val buildTypePrefix = if (debugMode.get()) DEBUG_PREFIX else RELEASE_PREFIX
-        return buildTypePrefix + target.get().sdk()
+        return if (!target.get().isMacOS()) {
+            buildTypePrefix + "-" + target.get().sdk()
+        } else {
+            buildTypePrefix
+        }
     }
 }
