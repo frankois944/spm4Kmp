@@ -44,7 +44,8 @@ kotlin {
         }
         it.compilations {
             val main by getting {
-                cinterops.create("nativeMacosShared")
+                cinterops.create("nativeMacosShared") {
+                }
             }
         }
     }
@@ -89,13 +90,13 @@ swiftPackageConfig {
     create("nativeIosShared") {
         // optional parameters
         // the ios minimal version
-        // minIos = "12.0"
+        // minIos = "14.0"
         // the tvos minimal version
-        // minTvos = "12.0"
+        // minTvos = "10.13"
         // the watchos minimal version
-        // minWatchos = "12.0"
+        // minWatchos = ""
         // the macos minimal version
-        minMacos = "10.15"
+        // minMacos = "10.13"
         // the directory where your own swift code is located
         // customPackageSourcePath = "{buildDir}/src/swift"
         // the swift code is built in debug by default

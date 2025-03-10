@@ -19,24 +19,20 @@ internal fun findHeadersModule(
         withDirectory = true,
     )
 
-internal fun getBuildDirectoriesContent(
-    buildDir: File,
-    vararg extensions: String,
+internal fun GenerateCInteropDefinitionTask.getDirectories(
+    from: File,
+    vararg names: String,
 ): List<File> =
-    buildDir // get folders with headers for internal dependencies
-        .listFiles { file -> extensions.contains(file.extension) || file.name == "Modules" }
-        // remove folder with weird names, cinterop doesn't like module with symbol names like grp-c++
-        // it doesn't matter for the kotlin export, to be rethinking
-        ?.filter { file -> !file.nameWithoutExtension.lowercase().contains("grpc") }
-        ?.toList()
-        .orEmpty()
+    findFilesRecursively(
+        directory = from,
+        criteria = { filename -> filename.isDirectory && names.contains(filename.name.lowercase()) },
+        withDirectory = true,
+    )
 
 internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
     fromDir: File,
     module: ModuleConfig,
 ): Set<File> {
-    logger.debug("Looking for public header for ${module.name}")
-
     val checkoutsDir = "checkouts"
     val packageSwift = "Package.swift"
     val sourcesDir = "Sources"
@@ -84,16 +80,3 @@ internal fun extractFirstMatch(
     input: String,
     pattern: String,
 ): String? = Regex(pattern).find(input)?.groupValues?.getOrNull(1)
-
-internal fun GenerateCInteropDefinitionTask.extractModuleNameFromModuleMap(module: String): String? {
-    val regex = """module\s+\S+\s+""".toRegex()
-    return regex
-        .find(module)
-        ?.groupValues
-        ?.firstOrNull()
-        ?.replace("module", "")
-        ?.trim()
-        ?.also {
-            logger.debug("MODULE FOUND {}", it)
-        }
-}

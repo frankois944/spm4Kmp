@@ -7,39 +7,24 @@ import org.gradle.api.Project
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-@Suppress("LongParameterList")
 internal fun Project.resolvePackage(
     workingDir: File,
-    scratchPath: File,
-    sharedCachePath: File?,
-    sharedConfigPath: File?,
-    sharedSecurityPath: File?,
+    clonedSourcePackages: File,
+    packageCachePath: String?,
 ) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
-        mutableListOf(
-            "--sdk",
-            "macosx",
-            "swift",
-            "package",
-            "resolve",
-            "--scratch-path",
-            scratchPath.path,
-            "--jobs",
-            getNbJobs(),
-        )
-    sharedCachePath?.let {
-        args.add("--cache-path")
-        args.add(it.path)
-    }
-    sharedConfigPath?.let {
-        args.add("--config-path")
-        args.add(it.path)
-    }
-    sharedSecurityPath?.let {
-        args.add("--security-path")
-        args.add(it.path)
-    }
+        buildList {
+            add("xcodebuild")
+            add("-resolvePackageDependencies")
+            add("-clonedSourcePackagesDirPath")
+            add(clonedSourcePackages.path)
+            packageCachePath?.let {
+                add("-packageCachePath")
+                add(it)
+            }
+            add("COMPILER_INDEX_STORE_ENABLE=NO")
+        }
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
@@ -125,46 +110,6 @@ internal fun Project.getSDKPath(target: AppleCompileTarget): String {
     return standardOutput.toString().trim()
 }
 
-internal fun Project.getPackageImplicitDependencies(
-    workingDir: File,
-    scratchPath: File,
-): PackageImplicitDependencies {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
-    val args =
-        listOf(
-            "--sdk",
-            "macosx",
-            "swift",
-            "package",
-            "show-dependencies",
-            "--scratch-path",
-            scratchPath.path,
-            "--format",
-            "json",
-        )
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "xcrun"
-            it.workingDir = workingDir
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "show-dependencies",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
-    return PackageImplicitDependencies.fromString(standardOutput.toString())
-}
-
 internal fun Project.swiftFormat(file: File) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
@@ -196,33 +141,44 @@ internal fun Project.swiftFormat(file: File) {
         }
 }
 
-internal fun Project.getNbJobs(): String {
+internal fun Project.getPackageImplicitDependencies(
+    workingDir: File,
+    clonedSourcePackages: File,
+): PackageImplicitDependencies {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
-            "-n",
-            "hw.ncpu",
+            "--sdk",
+            "macosx",
+            "swift",
+            "package",
+            "show-dependencies",
+            "--scratch-path",
+            clonedSourcePackages.path,
+            "--format",
+            "json",
         )
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
     operation.execOps
         .exec {
-            it.executable = "sysctl"
+            it.executable = "xcrun"
+            it.workingDir = workingDir
             it.args = args
             it.standardOutput = standardOutput
             it.errorOutput = errorOutput
             it.isIgnoreExitValue = true
         }.also {
             printExecLogs(
-                "getNbJobs",
+                "show-dependencies",
                 args,
                 it.exitValue != 0,
                 standardOutput,
                 errorOutput,
             )
         }
-    return standardOutput.toString().trim()
+    return PackageImplicitDependencies.fromString(standardOutput.toString())
 }
 
 @Suppress("LongParameterList")
@@ -233,14 +189,19 @@ internal fun Project.printExecLogs(
     standardOutput: ByteArrayOutputStream,
     errorOutput: ByteArrayOutputStream,
 ) {
+    @Suppress("MagicNumber")
+    val standardLog = standardOutput.toString().take(2500)
+
     if (isError) {
+        @Suppress("MagicNumber")
+        val errorLog = errorOutput.toString().take(2500)
         logger.error(
             """
 ERROR FOUND WHEN EXEC
 RUN $action
 ARGS xcrun ${args.joinToString(" ")}
-ERROR $errorOutput
-OUTPUT $standardOutput
+ERROR $errorLog
+OUTPUT $standardLog
 ###
             """.trimMargin(),
         )
@@ -254,7 +215,7 @@ OUTPUT $standardOutput
             """
 RUN $action
 ARGS xcrun ${args.joinToString(" ")}
-OUTPUT $standardOutput
+OUTPUT $standardLog
 ###
             """.trimMargin(),
         )

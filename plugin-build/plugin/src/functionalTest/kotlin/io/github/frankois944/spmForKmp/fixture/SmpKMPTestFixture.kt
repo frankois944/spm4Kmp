@@ -29,16 +29,14 @@ abstract class SmpKMPTestFixture private constructor(
         var minIos: String = "12.0",
         var minMacos: String = "10.15",
         var minTvos: String = "12.0",
-        var minWatchos: String = "4.0",
+        var minWatchos: String = "5.0",
         var toolsVersion: String = "5.9",
         var packageDependencyPrefix: String? = null,
         var targets: List<AppleCompileTarget> = listOf(AppleCompileTarget.iosSimulatorArm64),
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
         val packages: List<SwiftDependency> = emptyList(),
-        val sharedCachePath: String? = null,
-        val sharedConfigPath: String? = null,
-        val sharedSecurityPath: String? = null,
+        val packageCachePath: String? = null,
         val customSPMPath: String? = null,
         val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
@@ -58,7 +56,7 @@ abstract class SmpKMPTestFixture private constructor(
     private fun RootProject.Builder.setupProperties() {
         var content = """
 kotlin.mpp.enableCInteropCommonization=true
-org.gradle.caching=true
+org.gradle.caching=false
 """
         // code coverage
         if (jacocoDestfile != null) {
@@ -154,14 +152,8 @@ swiftPackageConfig {
                     extension.packageDependencyPrefix?.let {
                         append("packageDependencyPrefix = \"${extension.packageDependencyPrefix}\"\n")
                     }
-                    extension.sharedCachePath?.let {
-                        append("sharedCachePath = \"${extension.sharedCachePath}\"\n")
-                    }
-                    extension.sharedConfigPath?.let {
-                        append("sharedConfigPath = \"${extension.sharedConfigPath}\"\n")
-                    }
-                    extension.sharedSecurityPath?.let {
-                        append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
+                    extension.packageCachePath?.let {
+                        append("packageCachePath = \"${extension.packageCachePath}\"\n")
                     }
                     extension.customSPMPath?.let {
                         append("spmWorkingPath = \"${extension.customSPMPath}\"\n")
@@ -379,17 +371,7 @@ swiftPackageConfig {
 
         fun withCache(path: String) =
             apply {
-                config = config.copy(sharedCachePath = path)
-            }
-
-        fun withConfig(path: String) =
-            apply {
-                config = config.copy(sharedConfigPath = path)
-            }
-
-        fun withSecurity(path: String) =
-            apply {
-                config = config.copy(sharedSecurityPath = path)
+                config = config.copy(packageCachePath = path)
             }
 
         fun withSPMPath(path: String) =
