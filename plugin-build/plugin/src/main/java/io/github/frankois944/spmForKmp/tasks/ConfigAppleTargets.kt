@@ -32,7 +32,7 @@ internal fun Project.configAppleTargets(
     extension: PackageRootDefinitionExtension,
     sourcePackageDir: File,
     workingDir: File,
-    swiftSourcePackageDir: File?,
+    swiftSourcePackageDir: File,
 ) {
     val allTargets =
         tasks
@@ -51,6 +51,7 @@ internal fun Project.configAppleTargets(
                 extension = extension,
                 manifestFile = sourcePackageDir.resolve(SWIFT_PACKAGE_NAME),
                 workingDir = workingDir,
+                bridgeSwiftSource = swiftSourcePackageDir,
             )
         }
 
@@ -91,7 +92,6 @@ internal fun Project.configAppleTargets(
                     target = cinteropTarget,
                     extension = extension,
                     workingDir = workingDir,
-                    sourcePackageDir = swiftSourcePackageDir,
                 )
             }
 
@@ -164,6 +164,7 @@ private fun configureManifestTask(
     extension: PackageRootDefinitionExtension,
     manifestFile: File,
     workingDir: File,
+    bridgeSwiftSource: File,
 ) {
     task.apply {
         this.packageDependencies.set(extension.packageDependencies)
@@ -176,6 +177,7 @@ private fun configureManifestTask(
         this.packageCachePath.set(extension.packageCachePath)
         this.manifestFile.set(manifestFile)
         this.clonedSourcePackages.set(workingDir.parentFile.resolve("clonedSourcePackages"))
+        this.bridgeSwiftSource.set(bridgeSwiftSource)
     }
 }
 
@@ -206,7 +208,6 @@ private fun configureCompileTask(
     target: AppleCompileTarget,
     extension: PackageRootDefinitionExtension,
     workingDir: File,
-    sourcePackageDir: File?,
 ) {
     task.apply {
         this.manifestFile.set(manifestFile)
@@ -214,7 +215,6 @@ private fun configureCompileTask(
         this.debugMode.set(extension.debug)
         this.clonedSourcePackages.set(workingDir.parentFile.resolve("clonedSourcePackages"))
         this.buildWorkingDir.set(workingDir)
-        this.sourcePackage.set(sourcePackageDir)
         this.xcodeBuildArgs.set(extension.xcodeBuildArgs)
         this.packageCachePath.set(extension.packageCachePath)
     }

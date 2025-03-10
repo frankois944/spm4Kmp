@@ -11,11 +11,16 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
+import java.io.File
+import kotlin.text.get
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
@@ -58,6 +63,18 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:OutputDirectory
     abstract val clonedSourcePackages: DirectoryProperty
 
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val bridgeSwiftSource: DirectoryProperty
+
+    @get:OutputDirectory
+    val bridgeBuiltSource: File
+        get() =
+            manifestFile
+                .get()
+                .asFile.parentFile
+                .resolve("Sources")
+
     @TaskAction
     fun generateFile() {
         val manifest =
@@ -99,15 +116,28 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     }
 
     // create a empty Source Dir for xcode to resolve the package
-    private fun prepareWorkingDir() {
-        val sourceDirectory =
-            manifestFile.asFile
-                .get()
-                .parentFile
-                .resolve("Sources")
-        if (!sourceDirectory.exists()) {
-            sourceDirectory.mkdirs()
-            sourceDirectory.resolve("DummyFile.swift").writeText("import Foundation")
+    private fun prepareWorkingDir(): File {
+        val sourceDir = bridgeBuiltSource
+        if (sourceDir.exists()) {
+            sourceDir.deleteRecursively()
         }
+        if (bridgeSwiftSource
+                .get()
+                .asFile
+                .list()
+                ?.isNotEmpty() == true
+        ) {
+            logger.debug(
+                """
+                Copy User Swift files to directory $sourceDir
+                ${bridgeSwiftSource.get().asFile.list()?.toList()}
+                """.trimIndent(),
+            )
+            bridgeSwiftSource.get().asFile.copyRecursively(sourceDir)
+        } else {
+            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
+            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
+        }
+        return sourceDir
     }
 }

@@ -58,6 +58,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Optional
     abstract val packageCachePath: Property<String?>
 
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val bridgeBuiltSource: File
+        get() = manifestFile.get().parentFile.resolve("Sources")
+
     @get:OutputDirectory
     val productDirectory: File
         get() =
@@ -78,10 +83,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 .resolve("Intermediates.noindex")
                 .resolve(getMapDir())
 
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val sourcePackage: Property<File>
-
     @get:Inject
     abstract val operation: ExecOperations
 
@@ -91,7 +92,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @TaskAction
     fun compilePackage() {
         logger.debug("Compile the manifest {}", manifestFile.get().path)
-        val workingDir = prepareWorkingDir()
 
         val args =
             buildList {
@@ -120,7 +120,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         operation
             .exec {
                 it.executable = "xcrun"
-                it.workingDir = workingDir
+                it.workingDir = manifestFile.get().parentFile
                 it.args = args
                 it.standardOutput = standardOutput
                 it.errorOutput = errorOutput
@@ -134,28 +134,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     errorOutput,
                 )
             }
-    }
-
-    private fun prepareWorkingDir(): File {
-        val workingDir = manifestFile.get().parentFile
-        val sourceDir = workingDir.resolve("Sources")
-        if (sourceDir.exists()) {
-            sourceDir.deleteRecursively()
-        }
-        sourceDir.mkdirs()
-        if (sourcePackage.get().list()?.isNotEmpty() == true) {
-            logger.debug(
-                """
-                Copy User Swift files to directory $sourceDir
-                ${sourcePackage.get().list()?.toList()}
-                """.trimIndent(),
-            )
-            sourcePackage.get().copyRecursively(sourceDir)
-        } else {
-            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
-            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
-        }
-        return workingDir
     }
 
     private fun getMapDir(): String =

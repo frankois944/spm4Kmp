@@ -16,6 +16,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
@@ -69,10 +70,24 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
+    val binaryBridgeFile: File
+        get() = productDirectory.resolve(compiledBinaryName.get())
+
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: RegularFileProperty
 
     @get:Internal
     abstract val buildWorkingDir: Property<File>
+
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val bridgeBuiltSource: File
+        get() =
+            manifestFile
+                .get()
+                .asFile.parentFile
+                .resolve("Sources")
 
     @get:Input
     @get:Optional
@@ -119,10 +134,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
             try {
-                val finalBinaryFile = productDirectory.resolve(compiledBinaryName.get())
-                if (!finalBinaryFile.exists()) {
-                    throw RuntimeException("Cant find the binary of the bridge ${finalBinaryFile.absolutePath}")
-                }
                 // The following methods are dirty hacks for getting the implicit header needed by cinterop
                 // These headers are available in the Swift Package manifest of the dependencies.
                 // but it's very hard to extract them as some packages are highly customized.
@@ -163,7 +174,7 @@ compilerOpts = -fmodules $compilerOpts -I"${moduleMapDirectory.path}" -I"${cinte
 linkerOpts = -L"${productDirectory.path}" ${if (index == 0) getLinkers() else ""} $linkerOps -F"${cinteropModulePath.path}" -F"${productDirectory.path}" ${getExtraLinkers()}
 """
                 if (index == 0) {
-                    definition += "\n#checksum: ${finalBinaryFile.md5()}"
+                    definition += "\n#checksum: ${binaryBridgeFile.md5()}"
                 }
                 if (definition.isNotEmpty()) {
                     moduleConfig.definitionFile.writeText(definition)
