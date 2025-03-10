@@ -108,33 +108,6 @@ public enum class AppleCompileTarget : Serializable {
             else -> ""
         }
 
-    internal fun getOsVersion(
-        minIos: String,
-        minWatchos: String,
-        minTvos: String,
-        minMacos: String,
-    ): String =
-        when (this) {
-            iosX64,
-            iosArm64,
-            iosSimulatorArm64,
-            -> minIos
-
-            watchosX64,
-            watchosArm64,
-            watchosSimulatorArm64,
-            -> minWatchos
-
-            tvosX64,
-            tvosArm64,
-            tvosSimulatorArm64,
-            -> minTvos
-
-            macosX64,
-            macosArm64,
-            -> minMacos
-        }
-
     /**
      * @see [org.jetbrains.kotlin.konan.target.KonanTarget](https://github.com/JetBrains/kotlin/blob/v2.1.0/native/utils/src/org/jetbrains/kotlin/konan/target/KonanTarget.kt)
      */

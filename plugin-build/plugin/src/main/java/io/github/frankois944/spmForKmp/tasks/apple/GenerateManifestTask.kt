@@ -16,7 +16,6 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
-import kotlin.io.resolve
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {

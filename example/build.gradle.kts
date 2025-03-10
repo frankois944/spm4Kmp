@@ -1,4 +1,7 @@
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.net.URI
 
 plugins {
     alias(libs.plugins.androidLibrary)
@@ -32,7 +35,7 @@ kotlin {
         }
     }
 
-    /*listOf(
+    listOf(
         macosArm64(),
     ).forEach {
         it.binaries.framework {
@@ -45,7 +48,7 @@ kotlin {
                 }
             }
         }
-    }*/
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -87,14 +90,13 @@ swiftPackageConfig {
     create("nativeIosShared") {
         // optional parameters
         // the ios minimal version
-        minIos = "14.0"
+        // minIos = "14.0"
         // the tvos minimal version
-        minTvos = "10.13"
+        // minTvos = "10.13"
         // the watchos minimal version
-        minWatchos = ""
+        // minWatchos = ""
         // the macos minimal version
-        minMacos = "10.13"
-        toolsVersion = "5.6"
+        // minMacos = "10.13"
         // the directory where your own swift code is located
         // customPackageSourcePath = "{buildDir}/src/swift"
         // the swift code is built in debug by default
@@ -106,7 +108,7 @@ swiftPackageConfig {
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         dependency(
-            /*SwiftDependency.Package.Remote.Version(
+            SwiftDependency.Package.Remote.Version(
                 // Repository URL
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
@@ -142,18 +144,10 @@ swiftPackageConfig {
                     add("CryptoSwift")
                 },
             ),
-            SwiftDependency.Package.Remote.Version(
-                url = URI("https://github.com/appmetrica/appmetrica-sdk-ios"),
-                version = "5.9.0",
-                products = {
-                    // Can be only used in your "src/swift" code.
-                    add("AppMetricaCore", "AppMetricaAdSupport", "AppMetricaCrashes", "AppMetricaWebKit", exportToKotlin = true)
-                },
-            ),*/
             // see SwiftDependency class for more use cases
         )
     }
-    /*create("nativeMacosShared") {
+    create("nativeMacosShared") {
         dependency(
             SwiftDependency.Package.Local(
                 path = "$testResources/LocalSourceDummyFramework",
@@ -164,5 +158,5 @@ swiftPackageConfig {
                 },
             ),
         )
-    }*/
+    }
 }
