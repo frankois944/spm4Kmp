@@ -16,7 +16,6 @@ let package = Package(
       path:
         "/Users/francoisdabonot/devs/spm4Kmp/example/../plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework"
     ), .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", exact: "1.8.1"),
-    .package(url: "https://github.com/appmetrica/appmetrica-sdk-ios", exact: "5.9.0"),
   ],
   targets: [
     .target(
@@ -27,10 +26,6 @@ let package = Package(
         .product(name: "FirebaseDatabase", package: "firebase-ios-sdk"), "DummyFramework",
         .product(name: "LocalSourceDummyFramework", package: "LocalSourceDummyFramework"),
         .product(name: "CryptoSwift", package: "CryptoSwift"),
-        .product(name: "AppMetricaCore", package: "appmetrica-sdk-ios"),
-        .product(name: "AppMetricaAdSupport", package: "appmetrica-sdk-ios"),
-        .product(name: "AppMetricaCrashes", package: "appmetrica-sdk-ios"),
-        .product(name: "AppMetricaWebKit", package: "appmetrica-sdk-ios"),
       ],
       path: "Sources"),
     .binaryTarget(

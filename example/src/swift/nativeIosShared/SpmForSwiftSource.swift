@@ -1,6 +1,9 @@
 import Foundation
 import UIKit
 
+import CryptoSwift
+import FirebaseDatabase
+
 // Force cinterop to include `platform.UIKit.UIView`
 @objcMembers public class MyDummyView: UIView {}
 
@@ -26,7 +29,7 @@ import UIKit
     }
 
     public func getValueFromCrypt() -> String {
-        return "yftghjk"
+        return "123".md5()
     }
 }
 

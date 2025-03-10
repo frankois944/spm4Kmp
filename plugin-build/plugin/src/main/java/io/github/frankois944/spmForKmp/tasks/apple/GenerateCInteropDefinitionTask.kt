@@ -4,6 +4,7 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
+import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
@@ -159,7 +160,7 @@ modules = ${moduleConfig.name}
 package = $packageName
 libraryPaths = "${cinteropModulePath.path}"
 compilerOpts = -fmodules $compilerOpts -I"${moduleMapDirectory.path}" -I"${cinteropModulePath.path}" -F"${cinteropModulePath.path}" -F"${productDirectory.path}" $headerSearchPaths
-linkerOpts = ${if (index == 0) "-l:\"${finalBinaryFile.path}\"" else ""} $linkerOps -F"${cinteropModulePath.path}" -I"${cinteropModulePath.path}" -F"${cinteropModulePath.path}" -F"${productDirectory.path}"
+linkerOpts = -L"${productDirectory.path}" ${if (index == 0) getLinkers() else ""} $linkerOps -F"${cinteropModulePath.path}" -F"${productDirectory.path}" ${getExtraLinkers()}
 """
                 if (index == 0) {
                     definition += "\n#checksum: ${finalBinaryFile.md5()}"
@@ -290,6 +291,28 @@ linkerOpts = ${if (index == 0) "-l:\"${finalBinaryFile.path}\"" else ""} $linker
         } else {
             "GeneratedModuleMaps"
         }
+
+    private fun getLinkers(): String {
+        val builtLibs =
+            buildList {
+                addAll(productDirectory.listFiles { it.extension == "o" }.map { it.name })
+            }.distinct().joinToString(" ") { "-l$it" }
+        val frameworks =
+            productDirectory
+                .listFiles {
+                    it.extension == "framework"
+                }.map { it.nameWithoutExtension }
+                .distinct()
+                .joinToString(" ") { "-framework $it" }
+        return "$builtLibs $frameworks"
+    }
+
+    private fun getExtraLinkers(): String {
+        val xcodeDevPath = project.getXcodeDevPath()
+        return buildList {
+            add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
+        }.joinToString(" ")
+    }
 
     private fun getProductSubPath(): String {
         val buildTypePrefix = if (debugMode.get()) DEBUG_PREFIX else RELEASE_PREFIX
