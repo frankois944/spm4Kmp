@@ -189,9 +189,11 @@ internal fun Project.printExecLogs(
     standardOutput: ByteArrayOutputStream,
     errorOutput: ByteArrayOutputStream,
 ) {
+    @Suppress("MagicNumber")
     val standardLog = standardOutput.toString().take(2500)
 
     if (isError) {
+        @Suppress("MagicNumber")
         val errorLog = errorOutput.toString().take(2500)
         logger.error(
             """
