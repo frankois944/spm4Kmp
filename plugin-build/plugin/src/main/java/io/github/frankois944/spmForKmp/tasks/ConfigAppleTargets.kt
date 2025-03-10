@@ -114,9 +114,8 @@ internal fun Project.configAppleTargets(
                 )
             }
 
-        val outputFiles = definitionTask.get().outputFiles
+        val outputFiles = definitionTask.get().definitionFiles
 
-        logger.warn(outputFiles.joinToString(" - "))
         if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
             val ktTarget =
                 extensions
@@ -214,7 +213,7 @@ private fun configureCompileTask(
         this.target.set(target)
         this.debugMode.set(extension.debug)
         this.clonedSourcePackages.set(workingDir.resolve("clonedSourcePackages"))
-        this.buildWorkingDir.set(workingDir.resolve("build"))
+        this.buildWorkingDir.set(workingDir)
         this.sourcePackage.set(sourcePackageDir)
         this.xcodeBuildArgs.set(extension.xcodeBuildArgs)
     }
@@ -236,7 +235,7 @@ private fun configureGenerateCInteropDefinitionTask(
         this.packages.set(extension.packageDependencies)
         this.debugMode.set(extension.debug)
         this.manifestFile.set(sourcePackageDir.resolve(SWIFT_PACKAGE_NAME))
-        this.buildWorkingDir.set(workingDir.resolve("build"))
+        this.buildWorkingDir.set(workingDir)
         this.packageDependencyPrefix.set(extension.packageDependencyPrefix)
         this.compilerOpts.set(extension.compilerOpts)
         this.linkerOpts.set(extension.linkerOpts)

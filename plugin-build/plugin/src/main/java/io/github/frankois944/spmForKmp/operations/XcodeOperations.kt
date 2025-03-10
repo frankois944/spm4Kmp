@@ -13,17 +13,17 @@ internal fun Project.resolvePackage(
 ) {
     val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
-        mutableListOf(
-            "xcodebuild",
-            "-resolvePackageDependencies",
-            "-clonedSourcePackagesDirPath",
-            clonedSourcePackages.path,
-            "COMPILER_INDEX_STORE_ENABLE=NO",
-        )
-    packageCachePath?.let {
-        args.add("-packageCachePath")
-        args.add(it)
-    }
+        buildList {
+            add("xcodebuild")
+            add("-resolvePackageDependencies")
+            add("-clonedSourcePackagesDirPath")
+            add(clonedSourcePackages.path)
+            packageCachePath?.let {
+                add("-packageCachePath")
+                add(it)
+            }
+            add("COMPILER_INDEX_STORE_ENABLE=NO")
+        }
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
@@ -34,7 +34,6 @@ internal fun Project.resolvePackage(
             it.workingDir = workingDir
             it.standardOutput = standardOutput
             it.errorOutput = errorOutput
-            it.environment("COMPILER_INDEX_STORE_ENABLE", "NO")
             it.isIgnoreExitValue = true
         }.also {
             printExecLogs(

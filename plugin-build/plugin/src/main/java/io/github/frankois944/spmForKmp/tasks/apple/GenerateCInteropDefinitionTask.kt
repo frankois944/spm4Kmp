@@ -7,28 +7,28 @@ import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
-import java.nio.file.Path
-import kotlin.io.path.nameWithoutExtension
-import kotlin.io.path.pathString
+import kotlin.io.path.copyTo
 
 @CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     init {
+        description = "Generate the cinterop definitions files"
+        group = "io.github.frankois944.spmForKmp.tasks.apple"
         onlyIf {
             HostManager.hostIsMac
         }
@@ -64,116 +64,31 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: RegularFileProperty
 
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val buildWorkingDir: DirectoryProperty
+    @get:Internal
+    abstract val buildWorkingDir: Property<File>
 
     @get:Input
     @get:Optional
     abstract val packageDependencyPrefix: Property<String?>
 
-    init {
-        description = "Generate the cinterop definitions files"
-        group = "io.github.frankois944.spmForKmp.tasks"
-    }
-
-    private val definitionDirectoryPath: Path
-        get() =
-            buildWorkingDir
-                .get()
-                .asFile
-                .resolve("Definitions")
-                .toPath()
-
-    private val productDirectory: Path
-        get() =
-            buildWorkingDir
-                .get()
-                .asFile
-                .resolve("Build")
-                .resolve("Products")
-                .resolve(getProductSubPath())
-                .toPath()
-
-    private fun getProductSubPath(): String {
-        val buildTypePrefix = if (debugMode.get()) DEBUG_PREFIX else RELEASE_PREFIX
-        return buildTypePrefix + target.get().sdk()
-    }
-
-    private val moduleMapDirectory: Path
-        get() =
-            buildWorkingDir
-                .get()
-                .asFile
-                .resolve("Build")
-                .resolve("Intermediates.noindex")
-                .resolve("GeneratedModuleMaps-${target.get().sdk()}")
-                .toPath()
-
     @get:OutputFiles
-    val outputFiles: List<File>
+    val definitionFiles: List<File>
         get() =
             buildList {
                 getModuleInfos().forEach { moduleName ->
                     add(
-                        definitionDirectoryPath.resolve("${moduleName.name}.def").toFile(),
+                        definitionDirectoryPath.resolve("${moduleName.name}.def"),
                     )
                 }
             }
 
-    private fun getModuleInfos(): List<ModuleConfig> =
-        buildList {
-            // the first item must be the product name
-            add(
-                ModuleConfig(
-                    name = productName.get(),
-                    compilerOpts = compilerOpts.get(),
-                    linkerOpts = linkerOpts.get(),
-                ),
-            )
-            addAll(
-                packages
-                    .get()
-                    .filterExportableDependency()
-                    .also {
-                        logger.debug("Filtered exportable dependency: {}", it)
-                    }.flatMap { dependency ->
-                        if (dependency is SwiftDependency.Package) {
-                            dependency.productsConfig.productPackages
-                                .flatMap { product ->
-                                    product.products
-                                }.map { product ->
-                                    ModuleConfig(
-                                        name = product.name,
-                                        packageName = dependency.packageName,
-                                        linkerOpts = product.linkerOpts,
-                                        compilerOpts = product.compilerOpts,
-                                    )
-                                }
-                        } else if (dependency is SwiftDependency.Binary) {
-                            listOf(
-                                ModuleConfig(
-                                    name = dependency.packageName,
-                                    linkerOpts = dependency.linkerOpts,
-                                    compilerOpts = dependency.compilerOpts,
-                                ),
-                            )
-                        } else {
-                            listOf(ModuleConfig(name = dependency.packageName))
-                        }
-                    },
-            )
-        }.distinctBy { it.name }
-            .also {
-                logger.debug("Product names to export: {}", it)
-            }
-
-    private fun getExtraLinkers(): String {
-        val xcodeDevPath = project.getXcodeDevPath()
-        return buildList {
-            add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
-        }.joinToString(" ")
-    }
+    @get:OutputDirectory
+    val cinteropModulePath: File
+        get() =
+            buildWorkingDir
+                .get()
+                .resolve("Modules")
+                .resolve(target.get().getPackageBuildDir())
 
     @Suppress("LongMethod")
     @TaskAction
@@ -182,15 +97,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
         // find the build directory of the declared module in the manifest
         moduleConfigs
-            .forEach { moduleInfo ->
-                logger.debug("LOOKING for module dir {}", moduleInfo.name)
-                moduleMapDirectory.find { moduleMap ->
-                    moduleMap.nameWithoutExtension.lowercase() == moduleInfo.name.lowercase()
-                }
+            .forEach { module ->
+                logger.debug("LOOKING for module dir {}", module.name)
                 // moduleInfo.isFramework = buildDir.extension == "framework"
                 // moduleInfo.buildDir = buildDir
-                moduleInfo.definitionFile = definitionDirectoryPath.resolve("${moduleInfo.name}.def").toFile()
-                logger.debug("Setup module DONE: {}", moduleInfo)
+                copyModuleResources(module)
+                module.definitionFile = definitionDirectoryPath.resolve("${module.name}.def")
+                logger.debug("Setup module DONE: {}", module)
             }
         logger.debug(
             """
@@ -201,22 +114,25 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
             try {
-                val finalBinaryFile = productDirectory.resolve(compiledBinaryName.get()).toFile()
+                val finalBinaryFile = productDirectory.resolve(compiledBinaryName.get())
                 if (!finalBinaryFile.exists()) {
-                    throw RuntimeException("Cant find the binary output of the bridge ${finalBinaryFile.absolutePath}")
+                    throw RuntimeException("Cant find the binary of the bridge ${finalBinaryFile.absolutePath}")
                 }
                 val libName = finalBinaryFile.nameWithoutExtension
                 val checksum = finalBinaryFile.md5()
 
-                val definition =
-                    """
+                var definition =
+"""
 language = Objective-C
 modules = $libName
 package = $libName
-libraryPaths = ${moduleMapDirectory.pathString}
-compilerOpts = -fmodules -I"${moduleMapDirectory.pathString}" -L"${moduleMapDirectory.pathString}" -F"${moduleMapDirectory.pathString}"
-linkerOpts = -l:${finalBinaryFile.path} ${getExtraLinkers()} -L"${moduleMapDirectory.pathString}" -F"${moduleMapDirectory.pathString}"
-                    """.trimIndent()
+libraryPaths = ${cinteropModulePath.path}
+compilerOpts = -fmodules -I"${cinteropModulePath.path}" -F"${cinteropModulePath.path}"
+linkerOpts = -l:${finalBinaryFile.path} ${getExtraLinkers()} -L"${cinteropModulePath.path}" -F"${cinteropModulePath.path}"
+"""
+                if (index == 0) {
+                    definition = "$definition\n#checksum: $checksum"
+                }
 
                 /* val mapFile =
                      moduleConfig.buildDir.resolve(
@@ -321,5 +237,107 @@ linkerOpts = -l:${finalBinaryFile.path} ${getExtraLinkers()} -L"${moduleMapDirec
  compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
  linkerOpts = $linkerOps ${getExtraLinkers()} -F"${getBuildDirectory().path}"
              """.trimIndent()
-     }*/
+     }}*/
+
+    private fun copyModuleResources(module: ModuleConfig) {
+        val moduleDir = cinteropModulePath.resolve(module.name + ".build")
+        if (!moduleDir.exists()) {
+            moduleDir.mkdirs()
+        }
+        val files = moduleMapDirectory.listFiles()
+        files
+            .firstOrNull { moduleMap ->
+                moduleMap.nameWithoutExtension.lowercase() == module.name.lowercase() &&
+                    moduleMap.extension == "modulemap"
+            }?.toPath()
+            ?.copyTo(moduleDir.resolve("module.modulemap").toPath(), overwrite = true)
+        files
+            .firstOrNull { moduleMap ->
+                moduleMap.nameWithoutExtension == "${module.name}-Swift"
+            }?.let { header ->
+                header.toPath().copyTo(moduleDir.resolve(header.name).toPath(), overwrite = true)
+            }
+    }
+
+    private fun getModuleInfos(): List<ModuleConfig> =
+        buildList {
+            // the first item must be the product name
+            add(
+                ModuleConfig(
+                    name = productName.get(),
+                    compilerOpts = compilerOpts.get(),
+                    linkerOpts = linkerOpts.get(),
+                ),
+            )
+            addAll(
+                packages
+                    .get()
+                    .filterExportableDependency()
+                    .also {
+                        logger.debug("Filtered exportable dependency: {}", it)
+                    }.flatMap { dependency ->
+                        if (dependency is SwiftDependency.Package) {
+                            dependency.productsConfig.productPackages
+                                .flatMap { product ->
+                                    product.products
+                                }.map { product ->
+                                    ModuleConfig(
+                                        name = product.name,
+                                        packageName = dependency.packageName,
+                                        linkerOpts = product.linkerOpts,
+                                        compilerOpts = product.compilerOpts,
+                                    )
+                                }
+                        } else if (dependency is SwiftDependency.Binary) {
+                            listOf(
+                                ModuleConfig(
+                                    name = dependency.packageName,
+                                    linkerOpts = dependency.linkerOpts,
+                                    compilerOpts = dependency.compilerOpts,
+                                ),
+                            )
+                        } else {
+                            listOf(ModuleConfig(name = dependency.packageName))
+                        }
+                    },
+            )
+        }.distinctBy { it.name }
+            .also {
+                logger.debug("Product names to export: {}", it)
+            }
+
+    private fun getExtraLinkers(): String {
+        val xcodeDevPath = project.getXcodeDevPath()
+        return buildList {
+            add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
+        }.joinToString(" ")
+    }
+
+    private val definitionDirectoryPath: File
+        get() =
+            buildWorkingDir
+                .get()
+                .resolve("Definitions")
+                .resolve(target.get().getPackageBuildDir())
+
+    private val productDirectory: File
+        get() =
+            buildWorkingDir
+                .get()
+                .resolve("Build")
+                .resolve("Products")
+                .resolve(getProductSubPath())
+
+    private val moduleMapDirectory: File
+        get() =
+            buildWorkingDir
+                .get()
+                .resolve("Build")
+                .resolve("Intermediates.noindex")
+                .resolve("GeneratedModuleMaps-${target.get().sdk()}")
+
+    private fun getProductSubPath(): String {
+        val buildTypePrefix = if (debugMode.get()) DEBUG_PREFIX else RELEASE_PREFIX
+        return buildTypePrefix + target.get().sdk()
+    }
 }

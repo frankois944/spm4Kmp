@@ -21,6 +21,8 @@ import kotlin.io.resolve
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
     init {
+        description = "Generate a Swift Package manifest"
+        group = "io.github.frankois944.spmForKmp.tasks.apple"
         onlyIf {
             HostManager.hostIsMac
         }
@@ -56,24 +58,6 @@ internal abstract class GenerateManifestTask : DefaultTask() {
 
     @get:OutputDirectory
     abstract val clonedSourcePackages: DirectoryProperty
-
-    init {
-        description = "Generate a Swift Package manifest"
-        group = "io.github.frankois944.spmForKmp.tasks"
-    }
-
-    // create a empty Source Dir for xcode to resolve the package
-    private fun prepareWorkingDir() {
-        val sourceDirectory =
-            manifestFile.asFile
-                .get()
-                .parentFile
-                .resolve("Sources")
-        if (!sourceDirectory.exists()) {
-            sourceDirectory.mkdirs()
-            sourceDirectory.resolve("DummyFile.swift").writeText("import Foundation")
-        }
-    }
 
     @TaskAction
     fun generateFile() {
@@ -112,6 +96,19 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 """.trimIndent(),
             )
             throw ex
+        }
+    }
+
+    // create a empty Source Dir for xcode to resolve the package
+    private fun prepareWorkingDir() {
+        val sourceDirectory =
+            manifestFile.asFile
+                .get()
+                .parentFile
+                .resolve("Sources")
+        if (!sourceDirectory.exists()) {
+            sourceDirectory.mkdirs()
+            sourceDirectory.resolve("DummyFile.swift").writeText("import Foundation")
         }
     }
 }

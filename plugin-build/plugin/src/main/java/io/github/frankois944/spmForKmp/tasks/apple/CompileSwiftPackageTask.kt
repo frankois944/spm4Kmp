@@ -10,6 +10,7 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -22,7 +23,14 @@ import javax.inject.Inject
 
 @CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
+    private companion object {
+        const val DEBUG_PREFIX = "Debug-"
+        const val RELEASE_PREFIX = "Release-"
+    }
+
     init {
+        description = "Compile the Swift Package manifest"
+        group = "io.github.frankois944.spmForKmp.tasks.apple"
         onlyIf {
             HostManager.hostIsMac
         }
@@ -42,8 +50,28 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val clonedSourcePackages: DirectoryProperty
 
-    @get:OutputDirectory
+    @get:Internal
     abstract val buildWorkingDir: DirectoryProperty
+
+    @get:OutputDirectory
+    val productDirectory: File
+        get() =
+            buildWorkingDir
+                .asFile
+                .get()
+                .resolve("Build")
+                .resolve("Products")
+                .resolve(getProductSubPath())
+
+    @get:OutputDirectory
+    val moduleMapDirectory: File
+        get() =
+            buildWorkingDir
+                .asFile
+                .get()
+                .resolve("Build")
+                .resolve("Intermediates.noindex")
+                .resolve("GeneratedModuleMaps-${target.get().sdk()}")
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -54,33 +82,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     @get:Input
     abstract val xcodeBuildArgs: ListProperty<String>
-
-    init {
-        description = "Compile the Swift Package manifest"
-        group = "io.github.frankois944.spmForKmp.tasks"
-    }
-
-    private fun prepareWorkingDir(): File {
-        val workingDir = manifestFile.get().parentFile
-        val sourceDir = workingDir.resolve("Sources")
-        if (sourceDir.exists()) {
-            sourceDir.deleteRecursively()
-        }
-        sourceDir.mkdirs()
-        if (sourcePackage.get().list()?.isNotEmpty() == true) {
-            logger.debug(
-                """
-                Copy User Swift files to directory $sourceDir
-                ${sourcePackage.get().list()?.toList()}
-                """.trimIndent(),
-            )
-            sourcePackage.get().copyRecursively(sourceDir)
-        } else {
-            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
-            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
-        }
-        return workingDir
-    }
 
     @TaskAction
     fun compilePackage() {
@@ -129,5 +130,32 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     errorOutput,
                 )
             }
+    }
+
+    private fun prepareWorkingDir(): File {
+        val workingDir = manifestFile.get().parentFile
+        val sourceDir = workingDir.resolve("Sources")
+        if (sourceDir.exists()) {
+            sourceDir.deleteRecursively()
+        }
+        sourceDir.mkdirs()
+        if (sourcePackage.get().list()?.isNotEmpty() == true) {
+            logger.debug(
+                """
+                Copy User Swift files to directory $sourceDir
+                ${sourcePackage.get().list()?.toList()}
+                """.trimIndent(),
+            )
+            sourcePackage.get().copyRecursively(sourceDir)
+        } else {
+            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
+            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
+        }
+        return workingDir
+    }
+
+    private fun getProductSubPath(): String {
+        val buildTypePrefix = if (debugMode.get()) DEBUG_PREFIX else RELEASE_PREFIX
+        return buildTypePrefix + target.get().sdk()
     }
 }

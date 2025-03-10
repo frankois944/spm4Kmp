@@ -16,6 +16,8 @@ import org.jetbrains.kotlin.konan.target.HostManager
 @CacheableTask
 internal abstract class GenerateExportableManifestTask : DefaultTask() {
     init {
+        description = "Generate a Swift Package manifest with exported product"
+        group = "io.github.frankois944.spmForKmp.tasks.apple"
         onlyIf {
             HostManager.hostIsMac
         }
@@ -44,23 +46,6 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
 
     @get:OutputFile
     abstract val manifestFile: RegularFileProperty
-
-    init {
-        description = "Generate a Swift Package manifest with exported product"
-        group = "io.github.frankois944.spmForKmp.tasks"
-    }
-
-    private fun prepareExportableDir() {
-        val sourceDir =
-            manifestFile
-                .get()
-                .asFile
-                .parentFile
-                .resolve("Sources")
-                .takeIf { !it.exists() }
-                ?.also { it.mkdirs() }
-        sourceDir?.resolve("DummySPMFile.swift")?.writeText("import Foundation")
-    }
 
     @TaskAction
     fun generateFile() {
@@ -102,5 +87,17 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             )
             throw ex
         }
+    }
+
+    private fun prepareExportableDir() {
+        val sourceDir =
+            manifestFile
+                .get()
+                .asFile
+                .parentFile
+                .resolve("Sources")
+                .takeIf { !it.exists() }
+                ?.also { it.mkdirs() }
+        sourceDir?.resolve("DummySPMFile.swift")?.writeText("import Foundation")
     }
 }
