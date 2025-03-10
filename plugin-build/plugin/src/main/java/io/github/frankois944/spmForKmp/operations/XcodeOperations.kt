@@ -189,14 +189,17 @@ internal fun Project.printExecLogs(
     standardOutput: ByteArrayOutputStream,
     errorOutput: ByteArrayOutputStream,
 ) {
+    val standardLog = standardOutput.toString().take(2500)
+
     if (isError) {
+        val errorLog = errorOutput.toString().take(2500)
         logger.error(
             """
 ERROR FOUND WHEN EXEC
 RUN $action
 ARGS xcrun ${args.joinToString(" ")}
-ERROR $errorOutput
-OUTPUT $standardOutput
+ERROR $errorLog
+OUTPUT $standardLog
 ###
             """.trimMargin(),
         )
@@ -210,7 +213,7 @@ OUTPUT $standardOutput
             """
 RUN $action
 ARGS xcrun ${args.joinToString(" ")}
-OUTPUT $standardOutput
+OUTPUT $standardLog
 ###
             """.trimMargin(),
         )
