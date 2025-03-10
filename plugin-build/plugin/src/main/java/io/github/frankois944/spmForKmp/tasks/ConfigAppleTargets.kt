@@ -42,7 +42,6 @@ internal fun Project.configAppleTargets(
                 it.name.startsWith("cinterop" + extension.name.capitalized())
             }.mapNotNull { AppleCompileTarget.byKonanName(it.konanTarget.name) }
 
-    sourcePackageDir.resolve(SWIFT_PACKAGE_NAME).mkdirs()
     val manifestTask =
         tasks.register(
             getTaskName(TASK_GENERATE_MANIFEST, extension.name),
