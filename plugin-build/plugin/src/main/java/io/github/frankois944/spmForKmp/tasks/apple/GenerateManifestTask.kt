@@ -115,29 +115,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
         }
     }
 
-    // create a empty Source Dir for xcode to resolve the package
-    private fun prepareWorkingDir(): File {
-        val sourceDir = bridgeBuiltSource
-        if (sourceDir.exists()) {
-            sourceDir.deleteRecursively()
-        }
-        if (bridgeSwiftSource
-                .get()
-                .asFile
-                .list()
-                ?.isNotEmpty() == true
-        ) {
-            logger.debug(
-                """
-                Copy User Swift files to directory $sourceDir
-                ${bridgeSwiftSource.get().asFile.list()?.toList()}
-                """.trimIndent(),
-            )
-            bridgeSwiftSource.get().asFile.copyRecursively(sourceDir)
-        } else {
-            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
-            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
-        }
-        return sourceDir
+    private fun prepareWorkingDir() {
+        bridgeBuiltSource.resolve("DummyFile.swift").writeText("import Foundation")
     }
 }

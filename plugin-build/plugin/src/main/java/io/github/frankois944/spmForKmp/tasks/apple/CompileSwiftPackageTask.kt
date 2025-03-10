@@ -92,7 +92,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @TaskAction
     fun compilePackage() {
         logger.debug("Compile the manifest {}", manifestFile.get().path)
-
+        prepareWorkingDir()
         val args =
             buildList {
                 add("xcodebuild")
@@ -134,6 +134,30 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     errorOutput,
                 )
             }
+    }
+
+    // create a empty Source Dir for xcode to resolve the package
+    private fun prepareWorkingDir() {
+        val sourceDir = bridgeBuiltSource
+        if (sourceDir.exists()) {
+            sourceDir.deleteRecursively()
+        }
+        sourceDir.mkdirs()
+        if (sourceDir
+                .list()
+                ?.isNotEmpty() == true
+        ) {
+            logger.debug(
+                """
+                Copy User Swift files to directory $sourceDir
+                ${sourceDir.list()?.toList()}
+                """.trimIndent(),
+            )
+            sourceDir.copyRecursively(sourceDir)
+        } else {
+            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
+            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
+        }
     }
 
     private fun getMapDir(): String =

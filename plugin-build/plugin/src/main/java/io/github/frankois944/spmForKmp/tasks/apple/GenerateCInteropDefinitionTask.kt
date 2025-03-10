@@ -70,11 +70,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val binaryBridgeFile: File
-        get() = productDirectory.resolve(compiledBinaryName.get())
-
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: RegularFileProperty
 
     @get:Internal
@@ -174,7 +169,8 @@ compilerOpts = -fmodules $compilerOpts -I"${moduleMapDirectory.path}" -I"${cinte
 linkerOpts = -L"${productDirectory.path}" ${if (index == 0) getLinkers() else ""} $linkerOps -F"${cinteropModulePath.path}" -F"${productDirectory.path}" ${getExtraLinkers()}
 """
                 if (index == 0) {
-                    definition += "\n#checksum: ${binaryBridgeFile.md5()}"
+                    val sum = productDirectory.resolve(compiledBinaryName.get()).md5()
+                    definition += "\n#checksum: $sum"
                 }
                 if (definition.isNotEmpty()) {
                     moduleConfig.definitionFile.writeText(definition)
