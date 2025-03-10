@@ -60,8 +60,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val bridgeBuiltSource: File
-        get() = manifestFile.get().parentFile.resolve("Sources")
+    abstract val bridgeSwiftSource: DirectoryProperty
+
+    @get:Internal
+    abstract val builtBridgeSwiftSource: DirectoryProperty
 
     @get:OutputDirectory
     val productDirectory: File
@@ -138,25 +140,25 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     // create a empty Source Dir for xcode to resolve the package
     private fun prepareWorkingDir() {
-        val sourceDir = bridgeBuiltSource
-        if (sourceDir.exists()) {
-            sourceDir.deleteRecursively()
+        val destination = builtBridgeSwiftSource.get().asFile
+        val source = bridgeSwiftSource.get()
+        logger.warn("sourceBuildDir ${destination.path}")
+        if (destination.exists()) {
+            destination.deleteRecursively()
         }
-        sourceDir.mkdirs()
-        if (sourceDir
-                .list()
-                ?.isNotEmpty() == true
+        destination.mkdirs()
+        if (!source.asFileTree.isEmpty
         ) {
-            logger.debug(
+            logger.warn(
                 """
-                Copy User Swift files to directory $sourceDir
-                ${sourceDir.list()?.toList()}
+                Copy User Swift files to directory ${destination.path}
+                ${source.asFileTree.files.joinToString(",")}
                 """.trimIndent(),
             )
-            sourceDir.copyRecursively(sourceDir)
+            source.asFile.copyRecursively(destination)
         } else {
-            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
-            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
+            logger.warn("Copy Dummy swift file to directory {}", destination.path)
+            destination.resolve("DummyFile.swift").writeText("import Foundation")
         }
     }
 

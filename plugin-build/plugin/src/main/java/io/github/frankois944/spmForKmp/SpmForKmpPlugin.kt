@@ -16,6 +16,7 @@ import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
 
 internal const val PLUGIN_NAME: String = "swiftPackageConfig"
+internal const val SWIFT_SOURCE_PACKAGE_NAME = "Sources"
 internal const val SWIFT_PACKAGE_NAME = "Package.swift"
 internal const val TASK_GENERATE_MANIFEST: String = "generateSwiftPackage"
 internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"

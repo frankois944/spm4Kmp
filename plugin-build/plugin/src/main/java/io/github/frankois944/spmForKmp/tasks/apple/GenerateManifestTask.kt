@@ -11,16 +11,12 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
-import java.io.File
-import kotlin.text.get
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
@@ -63,17 +59,8 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:OutputDirectory
     abstract val clonedSourcePackages: DirectoryProperty
 
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val bridgeSwiftSource: DirectoryProperty
-
-    @get:OutputDirectory
-    val bridgeBuiltSource: File
-        get() =
-            manifestFile
-                .get()
-                .asFile.parentFile
-                .resolve("Sources")
+    @get:Internal
+    abstract val builtBridgeSwiftSource: DirectoryProperty
 
     @TaskAction
     fun generateFile() {
@@ -116,6 +103,11 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     }
 
     private fun prepareWorkingDir() {
-        bridgeBuiltSource.resolve("DummyFile.swift").writeText("import Foundation")
+        builtBridgeSwiftSource.get().asFile.mkdirs()
+        builtBridgeSwiftSource
+            .get()
+            .asFile
+            .resolve("DummyFile.swift")
+            .writeText("import Foundation")
     }
 }

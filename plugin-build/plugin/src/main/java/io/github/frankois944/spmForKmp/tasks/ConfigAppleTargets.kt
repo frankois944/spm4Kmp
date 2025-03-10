@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
+import io.github.frankois944.spmForKmp.SWIFT_SOURCE_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
@@ -41,6 +42,7 @@ internal fun Project.configAppleTargets(
                 it.name.startsWith("cinterop" + extension.name.capitalized())
             }.mapNotNull { AppleCompileTarget.byKonanName(it.konanTarget.name) }
 
+    sourcePackageDir.resolve(SWIFT_PACKAGE_NAME).mkdirs()
     val manifestTask =
         tasks.register(
             getTaskName(TASK_GENERATE_MANIFEST, extension.name),
@@ -92,6 +94,7 @@ internal fun Project.configAppleTargets(
                     target = cinteropTarget,
                     extension = extension,
                     workingDir = workingDir,
+                    bridgeSwiftSource = swiftSourcePackageDir,
                 )
             }
 
@@ -177,7 +180,7 @@ private fun configureManifestTask(
         this.packageCachePath.set(extension.packageCachePath)
         this.manifestFile.set(manifestFile)
         this.clonedSourcePackages.set(workingDir.parentFile.resolve("clonedSourcePackages"))
-        this.bridgeSwiftSource.set(bridgeSwiftSource)
+        this.builtBridgeSwiftSource.set(manifestFile.parentFile.resolve(SWIFT_SOURCE_PACKAGE_NAME))
     }
 }
 
@@ -196,7 +199,7 @@ private fun configureExportableManifestTask(
         this.minMacos.set(extension.minMacos)
         this.minWatchos.set(extension.minWatchos)
         this.toolsVersion.set(extension.toolsVersion)
-        // manifestDir.mkdirs()
+        manifestDir.mkdirs()
         this.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
     }
 }
@@ -208,6 +211,7 @@ private fun configureCompileTask(
     target: AppleCompileTarget,
     extension: PackageRootDefinitionExtension,
     workingDir: File,
+    bridgeSwiftSource: File,
 ) {
     task.apply {
         this.manifestFile.set(manifestFile)
@@ -217,6 +221,8 @@ private fun configureCompileTask(
         this.buildWorkingDir.set(workingDir)
         this.xcodeBuildArgs.set(extension.xcodeBuildArgs)
         this.packageCachePath.set(extension.packageCachePath)
+        this.bridgeSwiftSource.set(bridgeSwiftSource)
+        this.builtBridgeSwiftSource.set(manifestFile.parentFile.resolve(SWIFT_SOURCE_PACKAGE_NAME))
     }
 }
 
@@ -241,6 +247,7 @@ private fun configureGenerateCInteropDefinitionTask(
         this.compilerOpts.set(extension.compilerOpts)
         this.linkerOpts.set(extension.linkerOpts)
         this.clonedSourcePackages.set(workingDir.parentFile.resolve("clonedSourcePackages"))
+        this.builtBridgeSwiftSource.set(sourcePackageDir.resolve(SWIFT_SOURCE_PACKAGE_NAME))
     }
 }
 

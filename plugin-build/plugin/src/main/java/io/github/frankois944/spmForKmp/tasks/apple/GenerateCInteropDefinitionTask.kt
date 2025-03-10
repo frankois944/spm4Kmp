@@ -11,6 +11,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
 import io.github.frankois944.spmForKmp.tasks.utils.getDirectories
 import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -77,12 +78,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val bridgeBuiltSource: File
-        get() =
-            manifestFile
-                .get()
-                .asFile.parentFile
-                .resolve("Sources")
+    abstract val builtBridgeSwiftSource: DirectoryProperty
 
     @get:Input
     @get:Optional

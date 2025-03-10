@@ -56,7 +56,7 @@ abstract class SmpKMPTestFixture private constructor(
     private fun RootProject.Builder.setupProperties() {
         var content = """
 kotlin.mpp.enableCInteropCommonization=true
-org.gradle.caching=true
+org.gradle.caching=false
 """
         // code coverage
         if (jacocoDestfile != null) {
