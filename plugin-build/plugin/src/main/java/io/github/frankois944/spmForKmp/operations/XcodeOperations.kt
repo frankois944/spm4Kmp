@@ -188,13 +188,12 @@ internal fun Project.printExecLogs(
     isError: Boolean,
     standardOutput: ByteArrayOutputStream,
     errorOutput: ByteArrayOutputStream,
+    forceStandardLog: Boolean = false,
 ) {
-    @Suppress("MagicNumber")
-    val standardLog = standardOutput.toString().take(5000)
+    val standardLog = standardOutput.toString()
 
     if (isError) {
-        @Suppress("MagicNumber")
-        val errorLog = errorOutput.toString().take(5000)
+        val errorLog = errorOutput.toString()
         logger.error(
             """
 ERROR FOUND WHEN EXEC
@@ -211,13 +210,19 @@ OUTPUT $standardLog
             )
         }
     } else {
-        logger.debug(
-            """
+        if (forceStandardLog) {
+            if (standardLog.isNotEmpty()) {
+                logger.lifecycle(standardLog)
+            }
+        } else {
+            logger.debug(
+                """
 RUN $action
 ARGS xcrun ${args.joinToString(" ")}
 OUTPUT $standardLog
 ###
-            """.trimMargin(),
-        )
+                """.trimMargin(),
+            )
+        }
     }
 }

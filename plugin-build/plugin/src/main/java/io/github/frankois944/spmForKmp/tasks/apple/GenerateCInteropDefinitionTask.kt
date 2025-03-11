@@ -160,12 +160,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 language = Objective-C
 modules = ${moduleConfig.name}
 package = $packageName
-libraryPaths = "${cinteropModulePath.path}"
-compilerOpts = -fmodules $compilerOpts -I"${moduleMapDirectory.path}" -I"${cinteropModulePath.path}" -F"${cinteropModulePath.path}" -F"${productDirectory.path}" $headerSearchPaths
-linkerOpts = -L"${productDirectory.path}" ${if (index == 0) getLinkers() else ""} $linkerOps -F"${cinteropModulePath.path}" -F"${productDirectory.path}" ${getExtraLinkers()}
+libraryPaths = "${cinteropModulePath.path}" "${productDirectory.path}"
+compilerOpts = -fmodules $compilerOpts -I"${moduleMapDirectory.path}" -I"${cinteropModulePath.path}" -F"${productDirectory.path}" $headerSearchPaths
+linkerOpts = -ObjC  ${if (index == 0) getLinkers() else ""} $linkerOps -F"${productDirectory.path}" ${getExtraLinkers()}
 """
                 if (index == 0) {
                     val sum = productDirectory.resolve(compiledBinaryName.get()).md5()
+                    definition += "\nstaticLibraries = ${compiledBinaryName.get()}"
                     definition += "\n#checksum: $sum"
                 }
                 if (definition.isNotEmpty()) {
@@ -298,7 +299,8 @@ linkerOpts = -L"${productDirectory.path}" ${if (index == 0) getLinkers() else ""
     private fun getLinkers(): String {
         val builtLibs =
             buildList {
-                addAll(productDirectory.listFiles { it.extension == "o" }.map { it.name })
+                add("")
+                //  addAll(productDirectory.listFiles { it.extension == "o" }.map { it.name })
             }.distinct().joinToString(" ") { "-l$it" }
         val frameworks =
             productDirectory

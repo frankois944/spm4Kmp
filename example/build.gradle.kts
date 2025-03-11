@@ -21,7 +21,7 @@ kotlin {
     }
 
     listOf(
-        iosX64(),
+        // iosX64(),
         iosSimulatorArm64(),
     ).forEach {
         it.binaries.framework {
@@ -35,7 +35,7 @@ kotlin {
         }
     }
 
-    listOf(
+    /*listOf(
         macosArm64(),
     ).forEach {
         it.binaries.framework {
@@ -48,7 +48,7 @@ kotlin {
                 }
             }
         }
-    }
+    }*/
 
     sourceSets {
         commonMain.dependencies {
@@ -106,7 +106,7 @@ swiftPackageConfig {
         //  - packageDependencyPrefix = "customName"
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
-        spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
+        // spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         dependency(
             SwiftDependency.Package.Remote.Version(
                 // Repository URL
@@ -147,7 +147,7 @@ swiftPackageConfig {
             // see SwiftDependency class for more use cases
         )
     }
-    create("nativeMacosShared") {
+    /*create("nativeMacosShared") {
         dependency(
             SwiftDependency.Package.Local(
                 path = "$testResources/LocalSourceDummyFramework",
@@ -158,5 +158,5 @@ swiftPackageConfig {
                 },
             ),
         )
-    }
+    }*/
 }

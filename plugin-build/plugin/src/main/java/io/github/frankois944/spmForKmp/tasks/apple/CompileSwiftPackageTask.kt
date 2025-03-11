@@ -97,7 +97,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         prepareWorkingDir()
         val args =
             buildList {
+                add("--sdk")
+                add("macosx")
                 add("xcodebuild")
+                add("-quiet")
                 add("-scheme")
                 add(manifestFile.get().parentFile.name)
                 add("-derivedDataPath")
@@ -116,6 +119,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add(it)
                 }
                 add("COMPILER_INDEX_STORE_ENABLE=NO")
+                add("ARCHS=\"${target.get().arch()}\"")
+                add("ONLY_ACTIVE_ARCH=YES")
+                // add("SKIP_INSTALL=NO")
+                // add("BUILD_LIBRARY_FOR_DISTRIBUTION=YES")
             }
         val standardOutput = ByteArrayOutputStream()
         val errorOutput = ByteArrayOutputStream()
@@ -134,6 +141,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     it.exitValue != 0,
                     standardOutput,
                     errorOutput,
+                    true,
                 )
             }
     }

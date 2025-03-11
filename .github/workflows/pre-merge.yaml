@@ -69,8 +69,10 @@ jobs:
         run: ./gradlew :plugin-build:plugin:ktlintCheck :plugin-build:plugin:detektMain --continue
       - name: Run Gradle tasks
         run: ./gradlew :preMerge :plugin-build:plugin:jacocoTestReport --no-configuration-cache --continue
+      - name: xcbeautify
+        run: brew install xcbeautify
       - name: build iosExampleApp
-        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" build
+        run: set -o pipefail && xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" build | xcbeautify --renderer github-actions
         working-directory: "example/iosApp"
       - name: Archive test results
         uses: actions/upload-artifact@v4
