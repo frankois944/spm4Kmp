@@ -95,7 +95,7 @@ swiftPackageConfig {
         // the watchos minimal version
         // minWatchos = "12.0"
         // the macos minimal version
-        minMacos = "10.15"
+        // minMacos = "10.15"
         // the directory where your own swift code is located
         // customPackageSourcePath = "{buildDir}/src/swift"
         // the swift code is built in debug by default
