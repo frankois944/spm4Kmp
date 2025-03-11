@@ -142,14 +142,14 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     private fun prepareWorkingDir() {
         val destination = builtBridgeSwiftSource.get().asFile
         val source = bridgeSwiftSource.get()
-        logger.warn("sourceBuildDir ${destination.path}")
+        logger.debug("sourceBuildDir ${destination.path}")
         if (destination.exists()) {
             destination.deleteRecursively()
         }
         destination.mkdirs()
         if (!source.asFileTree.isEmpty
         ) {
-            logger.warn(
+            logger.debug(
                 """
                 Copy User Swift files to directory ${destination.path}
                 ${source.asFileTree.files.joinToString(",")}
@@ -157,7 +157,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             )
             source.asFile.copyRecursively(destination)
         } else {
-            logger.warn("Copy Dummy swift file to directory {}", destination.path)
+            logger.debug("Copy Dummy swift file to directory {}", destination.path)
             destination.resolve("DummyFile.swift").writeText("import Foundation")
         }
     }

@@ -190,11 +190,11 @@ internal fun Project.printExecLogs(
     errorOutput: ByteArrayOutputStream,
 ) {
     @Suppress("MagicNumber")
-    val standardLog = standardOutput.toString().take(2500)
+    val standardLog = standardOutput.toString().take(5000)
 
     if (isError) {
         @Suppress("MagicNumber")
-        val errorLog = errorOutput.toString().take(2500)
+        val errorLog = errorOutput.toString().take(5000)
         logger.error(
             """
 ERROR FOUND WHEN EXEC
