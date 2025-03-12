@@ -5,12 +5,14 @@ import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.resolvePackage
 import io.github.frankois944.spmForKmp.operations.swiftFormat
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -45,8 +47,8 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:Input
     abstract val toolsVersion: Property<String>
 
-    @get:Input
-    abstract val packageScratchDir: Property<File>
+    @get:OutputDirectory
+    abstract val packageScratchDir: DirectoryProperty
 
     @get:Input
     @get:Optional
@@ -92,7 +94,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             )
             project.resolvePackage(
                 workingDir = manifestFile.asFile.get().parentFile,
-                scratchPath = packageScratchDir.get(),
+                scratchPath = packageScratchDir.get().asFile,
                 sharedCachePath = sharedCacheDir.orNull,
                 sharedConfigPath = sharedConfigDir.orNull,
                 sharedSecurityPath = sharedSecurityDir.orNull,

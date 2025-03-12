@@ -57,9 +57,10 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 .asFile
                 .parentFile
                 .resolve("Sources")
-                .takeIf { !it.exists() }
-                ?.also { it.mkdirs() }
-        sourceDir?.resolve("DummySPMFile.swift")?.writeText("import Foundation")
+                .also {
+                    it.mkdirs()
+                }
+        sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
     }
 
     @TaskAction

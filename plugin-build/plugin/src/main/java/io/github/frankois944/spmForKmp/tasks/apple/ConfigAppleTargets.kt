@@ -34,7 +34,7 @@ internal fun Project.configAppleTargets(
     sharedCacheDir: File?,
     sharedConfigDir: File?,
     sharedSecurityDir: File?,
-    swiftSourcePackageDir: File?,
+    swiftSourcePackageDir: File,
 ) {
     val allTargets =
         tasks
@@ -224,7 +224,7 @@ private fun configureCompileTask(
     extension: PackageRootDefinitionExtension,
     scratchDir: File,
     buildDir: File,
-    sourcePackageDir: File?,
+    sourcePackageDir: File,
     cacheDir: File?,
     configDir: File?,
     securityDir: File?,

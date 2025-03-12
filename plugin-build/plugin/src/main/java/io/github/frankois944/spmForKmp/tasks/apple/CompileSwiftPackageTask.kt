@@ -5,6 +5,7 @@ import io.github.frankois944.spmForKmp.operations.getNbJobs
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -47,7 +48,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val sourcePackage: Property<File>
+    abstract val sourcePackage: DirectoryProperty
 
     @get:Input
     abstract val osVersion: Property<String>
@@ -79,14 +80,14 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             sourceDir.deleteRecursively()
         }
         sourceDir.mkdirs()
-        if (sourcePackage.get().list()?.isNotEmpty() == true) {
+        if (!sourcePackage.get().asFileTree.isEmpty) {
             logger.debug(
                 """
                 Copy User Swift files to directory $sourceDir
-                ${sourcePackage.get().list()?.toList()}
+                ${sourcePackage.get().asFile.list()?.toList()}
                 """.trimIndent(),
             )
-            sourcePackage.get().copyRecursively(sourceDir)
+            sourcePackage.get().asFile.copyRecursively(sourceDir)
         } else {
             logger.debug("Copy Dummy swift file to directory {}", sourceDir)
             sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
