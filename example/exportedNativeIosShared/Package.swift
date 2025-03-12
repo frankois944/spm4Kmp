@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "exportedNativeIosShared",
-  platforms: [.iOS("12.0"), .macOS("10.15"), .tvOS("12.0"), .watchOS("4.0")],
+  platforms: [.iOS("12.0"), .macOS("10.13"), .tvOS("12.0"), .watchOS("4.0")],
   products: [
     .library(
       name: "exportedNativeIosShared",
@@ -16,6 +16,7 @@ let package = Package(
       path:
         "/Users/francoisdabonot/devs/spm4Kmp/example/../plugin-build/plugin/src/functionalTest/resources/LocalSourceDummyFramework"
     ), .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", exact: "1.8.1"),
+    .package(url: "https://github.com/appmetrica/appmetrica-sdk-ios", exact: "5.0.0"),
   ],
   targets: [
     .target(
@@ -26,6 +27,7 @@ let package = Package(
         .product(name: "FirebaseDatabase", package: "firebase-ios-sdk"), "DummyFramework",
         .product(name: "LocalSourceDummyFramework", package: "LocalSourceDummyFramework"),
         .product(name: "CryptoSwift", package: "CryptoSwift"),
+        .product(name: "AppMetricaCore", package: "appmetrica-sdk-ios"),
       ],
       path: "Sources"),
     .binaryTarget(

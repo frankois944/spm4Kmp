@@ -5,6 +5,7 @@ import io.github.frankois944.spmForKmp.operations.getNbJobs
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -24,6 +25,8 @@ import javax.inject.Inject
 @CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
     init {
+        description = "Compile the Swift Package manifest"
+        group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
             HostManager.hostIsMac
         }
@@ -47,7 +50,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val sourcePackage: Property<File>
+    abstract val sourcePackage: DirectoryProperty
+
+    @get:OutputDirectory
+    val copiedSourcePackage: File
+        get() = manifestFile.get().parentFile.resolve("Sources")
 
     @get:Input
     abstract val osVersion: Property<String>
@@ -67,38 +74,31 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Inject
     abstract val operation: ExecOperations
 
-    init {
-        description = "Compile the Swift Package manifest"
-        group = "io.github.frankois944.spmForKmp.tasks"
-    }
-
-    private fun prepareWorkingDir(): File {
-        val workingDir = manifestFile.get().parentFile
-        val sourceDir = workingDir.resolve("Sources")
+    private fun prepareWorkingDir() {
+        val sourceDir = copiedSourcePackage
         if (sourceDir.exists()) {
             sourceDir.deleteRecursively()
         }
         sourceDir.mkdirs()
-        if (sourcePackage.get().list()?.isNotEmpty() == true) {
+        if (!sourcePackage.get().asFileTree.isEmpty) {
             logger.debug(
                 """
                 Copy User Swift files to directory $sourceDir
-                ${sourcePackage.get().list()?.toList()}
+                ${sourcePackage.get().asFile.list()?.toList()}
                 """.trimIndent(),
             )
-            sourcePackage.get().copyRecursively(sourceDir)
+            sourcePackage.get().asFile.copyRecursively(sourceDir)
         } else {
             logger.debug("Copy Dummy swift file to directory {}", sourceDir)
             sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
         }
-        return workingDir
     }
 
     @TaskAction
     fun compilePackage() {
         logger.debug("Compile the manifest {}", manifestFile.get().path)
         val sdkPath = project.getSDKPath(target.get())
-        val workingDir = prepareWorkingDir()
+        prepareWorkingDir()
 
         val args =
             mutableListOf(
@@ -135,7 +135,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         operation
             .exec {
                 it.executable = "xcrun"
-                it.workingDir = workingDir
+                it.workingDir = manifestFile.get().parentFile
                 it.args = args
                 it.standardOutput = standardOutput
                 it.errorOutput = errorOutput

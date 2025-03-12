@@ -29,6 +29,8 @@ import java.io.File
 @CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     init {
+        description = "Generate the cinterop definitions files"
+        group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
             HostManager.hostIsMac
         }
@@ -69,11 +71,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
     @get:Optional
     abstract val packageDependencyPrefix: Property<String?>
-
-    init {
-        description = "Generate the cinterop definitions files"
-        group = "io.github.frankois944.spmForKmp.tasks"
-    }
 
     @get:OutputFiles
     val outputFiles: List<File>

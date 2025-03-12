@@ -7,15 +7,15 @@ on:
 
 jobs:
   gradle:
-    strategy:
-      matrix:
-        os: [ macos-latest ]
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
       GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
       - name: Checkout Repo
         uses: actions/checkout@v4 # v4
       - name: Cache Gradle Caches

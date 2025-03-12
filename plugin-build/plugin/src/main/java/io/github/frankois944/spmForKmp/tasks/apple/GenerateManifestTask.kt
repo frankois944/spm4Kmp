@@ -5,12 +5,13 @@ import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.resolvePackage
 import io.github.frankois944.spmForKmp.operations.swiftFormat
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -19,6 +20,8 @@ import java.io.File
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
     init {
+        description = "Generate a Swift Package manifest"
+        group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
             HostManager.hostIsMac
         }
@@ -45,8 +48,8 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:Input
     abstract val toolsVersion: Property<String>
 
-    @get:Input
-    abstract val packageScratchDir: Property<File>
+    @get:OutputDirectory
+    abstract val packageScratchDir: DirectoryProperty
 
     @get:Input
     @get:Optional
@@ -61,12 +64,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     abstract val sharedSecurityDir: Property<File?>
 
     @get:OutputFile
-    abstract val manifestFile: RegularFileProperty
-
-    init {
-        description = "Generate a Swift Package manifest"
-        group = "io.github.frankois944.spmForKmp.tasks"
-    }
+    abstract val manifestFile: Property<File>
 
     @TaskAction
     fun generateFile() {
@@ -76,7 +74,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 generatedPackageDirectory =
                     manifestFile
                         .get()
-                        .asFile.parentFile
+                        .parentFile
                         .toPath(),
                 productName = packageName.get(),
                 minIos = minIos.get(),
@@ -85,14 +83,14 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 minWatchos = minWatchos.get(),
                 toolsVersion = toolsVersion.get(),
             )
-        manifestFile.asFile.get().writeText(manifest)
+        manifestFile.get().writeText(manifest)
         try {
             project.swiftFormat(
-                manifestFile.asFile.get(),
+                manifestFile.get(),
             )
             project.resolvePackage(
-                workingDir = manifestFile.asFile.get().parentFile,
-                scratchPath = packageScratchDir.get(),
+                workingDir = manifestFile.get().parentFile,
+                scratchPath = packageScratchDir.get().asFile,
                 sharedCachePath = sharedCacheDir.orNull,
                 sharedConfigPath = sharedConfigDir.orNull,
                 sharedSecurityPath = sharedSecurityDir.orNull,
@@ -101,8 +99,8 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             logger.error(
                 """
                 Manifest file generated :
-                ${manifestFile.get().asFile}
-                ${manifestFile.get().asFile.readText()}
+                ${manifestFile.get()}
+                ${manifestFile.get().readText()}
                 """.trimIndent(),
             )
             throw ex

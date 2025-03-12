@@ -95,7 +95,7 @@ swiftPackageConfig {
         // the watchos minimal version
         // minWatchos = "12.0"
         // the macos minimal version
-        minMacos = "10.15"
+        // minMacos = "10.15"
         // the directory where your own swift code is located
         // customPackageSourcePath = "{buildDir}/src/swift"
         // the swift code is built in debug by default
@@ -141,6 +141,14 @@ swiftPackageConfig {
                 products = {
                     // Can be only used in your "src/swift" code.
                     add("CryptoSwift")
+                },
+            ),
+            SwiftDependency.Package.Remote.Version(
+                url = URI("https://github.com/appmetrica/appmetrica-sdk-ios"),
+                version = "5.0.0",
+                products = {
+                    // Can be only used in your "src/swift" code.
+                    add("AppMetricaCore", exportToKotlin = true)
                 },
             ),
             // see SwiftDependency class for more use cases
