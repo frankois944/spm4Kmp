@@ -143,6 +143,14 @@ swiftPackageConfig {
                     add("CryptoSwift")
                 },
             ),
+            SwiftDependency.Package.Remote.Version(
+                url = URI("https://github.com/appmetrica/appmetrica-sdk-ios"),
+                version = "5.0.0",
+                products = {
+                    // Can be only used in your "src/swift" code.
+                    add("AppMetricaCore", exportToKotlin = true)
+                },
+            ),
             // see SwiftDependency class for more use cases
         )
     }
