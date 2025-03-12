@@ -66,14 +66,6 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:OutputFile
     abstract val manifestFile: Property<File>
 
-    @get:OutputFile
-    val manifestResolveFile: File
-        get() =
-            manifestFile
-                .get()
-                .parentFile
-                .resolve("Package.resolved")
-
     @TaskAction
     fun generateFile() {
         val manifest =
