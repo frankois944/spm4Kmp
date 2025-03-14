@@ -232,12 +232,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
         return """
-language = Objective-C
-modules = $moduleName
-package = $packageName
-libraryPaths = "${getBuildDirectory().path}"
-compilerOpts = $compilerOpts -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
-linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
+            language = Objective-C
+            modules = $moduleName
+            package = $packageName
+            libraryPaths = "${getBuildDirectory().path}"
+            compilerOpts = $compilerOpts -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
+            linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
             """.trimIndent()
     }
 
@@ -267,12 +267,12 @@ linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${ge
         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
         return """
-language = Objective-C
-modules = $moduleName
-package = $packageName
-libraryPaths = "${getBuildDirectory().path}"
-compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
-linkerOpts = $linkerOps ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+            language = Objective-C
+            modules = $moduleName
+            package = $packageName
+            libraryPaths = "${getBuildDirectory().path}"
+            compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
+            linkerOpts = $linkerOps ${getExtraLinkers()} -F"${getBuildDirectory().path}"
             """.trimIndent()
     }
 }
