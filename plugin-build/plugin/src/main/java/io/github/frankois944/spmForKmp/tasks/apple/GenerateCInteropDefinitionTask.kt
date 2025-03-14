@@ -68,7 +68,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     val outputFiles: List<File>
         get() =
             buildList {
-                getModuleInfos().forEach { moduleName ->
+                getModuleConfigs().forEach { moduleName ->
                     add(getBuildDirectory().resolve("${moduleName.name}.def"))
                 }
             }
@@ -87,7 +87,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             .get()
             .parentFile
 
-    private fun getModuleInfos(): List<ModuleConfig> =
+    private fun getModuleConfigs(): List<ModuleConfig> =
         buildList {
             // the first item must be the product name
             add(
@@ -144,13 +144,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
-        val moduleConfigs = getModuleInfos()
-
+        val moduleConfigs = getModuleConfigs()
+        val buildDirContent = getBuildDirectoriesContent(getBuildDirectory(), "build", "framework")
         // find the build directory of the declared module in the manifest
         moduleConfigs
             .forEach { moduleInfo ->
                 logger.debug("LOOKING for module dir {}", moduleInfo.name)
-                getBuildDirectoriesContent(getBuildDirectory(), "build", "framework")
+                buildDirContent
                     .find {
                         it.nameWithoutExtension.lowercase() == moduleInfo.name.lowercase()
                     }?.let { buildDir ->
@@ -169,17 +169,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
             try {
-                val libName = compiledBinary.asFile.get().name
-                val checksum = compiledBinary.asFile.get().md5()
                 val mapFile =
                     moduleConfig.buildDir.resolve(
                         if (moduleConfig.isFramework) "Modules/module.modulemap" else "module.modulemap",
                     )
-                val mapFileContent = mapFile.readText()
                 val moduleName =
-                    extractModuleNameFromModuleMap(mapFileContent)
+                    extractModuleNameFromModuleMap(mapFile.readText())
                         ?: throw Exception("No module name for ${moduleConfig.name} in mapFile")
-
                 val definition =
                     if (moduleConfig.isFramework) {
                         generateFrameworkDefinition(moduleName, moduleConfig)
@@ -187,6 +183,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         generateNonFrameworkDefinition(moduleName, moduleConfig)
                     }.let { def ->
                         // Append staticLibraries for the first index which is the bridge
+                        val libName = compiledBinary.asFile.get().name
+                        val checksum = compiledBinary.asFile.get().md5()
                         val md5 = "#checksum: $checksum"
                         if (index == 0) "$def\n$md5\nstaticLibraries = $libName" else def
                     }
@@ -255,9 +253,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         val headerSearchPaths =
             buildList {
                 addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
-                addAll(getBuildDirectoriesContent(getBuildDirectory(), "build"))
                 addAll(implicitDependencies)
                 addAll(findHeadersModule(scratchDir.get().resolve("artifacts"), target.get()))
+                add(getBuildDirectory().path)
             }.joinToString(" ") { "-I\"$it\"" }
 
         val packageName =
