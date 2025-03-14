@@ -4,7 +4,7 @@ package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
-import io.github.frankois944.spmForKmp.tasks.apple.configAppleTargets
+import io.github.frankois944.spmForKmp.tasks.configAppleTargets
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -57,7 +57,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     val sharedCacheDir: File? = extension.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
                     val sharedConfigDir: File? = extension.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
                     val sharedSecurityDir: File? = extension.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
-                    val swiftSourcePackageDir =
+                    val bridgeSourceDir =
                         resolveAndCreateDir(
                             File(extension.customPackageSourcePath),
                             extension.name,
@@ -71,7 +71,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         sharedCacheDir = sharedCacheDir,
                         sharedConfigDir = sharedConfigDir,
                         sharedSecurityDir = sharedSecurityDir,
-                        swiftSourcePackageDir = swiftSourcePackageDir,
+                        bridgeSourceDir = bridgeSourceDir,
                     )
                 }
                 // link the main definition File

@@ -19,14 +19,6 @@ import java.io.File
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
-    init {
-        description = "Generate a Swift Package manifest"
-        group = "io.github.frankois944.spmForKmp.tasks"
-        onlyIf {
-            HostManager.hostIsMac
-        }
-    }
-
     @get:Input
     abstract val packageDependencies: ListProperty<SwiftDependency>
 
@@ -65,6 +57,14 @@ internal abstract class GenerateManifestTask : DefaultTask() {
 
     @get:OutputFile
     abstract val manifestFile: Property<File>
+
+    init {
+        description = "Generate a Swift Package manifest"
+        group = "io.github.frankois944.spmForKmp.tasks"
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
 
     @TaskAction
     fun generateFile() {

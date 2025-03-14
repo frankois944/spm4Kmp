@@ -50,10 +50,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val sourcePackage: DirectoryProperty
+    abstract val bridgeSourceDir: DirectoryProperty
 
     @get:OutputDirectory
-    val copiedSourcePackage: File
+    val bridgeSourceBuiltDir: File
         get() = manifestFile.get().parentFile.resolve("Sources")
 
     @get:Input
@@ -74,30 +74,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Inject
     abstract val operation: ExecOperations
 
-    private fun prepareWorkingDir() {
-        val sourceDir = copiedSourcePackage
-        if (sourceDir.exists()) {
-            sourceDir.deleteRecursively()
-        }
-        sourceDir.mkdirs()
-        if (!sourcePackage.get().asFileTree.isEmpty) {
-            logger.debug(
-                """
-                Copy User Swift files to directory $sourceDir
-                ${sourcePackage.get().asFile.list()?.toList()}
-                """.trimIndent(),
-            )
-            sourcePackage.get().asFile.copyRecursively(sourceDir)
-        } else {
-            logger.debug("Copy Dummy swift file to directory {}", sourceDir)
-            sourceDir.resolve("DummySPMFile.swift").writeText("import Foundation")
-        }
-    }
-
     @TaskAction
     fun compilePackage() {
         logger.debug("Compile the manifest {}", manifestFile.get().path)
-        val sdkPath = project.getSDKPath(target.get())
         prepareWorkingDir()
 
         val args =
@@ -107,7 +86,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 "swift",
                 "build",
                 "--sdk",
-                sdkPath,
+                project.getSDKPath(target.get()),
                 "--triple",
                 target.get().getTriple(osVersion.get()),
                 "--scratch-path",
@@ -149,5 +128,24 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     errorOutput,
                 )
             }
+    }
+
+    private fun prepareWorkingDir() {
+        if (bridgeSourceBuiltDir.exists()) {
+            bridgeSourceBuiltDir.deleteRecursively()
+        }
+        bridgeSourceBuiltDir.mkdirs()
+        if (!bridgeSourceDir.get().asFileTree.isEmpty) {
+            logger.debug(
+                """
+                Copy User Swift files to directory $bridgeSourceBuiltDir
+                ${bridgeSourceDir.get().asFile.list()?.toList()}
+                """.trimIndent(),
+            )
+            bridgeSourceDir.get().asFile.copyRecursively(bridgeSourceBuiltDir)
+        } else {
+            logger.debug("Copy Dummy swift file to directory {}", bridgeSourceBuiltDir)
+            bridgeSourceBuiltDir.resolve("DummySPMFile.swift").writeText("import Foundation")
+        }
     }
 }

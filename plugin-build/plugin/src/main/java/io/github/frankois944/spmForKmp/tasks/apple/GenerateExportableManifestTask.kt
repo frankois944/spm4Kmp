@@ -16,14 +16,6 @@ import java.io.File
 
 @CacheableTask
 internal abstract class GenerateExportableManifestTask : DefaultTask() {
-    init {
-        description = "Generate a Swift Package manifest with exported product"
-        group = "io.github.frankois944.spmForKmp.tasks"
-        onlyIf {
-            HostManager.hostIsMac
-        }
-    }
-
     @get:Input
     abstract val packageDependencies: ListProperty<SwiftDependency>
 
@@ -67,6 +59,14 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                         """.trimIndent(),
                     )
                 }
+
+    init {
+        description = "Generate a Swift Package manifest with exported product"
+        group = "io.github.frankois944.spmForKmp.tasks"
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
 
     @TaskAction
     fun generateFile() {

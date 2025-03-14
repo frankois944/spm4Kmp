@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.tasks.apple
+package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
@@ -8,6 +8,10 @@ import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
+import io.github.frankois944.spmForKmp.tasks.apple.GenerateExportableManifestTask
+import io.github.frankois944.spmForKmp.tasks.apple.GenerateManifestTask
 import io.github.frankois944.spmForKmp.tasks.utils.computeOsVersion
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
@@ -34,7 +38,7 @@ internal fun Project.configAppleTargets(
     sharedCacheDir: File?,
     sharedConfigDir: File?,
     sharedSecurityDir: File?,
-    swiftSourcePackageDir: File,
+    bridgeSourceDir: File,
 ) {
     val allTargets =
         tasks
@@ -101,7 +105,7 @@ internal fun Project.configAppleTargets(
                     extension,
                     packageScratchDir,
                     targetBuildDir,
-                    swiftSourcePackageDir,
+                    bridgeSourceDir,
                     sharedCacheDir,
                     sharedConfigDir,
                     sharedSecurityDir,
@@ -224,7 +228,7 @@ private fun configureCompileTask(
     extension: PackageRootDefinitionExtension,
     scratchDir: File,
     buildDir: File,
-    sourcePackageDir: File,
+    bridgeSourceDir: File,
     cacheDir: File?,
     configDir: File?,
     securityDir: File?,
@@ -235,7 +239,7 @@ private fun configureCompileTask(
         this.debugMode.set(extension.debug)
         this.packageScratchDir.set(scratchDir)
         this.compiledTargetDir.set(buildDir)
-        this.sourcePackage.set(sourcePackageDir)
+        this.bridgeSourceDir.set(bridgeSourceDir)
         this.osVersion.set(computeOsVersion(target, extension))
         this.sharedCacheDir.set(cacheDir)
         this.sharedConfigDir.set(configDir)

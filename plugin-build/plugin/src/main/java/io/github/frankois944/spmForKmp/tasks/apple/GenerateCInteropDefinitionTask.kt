@@ -28,14 +28,6 @@ import java.io.File
 
 @CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
-    init {
-        description = "Generate the cinterop definitions files"
-        group = "io.github.frankois944.spmForKmp.tasks"
-        onlyIf {
-            HostManager.hostIsMac
-        }
-    }
-
     @get:Input
     abstract val target: Property<AppleCompileTarget>
 
@@ -80,6 +72,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     add(getBuildDirectory().resolve("${moduleName.name}.def"))
                 }
             }
+
+    init {
+        description = "Generate the cinterop definitions files"
+        group = "io.github.frankois944.spmForKmp.tasks"
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
 
     private fun getBuildDirectory(): File =
         compiledBinary
