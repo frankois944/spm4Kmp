@@ -5,12 +5,14 @@ package io.github.frankois944.spmForKmp
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.configAppleTargets
+import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
@@ -76,14 +78,29 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 }
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
-                    val cinteropTarget =
-                        AppleCompileTarget.byKonanName(cinterop.konanTarget.name)
-                            ?: return@configureEach
-                    // The cinterop task needs to run the requirement tasks before getting the .def file
-                    cinterop.dependsOn(taskGroup[cinteropTarget])
-                    cinterop.mustRunAfter(taskGroup[cinteropTarget])
-                    val definitionFile = cInteropTaskNamesWithDefFile[cinterop.name]
-                    cinterop.settings.definitionFile.set(definitionFile)
+                    if (HostManager.hostIsMac) {
+                        val cinteropTarget =
+                            AppleCompileTarget.byKonanName(cinterop.konanTarget.name)
+                                ?: return@configureEach
+                        taskGroup[cinteropTarget]?.let {
+                            cinterop.dependsOn(taskGroup[cinteropTarget])
+                            cinterop.mustRunAfter(taskGroup[cinteropTarget])
+                        } ?: run {
+                            // If there is no task, there is something really wrong somewhere.
+                            // the user must make an issue with its configuration
+                            logger.error(
+                                """
+                                No task found for target ${cinteropTarget.name}
+                                make an issue with your plugin configuration
+                                """.trimIndent(),
+                            )
+                        }
+                        val definitionFile = cInteropTaskNamesWithDefFile[cinterop.name]
+                        // Note: the definitionFile doesn't exist yet, but we know where it will be.
+                        cinterop.settings.definitionFile.set(definitionFile)
+                    } else {
+                        cinterop.settings.definitionFile.set(getAndCreateFakeDefinitionFile())
+                    }
                 }
             }
         }
