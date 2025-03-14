@@ -19,17 +19,12 @@ internal fun findHeadersModule(
         withDirectory = true,
     )
 
-internal fun getBuildDirectoriesContent(
-    buildDir: File,
-    vararg extensions: String,
-): List<File> =
-    buildDir // get folders with headers for internal dependencies
+internal fun getModulesInBuildDirectory(buildDir: File): List<File> {
+    val extensions = listOf("build", "framework")
+    return buildDir // get folders with headers for internal dependencies
         .listFiles { file -> extensions.contains(file.extension) || file.name == "Modules" }
-        // remove folder with weird names, cinterop doesn't like module with symbol names like grp-c++
-        // it doesn't matter for the kotlin export, to be rethinking
-        ?.filter { file -> !file.nameWithoutExtension.lowercase().contains("grpc") }
-        ?.toList()
-        .orEmpty()
+        ?.toList() ?: throw RuntimeException("No Module/Framework found in ${buildDir.path}")
+}
 
 internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
     fromDir: File,

@@ -80,34 +80,34 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         prepareWorkingDir()
 
         val args =
-            mutableListOf(
-                "--sdk",
-                "macosx",
-                "swift",
-                "build",
-                "--sdk",
-                project.getSDKPath(target.get()),
-                "--triple",
-                target.get().getTriple(osVersion.get()),
-                "--scratch-path",
-                packageScratchDir.get().path,
-                "-c",
-                if (debugMode.get()) "debug" else "release",
-                "--jobs",
-                project.getNbJobs(),
-            )
-        sharedCacheDir.orNull?.let {
-            args.add("--cache-path")
-            args.add(it.path)
-        }
-        sharedConfigDir.orNull?.let {
-            args.add("--config-path")
-            args.add(it.path)
-        }
-        sharedSecurityDir.orNull?.let {
-            args.add("--security-path")
-            args.add(it.path)
-        }
+            buildList {
+                add("--sdk")
+                add("macosx")
+                add("swift")
+                add("build")
+                add("--sdk")
+                add(project.getSDKPath(target.get()))
+                add("--triple")
+                add(target.get().triple(osVersion.get()))
+                add("--scratch-path")
+                add(packageScratchDir.get().path)
+                add("-c")
+                add(if (debugMode.get()) "debug" else "release")
+                add("--jobs")
+                add(project.getNbJobs())
+                sharedCacheDir.orNull?.let {
+                    add("--cache-path")
+                    add(it.path)
+                }
+                sharedConfigDir.orNull?.let {
+                    add("--config-path")
+                    add(it.path)
+                }
+                sharedSecurityDir.orNull?.let {
+                    add("--security-path")
+                    add(it.path)
+                }
+            }
 
         val standardOutput = ByteArrayOutputStream()
         val errorOutput = ByteArrayOutputStream()

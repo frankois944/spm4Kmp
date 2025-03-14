@@ -7,7 +7,6 @@ import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateExportableManifestTask
@@ -33,7 +32,7 @@ internal fun Project.configAppleTargets(
     taskGroup: MutableMap<AppleCompileTarget, Task>,
     cInteropTaskNamesWithDefFile: MutableMap<String, File>,
     extension: PackageRootDefinitionExtension,
-    sourcePackageDir: File,
+    spmWorkingDir: File,
     packageScratchDir: File,
     sharedCacheDir: File?,
     sharedConfigDir: File?,
@@ -51,11 +50,10 @@ internal fun Project.configAppleTargets(
         tasks.register(
             getTaskName(TASK_GENERATE_MANIFEST, extension.name),
             GenerateManifestTask::class.java,
-        ) { taskConfig ->
-            configureManifestTask(
-                taskConfig = taskConfig,
+        ) {
+            it.configureManifestTask(
                 extension = extension,
-                manifestFile = sourcePackageDir.resolve(SWIFT_PACKAGE_NAME),
+                manifestFile = spmWorkingDir.resolve(SWIFT_PACKAGE_NAME),
                 packageScratchDir = packageScratchDir,
                 sharedCacheDir = sharedCacheDir,
                 sharedConfigDir = sharedConfigDir,
@@ -73,12 +71,9 @@ internal fun Project.configAppleTargets(
             tasks.register(
                 getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, extension.name),
                 GenerateExportableManifestTask::class.java,
-            ) { taskConfig ->
-                configureExportableManifestTask(
-                    taskConfig,
-                    extension.packageDependencies,
+            ) {
+                it.configureExportableManifestTask(
                     extension,
-                    exportedManifestDirectory.name,
                     exportedManifestDirectory,
                 )
             }
@@ -96,11 +91,9 @@ internal fun Project.configAppleTargets(
             tasks.register(
                 getTaskName(TASK_COMPILE_PACKAGE, extension.name, cinteropTarget),
                 CompileSwiftPackageTask::class.java,
-            ) { taskConfig ->
-                // Rename parameter for brevity
-                configureCompileTask(
-                    taskConfig,
-                    File(sourcePackageDir, SWIFT_PACKAGE_NAME),
+            ) {
+                it.configureCompileTask(
+                    File(spmWorkingDir, SWIFT_PACKAGE_NAME),
                     cinteropTarget,
                     extension,
                     packageScratchDir,
@@ -121,13 +114,11 @@ internal fun Project.configAppleTargets(
                 ),
                 GenerateCInteropDefinitionTask::class.java,
             ) {
-                configureGenerateCInteropDefinitionTask(
-                    task = it,
+                it.configureGenerateCInteropDefinitionTask(
                     targetBuildDir = targetBuildDir,
-                    compiledBinaryName = "lib${extension.name}.a",
                     cinteropTarget = cinteropTarget,
                     extension = extension,
-                    sourcePackageDir = sourcePackageDir,
+                    sourcePackageDir = spmWorkingDir,
                     packageScratchDir = packageScratchDir,
                 )
             }
@@ -177,8 +168,7 @@ internal fun Project.configAppleTargets(
 }
 
 @Suppress("LongParameterList")
-private fun configureManifestTask(
-    taskConfig: GenerateManifestTask,
+private fun GenerateManifestTask.configureManifestTask(
     extension: PackageRootDefinitionExtension,
     manifestFile: File,
     packageScratchDir: File,
@@ -186,43 +176,37 @@ private fun configureManifestTask(
     sharedConfigDir: File?,
     sharedSecurityDir: File?,
 ) {
-    taskConfig.apply {
-        packageDependencies.set(extension.packageDependencies)
-        packageName.set(extension.name)
-        minIos.set(extension.minIos)
-        minTvos.set(extension.minTvos)
-        minMacos.set(extension.minMacos)
-        minWatchos.set(extension.minWatchos)
-        toolsVersion.set(extension.toolsVersion)
-        this.manifestFile.set(manifestFile)
-        this.packageScratchDir.set(packageScratchDir)
-        this.sharedCacheDir.set(sharedCacheDir)
-        this.sharedConfigDir.set(sharedConfigDir)
-        this.sharedSecurityDir.set(sharedSecurityDir)
-    }
+    this.packageDependencies.set(extension.packageDependencies)
+    this.packageName.set(extension.name)
+    this.minIos.set(extension.minIos)
+    this.minTvos.set(extension.minTvos)
+    this.minMacos.set(extension.minMacos)
+    this.minWatchos.set(extension.minWatchos)
+    this.toolsVersion.set(extension.toolsVersion)
+    this.manifestFile.set(manifestFile)
+    this.packageScratchDir.set(packageScratchDir)
+    this.sharedCacheDir.set(sharedCacheDir)
+    this.sharedConfigDir.set(sharedConfigDir)
+    this.sharedSecurityDir.set(sharedSecurityDir)
 }
 
-private fun configureExportableManifestTask(
-    taskConfig: GenerateExportableManifestTask,
-    dependencies: List<SwiftDependency>,
+private fun GenerateExportableManifestTask.configureExportableManifestTask(
     extension: PackageRootDefinitionExtension,
-    packageName: String,
     manifestDir: File,
 ) {
-    taskConfig.packageDependencies.set(dependencies)
-    taskConfig.packageName.set(packageName)
-    taskConfig.minIos.set(extension.minIos)
-    taskConfig.minTvos.set(extension.minTvos)
-    taskConfig.minMacos.set(extension.minMacos)
-    taskConfig.minWatchos.set(extension.minWatchos)
-    taskConfig.toolsVersion.set(extension.toolsVersion)
+    this.packageDependencies.set(extension.packageDependencies)
+    this.packageName.set(manifestDir.name)
+    this.minIos.set(extension.minIos)
+    this.minTvos.set(extension.minTvos)
+    this.minMacos.set(extension.minMacos)
+    this.minWatchos.set(extension.minWatchos)
+    this.toolsVersion.set(extension.toolsVersion)
     manifestDir.mkdirs()
-    taskConfig.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
+    this.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
 }
 
 @Suppress("LongParameterList")
-private fun configureCompileTask(
-    taskConfig: CompileSwiftPackageTask,
+private fun CompileSwiftPackageTask.configureCompileTask(
     manifestFile: File,
     target: AppleCompileTarget,
     extension: PackageRootDefinitionExtension,
@@ -233,43 +217,38 @@ private fun configureCompileTask(
     configDir: File?,
     securityDir: File?,
 ) {
-    taskConfig.apply {
-        this.manifestFile.set(manifestFile)
-        this.target.set(target)
-        this.debugMode.set(extension.debug)
-        this.packageScratchDir.set(scratchDir)
-        this.compiledTargetDir.set(buildDir)
-        this.bridgeSourceDir.set(bridgeSourceDir)
-        this.osVersion.set(computeOsVersion(target, extension))
-        this.sharedCacheDir.set(cacheDir)
-        this.sharedConfigDir.set(configDir)
-        this.sharedSecurityDir.set(securityDir)
-    }
+    this.manifestFile.set(manifestFile)
+    this.target.set(target)
+    this.debugMode.set(extension.debug)
+    this.packageScratchDir.set(scratchDir)
+    this.compiledTargetDir.set(buildDir)
+    this.bridgeSourceDir.set(bridgeSourceDir)
+    this.osVersion.set(computeOsVersion(target, extension))
+    this.sharedCacheDir.set(cacheDir)
+    this.sharedConfigDir.set(configDir)
+    this.sharedSecurityDir.set(securityDir)
 }
 
-@Suppress("LongParameterList")
-private fun configureGenerateCInteropDefinitionTask(
-    task: GenerateCInteropDefinitionTask,
+private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTask(
     targetBuildDir: File,
-    compiledBinaryName: String,
     cinteropTarget: AppleCompileTarget,
     extension: PackageRootDefinitionExtension,
     sourcePackageDir: File,
     packageScratchDir: File,
 ) {
-    task.compiledBinary.set(targetBuildDir.resolve(compiledBinaryName))
-    task.target.set(cinteropTarget)
-    task.productName.set(extension.name)
-    task.packages.set(extension.packageDependencies)
-    task.debugMode.set(extension.debug)
-    task.osVersion.set(
+    this.compiledBinary.set(targetBuildDir.resolve("lib${extension.name}.a"))
+    this.target.set(cinteropTarget)
+    this.productName.set(extension.name)
+    this.packages.set(extension.packageDependencies)
+    this.debugMode.set(extension.debug)
+    this.osVersion.set(
         computeOsVersion(cinteropTarget, extension),
     )
-    task.manifestFile.set(sourcePackageDir.resolve(SWIFT_PACKAGE_NAME))
-    task.scratchDir.set(packageScratchDir)
-    task.packageDependencyPrefix.set(extension.packageDependencyPrefix)
-    task.compilerOpts.set(extension.compilerOpts)
-    task.linkerOpts.set(extension.linkerOpts)
+    this.manifestFile.set(sourcePackageDir.resolve(SWIFT_PACKAGE_NAME))
+    this.scratchDir.set(packageScratchDir)
+    this.packageDependencyPrefix.set(extension.packageDependencyPrefix)
+    this.compilerOpts.set(extension.compilerOpts)
+    this.linkerOpts.set(extension.linkerOpts)
 }
 
 private fun createCInteropTask(

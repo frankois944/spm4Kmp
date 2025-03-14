@@ -38,5 +38,5 @@ internal fun getTargetBuildDirectory(
     buildMode: String,
 ): File =
     packageScratchDir
-        .resolve(cinteropTarget.getPackageBuildDir())
+        .resolve(cinteropTarget.packageBuildDirName())
         .resolve(buildMode)

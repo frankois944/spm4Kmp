@@ -9,7 +9,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMa
 import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
-import io.github.frankois944.spmForKmp.tasks.utils.getBuildDirectoriesContent
+import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -145,25 +145,25 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @TaskAction
     fun generateDefinitions() {
         val moduleConfigs = getModuleConfigs()
-        val buildDirContent = getBuildDirectoriesContent(getBuildDirectory(), "build", "framework")
+        val buildDirContent = getModulesInBuildDirectory(getBuildDirectory())
         // find the build directory of the declared module in the manifest
         moduleConfigs
             .forEach { moduleInfo ->
                 logger.debug("LOOKING for module dir {}", moduleInfo.name)
                 buildDirContent
                     .find {
+                        logger.debug("CHECK ${moduleInfo.name} == ${it.nameWithoutExtension}")
                         it.nameWithoutExtension.lowercase() == moduleInfo.name.lowercase()
                     }?.let { buildDir ->
                         moduleInfo.isFramework = buildDir.extension == "framework"
                         moduleInfo.buildDir = buildDir
                         moduleInfo.definitionFile = getBuildDirectory().resolve("${moduleInfo.name}.def")
-                        logger.debug("Setup module DONE: {}", moduleInfo)
                     }
             }
         logger.debug(
             """
-            ModulesConfigs found
-            $moduleConfigs
+            Modules configured
+            ${moduleConfigs.joinToString("\n")}
             """.trimIndent(),
         )
         moduleConfigs.forEachIndexed { index, moduleConfig ->
@@ -175,7 +175,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     )
                 val moduleName =
                     extractModuleNameFromModuleMap(mapFile.readText())
-                        ?: throw Exception("No module name for ${moduleConfig.name} in mapFile")
+                        ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
                 val definition =
                     if (moduleConfig.isFramework) {
                         generateFrameworkDefinition(moduleName, moduleConfig)
@@ -188,11 +188,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         val md5 = "#checksum: $checksum"
                         if (index == 0) "$def\n$md5\nstaticLibraries = $libName" else def
                     }
-                if (definition.isNotEmpty()) {
-                    moduleConfig.definitionFile.writeText(definition.trimIndent())
-                } else {
-                    throw RuntimeException("Can't generate definition file")
-                }
+                moduleConfig.definitionFile.writeText(definition.trimIndent())
                 logger.debug(
                     """
                     ######

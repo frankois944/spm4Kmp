@@ -13,8 +13,8 @@ import java.io.Serializable
  * SDK names, triple identifiers, platform versions, and minimum OS versions.
  *
  * Utility methods:
- * - `getTriple(version: String)`: Constructs a triple identifier for the target.
- * - `getPackageBuildDir()`: Retrieves the build directory identifier specific to the target.
+ * - `triple(version: String)`: Constructs a triple identifier for the target.
+ * - `packageBuildDirName()`: Retrieves the build directory identifier specific to the target.
  * - `sdk()`: Determines the SDK name for the target.
  * - `getOsVersion(...)`: Resolves the minimum OS version for the target based on platform-specific inputs.
  * - `linkerPlatformVersionName()`: Retrieves the linker platform version flag for the target.
@@ -41,10 +41,9 @@ public enum class AppleCompileTarget : Serializable {
     macosArm64,
     ;
 
-    @Suppress("MaxLineLength")
-    internal fun getTriple(version: String): String = "${this.arch()}-apple-${this.osCompiler()}$version${this.simulatorSuffix()}"
+    internal fun triple(version: String) = "${this.arch()}-apple-${this.osCompiler()}$version${this.simulatorSuffix()}"
 
-    internal fun getPackageBuildDir(): String = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"
+    internal fun packageBuildDirName() = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"
 
     private fun osCompiler(): String =
         when (this) {

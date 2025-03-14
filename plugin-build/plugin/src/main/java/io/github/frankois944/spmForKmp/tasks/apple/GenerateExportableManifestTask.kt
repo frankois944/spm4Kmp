@@ -72,7 +72,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     fun generateFile() {
         val manifest =
             generateManifest(
-                packageDependencies.get(),
+                dependencies = packageDependencies.get(),
                 generatedPackageDirectory =
                     manifestFile
                         .get()

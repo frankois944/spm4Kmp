@@ -66,7 +66,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         taskGroup = taskGroup,
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
                         extension = extension,
-                        sourcePackageDir = spmWorkingDir,
+                        spmWorkingDir = spmWorkingDir,
                         packageScratchDir = packageScratchDir,
                         sharedCacheDir = sharedCacheDir,
                         sharedConfigDir = sharedConfigDir,
