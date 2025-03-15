@@ -40,7 +40,7 @@ internal fun Project.configAppleTargets(
             .withType(CInteropProcess::class.java)
             .filter {
                 it.name.startsWith("cinterop" + extension.name.capitalized())
-            }.mapNotNull { AppleCompileTarget.byKonanName(it.konanTarget.name) }
+            }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
 
     val manifestTask =
         tasks.register(

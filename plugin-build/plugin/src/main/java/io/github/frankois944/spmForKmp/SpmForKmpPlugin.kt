@@ -84,7 +84,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
                     if (HostManager.hostIsMac) {
                         val cinteropTarget =
-                            AppleCompileTarget.byKonanName(cinterop.konanTarget.name)
+                            AppleCompileTarget.fromKonanTarget(cinterop.konanTarget)
                                 ?: return@configureEach
                         taskGroup[cinteropTarget]?.let {
                             cinterop.dependsOn(taskGroup[cinteropTarget])

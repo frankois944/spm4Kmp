@@ -128,19 +128,19 @@ public enum class AppleCompileTarget : Serializable {
      * @see [org.jetbrains.kotlin.konan.target.KonanTarget](https://github.com/JetBrains/kotlin/blob/v2.1.0/native/utils/src/org/jetbrains/kotlin/konan/target/KonanTarget.kt)
      */
     internal companion object {
-        fun byKonanName(konanName: String): AppleCompileTarget? =
+        fun fromKonanTarget(konanName: KonanTarget): AppleCompileTarget? =
             when (konanName) {
-                KonanTarget.IOS_X64.name -> iosX64
-                KonanTarget.IOS_ARM64.name -> iosArm64
-                KonanTarget.IOS_SIMULATOR_ARM64.name -> iosSimulatorArm64
-                KonanTarget.WATCHOS_X64.name -> watchosX64
-                KonanTarget.WATCHOS_ARM64.name -> watchosArm64
-                KonanTarget.WATCHOS_SIMULATOR_ARM64.name -> watchosSimulatorArm64
-                KonanTarget.TVOS_X64.name -> tvosX64
-                KonanTarget.TVOS_ARM64.name -> tvosArm64
-                KonanTarget.TVOS_SIMULATOR_ARM64.name -> tvosSimulatorArm64
-                KonanTarget.MACOS_X64.name -> macosX64
-                KonanTarget.MACOS_ARM64.name -> macosArm64
+                KonanTarget.IOS_X64 -> iosX64
+                KonanTarget.IOS_ARM64 -> iosArm64
+                KonanTarget.IOS_SIMULATOR_ARM64 -> iosSimulatorArm64
+                KonanTarget.WATCHOS_X64 -> watchosX64
+                KonanTarget.WATCHOS_ARM64 -> watchosArm64
+                KonanTarget.WATCHOS_SIMULATOR_ARM64 -> watchosSimulatorArm64
+                KonanTarget.TVOS_X64 -> tvosX64
+                KonanTarget.TVOS_ARM64 -> tvosArm64
+                KonanTarget.TVOS_SIMULATOR_ARM64 -> tvosSimulatorArm64
+                KonanTarget.MACOS_X64 -> macosX64
+                KonanTarget.MACOS_ARM64 -> macosArm64
                 else -> null
             }
 
