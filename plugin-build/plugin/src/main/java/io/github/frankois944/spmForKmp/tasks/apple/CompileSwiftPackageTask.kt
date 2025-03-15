@@ -24,14 +24,6 @@ import javax.inject.Inject
 
 @CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
-    init {
-        description = "Compile the Swift Package manifest"
-        group = "io.github.frankois944.spmForKmp.tasks"
-        onlyIf {
-            HostManager.hostIsMac
-        }
-    }
-
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: Property<File>
@@ -73,6 +65,14 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     @get:Inject
     abstract val operation: ExecOperations
+
+    init {
+        description = "Compile the Swift Package manifest"
+        group = "io.github.frankois944.spmForKmp.tasks"
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
 
     @TaskAction
     fun compilePackage() {

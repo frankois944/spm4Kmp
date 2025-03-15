@@ -32,7 +32,7 @@ internal data class PackageImplicitDependencies(
             )
     }
 
-    fun getFolders(): Set<File> =
+    fun getPublicFolders(): Set<File> =
         searchInFolder(
             dependencies = this.dependencies,
         ).distinct()

@@ -25,7 +25,6 @@ internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
 internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
 
-@Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
     @Suppress("LongMethod")
     override fun apply(target: Project): Unit =
@@ -47,28 +46,28 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val taskGroup = mutableMapOf<AppleCompileTarget, Task>()
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
-                swiftPackageEntries.forEach { extension ->
+                swiftPackageEntries.forEach { swiftPackageEntry ->
 
                     val spmWorkingDir =
                         resolveAndCreateDir(
-                            File(extension.spmWorkingPath),
+                            File(swiftPackageEntry.spmWorkingPath),
                             "spmKmpPlugin",
-                            extension.name,
+                            swiftPackageEntry.name,
                         )
 
                     val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
-                    val sharedCacheDir: File? = extension.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
-                    val sharedConfigDir: File? = extension.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
-                    val sharedSecurityDir: File? = extension.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
+                    val sharedCacheDir = swiftPackageEntry.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
+                    val sharedConfigDir = swiftPackageEntry.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
+                    val sharedSecurityDir = swiftPackageEntry.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
                     val bridgeSourceDir =
                         resolveAndCreateDir(
-                            File(extension.customPackageSourcePath),
-                            extension.name,
+                            File(swiftPackageEntry.customPackageSourcePath),
+                            swiftPackageEntry.name,
                         )
                     configAppleTargets(
                         taskGroup = taskGroup,
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
-                        extension = extension,
+                        swiftPackageEntry = swiftPackageEntry,
                         packageDirectoriesConfig =
                             PackageDirectoriesConfig(
                                 spmWorkingDir = spmWorkingDir,

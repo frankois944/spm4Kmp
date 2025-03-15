@@ -239,18 +239,24 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleName: String,
         moduleConfig: ModuleConfig,
     ): String {
-        val implicitDependencies =
-            project
-                .getPackageImplicitDependencies(
-                    workingDir = manifestFile.asFile.get().parentFile,
-                    scratchPath = scratchDir.get(),
-                ).getFolders()
-
+        // There are some dirty hacks for getting the headers paths needed by cinterop
+        // Because, It's really difficult to extract the correct headers path from each dependency.
+        // Some manifests are heavily customized and use dynamic values.
         val headerSearchPaths =
             buildList {
+                // extract from the current module manifest the `publicHeadersPath` values
                 addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
-                addAll(implicitDependencies)
+                // extract the Public third-party dependencies' for all the modules
+                addAll(
+                    project
+                        .getPackageImplicitDependencies(
+                            workingDir = manifestFile.asFile.get().parentFile,
+                            scratchPath = scratchDir.get(),
+                        ).getPublicFolders(),
+                )
+                // extract the header from the SPM artifacts, which there are xcframework
                 addAll(findHeadersModule(scratchDir.get().resolve("artifacts"), target.get()))
+                // add the current build dir of the package where there are every built module
                 add(currentBuildDirectory().path)
             }.joinToString(" ") { "-I\"$it\"" }
 
