@@ -25,6 +25,7 @@ internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
 internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
 
+@Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
     @Suppress("LongMethod")
     override fun apply(target: Project): Unit =
