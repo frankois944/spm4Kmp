@@ -3,6 +3,7 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.configAppleTargets
 import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
@@ -68,12 +69,15 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         taskGroup = taskGroup,
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
                         extension = extension,
-                        spmWorkingDir = spmWorkingDir,
-                        packageScratchDir = packageScratchDir,
-                        sharedCacheDir = sharedCacheDir,
-                        sharedConfigDir = sharedConfigDir,
-                        sharedSecurityDir = sharedSecurityDir,
-                        bridgeSourceDir = bridgeSourceDir,
+                        packageDirectoriesConfig =
+                            PackageDirectoriesConfig(
+                                spmWorkingDir = spmWorkingDir,
+                                packageScratchDir = packageScratchDir,
+                                sharedCacheDir = sharedCacheDir,
+                                sharedConfigDir = sharedConfigDir,
+                                sharedSecurityDir = sharedSecurityDir,
+                                bridgeSourceDir = bridgeSourceDir,
+                            ),
                     )
                 }
                 // link the main definition File

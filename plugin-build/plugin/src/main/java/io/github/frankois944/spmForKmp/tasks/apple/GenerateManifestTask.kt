@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.resolvePackage
 import io.github.frankois944.spmForKmp.operations.swiftFormat
@@ -70,18 +71,21 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     fun generateFile() {
         val manifest =
             generateManifest(
-                packageDependencies.get(),
-                generatedPackageDirectory =
-                    manifestFile
-                        .get()
-                        .parentFile
-                        .toPath(),
-                productName = packageName.get(),
-                minIos = minIos.get(),
-                minMacos = minMacos.get(),
-                minTvos = minTvos.get(),
-                minWatchos = minWatchos.get(),
-                toolsVersion = toolsVersion.get(),
+                parameters =
+                    TemplateParameters(
+                        dependencies = packageDependencies.get(),
+                        generatedPackageDirectory =
+                            manifestFile
+                                .get()
+                                .parentFile
+                                .toPath(),
+                        productName = packageName.get(),
+                        minIos = minIos.get(),
+                        minMacos = minMacos.get(),
+                        minTvos = minTvos.get(),
+                        minWatchos = minWatchos.get(),
+                        toolsVersion = toolsVersion.get(),
+                    ),
             )
         manifestFile.get().writeText(manifest)
         try {

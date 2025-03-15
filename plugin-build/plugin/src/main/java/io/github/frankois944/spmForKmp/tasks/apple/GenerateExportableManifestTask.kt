@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.swiftFormat
 import org.gradle.api.DefaultTask
@@ -72,18 +73,21 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     fun generateFile() {
         val manifest =
             generateManifest(
-                dependencies = packageDependencies.get(),
-                generatedPackageDirectory =
-                    manifestFile
-                        .get()
-                        .asFile.parentFile
-                        .toPath(),
-                productName = packageName.get(),
-                minIos = minIos.get(),
-                minMacos = minMacos.get(),
-                minTvos = minTvos.get(),
-                minWatchos = minWatchos.get(),
-                toolsVersion = toolsVersion.get(),
+                parameters =
+                    TemplateParameters(
+                        dependencies = packageDependencies.get(),
+                        generatedPackageDirectory =
+                            manifestFile
+                                .get()
+                                .asFile.parentFile
+                                .toPath(),
+                        productName = packageName.get(),
+                        minIos = minIos.get(),
+                        minMacos = minMacos.get(),
+                        minTvos = minTvos.get(),
+                        minWatchos = minWatchos.get(),
+                        toolsVersion = toolsVersion.get(),
+                    ),
             )
         manifestFile.asFile.get().writeText(manifest)
         try {

@@ -69,7 +69,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         get() =
             buildList {
                 getModuleConfigs().forEach { moduleName ->
-                    add(getBuildDirectory().resolve("${moduleName.name}.def"))
+                    add(currentBuildDirectory().resolve("${moduleName.name}.def"))
                 }
             }
 
@@ -81,7 +81,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         }
     }
 
-    private fun getBuildDirectory(): File =
+    private fun currentBuildDirectory(): File =
         compiledBinary
             .asFile
             .get()
@@ -145,7 +145,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @TaskAction
     fun generateDefinitions() {
         val moduleConfigs = getModuleConfigs()
-        val buildDirContent = getModulesInBuildDirectory(getBuildDirectory())
+        val buildDirContent = getModulesInBuildDirectory(currentBuildDirectory())
         // find the build directory of the declared module in the manifest
         moduleConfigs
             .forEach { moduleInfo ->
@@ -157,7 +157,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     }?.let { buildDir ->
                         moduleInfo.isFramework = buildDir.extension == "framework"
                         moduleInfo.buildDir = buildDir
-                        moduleInfo.definitionFile = getBuildDirectory().resolve("${moduleInfo.name}.def")
+                        moduleInfo.definitionFile = currentBuildDirectory().resolve("${moduleInfo.name}.def")
                     }
             }
         logger.debug(
@@ -229,9 +229,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             language = Objective-C
             modules = $moduleName
             package = $packageName
-            libraryPaths = "${getBuildDirectory().path}"
-            compilerOpts = $compilerOpts -fmodules -framework "$frameworkName" -F"${getBuildDirectory().path}"
-            linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${getBuildDirectory().path}"
+            libraryPaths = "${currentBuildDirectory().path}"
+            compilerOpts = $compilerOpts -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+            linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
             """.trimIndent()
     }
 
@@ -251,7 +251,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
                 addAll(implicitDependencies)
                 addAll(findHeadersModule(scratchDir.get().resolve("artifacts"), target.get()))
-                add(getBuildDirectory().path)
+                add(currentBuildDirectory().path)
             }.joinToString(" ") { "-I\"$it\"" }
 
         val packageName =
@@ -264,9 +264,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             language = Objective-C
             modules = $moduleName
             package = $packageName
-            libraryPaths = "${getBuildDirectory().path}"
-            compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${getBuildDirectory().path}"
-            linkerOpts = $linkerOps ${getExtraLinkers()} -F"${getBuildDirectory().path}"
+            libraryPaths = "${currentBuildDirectory().path}"
+            compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${currentBuildDirectory().path}"
+            linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
             """.trimIndent()
     }
 }

@@ -4,47 +4,45 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import java.nio.file.Path
 import kotlin.io.path.relativeToOrSelf
 
-@Suppress("LongParameterList")
-internal fun generateManifest(
-    dependencies: List<SwiftDependency>,
-    generatedPackageDirectory: Path,
-    productName: String,
-    minIos: String,
-    minMacos: String,
-    minTvos: String,
-    minWatchos: String,
-    toolsVersion: String,
-): String {
+internal fun generateManifest(parameters: TemplateParameters): String {
     var binaryDependencies =
         listOfNotNull(
-            getLocaleBinary(dependencies, generatedPackageDirectory).takeIf { it.isNotEmpty() },
-            getRemoteBinary(dependencies).takeIf { it.isNotEmpty() },
+            getLocaleBinary(parameters.dependencies, parameters.generatedPackageDirectory).takeIf { it.isNotEmpty() },
+            getRemoteBinary(parameters.dependencies).takeIf { it.isNotEmpty() },
         ).joinToString(",")
     if (binaryDependencies.isNotEmpty()) {
         binaryDependencies = ",$binaryDependencies"
     }
 
+    val platforms =
+        getPlatformBlock(
+            minIos = parameters.minIos,
+            minMacos = parameters.minMacos,
+            minTvos = parameters.minTvos,
+            minWatchos = parameters.minWatchos,
+        )
+
     return """
-        // swift-tools-version: $toolsVersion
+        // swift-tools-version: ${parameters.toolsVersion}
         import PackageDescription
 
         let package = Package(
-            name: "$productName",
-            ${getPlatformBlock(minIos, minMacos, minTvos, minWatchos)},
+            name: "${parameters.productName}",
+            $platforms,
             products: [
                 .library(
-                    name: "$productName",
+                    name: "${parameters.productName}",
                     type: .static,
-                    targets: [${getProductsTargets(productName, dependencies)}])
+                    targets: [${getProductsTargets(parameters.productName, parameters.dependencies)}])
             ],
             dependencies: [
-                ${getDependencies(dependencies)}
+                ${getDependencies(parameters.dependencies)}
             ],
             targets: [
                 .target(
-                    name: "$productName",
+                    name: "${parameters.productName}",
                     dependencies: [
-                        ${getDependenciesTargets(dependencies)}
+                        ${getDependenciesTargets(parameters.dependencies)}
                     ],
                     path: "Sources")
                 $binaryDependencies
