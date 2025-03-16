@@ -28,6 +28,12 @@ public interface SwiftSettingConfig : Serializable {
 
     /**
      * Defines a -language-mode to pass to the corresponding build tool.
+
+     *  A user-defined value for the Swift version: 4, 5, 6
+     *
+     *  Available on swift-tools-version > 6.0
+     *
+     * [Reference](https://developer.apple.com/documentation/packagedescription/swiftlanguagemode)
      */
     public var swiftLanguageMode: String?
 

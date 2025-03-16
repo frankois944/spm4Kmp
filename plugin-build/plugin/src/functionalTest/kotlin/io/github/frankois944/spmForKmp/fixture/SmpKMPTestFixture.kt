@@ -12,6 +12,7 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductConfig
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.gradle.internal.cc.base.logger
+import org.intellij.lang.annotations.Language
 
 abstract class SmpKMPTestFixture private constructor(
     private val configuration: TestConfiguration,
@@ -42,6 +43,7 @@ abstract class SmpKMPTestFixture private constructor(
         val customSPMPath: String? = null,
         val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
+        val rawPluginRootConfig: String? = null,
     )
 
     protected abstract fun createProject(): GradleProject
@@ -200,6 +202,9 @@ swiftPackageConfig {
                             appendLine(")")
                         }
 
+                    extension.rawPluginRootConfig?.let {
+                        appendLine(it)
+                    }
                     appendLine("    dependency(     ")
                     extension.rawDependencyConfiguration.forEach { rawDependency ->
                         appendLine(rawDependency.content + ",")
@@ -416,6 +421,12 @@ swiftPackageConfig {
             apply {
                 config = config.copy(rawPluginConfiguration = sources.toList())
             }
+
+        fun appendRawPluginRootConfig(
+            @Language("kotlin") source: String,
+        ) = apply {
+            config = config.copy(rawPluginRootConfig = source)
+        }
 
         fun withPackageDependencyPrefix(prefix: String?) =
             apply {

@@ -193,10 +193,10 @@ public abstract class PackageRootDefinitionExtension
          * a configuration block where settings can be defined for compilers (C, C++, Swift)
          * and linker options. These settings adjust the behavior of the package during the build process.
          *
-         * @param packageSettings A configuration block of type `PackageSettingConfig`. The block allows
+         * @param targetSettings A configuration block of type `PackageSettingConfig`. The block allows
          * specifying various compiler and linker settings needed for the package build.
          */
-        public fun packageSettings(settings: TargetSettingsConfig.() -> Unit) {
-            targetSettings.apply(settings)
+        public fun targetSettings(setting: TargetSettingsConfig.() -> Unit) {
+            targetSettings.apply(setting)
         }
     }
