@@ -39,7 +39,7 @@ class CustomSettingsTest : BaseTest() {
                         }
                         swiftSettings {
                             defines = listOf("CUSTOM_DEFINE")
-                            enableExperimentalFeature = "CImplementation"
+                           // enableExperimentalFeature = "CImplementation"
                             enableUpcomingFeature = "ExistentialAny"
                             interoperabilityMode = "Cxx"
                         }
