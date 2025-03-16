@@ -21,14 +21,14 @@ class CustomSettingsTest : BaseTest() {
                     AppleCompileTarget.iosSimulatorArm64,
                 ).appendRawPluginRootConfig(
                     """
-                     targetSettings {
+                    targetSettings {
                         cSetting {
-                            defines = listOf(Pair("DEBUG", "2"))
+                            defines = listOf(Pair("C_DEBUG", "2"))
                             headerSearchPath = listOf("./includes/")
                             unsafeFlags = listOf("-W")
                         }
                         cxxSetting {
-                            defines = listOf(Pair("DEBUG", "1"))
+                            defines = listOf(Pair("CXX_DEBUG", "1"))
                             headerSearchPath = listOf("./includes/")
                             unsafeFlags = listOf("-W")
                         }
@@ -39,7 +39,7 @@ class CustomSettingsTest : BaseTest() {
                         }
                         swiftSettings {
                             defines = listOf("CUSTOM_DEFINE")
-                           // enableExperimentalFeature = "CImplementation"
+                            enableExperimentalFeature = "CImplementation"
                             enableUpcomingFeature = "ExistentialAny"
                             interoperabilityMode = "Cxx"
                         }
@@ -50,10 +50,12 @@ class CustomSettingsTest : BaseTest() {
                         content =
                             """
                             import Foundation
+                            #if CUSTOM_DEFINE
+                            import UIKit
+                            #endif
+
                             @objc public class MySwiftDummyClass: NSObject {
-                                #if CUSTOM_DEFINE
-                                    dsfsdfsddsf
-                                #endif
+                                private let view: UIView = UIView()
                             }
                             """.trimIndent(),
                     ),
