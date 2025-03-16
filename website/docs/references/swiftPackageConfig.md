@@ -175,11 +175,11 @@ public var spmWorkingPath: String
 
 ### targetSettings
 
-Configures package-level settings by applying the specified configuration options.
+Configures the bridge settings by applying the specified configuration options.
 
-This method allows customization of the package's build settings by providing
+This method allows customization of the bridge's build settings by providing
 a configuration block where settings can be defined for compilers (C, C++, Swift)
-and linker options. These settings adjust the behavior of the package during the build process.
+and linker options. These settings adjust the behavior of the bridge during the build process.
 
 - targetSettings A configuration block of type `PackageSettingConfig`. The block allows
   specifying various compiler and linker settings needed for the package build.
