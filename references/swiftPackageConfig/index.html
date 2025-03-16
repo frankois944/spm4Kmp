@@ -1371,7 +1371,7 @@ remote, branch-based remote, or commit-based remote dependencies.</p>
 a configuration block where settings can be defined for compilers (C, C++, Swift)
 and linker options. These settings adjust the behavior of the bridge during the build process.</p>
 <ul>
-<li>setting A configuration block of type <code>PackageSettingConfig</code>. The block allows
+<li>setting A configuration block of type <code>BridgeSettingsConfig</code>. The block allows
   specifying various compiler and linker settings needed for the package build.</li>
 </ul>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">bridgeSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">BridgeSettingsConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
