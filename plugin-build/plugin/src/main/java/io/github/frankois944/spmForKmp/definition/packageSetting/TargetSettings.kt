@@ -10,13 +10,13 @@ import io.github.frankois944.spmForKmp.definition.packageSetting.swiftSetting.Sw
 import io.github.frankois944.spmForKmp.definition.packageSetting.swiftSetting.SwiftSettingConfig
 import java.io.Serializable
 
-internal data class PackageSetting(
+internal data class TargetSettings(
     var cSettings: CSettingConfig = CSetting(),
     var cxxSettings: CxxSettingConfig = CxxSetting(),
     var swiftSettings: SwiftSettingConfig = SwiftSetting(),
     var linkerSettings: LinkerSettingConfig = LinkerSetting(),
 ) : Serializable,
-    PackageSettingConfig {
+    TargetSettingsConfig {
     override fun cSetting(setting: CSettingConfig.() -> Unit) {
         cSettings.apply(setting)
     }
@@ -34,6 +34,6 @@ internal data class PackageSetting(
     }
 
     internal companion object {
-        private const val serialVersionUID: Long = 2
+        private const val serialVersionUID: Long = 1
     }
 }

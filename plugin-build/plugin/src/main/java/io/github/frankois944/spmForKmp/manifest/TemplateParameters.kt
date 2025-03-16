@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.manifest
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.packageSetting.TargetSettings
 import java.nio.file.Path
 
 internal data class TemplateParameters(
@@ -12,4 +13,5 @@ internal data class TemplateParameters(
     val minTvos: String,
     val minWatchos: String,
     val toolsVersion: String,
+    val targetSettings: TargetSettings?,
 )

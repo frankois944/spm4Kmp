@@ -87,6 +87,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                         minTvos = minTvos.get(),
                         minWatchos = minWatchos.get(),
                         toolsVersion = toolsVersion.get(),
+                        targetSettings = null,
                     ),
             )
         manifestFile.asFile.get().writeText(manifest)

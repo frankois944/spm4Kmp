@@ -2,13 +2,13 @@
 
 package io.github.frankois944.spmForKmp.definition
 
-import io.github.frankois944.spmForKmp.definition.packageSetting.PackageSetting
-import io.github.frankois944.spmForKmp.definition.packageSetting.PackageSettingConfig
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_IOS_VERSION
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_MAC_OS_VERSION
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_TV_OS_VERSION
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_WATCH_OS_VERSION
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_TOOL_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_IOS_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_MAC_OS_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_TV_OS_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_WATCH_OS_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_TOOL_VERSION
+import io.github.frankois944.spmForKmp.definition.packageSetting.TargetSettings
+import io.github.frankois944.spmForKmp.definition.packageSetting.TargetSettingsConfig
 import org.gradle.api.Project
 import javax.inject.Inject
 import kotlin.io.path.Path
@@ -184,7 +184,7 @@ public abstract class PackageRootDefinitionExtension
                 .get()
                 .path
 
-        internal var packageSetting: PackageSettingConfig = PackageSetting()
+        internal var targetSettings: TargetSettingsConfig = TargetSettings()
 
         /**
          * Configures package-level settings by applying the specified configuration options.
@@ -196,7 +196,7 @@ public abstract class PackageRootDefinitionExtension
          * @param packageSettings A configuration block of type `PackageSettingConfig`. The block allows
          * specifying various compiler and linker settings needed for the package build.
          */
-        public fun packageSettings(settings: PackageSettingConfig.() -> Unit) {
-            packageSetting.apply(settings)
+        public fun packageSettings(settings: TargetSettingsConfig.() -> Unit) {
+            targetSettings.apply(settings)
         }
     }

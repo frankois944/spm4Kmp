@@ -6,7 +6,7 @@ import io.github.frankois944.spmForKmp.definition.packageSetting.linkerSetting.L
 import io.github.frankois944.spmForKmp.definition.packageSetting.swiftSetting.SwiftSettingConfig
 import java.io.Serializable
 
-public interface PackageSettingConfig : Serializable {
+public interface TargetSettingsConfig : Serializable {
     /**
      * The target’s C build settings.
      *
