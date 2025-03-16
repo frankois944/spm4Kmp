@@ -20,7 +20,11 @@ internal fun generateManifest(parameters: TemplateParameters): String {
             minWatchos = parameters.minWatchos,
         )
 
-    val getTargetSetting = getTargetSettings(parameters.targetSettings).takeIf { it.isNotEmpty() }
+    val getTargetSetting =
+        getTargetSettings(
+            swiftBuildDir = parameters.generatedPackageDirectory,
+            settings = parameters.targetSettings,
+        ).takeIf { it.isNotEmpty() }
 
     return """
         // swift-tools-version: ${parameters.toolsVersion}

@@ -108,8 +108,8 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             logger.error(
                 """
                 Manifest file generated :
-                ${manifestFile.get()}
-                ${manifestFile.get().readText()}
+                ${manifestFile.get()}manifestFile.get()}
+                ${manifestFile.get().readText()}manifestFile.get().readText()}
                 """.trimIndent(),
             )
             throw ex

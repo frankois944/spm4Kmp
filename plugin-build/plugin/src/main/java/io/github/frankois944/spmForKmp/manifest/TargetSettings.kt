@@ -5,15 +5,20 @@ import io.github.frankois944.spmForKmp.definition.packageSetting.cSetting.CSetti
 import io.github.frankois944.spmForKmp.definition.packageSetting.cxxSetting.CxxSettingConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.linkerSetting.LinkerSettingConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.swiftSetting.SwiftSettingConfig
+import java.nio.file.Path
+import kotlin.io.path.relativeToOrSelf
 
-internal fun getTargetSettings(settings: TargetSettings?): String =
+internal fun getTargetSettings(
+    settings: TargetSettings?,
+    swiftBuildDir: Path,
+): String =
     buildList {
         settings?.run {
-            val cSettings = getCSettings(cSettings)
+            val cSettings = getCSettings(cSettings, swiftBuildDir)
             if (cSettings.isNotEmpty()) {
                 add("cSettings: [$cSettings]")
             }
-            val cxxSettings = getCXXSettings(cxxSettings)
+            val cxxSettings = getCXXSettings(cxxSettings, swiftBuildDir)
             if (cxxSettings.isNotEmpty()) {
                 add("cxxSettings: [$cxxSettings]")
             }
@@ -26,33 +31,41 @@ internal fun getTargetSettings(settings: TargetSettings?): String =
                 add("linkerSettings: [$linkerSettings]")
             }
         }
-    }.joinToString(",")
+    }.joinToString(",\n")
 
-private fun getCSettings(settings: CSettingConfig): String =
+private fun getCSettings(
+    settings: CSettingConfig,
+    swiftBuildDir: Path,
+): String =
     buildList {
         settings.defines.forEach {
-            add(".define(\"${it.first}\", value: \"${it.second}\")")
+            add(".define(\"${it.first}\", to: \"${it.second}\")")
         }
         settings.headerSearchPath.forEach {
-            add(".headerSearchPath(\"${it}\")")
+            val path = Path.of(it).relativeToOrSelf(swiftBuildDir)
+            add(".headerSearchPath(\"$path\")")
         }
         if (settings.unsafeFlags.isNotEmpty()) {
             add(".unsafeFlags([${settings.unsafeFlags.joinToString(",") { "\"$it\"" }}])")
         }
-    }.joinToString(",")
+    }.joinToString(",\n")
 
-private fun getCXXSettings(settings: CxxSettingConfig): String =
+private fun getCXXSettings(
+    settings: CxxSettingConfig,
+    swiftBuildDir: Path,
+): String =
     buildList {
         settings.defines.forEach {
-            add(".define(\"${it.first}\", value: \"${it.second}\")")
+            add(".define(\"${it.first}\", to: \"${it.second}\")")
         }
         settings.headerSearchPath.forEach {
-            add(".headerSearchPath(\"${it}\")")
+            val path = Path.of(it).relativeToOrSelf(swiftBuildDir)
+            add(".headerSearchPath(\"$path\")")
         }
         if (settings.unsafeFlags.isNotEmpty()) {
             add(".unsafeFlags([${settings.unsafeFlags.joinToString(",") { "\"$it\"" }}])")
         }
-    }.joinToString(",")
+    }.joinToString(",\n")
 
 private fun getSwiftSettings(settings: SwiftSettingConfig): String =
     buildList {
@@ -69,12 +82,12 @@ private fun getSwiftSettings(settings: SwiftSettingConfig): String =
             add(".enableUpcomingFeature(\"${it}\")")
         }
         settings.interoperabilityMode?.let {
-            add(".interoperabilityMode(\".${it}\")")
+            add(".interoperabilityMode(.$it)")
         }
         settings.swiftLanguageMode?.let {
-            add(".swiftLanguageMode(\"${it}\")")
+            add(".swiftLanguageMode(.version(\"$it\"))")
         }
-    }.joinToString(",")
+    }.joinToString(",\n")
 
 private fun getLinkerSettings(settings: LinkerSettingConfig): String =
     buildList {
@@ -87,4 +100,4 @@ private fun getLinkerSettings(settings: LinkerSettingConfig): String =
         if (settings.unsafeFlags.isNotEmpty()) {
             add(".unsafeFlags([${settings.unsafeFlags.joinToString(",") { "\"$it\"" }}])")
         }
-    }.joinToString(",")
+    }.joinToString(",\n")
