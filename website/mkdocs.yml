@@ -44,8 +44,8 @@ nav:
       - references/swiftDependency.md
       - references/productPackageConfig.md
       - references/productName.md
-      - references/targetSettingsConfig.md
       - TargetSettings:
+          - references/targetSettingsConfig.md
           - references/targetSettingsConfigs/CSettingConfig.md
           - references/targetSettingsConfigs/CxxSettingConfig.md
           - references/targetSettingsConfigs/LinkerSettingConfig.md
