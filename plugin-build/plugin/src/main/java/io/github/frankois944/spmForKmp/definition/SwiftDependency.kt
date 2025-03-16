@@ -141,11 +141,14 @@ public sealed interface SwiftDependency : Serializable {
              */
             public data class Version(
                 public override val url: URI,
-                public override val packageName: String = buildPackageName(url),
+                public override var packageName: String = "",
                 public val version: String,
                 public override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
+                    if (packageName.isEmpty()) {
+                        packageName = buildPackageName(url)
+                    }
                     productsConfig.apply(products)
                 }
             }
@@ -160,11 +163,14 @@ public sealed interface SwiftDependency : Serializable {
              */
             public data class Branch(
                 public override val url: URI,
-                public override val packageName: String = buildPackageName(url),
+                public override var packageName: String = "",
                 public val branch: String,
                 override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
+                    if (packageName.isEmpty()) {
+                        packageName = buildPackageName(url)
+                    }
                     productsConfig.apply(products)
                 }
             }
@@ -179,11 +185,14 @@ public sealed interface SwiftDependency : Serializable {
              */
             public data class Commit(
                 public override val url: URI,
-                public override val packageName: String = buildPackageName(url),
+                public override var packageName: String = "",
                 public val revision: String,
                 override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
+                    if (packageName.isEmpty()) {
+                        packageName = buildPackageName(url)
+                    }
                     productsConfig.apply(products)
                 }
             }

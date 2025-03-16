@@ -2,11 +2,15 @@
 
 package io.github.frankois944.spmForKmp.definition
 
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_IOS_VERSION
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_MAC_OS_VERSION
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_TV_OS_VERSION
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_WATCH_OS_VERSION
-import io.github.frankois944.spmForKmp.manifest.DEFAULT_TOOL_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_IOS_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_MAC_OS_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_TV_OS_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_WATCH_OS_VERSION
+import io.github.frankois944.spmForKmp.config.DEFAULT_TOOL_VERSION
+import io.github.frankois944.spmForKmp.definition.dependency.Dependency
+import io.github.frankois944.spmForKmp.definition.dependency.DependencyConfig
+import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
+import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettingsConfig
 import org.gradle.api.Project
 import javax.inject.Inject
 import kotlin.io.path.Path
@@ -141,8 +145,26 @@ public abstract class PackageRootDefinitionExtension
          * It supports different dependency models such as local, versioned
          * remote, branch-based remote, or commit-based remote dependencies.
          */
+        @Deprecated(
+            "Use dependency2(dependency: DependencyConfig.() -> Unit)",
+        )
         public fun dependency(vararg dependency: SwiftDependency) {
             packageDependencies.addAll(dependency)
+        }
+
+        internal val packageDependencies2: DependencyConfig = Dependency()
+
+        /**
+         * Adds one or more Swift dependencies to the dependencies list.
+         *
+         * @param dependencies
+         * This can include local or remote dependencies in the form of
+         * Swift packages or binary `xcframework` bundles.
+         * It supports different dependency models such as local, versioned
+         * remote, branch-based remote, or commit-based remote dependencies.
+         */
+        public fun dependency2(dependencies: DependencyConfig.() -> Unit) {
+            packageDependencies2.apply(dependencies)
         }
 
         /**
@@ -181,4 +203,20 @@ public abstract class PackageRootDefinitionExtension
             project.layout.buildDirectory.asFile
                 .get()
                 .path
+
+        internal var bridgeSettings: BridgeSettingsConfig = BridgeSettings()
+
+        /**
+         * Configures bridge-level settings by applying the specified configuration options.
+         *
+         * This method allows customization of the bridge's build settings by providing
+         * a configuration block where settings can be defined for compilers (C, C++, Swift)
+         * and linker options. These settings adjust the behavior of the bridge during the build process.
+         *
+         * @param bridgeSettings A configuration block of type `PackageSettingConfig`. The block allows
+         * specifying various compiler and linker settings needed for the bridge build.
+         */
+        public fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit) {
+            bridgeSettings.apply(setting)
+        }
     }
