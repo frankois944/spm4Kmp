@@ -10,13 +10,13 @@ import io.github.frankois944.spmForKmp.definition.packageSetting.swiftSetting.Sw
 import io.github.frankois944.spmForKmp.definition.packageSetting.swiftSetting.SwiftSettingConfig
 import java.io.Serializable
 
-internal data class TargetSettings(
+internal data class BridgeSettings(
     var cSettings: CSettingConfig = CSetting(),
     var cxxSettings: CxxSettingConfig = CxxSetting(),
     var swiftSettings: SwiftSettingConfig = SwiftSetting(),
     var linkerSettings: LinkerSettingConfig = LinkerSetting(),
 ) : Serializable,
-    TargetSettingsConfig {
+    BridgeSettingsConfig {
     override fun cSetting(setting: CSettingConfig.() -> Unit) {
         cSettings.apply(setting)
     }

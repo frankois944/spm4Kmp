@@ -8,7 +8,7 @@ import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
-import io.github.frankois944.spmForKmp.definition.packageSetting.TargetSettings
+import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateExportableManifestTask
@@ -176,7 +176,7 @@ private fun GenerateManifestTask.configureManifestTask(
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir)
     this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
-    this.targetSettings.set(swiftPackageEntry.targetSettings as TargetSettings)
+    this.targetSettings.set(swiftPackageEntry.bridgeSettings as BridgeSettings)
 }
 
 private fun GenerateExportableManifestTask.configureExportableManifestTask(
