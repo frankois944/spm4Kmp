@@ -2,6 +2,8 @@
 
 package io.github.frankois944.spmForKmp.definition
 
+import io.github.frankois944.spmForKmp.definition.packageSetting.PackageSetting
+import io.github.frankois944.spmForKmp.definition.packageSetting.PackageSettingConfig
 import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_IOS_VERSION
 import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_MAC_OS_VERSION
 import io.github.frankois944.spmForKmp.manifest.DEFAULT_MIN_TV_OS_VERSION
@@ -181,4 +183,20 @@ public abstract class PackageRootDefinitionExtension
             project.layout.buildDirectory.asFile
                 .get()
                 .path
+
+        internal var packageSetting: PackageSettingConfig = PackageSetting()
+
+        /**
+         * Configures package-level settings by applying the specified configuration options.
+         *
+         * This method allows customization of the package's build settings by providing
+         * a configuration block where settings can be defined for compilers (C, C++, Swift)
+         * and linker options. These settings adjust the behavior of the package during the build process.
+         *
+         * @param packageSettings A configuration block of type `PackageSettingConfig`. The block allows
+         * specifying various compiler and linker settings needed for the package build.
+         */
+        public fun packageSettings(settings: PackageSettingConfig.() -> Unit) {
+            packageSetting.apply(settings)
+        }
     }
