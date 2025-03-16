@@ -4,7 +4,7 @@
 
 The target’s C build settings.
 
-[Reference](https://developer.apple.com/documentation/packagedescription/target/csettings)
+[Swift Reference](https://developer.apple.com/documentation/packagedescription/target/csettings)
 
 ``` kotlin
 public fun cSetting(setting: CSettingConfig.() -> Unit)
@@ -14,7 +14,7 @@ public fun cSetting(setting: CSettingConfig.() -> Unit)
 
 The target’s C++ build settings.
 
-[Reference](https://developer.apple.com/documentation/packagedescription/target/cxxsettings)
+[Swift Reference](https://developer.apple.com/documentation/packagedescription/target/cxxsettings)
 
 ``` kotlin
 public fun cxxSetting(setting: CxxSettingConfig.() -> Unit)
@@ -24,7 +24,7 @@ public fun cxxSetting(setting: CxxSettingConfig.() -> Unit)
 
 The target’s Swift build settings.
 
-[Reference](https://developer.apple.com/documentation/packagedescription/target/swiftsettings)
+[Swift Reference](https://developer.apple.com/documentation/packagedescription/target/swiftsettings)
 
 ``` kotlin
 public fun swiftSettings(setting: SwiftSettingConfig.() -> Unit)
@@ -34,7 +34,7 @@ public fun swiftSettings(setting: SwiftSettingConfig.() -> Unit)
 
 The target’s linker settings.
 
-[Reference](https://developer.apple.com/documentation/packagedescription/target/linkersettings)
+[Swift Reference](https://developer.apple.com/documentation/packagedescription/target/linkersettings)
 
 ``` kotlin
 public fun linkerSetting(setting: LinkerSettingConfig.() -> Unit)
