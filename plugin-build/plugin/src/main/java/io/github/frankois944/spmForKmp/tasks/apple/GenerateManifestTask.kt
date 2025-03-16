@@ -1,7 +1,7 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.definition.packageSetting.TargetSettings
+import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.resolvePackage
@@ -61,7 +61,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     abstract val manifestFile: Property<File>
 
     @get:Input
-    abstract val targetSettings: Property<TargetSettings>
+    abstract val targetSettings: Property<BridgeSettings>
 
     init {
         description = "Generate a Swift Package manifest"

@@ -1,6 +1,6 @@
 package io.github.frankois944.spmForKmp.manifest
 
-import io.github.frankois944.spmForKmp.definition.packageSetting.TargetSettings
+import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.definition.packageSetting.cSetting.CSettingConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.cxxSetting.CxxSettingConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.linkerSetting.LinkerSettingConfig
@@ -9,7 +9,7 @@ import java.nio.file.Path
 import kotlin.io.path.relativeToOrSelf
 
 internal fun getTargetSettings(
-    settings: TargetSettings?,
+    settings: BridgeSettings?,
     swiftBuildDir: Path,
 ): String =
     buildList {

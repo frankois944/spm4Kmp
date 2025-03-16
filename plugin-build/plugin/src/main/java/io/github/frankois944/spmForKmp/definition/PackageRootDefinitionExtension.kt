@@ -7,8 +7,8 @@ import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_MAC_OS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_TV_OS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_WATCH_OS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_TOOL_VERSION
-import io.github.frankois944.spmForKmp.definition.packageSetting.TargetSettings
-import io.github.frankois944.spmForKmp.definition.packageSetting.TargetSettingsConfig
+import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
+import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettingsConfig
 import org.gradle.api.Project
 import javax.inject.Inject
 import kotlin.io.path.Path
@@ -184,19 +184,19 @@ public abstract class PackageRootDefinitionExtension
                 .get()
                 .path
 
-        internal var targetSettings: TargetSettingsConfig = TargetSettings()
+        internal var bridgeSettings: BridgeSettingsConfig = BridgeSettings()
 
         /**
-         * Configures package-level settings by applying the specified configuration options.
+         * Configures bridge-level settings by applying the specified configuration options.
          *
-         * This method allows customization of the package's build settings by providing
+         * This method allows customization of the bridge's build settings by providing
          * a configuration block where settings can be defined for compilers (C, C++, Swift)
-         * and linker options. These settings adjust the behavior of the package during the build process.
+         * and linker options. These settings adjust the behavior of the bridge during the build process.
          *
-         * @param targetSettings A configuration block of type `PackageSettingConfig`. The block allows
-         * specifying various compiler and linker settings needed for the package build.
+         * @param bridgeSettings A configuration block of type `PackageSettingConfig`. The block allows
+         * specifying various compiler and linker settings needed for the bridge build.
          */
-        public fun targetSettings(setting: TargetSettingsConfig.() -> Unit) {
-            targetSettings.apply(setting)
+        public fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit) {
+            bridgeSettings.apply(setting)
         }
     }

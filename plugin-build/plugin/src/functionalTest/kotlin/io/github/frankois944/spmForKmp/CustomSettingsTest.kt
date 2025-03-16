@@ -21,7 +21,7 @@ class CustomSettingsTest : BaseTest() {
                     AppleCompileTarget.iosSimulatorArm64,
                 ).appendRawPluginRootConfig(
                     """
-                    targetSettings {
+                    bridgeSettings {
                         cSetting {
                             defines = listOf(Pair("C_DEBUG", "2"))
                             headerSearchPath = listOf("./includes/")

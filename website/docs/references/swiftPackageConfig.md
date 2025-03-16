@@ -185,5 +185,5 @@ and linker options. These settings adjust the behavior of the bridge during the 
   specifying various compiler and linker settings needed for the package build.
 
 ``` kotlin
-public fun targetSettings(setting: TargetSettingsConfig.() -> Unit)
+public fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit)
 ```

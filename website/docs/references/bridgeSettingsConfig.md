@@ -1,4 +1,4 @@
-# TargetSettingsConfig
+# BridgeSettingsConfig
 
 ## cSetting
 
