@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.manifest
+package io.github.frankois944.spmForKmp.config
 
 /**
  * DEFAULT_MIN_IOS_VERSION: 12.0

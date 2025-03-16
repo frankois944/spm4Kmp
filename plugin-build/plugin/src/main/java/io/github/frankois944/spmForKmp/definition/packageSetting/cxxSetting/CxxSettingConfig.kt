@@ -9,7 +9,7 @@ public interface CxxSettingConfig : Serializable {
     /**
      * Defines a value for a macro.
      */
-    public var defines: List<Map<String, String?>>
+    public var defines: List<Pair<String, String?>>
 
     /**
      * Provides a header search path relative to the target’s directory.

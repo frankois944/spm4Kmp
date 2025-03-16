@@ -34,7 +34,7 @@ public interface SwiftSettingConfig : Serializable {
     /**
      * Enable Swift interoperability with a given language.
      *
-     * C / Cxx
+     * available values : C, Cxx
      */
     public var interoperabilityMode: String?
 }
