@@ -22,7 +22,9 @@ let package = Package(
       dependencies: [
         .product(name: "LocalSourceDummyFramework", package: "LocalSourceDummyFramework")
       ],
-      path: "Sources")
+      path: "Sources"
+
+    )
 
   ]
 )
