@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.resolvePackage
@@ -59,6 +60,9 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:OutputFile
     abstract val manifestFile: Property<File>
 
+    @get:Input
+    abstract val targetSettings: Property<BridgeSettings>
+
     init {
         description = "Generate a Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -85,6 +89,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                         minTvos = minTvos.get(),
                         minWatchos = minWatchos.get(),
                         toolsVersion = toolsVersion.get(),
+                        targetSettings = targetSettings.get(),
                     ),
             )
         manifestFile.get().writeText(manifest)
@@ -103,8 +108,8 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             logger.error(
                 """
                 Manifest file generated :
-                ${manifestFile.get()}
-                ${manifestFile.get().readText()}
+                ${manifestFile.get()}manifestFile.get()}
+                ${manifestFile.get().readText()}manifestFile.get().readText()}
                 """.trimIndent(),
             )
             throw ex

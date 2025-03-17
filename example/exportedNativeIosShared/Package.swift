@@ -29,7 +29,9 @@ let package = Package(
         .product(name: "CryptoSwift", package: "CryptoSwift"),
         .product(name: "AppMetricaCore", package: "appmetrica-sdk-ios"),
       ],
-      path: "Sources"),
+      path: "Sources"
+
+    ),
     .binaryTarget(
       name: "DummyFramework",
       path: "../../plugin-build/plugin/src/functionalTest/resources/DummyFramework.xcframework.zip"),

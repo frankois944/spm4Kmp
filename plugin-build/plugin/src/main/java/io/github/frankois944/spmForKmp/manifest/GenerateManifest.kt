@@ -1,8 +1,6 @@
 package io.github.frankois944.spmForKmp.manifest
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import java.nio.file.Path
-import kotlin.io.path.relativeToOrSelf
 
 internal fun generateManifest(parameters: TemplateParameters): String {
     var binaryDependencies =
@@ -21,6 +19,12 @@ internal fun generateManifest(parameters: TemplateParameters): String {
             minTvos = parameters.minTvos,
             minWatchos = parameters.minWatchos,
         )
+
+    val getTargetSetting =
+        getTargetSettings(
+            swiftBuildDir = parameters.generatedPackageDirectory,
+            settings = parameters.targetSettings,
+        ).takeIf { it.isNotEmpty() }
 
     return """
         // swift-tools-version: ${parameters.toolsVersion}
@@ -44,7 +48,9 @@ internal fun generateManifest(parameters: TemplateParameters): String {
                     dependencies: [
                         ${getDependenciesTargets(parameters.dependencies)}
                     ],
-                    path: "Sources")
+                    path: "Sources"
+                    ${getTargetSetting?.let { ",$it" }.orEmpty()}
+                )
                 $binaryDependencies
             ]
         )
@@ -77,61 +83,5 @@ private fun getProductsTargets(
             .filter { it.isBinaryDependency }
             .forEach { dependency ->
                 add("\"${dependency.packageName}\"")
-            }
-    }.joinToString(",")
-
-private fun getDependencies(dependencies: List<SwiftDependency>): String =
-    buildList {
-        dependencies
-            .filter { !it.isBinaryDependency }
-            .forEach { dependency ->
-                dependency.toDependencyDeclaration()?.let {
-                    add(it)
-                }
-            }
-    }.joinToString(",")
-
-private fun getDependenciesTargets(dependencies: List<SwiftDependency>): String =
-    buildList {
-        dependencies
-            .forEach { dependency ->
-                if (dependency.isBinaryDependency) {
-                    add("\"${dependency.packageName}\"")
-                } else if (dependency is SwiftDependency.Package) {
-                    dependency.productsConfig.productPackages.forEach { config ->
-                        config.products.forEach { product ->
-                            val name = product.alias ?: product.name
-                            add(".product(name: \"$name\", package: \"${dependency.packageName}\")")
-                        }
-                    }
-                }
-            }
-    }.joinToString(",")
-
-private fun getLocaleBinary(
-    dependencies: List<SwiftDependency>,
-    swiftBuildDir: Path,
-): String =
-    buildList {
-        dependencies
-            .filterIsInstance<SwiftDependency.Binary.Local>()
-            .forEach { dependency ->
-                // package path MUST be relative to somewhere, let's choose the swiftBuildDir
-                val path = Path.of(dependency.path).relativeToOrSelf(swiftBuildDir)
-                add(".binaryTarget(name: \"${dependency.packageName}\", path:\"${path}\")")
-            }
-    }.joinToString(",")
-
-private fun getRemoteBinary(dependencies: List<SwiftDependency>): String =
-    buildList {
-        dependencies
-            .filterIsInstance<SwiftDependency.Binary.Remote>()
-            .forEach { dependency ->
-                // checksum is MANDATORY
-                add(
-                    ".binaryTarget(name: \"${dependency.packageName}\", " +
-                        "url:\"${dependency.url}\", " +
-                        "checksum:\"${dependency.checksum}\")",
-                )
             }
     }.joinToString(",")

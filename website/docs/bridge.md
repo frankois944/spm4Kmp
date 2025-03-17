@@ -13,7 +13,7 @@ swiftPackageConfig {
 
 When syncing the project, the plugin creates a folder at `src/swift/[cinteropname]`.
 
-The content of this folder is your bridge between Swift and Kotlin, it can contain only Swift source files or no file.
+The content of this folder is your bridge between Swift and Kotlin, **everything inside is copied to the build directory**.
 
 ## Example
 
