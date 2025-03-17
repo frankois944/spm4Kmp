@@ -1,4 +1,3 @@
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
@@ -106,7 +105,7 @@ swiftPackageConfig {
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
-        dependency2 {
+        dependency {
             remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
@@ -153,8 +152,8 @@ swiftPackageConfig {
         }
     }
     create("nativeMacosShared") {
-        dependency(
-            SwiftDependency.Package.Local(
+        dependency {
+            localPackage(
                 path = "$testResources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
                 products = {
@@ -162,6 +161,6 @@ swiftPackageConfig {
                     add("LocalSourceDummyFramework", exportToKotlin = false)
                 },
             ),
-        )
+        }
     }
 }

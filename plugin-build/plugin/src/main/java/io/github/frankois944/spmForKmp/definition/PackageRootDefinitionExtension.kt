@@ -7,6 +7,8 @@ import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_MAC_OS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_TV_OS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_WATCH_OS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_TOOL_VERSION
+import io.github.frankois944.spmForKmp.definition.dependency.Dependency
+import io.github.frankois944.spmForKmp.definition.dependency.DependencyConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettingsConfig
 import org.gradle.api.Project
@@ -143,8 +145,24 @@ public abstract class PackageRootDefinitionExtension
          * It supports different dependency models such as local, versioned
          * remote, branch-based remote, or commit-based remote dependencies.
          */
-        public fun dependency(vararg dependency: SwiftDependency) {
-            packageDependencies.addAll(dependency)
+        @Deprecated("Use dependency(dependency: DependencyConfig.() -> Unit)")
+        public fun dependency(vararg dependencies: SwiftDependency) {
+            packageDependencies.addAll(dependencies)
+        }
+
+        internal val packageDependenciesConfig: DependencyConfig = Dependency()
+
+        /**
+         * Adds one or more Swift dependencies to the dependencies list.
+         *
+         * @param dependency
+         * This can include local or remote dependencies in the form of
+         * Swift packages or binary `xcframework` bundles.
+         * It supports different dependency models such as local, versioned
+         * remote, branch-based remote, or commit-based remote dependencies.
+         */
+        public fun dependency(dependencies: DependencyConfig.() -> Unit) {
+            packageDependenciesConfig.apply(dependencies)
         }
 
         /**
