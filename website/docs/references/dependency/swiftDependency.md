@@ -1,4 +1,8 @@
-# SwiftDependency
+# SwiftDependency (Deprecated)
+
+!!! warning "Please Be Aware"
+
+    Will be removed on version 1.0.0
 
 ## SwiftDependency.Package
 

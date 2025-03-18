@@ -8,8 +8,8 @@ By default, this path is set to the `src/swift` directory within the project's r
 This property allows defining a different directory for the Swift package source files,
 enabling customized project structure organization.
 
-``` kotlin
-public var customPackageSourcePath: String = Path(project.projectDir.path, "src", "swift").pathString
+```kotlin
+var customPackageSourcePath: String = Path(project.projectDir.path, "src", "swift").pathString
 ```
 
 ### minIos
@@ -22,8 +22,8 @@ and compatibility of the resulting package with iOS devices and emulators.
 
 Default value: `12.0`
 
-``` kotlin
-public var minIos: String = DEFAULT_MIN_IOS_VERSION
+```kotlin
+var minIos: String = DEFAULT_MIN_IOS_VERSION
 ```
 
 ### minMacos
@@ -36,8 +36,8 @@ with the specified macOS version.
 
 Default value: `10.13`
 
-``` kotlin
-public var minMacos: String = DEFAULT_MIN_MAC_OS_VERSION
+```kotlin
+var minMacos: String = DEFAULT_MIN_MAC_OS_VERSION
 ```
 
 ### minTvos
@@ -49,8 +49,8 @@ dependencies and targets must support.
 [
 Default value: `12.0`
 
-``` kotlin
-public var minTvos: String = DEFAULT_MIN_TV_OS_VERSION
+```kotlin
+var minTvos: String = DEFAULT_MIN_TV_OS_VERSION
 ```
 
 ### minWatchos
@@ -63,8 +63,8 @@ with the defined platform version during build processes or runtime configuratio
 
 Default value: `4.0`
 
-``` kotlin
-public var minWatchos: String = DEFAULT_MIN_WATCH_OS_VERSION
+```kotlin
+var minWatchos: String = DEFAULT_MIN_WATCH_OS_VERSION
 ```
 
 ### toolsVersion
@@ -77,8 +77,8 @@ the behavior of the Swift package dependencies during resolution and compilation
 
 Default value: `5.9`
 
-``` kotlin
-public var toolsVersion: String = DEFAULT_TOOL_VERSION
+```kotlin
+var toolsVersion: String = DEFAULT_TOOL_VERSION
 ```
 
 ### debug
@@ -92,8 +92,8 @@ Note: release build are faster (apparently...)
 
 Default value: `false`
 
-``` kotlin
-public var debug: Boolean = false
+```kotlin
+var debug: Boolean
 ```
 
 ### packageDependencyPrefix
@@ -104,63 +104,81 @@ This variable can be utilized to customize or uniquely identify package names or
 
 It is nullable and, when set, the prefix will be applied to all dependencies.
 
-``` kotlin
-public var packageDependencyPrefix: String? = null
+```kotlin
+var packageDependencyPrefix: String? = null
 ```
 
 ### linkerOpts
 
 Add custom linker flag when exporting the product to kotlin, used by cinterop
 
-``` kotlin
-public var linkerOpts: List<String> = emptyList()
+```kotlin
+var linkerOpts: List<String> = emptyList()
 ```
 
 ### compilerOpts
 
 Add custom compiler flag when exporting the product to kotlin, used by cinterop
 
-``` kotlin
-public var compilerOpts: List<String> = emptyList()
+```kotlin
+var compilerOpts: List<String> = emptyList()
 ```
 
 ### dependency
 
 Adds one or more Swift dependencies to the dependencies list.
 
-- dependency A variable number of `SwiftDependency` instances to be added.
+This can include local or remote dependencies in the form of
+Swift packages or binary `xcframework` bundles.
+
+It supports different dependency models such as local, versioned
+remote, branch-based remote, or commit-based remote dependencies.
+
+```kotlin
+fun dependency(dependencies: DependencyConfig.() -> Unit)
+```
+
+### dependency (Deprecated)
+
+!!! warning "Please Be Aware"
+
+    Will be removed on version 1.0.0
+
+Adds one or more Swift dependencies to the dependencies list.
+
+- **dependency** A variable number of `SwiftDependency` instances to be added.
   This can include local or remote dependencies in the form of
   Swift packages or binary `xcframework` bundles.
 
 It supports different dependency models such as local, versioned
 remote, branch-based remote, or commit-based remote dependencies.
 
-``` kotlin
-public fun dependency(vararg dependency: SwiftDependency)
+```kotlin
+fun dependency(vararg dependency: SwiftDependency)
 ```
 
 ### sharedCachePath
 
 Specify the shared cache directory path
 
-``` kotlin
-public var sharedCachePath: String? = null
+```kotlin
+var sharedCachePath: String? = null
 ```
 
 ### sharedConfigPath
 
 Specify the shared configuration directory path
 
-``` kotlin
-public var sharedConfigPath: String? = null
+```kotlin
+var sharedConfigPath: String? = null
 ```
 
 ### sharedSecurityPath
 
 Specify the shared security directory path
 
-``` kotlin
-public var sharedSecurityPath: String? = null
+```kotlin
+var sharedSecurityPath: String? = null
 ```
 
 ### spmWorkingPath
@@ -169,8 +187,8 @@ The path of the directory where working SPM file(s) will be written.
 
 Default : `{buildDirectory}/spmKmpPlugin/`
 
-``` kotlin
-public var spmWorkingPath: String
+```kotlin
+var spmWorkingPath: String
 ```
 
 ### targetSettings
@@ -181,9 +199,9 @@ This method allows customization of the bridge's build settings by providing
 a configuration block where settings can be defined for compilers (C, C++, Swift)
 and linker options. These settings adjust the behavior of the bridge during the build process.
 
-- targetSettings A configuration block of type `PackageSettingConfig`. The block allows
+- **targetSettings** A configuration block of type `PackageSettingConfig`. The block allows
   specifying various compiler and linker settings needed for the package build.
 
-``` kotlin
-public fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit)
+```kotlin
+fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit)
 ```

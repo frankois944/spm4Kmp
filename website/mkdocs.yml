@@ -41,9 +41,11 @@ nav:
     - usages/largebridge.md
   - References:
       - references/swiftPackageConfig.md
-      - references/swiftDependency.md
-      - references/productPackageConfig.md
-      - references/productName.md
+      - Dependencies:
+          - references/dependency/DependencyConfig.md
+          - references/dependency/productPackageConfig.md
+          - references/dependency/productName.md
+          - references/dependency/swiftDependency.md
       - BridgeSettings:
           - references/bridgeSettingsConfig.md
           - references/targetSettingsConfigs/CSettingConfig.md
