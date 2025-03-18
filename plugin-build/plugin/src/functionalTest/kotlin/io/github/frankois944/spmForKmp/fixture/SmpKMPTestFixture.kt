@@ -134,10 +134,22 @@ org.gradle.caching=true
     private fun createPluginBlock(extension: TestConfiguration): String {
         val pluginBlock =
             if (extension.rawPluginConfiguration.isNotEmpty()) {
-                extension.rawPluginConfiguration.forEach {
-                    buildString {
-                        appendLine(it)
+                buildString {
+                    appendLine(
+                        """
+                        swiftPackageConfig {
+                            create("${extension.cinteropsName}") {
+                        """,
+                    )
+                    extension.rawPluginConfiguration.forEach {
+                        appendLine(it.content)
                     }
+                    appendLine(
+                        """
+                            }
+                        }
+                        """.trimIndent(),
+                    )
                 }
             } else {
                 buildString {

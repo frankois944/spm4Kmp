@@ -128,7 +128,9 @@ var compilerOpts: List<String> = emptyList()
 
 Adds one or more Swift dependencies to the dependencies list.
 
-- **[dependencies](dependency/dependencyConfig.md)** A `DependencyConfig` declaration
+- **[dependencies](dependency/dependencyConfig.md)** A configuration block of type `DependencyConfig`.
+
+The block allows specifying various compiler and linker settings needed for the package build.
 
 This can include local or remote dependencies in the form of
 Swift packages or binary `xcframework` bundles.
@@ -202,8 +204,9 @@ This method allows customization of the bridge's build settings by providing
 a configuration block where settings can be defined for compilers (C, C++, Swift)
 and linker options. These settings adjust the behavior of the bridge during the build process.
 
-- **[setting](./bridgeSettingsConfig.md)** A configuration block of type `PackageSettingConfig`. The block allows
-  specifying various compiler and linker settings needed for the package build.
+- **[setting](./bridgeSettingsConfig.md)** A configuration block of type `PackageSettingConfig`.
+
+The block allows specifying various compiler and linker settings needed for the package build.
 
 ```kotlin
 fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit)
