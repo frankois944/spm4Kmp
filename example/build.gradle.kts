@@ -1,4 +1,3 @@
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
@@ -106,9 +105,8 @@ swiftPackageConfig {
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
-        dependency(
-            SwiftDependency.Package.Remote.Version(
-                // Repository URL
+        dependency {
+            remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
                 products = {
@@ -121,49 +119,48 @@ swiftPackageConfig {
                 packageName = "firebase-ios-sdk",
                 // Package version
                 version = "11.8.1",
-            ),
-            SwiftDependency.Binary.Local(
+            )
+            localBinary(
                 path = "$testResources/DummyFramework.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
-            ),
-            SwiftDependency.Package.Local(
+            )
+            localPackage(
                 path = "$testResources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
                 products = {
                     // Export to Kotlin for use in shared Kotlin code, false by default
                     add("LocalSourceDummyFramework", exportToKotlin = true)
                 },
-            ),
-            SwiftDependency.Package.Remote.Version(
+            )
+            remotePackageVersion(
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 version = "1.8.1",
                 products = {
                     // Can be only used in your "src/swift" code.
                     add("CryptoSwift")
                 },
-            ),
-            SwiftDependency.Package.Remote.Version(
+            )
+            remotePackageVersion(
                 url = URI("https://github.com/appmetrica/appmetrica-sdk-ios"),
                 version = "5.0.0",
                 products = {
                     // Can be only used in your "src/swift" code.
                     add("AppMetricaCore", exportToKotlin = true)
                 },
-            ),
-            // see SwiftDependency class for more use cases
-        )
+            )
+        }
     }
     create("nativeMacosShared") {
-        dependency(
-            SwiftDependency.Package.Local(
+        dependency {
+            localPackage(
                 path = "$testResources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
                 products = {
                     // Export to Kotlin for use in shared Kotlin code, false by default
                     add("LocalSourceDummyFramework", exportToKotlin = false)
                 },
-            ),
-        )
+            )
+        }
     }
 }

@@ -102,17 +102,17 @@ Add your local package to your plugin configuration, follow the [guide](../expor
 
 swiftPackageConfig {
     create("MyStripeSDKLibs") {
-        dependency(
-            SwiftDependency.Package.Local(
+        dependency {
+            localPackage(
                 // absolute path to your Local Package
                 path = "$projectDir/../MyStripeSDK",
                 packageName = "MyStripeSDK",
                 products = {
                     // Export to Kotlin for use in shared Kotlin code, false by default
                     add("MyStripeSDK", exportToKotlin = true)
-                },
-            ),
-        )
+                }
+            )
+        }
     }
 }
 ```

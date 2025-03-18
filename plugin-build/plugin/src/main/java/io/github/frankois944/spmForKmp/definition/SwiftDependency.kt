@@ -63,7 +63,12 @@ public sealed interface SwiftDependency : Serializable {
          * @property path The local file URL (file://...) to the xcFramework.
          * @property packageName The name of the package associated with this binary.
          * @property exportToKotlin Defines whether the dependency should be exported for use in Kotlin code.
+         * @property linkerOpts
+         * @property compilerOpts
+         *
+         * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
          */
+        @Deprecated("Replace with localBinary from dependency(dependency: DependencyConfig.() -> Unit)")
         public data class Local(
             val path: String,
             override val packageName: String,
@@ -82,7 +87,12 @@ public sealed interface SwiftDependency : Serializable {
          * @property packageName The name of the package associated with this binary dependency.
          * @property exportToKotlin Defines whether this dependency should be exported for use in Kotlin code.
          * @property checksum The checksum of the remote binary to verify its integrity.
+         * @property linkerOpts
+         * @property compilerOpts
+         *
+         * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
          */
+        @Deprecated("Replace with remoteBinary from dependency(dependency: DependencyConfig.() -> Unit)")
         public data class Remote(
             val url: URI,
             override val packageName: String,
@@ -106,7 +116,10 @@ public sealed interface SwiftDependency : Serializable {
          * @property path The local file URL (file://...) to the local Swift package folder.
          * @property packageName The name of the package, by default the first product name.
          * @property products A list of the product's package used during dependency configuration.
+         *
+         * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
          */
+        @Deprecated("Replace with localPackage from dependency(dependency: DependencyConfig.() -> Unit)")
         public data class Local(
             val path: String,
             override var packageName: String = "",
@@ -138,14 +151,20 @@ public sealed interface SwiftDependency : Serializable {
              * @property products A list of the product's package used during dependency configuration.
              * @property packageName The name of the package, by default base of the url.
              * @property version The specific version of the Swift package to be imported.
+             *
+             * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
              */
+            @Deprecated("Replace with remotePackageVersion from dependency(dependency: DependencyConfig.() -> Unit)")
             public data class Version(
                 public override val url: URI,
-                public override val packageName: String = buildPackageName(url),
+                public override var packageName: String = "",
                 public val version: String,
                 public override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
+                    if (packageName.isEmpty()) {
+                        packageName = buildPackageName(url)
+                    }
                     productsConfig.apply(products)
                 }
             }
@@ -157,14 +176,20 @@ public sealed interface SwiftDependency : Serializable {
              * @property products A list of the product's package used during dependency configuration.
              * @property packageName The name of the package, by default base of the url.
              * @property branch The branch name of the remote Git repository used for the dependency.
+             *
+             * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
              */
+            @Deprecated("Replace with remotePackageBranch from dependency(dependency: DependencyConfig.() -> Unit)")
             public data class Branch(
                 public override val url: URI,
-                public override val packageName: String = buildPackageName(url),
+                public override var packageName: String = "",
                 public val branch: String,
                 override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
+                    if (packageName.isEmpty()) {
+                        packageName = buildPackageName(url)
+                    }
                     productsConfig.apply(products)
                 }
             }
@@ -176,14 +201,20 @@ public sealed interface SwiftDependency : Serializable {
              * @property products A list of the product's package used during dependency configuration.
              * @property packageName The name of the package, by default base of the url.
              * @property revision A specific commit hash representing the dependency version.
+             *
+             * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
              */
+            @Deprecated("Replace with remotePackageCommit from dependency(dependency: DependencyConfig.() -> Unit)")
             public data class Commit(
                 public override val url: URI,
-                public override val packageName: String = buildPackageName(url),
+                public override var packageName: String = "",
                 public val revision: String,
                 override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
+                    if (packageName.isEmpty()) {
+                        packageName = buildPackageName(url)
+                    }
                     productsConfig.apply(products)
                 }
             }

@@ -27,15 +27,15 @@ The following configuration export to Kotlin the package [FirebaseAnalytics](htt
 ``` kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {
-        dependency(
-            SwiftDependency.Package.Remote.Version(
+        dependency {
+            remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 products = {
                     add("FirebaseAnalytics", exportToKotlin = true), // exported
                     add("FirebaseCore") // non-exported
                 },
                 version = "11.8.0",
-            ),
+            )
             // Another SwiftDependency
             // ...
         )
@@ -45,7 +45,7 @@ swiftPackageConfig {
 
 !!! warning
 
-    A local swift package is being generated during the build and this message diplayed
+    A local swift package is being generated during the build and this message displayed
     ```
     Spm4Kmp: A local Swift package has been generated at
     /path/to/the/local/package

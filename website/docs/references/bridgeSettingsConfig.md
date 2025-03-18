@@ -1,5 +1,34 @@
 # BridgeSettingsConfig
 
+
+## Example
+
+```kotlin
+bridgeSettings {
+    cSetting {
+        defines = listOf(Pair("C_DEBUG", "2"))
+        headerSearchPath = listOf("./includes/")
+        unsafeFlags = listOf("-W")
+    }
+    cxxSetting {
+        defines = listOf(Pair("CXX_DEBUG", "1"))
+        headerSearchPath = listOf("./includes/")
+        unsafeFlags = listOf("-W")
+    }
+    linkerSetting {
+        linkedFramework = listOf("UIKit")
+        linkedLibrary = listOf("-W")
+        unsafeFlags = listOf("-W")
+    }
+    swiftSettings {
+        defines = listOf("CUSTOM_DEFINE")
+        enableExperimentalFeature = "CImplementation"
+        enableUpcomingFeature = "ExistentialAny"
+        interoperabilityMode = "Cxx"
+    }
+}
+```
+
 ## cSetting
 
 The target’s C build settings.

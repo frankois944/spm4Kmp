@@ -17,7 +17,7 @@ The plugin supports the following configurations :
 === "Version"
 
     ``` kotlin
-    SwiftDependency.Package.Remote.Version(
+    remotePackageVersion(
         url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
         version = "1.8.4",
         products = {
@@ -29,7 +29,7 @@ The plugin supports the following configurations :
 === "Commit"
 
     ``` kotlin
-    SwiftDependency.Package.Remote.Commit(
+    remotePackageCommit(
         url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
         revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
         products = {
@@ -41,7 +41,7 @@ The plugin supports the following configurations :
 === "Branch"
 
     ``` kotlin
-    SwiftDependency.Package.Remote.Branch(
+    remotePackageBranch(
         url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
         branch = "main",
         products = {
@@ -52,7 +52,7 @@ The plugin supports the following configurations :
 === "Local"
 
     ``` kotlin
-    SwiftDependency.Package.Local(
+    localPackage(
         path = "Absolute path to the local package folder",
         packageName = "LocalSourceDummyFramework",
         products = {
@@ -64,7 +64,7 @@ The plugin supports the following configurations :
 === "Local Binary"
 
     ``` kotlin
-    SwiftDependency.Binary.Local(
+    localBinary(
         path = "/path/to/LocalFramework.xcframework"
         packageName = "LocalFramework"
     ),
@@ -73,14 +73,14 @@ The plugin supports the following configurations :
 === "Remote Binary"
 
     ``` kotlin
-    SwiftDependency.Binary.Remote(
+    remoteBinary(
         url = URI("https://.../RemoteBinaryFramework.xcframework.zip"),
         checksum = "[checksum]",
         packageName = "RemoteBinaryFramework",
     )
     ```
 
-[SwiftDependency reference](./references/swiftDependency.md)
+[SwiftDependency reference](references/dependency/dependencyConfig.md)
 
 ### XCFramework
 
@@ -94,24 +94,24 @@ The following configuration imports the package [CryptoSwift](https://github.com
 ``` kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {
-        dependency(
-            SwiftDependency.Package.Remote.Version(
+        dependency {
+            remotePackageVersion(
                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 products = {
                     add("CryptoSwift")
                 },
                 version = "1.8.4",
-            ),
+            )
             // Another SwiftDependency
             // ...
-        )
+        }
     }
 }
 ```
 
 !!! warning
 
-    A local swift package is being generated during the build and this message diplayed
+    A local swift package is being generated during the build and this message displayed
     ```
     Spm4Kmp: A local Swift package has been generated at
     /path/to/the/local/package

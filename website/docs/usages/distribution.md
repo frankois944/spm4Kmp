@@ -92,15 +92,15 @@ swiftPackageConfig {
         minMacos = "10.15"
         minTvos = "13.0"
         minWatchos = "2.0"
-        dependency(
-            SwiftDependency.Package.Remote.Branch(
+        dependency {
+            remotePackageBranch(
                 url = URI("https://github.com/kingslay/KSPlayer"),
                 products = {
                     add("KSPlayer")
                 },
                 branch = "main"
-            ),
-        )
+            )
+        }
     }
 }
 ```
