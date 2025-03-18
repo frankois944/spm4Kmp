@@ -128,24 +128,12 @@ public abstract class PackageRootDefinitionExtension
          */
         public var compilerOpts: List<String> = emptyList()
 
-        /**
-         * Internal list used to store Swift package dependencies.
-         *
-         * This property is mutable and holds a list of [SwiftDependency] instances. It is used to accumulate and manage
-         * dependencies added through the `dependency` method in the containing class.
-         */
         internal val packageDependencies: MutableList<SwiftDependency> = mutableListOf()
 
-        /**
-         * Adds one or more Swift dependencies to the dependencies list.
-         *
-         * @param dependency A variable number of `SwiftDependency` instances to be added.
-         * This can include local or remote dependencies in the form of
-         * Swift packages or binary `xcframework` bundles.
-         * It supports different dependency models such as local, versioned
-         * remote, branch-based remote, or commit-based remote dependencies.
-         */
         @Deprecated("Use dependency(dependency: DependencyConfig.() -> Unit)")
+        /**
+         * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
+         */
         public fun dependency(vararg dependencies: SwiftDependency) {
             packageDependencies.addAll(dependencies)
         }
@@ -155,7 +143,7 @@ public abstract class PackageRootDefinitionExtension
         /**
          * Adds one or more Swift dependencies to the dependencies list.
          *
-         * @param dependency
+         * @param dependencies
          * This can include local or remote dependencies in the form of
          * Swift packages or binary `xcframework` bundles.
          * It supports different dependency models such as local, versioned

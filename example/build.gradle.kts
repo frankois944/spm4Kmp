@@ -160,7 +160,7 @@ swiftPackageConfig {
                     // Export to Kotlin for use in shared Kotlin code, false by default
                     add("LocalSourceDummyFramework", exportToKotlin = false)
                 },
-            ),
+            )
         }
     }
 }

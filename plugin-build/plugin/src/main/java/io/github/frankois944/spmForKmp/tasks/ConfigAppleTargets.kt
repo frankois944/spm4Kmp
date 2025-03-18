@@ -45,9 +45,7 @@ internal fun Project.configAppleTargets(
                 it.name.startsWith("cinterop" + swiftPackageEntry.name.capitalized())
             }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
 
-    val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies
-    val oldDependency = swiftPackageEntry.packageDependencies
-    val packageDependencies = if (newDependency.isNotEmpty()) newDependency else oldDependency
+    val packageDependencies = getCurrentDependencies(swiftPackageEntry)
 
     val manifestTask =
         tasks.register(
@@ -254,4 +252,10 @@ private fun createCInteropTask(
     mainCompilation.cinterops.create(cinteropName) { settings ->
         settings.definitionFile.set(file)
     }
+}
+
+private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> {
+    val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies
+    val oldDependency = swiftPackageEntry.packageDependencies.toList()
+    return if (newDependency.isNotEmpty()) newDependency else oldDependency
 }
