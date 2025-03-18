@@ -1,5 +1,20 @@
 # DependencyConfig
 
+## Example
+
+```Kotlin
+dependency {
+    remotePackageVersion(
+        url = URI("https://github.com/appmetrica/appmetrica-sdk-ios"),
+        version = "5.0.0",
+        products = {
+            // Can be only used in your "src/swift" code.
+            add("AppMetricaCore", exportToKotlin = true)
+        },
+    )
+}
+```
+
 ## Binary Packages
 
 ### localBinary
