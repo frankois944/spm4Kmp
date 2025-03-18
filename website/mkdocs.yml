@@ -42,7 +42,7 @@ nav:
   - References:
       - references/swiftPackageConfig.md
       - Dependencies:
-          - references/dependency/DependencyConfig.md
+          - references/dependency/dependencyConfig.md
           - references/dependency/productPackageConfig.md
           - references/dependency/productName.md
           - references/dependency/swiftDependency.md

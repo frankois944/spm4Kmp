@@ -11,6 +11,7 @@ let package = Package(
       targets: ["exportedNativeIosShared", "DummyFramework"])
   ],
   dependencies: [
+    .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", exact: "1.8.1"),
     .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "11.8.1"),
     .package(
       path:
@@ -22,6 +23,7 @@ let package = Package(
     .target(
       name: "exportedNativeIosShared",
       dependencies: [
+        .product(name: "CryptoSwift", package: "CryptoSwift"),
         .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
         .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
         .product(name: "FirebaseDatabase", package: "firebase-ios-sdk"), "DummyFramework",
