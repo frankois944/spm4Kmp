@@ -1319,14 +1319,13 @@ as a dependency in a Kotlin Multiplatform project.</p>
 <li>packageName The name of the package associated with this binary .</li>
 <li>exportToKotlin Defines whether the dependency should be exported for use in Kotlin code .</li>
 </ul>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kotlin
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>SwiftDependency.Binary.Local(
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    val path : String,
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    override val packageName: String,
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    override val exportToKotlin: Boolean = false,
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    override var linkerOpts: List&lt;String&gt; = emptyList(),
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    override var compilerOpts: List&lt;String&gt; = emptyList(),
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>),
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">SwiftDependency</span><span class="p">.</span><span class="na">Binary</span><span class="p">.</span><span class="na">Local</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">packageName</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">exportToKotlin</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">linkerOpts</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emptyList</span><span class="p">(),</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">compilerOpts</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emptyList</span><span class="p">(),</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">),</span>
 </span></code></pre></div>
 <h3 id="remote_1">Remote</h3>
 <p>Represents a remote binary dependency as a zipped xcFramework</p>
