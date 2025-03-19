@@ -255,7 +255,7 @@ private fun createCInteropTask(
 }
 
 private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> {
-    val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies
+    val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies.toList()
     val oldDependency = swiftPackageEntry.packageDependencies.toList()
     return if (newDependency.isNotEmpty()) newDependency else oldDependency
 }

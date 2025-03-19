@@ -91,8 +91,7 @@ Represents a local binary dependency in the Kotlin Multiplatform project .
 - packageName The name of the package associated with this binary .
 - exportToKotlin Defines whether the dependency should be exported for use in Kotlin code .
 
-```
-kotlin
+``` kotlin
 SwiftDependency.Binary.Local(
     val path : String,
     override val packageName: String,

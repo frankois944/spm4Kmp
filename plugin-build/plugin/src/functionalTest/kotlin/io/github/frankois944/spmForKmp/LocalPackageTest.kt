@@ -107,8 +107,7 @@ class LocalPackageTest : BaseTest() {
                             )
                             """.trimIndent(),
                     ),
-                )
-                .withKotlinSources(
+                ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),
                     ),
