@@ -6,24 +6,24 @@
 
 Defines a value for a macro.
 
-``` kotlin
-public var defines: List<Pair<String, String?>>
+```kotlin
+var defines: List<Pair<String, String?>>
 ```
 
 ## headerSearchPath
 
 Provides a header search path relative to the target’s directory.
 
-``` kotlin
-public var headerSearchPath: List<String>
+```kotlin
+var headerSearchPath: List<String>
 ```
 
 ## unsafeFlags
 
 Sets unsafe flags to pass arbitrary command-line flags to the corresponding build tool.
 
-``` kotlin
-public var unsafeFlags: List<String>
+```kotlin
+var unsafeFlags: List<String>
 ```
 
 

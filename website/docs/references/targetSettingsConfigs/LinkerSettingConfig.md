@@ -6,22 +6,22 @@
 
 Declares linkage to a system framework.
 
-``` kotlin
-public var linkedFramework: List<String>
+```kotlin
+var linkedFramework: List<String>
 ```
 
 ## linkedLibrary
 
 Declares linkage to a system library.
 
-``` kotlin
-public var linkedLibrary: List<String>
+```kotlin
+var linkedLibrary: List<String>
 ```
 
 ## unsafeFlags
 
 Sets unsafe flags to pass arbitrary command-line flags to the corresponding build tool.
 
-``` kotlin
-public var unsafeFlags: List<String>
+```kotlin
+var unsafeFlags: List<String>
 ```

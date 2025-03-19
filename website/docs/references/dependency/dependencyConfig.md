@@ -8,7 +8,6 @@ dependency {
         url = URI("https://github.com/appmetrica/appmetrica-sdk-ios"),
         version = "5.0.0",
         products = {
-            // Can be only used in your "src/swift" code.
             add("AppMetricaCore", exportToKotlin = true)
         },
     )
@@ -72,7 +71,7 @@ Represents a local Swift package dependency.
 
 * **path** The local file URL (file://...) to the local Swift package folder.
 * **packageName** The name of the package, by default the first product name.
-* **products** A list of the product's package used during dependency configuration.
+* **[products](productPackageConfig.md)** A list of the product's package used during dependency configuration.
 
 ```kotlin
 fun localPackage(
@@ -89,7 +88,7 @@ Represents a specific version of a remote Swift package.a
 * **url** The URL of the remote Git repository where the package is hosted.
 * **packageName** The name of the package, by default base of the url.
 * **version** The specific version of the Swift package to be imported.
-* **products** A list of the product's package used during dependency configuration.
+* **[products](productPackageConfig.md)** A list of the product's package used during dependency configuration.
 
 ```kotlin
 fun remotePackageVersion(
@@ -107,7 +106,7 @@ Represents a branch-based remote Swift dependency.
 * **url** The URL of the remote Git repository where the package is hosted.
 * **packageName** The name of the package, by default base of the url.
 * **branch** The branch name of the remote Git repository used for the dependency.
-* **products** A list of the product's package used during dependency configuration.
+* **[products](productPackageConfig.md)** A list of the product's package used during dependency configuration.
 
 ```kotlin
 fun remotePackageBranch(
@@ -125,7 +124,7 @@ Represents a specific remote commit dependency.
 * **url** The URL of the remote Git repository where the package is hosted.
 * **packageName** The name of the package, by default base of the url.
 * **revision** A specific commit hash representing the dependency version.
-* **products** A list of the product's package used during dependency configuration.
+* **[products](productPackageConfig.md)** A list of the product's package used during dependency configuration.
 
 ```kotlin
 fun remotePackageCommit(
