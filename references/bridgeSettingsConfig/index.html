@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://frankois944.github.io/spm4Kmp/references/bridgeSettingsConfig/">
       
       
-        <link rel="prev" href="../productName/">
+        <link rel="prev" href="../dependency/swiftDependency/">
       
       
         <link rel="next" href="../targetSettingsConfigs/CSettingConfig/">
@@ -648,12 +648,50 @@
   
   
   
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_10_2" id="__nav_10_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Dependencies
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10_2">
+            <span class="md-nav__icon md-icon"></span>
+            Dependencies
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../swiftDependency/" class="md-nav__link">
+      <a href="../dependency/dependencyConfig/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    SwiftDependency
+    DependencyConfig
     
   </span>
   
@@ -671,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../productPackageConfig/" class="md-nav__link">
+      <a href="../dependency/productPackageConfig/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -693,7 +731,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../productName/" class="md-nav__link">
+      <a href="../dependency/productName/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -703,6 +741,36 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dependency/swiftDependency/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SwiftDependency (Deprecated)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -724,10 +792,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_10_5" id="__nav_10_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_10_3" id="__nav_10_3_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -739,8 +807,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_5_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_10_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10_3">
             <span class="md-nav__icon md-icon"></span>
             BridgeSettings
           </label>
@@ -799,6 +867,15 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#csetting" class="md-nav__link">
@@ -996,6 +1073,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#csetting" class="md-nav__link">
     <span class="md-ellipsis">
       cSetting
@@ -1051,25 +1137,50 @@
 
 
 <h1 id="bridgesettingsconfig">BridgeSettingsConfig</h1>
+<h2 id="example">Example</h2>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">bridgeSettings</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">cSetting</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="n">defines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">Pair</span><span class="p">(</span><span class="s">&quot;C_DEBUG&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;2&quot;</span><span class="p">))</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="n">headerSearchPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;./includes/&quot;</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="n">unsafeFlags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;-W&quot;</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="n">cxxSetting</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="n">defines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">Pair</span><span class="p">(</span><span class="s">&quot;CXX_DEBUG&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">))</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="n">headerSearchPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;./includes/&quot;</span><span class="p">)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">        </span><span class="n">unsafeFlags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;-W&quot;</span><span class="p">)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="n">linkerSetting</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="n">linkedFramework</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;UIKit&quot;</span><span class="p">)</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">        </span><span class="n">linkedLibrary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;-W&quot;</span><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">        </span><span class="n">unsafeFlags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;-W&quot;</span><span class="p">)</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="n">swiftSettings</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">        </span><span class="n">defines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;CUSTOM_DEFINE&quot;</span><span class="p">)</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">        </span><span class="n">enableExperimentalFeature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CImplementation&quot;</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">        </span><span class="n">enableUpcomingFeature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ExistentialAny&quot;</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="n">interoperabilityMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Cxx&quot;</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="p">}</span>
+</span></code></pre></div>
 <h2 id="csetting">cSetting</h2>
 <p>The target’s C build settings.</p>
 <p><a href="https://developer.apple.com/documentation/packagedescription/target/csettings">Swift Reference</a></p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">cSetting</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">CSettingConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">cSetting</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">CSettingConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="cxxsetting">cxxSetting</h2>
 <p>The target’s C++ build settings.</p>
 <p><a href="https://developer.apple.com/documentation/packagedescription/target/cxxsettings">Swift Reference</a></p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">cxxSetting</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">CxxSettingConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">cxxSetting</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">CxxSettingConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="swiftsettings">swiftSettings</h2>
 <p>The target’s Swift build settings.</p>
 <p><a href="https://developer.apple.com/documentation/packagedescription/target/swiftsettings">Swift Reference</a></p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">swiftSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">SwiftSettingConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">swiftSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">SwiftSettingConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="linkersetting">linkerSetting</h2>
 <p>The target’s linker settings.</p>
 <p><a href="https://developer.apple.com/documentation/packagedescription/target/linkersettings">Swift Reference</a></p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">linkerSetting</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">LinkerSettingConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">linkerSetting</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">LinkerSettingConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
 </span></code></pre></div>
 
 
