@@ -23,8 +23,10 @@ import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import javax.inject.Inject
 
 @CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
@@ -63,6 +65,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
     @get:Optional
     abstract val packageDependencyPrefix: Property<String?>
+
+    @get:Inject
+    abstract val execOps: ExecOperations
 
     @get:OutputFiles
     val outputFiles: List<File>
@@ -135,7 +140,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             }
 
     private fun getExtraLinkers(): String {
-        val xcodeDevPath = project.getXcodeDevPath()
+        val xcodeDevPath = execOps.getXcodeDevPath(logger)
         return buildList {
             add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
         }.joinToString(" ")
@@ -248,10 +253,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
                 // extract the Public third-party dependencies' for all the modules
                 addAll(
-                    project
+                    execOps
                         .getPackageImplicitDependencies(
                             workingDir = manifestFile.asFile.get().parentFile,
                             scratchPath = scratchDir.get(),
+                            logger = logger,
                         ).getPublicFolders(),
                 )
                 // extract the header from the SPM artifacts, which there are xcframework
