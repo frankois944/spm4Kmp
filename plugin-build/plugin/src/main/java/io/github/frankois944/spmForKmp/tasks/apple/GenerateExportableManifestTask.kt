@@ -12,8 +12,10 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import javax.inject.Inject
 
 @CacheableTask
 internal abstract class GenerateExportableManifestTask : DefaultTask() {
@@ -61,6 +63,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                     )
                 }
 
+    @get:Inject
+    abstract val execOps: ExecOperations
+
     init {
         description = "Generate a Swift Package manifest with exported product"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -92,8 +97,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             )
         manifestFile.asFile.get().writeText(manifest)
         try {
-            project.swiftFormat(
+            execOps.swiftFormat(
                 manifestFile.asFile.get(),
+                logger,
             )
             logger.lifecycle("Spm4Kmp: A local Swift package has been generated at")
             logger.lifecycle(

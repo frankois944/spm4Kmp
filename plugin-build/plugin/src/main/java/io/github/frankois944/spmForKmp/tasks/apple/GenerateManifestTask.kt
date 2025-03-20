@@ -16,8 +16,10 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import javax.inject.Inject
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
@@ -63,6 +65,9 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:Input
     abstract val targetSettings: Property<BridgeSettings>
 
+    @get:Inject
+    abstract val execOps: ExecOperations
+
     init {
         description = "Generate a Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -94,22 +99,24 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             )
         manifestFile.get().writeText(manifest)
         try {
-            project.swiftFormat(
+            execOps.swiftFormat(
                 manifestFile.get(),
+                logger,
             )
-            project.resolvePackage(
+            execOps.resolvePackage(
                 workingDir = manifestFile.get().parentFile,
                 scratchPath = packageScratchDir.get().asFile,
                 sharedCachePath = sharedCacheDir.orNull,
                 sharedConfigPath = sharedConfigDir.orNull,
                 sharedSecurityPath = sharedSecurityDir.orNull,
+                logger,
             )
         } catch (ex: Exception) {
             logger.error(
                 """
                 Manifest file generated :
-                ${manifestFile.get()}manifestFile.get()}
-                ${manifestFile.get().readText()}manifestFile.get().readText()}
+                ${manifestFile.get()}
+                ${manifestFile.get().readText()}
                 """.trimIndent(),
             )
             throw ex

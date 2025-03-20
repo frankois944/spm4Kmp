@@ -2,20 +2,20 @@ package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
-import io.github.frankois944.spmForKmp.utils.InjectedExecOps
-import org.gradle.api.Project
+import org.gradle.api.logging.Logger
+import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
 
 @Suppress("LongParameterList")
-internal fun Project.resolvePackage(
+internal fun ExecOperations.resolvePackage(
     workingDir: File,
     scratchPath: File,
     sharedCachePath: File?,
     sharedConfigPath: File?,
     sharedSecurityPath: File?,
+    logger: Logger,
 ) {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         mutableListOf(
             "--sdk",
@@ -26,7 +26,7 @@ internal fun Project.resolvePackage(
             "--scratch-path",
             scratchPath.path,
             "--jobs",
-            getNbJobs(),
+            getNbJobs(logger),
         )
     sharedCachePath?.let {
         args.add("--cache-path")
@@ -43,27 +43,25 @@ internal fun Project.resolvePackage(
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "xcrun"
-            it.args = args
-            it.workingDir = workingDir
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "resolvePackage",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
+    exec {
+        it.executable = "xcrun"
+        it.args = args
+        it.workingDir = workingDir
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "resolvePackage",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
 }
 
-internal fun Project.getXcodeDevPath(): String {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
+internal fun ExecOperations.getXcodeDevPath(logger: Logger): String {
     val args =
         listOf(
             "--sdk",
@@ -74,27 +72,28 @@ internal fun Project.getXcodeDevPath(): String {
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "xcrun"
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "getXcodeDevPath",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
+    exec {
+        it.executable = "xcrun"
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "getXcodeDevPath",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
     return standardOutput.toString().trim()
 }
 
-internal fun Project.getSDKPath(target: AppleCompileTarget): String {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
+internal fun ExecOperations.getSDKPath(
+    target: AppleCompileTarget,
+    logger: Logger,
+): String {
     val args =
         listOf(
             "--sdk",
@@ -106,30 +105,29 @@ internal fun Project.getSDKPath(target: AppleCompileTarget): String {
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "xcrun"
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "getSDKPath",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
+    exec {
+        it.executable = "xcrun"
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "getSDKPath",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
     return standardOutput.toString().trim()
 }
 
-internal fun Project.getPackageImplicitDependencies(
+internal fun ExecOperations.getPackageImplicitDependencies(
     workingDir: File,
     scratchPath: File,
+    logger: Logger,
 ): PackageImplicitDependencies {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
     val args =
         listOf(
             "--sdk",
@@ -145,28 +143,29 @@ internal fun Project.getPackageImplicitDependencies(
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "xcrun"
-            it.workingDir = workingDir
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "show-dependencies",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
+    exec {
+        it.executable = "xcrun"
+        it.workingDir = workingDir
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "show-dependencies",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
     return PackageImplicitDependencies.fromString(standardOutput.toString())
 }
 
-internal fun Project.swiftFormat(file: File) {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
+internal fun ExecOperations.swiftFormat(
+    file: File,
+    logger: Logger,
+) {
     val args =
         listOf(
             "--sdk",
@@ -178,26 +177,24 @@ internal fun Project.swiftFormat(file: File) {
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "xcrun"
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "swift-format",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
+    exec {
+        it.executable = "xcrun"
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "swift-format",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
 }
 
-internal fun Project.getNbJobs(): String {
-    val operation = objects.newInstance(InjectedExecOps::class.java)
+internal fun ExecOperations.getNbJobs(logger: Logger): String {
     val args =
         listOf(
             "-n",
@@ -206,27 +203,26 @@ internal fun Project.getNbJobs(): String {
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
-    operation.execOps
-        .exec {
-            it.executable = "sysctl"
-            it.args = args
-            it.standardOutput = standardOutput
-            it.errorOutput = errorOutput
-            it.isIgnoreExitValue = true
-        }.also {
-            printExecLogs(
-                "getNbJobs",
-                args,
-                it.exitValue != 0,
-                standardOutput,
-                errorOutput,
-            )
-        }
+    exec {
+        it.executable = "sysctl"
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "getNbJobs",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
     return standardOutput.toString().trim()
 }
 
 @Suppress("LongParameterList")
-internal fun Project.printExecLogs(
+internal fun Logger.printExecLogs(
     action: String,
     args: List<String>,
     isError: Boolean,
@@ -234,7 +230,7 @@ internal fun Project.printExecLogs(
     errorOutput: ByteArrayOutputStream,
 ) {
     if (isError) {
-        logger.error(
+        error(
             """
 ERROR FOUND WHEN EXEC
 RUN $action
@@ -250,7 +246,7 @@ OUTPUT $standardOutput
             )
         }
     } else {
-        logger.debug(
+        debug(
             """
 RUN $action
 ARGS xcrun ${args.joinToString(" ")}

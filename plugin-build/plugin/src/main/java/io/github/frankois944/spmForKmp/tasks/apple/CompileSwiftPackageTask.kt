@@ -45,8 +45,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     abstract val bridgeSourceDir: DirectoryProperty
 
     @get:OutputDirectory
-    val bridgeSourceBuiltDir: File
-        get() = manifestFile.get().parentFile.resolve("Sources")
+    abstract val bridgeSourceBuiltDir: Property<File>
 
     @get:Input
     abstract val osVersion: Property<String>
@@ -66,9 +65,15 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Inject
     abstract val operation: ExecOperations
 
+    @get:Inject
+    abstract val execOps: ExecOperations
+
     init {
         description = "Compile the Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
+        bridgeSourceBuiltDir.set(
+            manifestFile.map { it.parentFile.resolve("Sources") },
+        )
         onlyIf {
             HostManager.hostIsMac
         }
@@ -86,7 +91,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 add("swift")
                 add("build")
                 add("--sdk")
-                add(project.getSDKPath(target.get()))
+                add(execOps.getSDKPath(target.get(), logger))
                 add("--triple")
                 add(target.get().triple(osVersion.get()))
                 add("--scratch-path")
@@ -94,7 +99,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 add("-c")
                 add(if (debugMode.get()) "debug" else "release")
                 add("--jobs")
-                add(project.getNbJobs())
+                add(execOps.getNbJobs(logger))
                 sharedCacheDir.orNull?.let {
                     add("--cache-path")
                     add(it.path)
@@ -120,7 +125,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 it.errorOutput = errorOutput
                 it.isIgnoreExitValue = true
             }.also {
-                project.printExecLogs(
+                logger.printExecLogs(
                     "buildPackage",
                     args,
                     it.exitValue != 0,
@@ -131,10 +136,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     }
 
     private fun prepareWorkingDir() {
-        if (bridgeSourceBuiltDir.exists()) {
-            bridgeSourceBuiltDir.deleteRecursively()
+        if (bridgeSourceBuiltDir.get().exists()) {
+            bridgeSourceBuiltDir.get().deleteRecursively()
         }
-        bridgeSourceBuiltDir.mkdirs()
+        bridgeSourceBuiltDir.get().mkdirs()
         if (!bridgeSourceDir.get().asFileTree.isEmpty) {
             logger.debug(
                 """
@@ -142,10 +147,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 ${bridgeSourceDir.get().asFile.list()?.toList()}
                 """.trimIndent(),
             )
-            bridgeSourceDir.get().asFile.copyRecursively(bridgeSourceBuiltDir)
+            bridgeSourceDir.get().asFile.copyRecursively(bridgeSourceBuiltDir.get())
         } else {
             logger.debug("Copy Dummy swift file to directory {}", bridgeSourceBuiltDir)
-            bridgeSourceBuiltDir.resolve("DummySPMFile.swift").writeText("import Foundation")
+            bridgeSourceBuiltDir.get().resolve("DummySPMFile.swift").writeText("import Foundation")
         }
     }
 }
