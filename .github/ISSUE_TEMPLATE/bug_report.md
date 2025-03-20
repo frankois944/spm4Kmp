@@ -25,6 +25,8 @@ Before creating an issue, please test on the [example project](https://github.co
  - Device: <!-- e.g. Nexus One -->
  - OS: <!-- e.g. 7.1.1 -->
  - Library: <!-- e.g. 1.0.0 -->
+ - Xcode :  <!-- e.g. 16.0 -->
  - Gradle: <!-- e.g. 8.12 -->
  - Android Gradle Plugin: <!-- e.g. 8.0.0 -->
  - Kotlin: <!-- e.g. 2.1.0 -->
+
