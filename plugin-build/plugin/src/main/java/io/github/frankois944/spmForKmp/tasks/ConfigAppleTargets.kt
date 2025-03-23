@@ -99,7 +99,7 @@ internal fun Project.configAppleTargets(
                 it.configureCompileTask(
                     target = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
-                    buildDir = targetBuildDir,
+                    targetBuildDir = targetBuildDir,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                 )
             }
@@ -207,14 +207,14 @@ private fun GenerateExportableManifestTask.configureExportableManifestTask(
 private fun CompileSwiftPackageTask.configureCompileTask(
     target: AppleCompileTarget,
     swiftPackageEntry: PackageRootDefinitionExtension,
-    buildDir: File,
+    targetBuildDir: File,
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
     this.target.set(target)
     this.debugMode.set(swiftPackageEntry.debug)
     this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
-    this.compiledTargetDir.set(buildDir)
+    this.compiledTargetDir.set(targetBuildDir)
     this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
     this.osVersion.set(computeOsVersion(target, swiftPackageEntry))
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir)

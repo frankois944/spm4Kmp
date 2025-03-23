@@ -44,9 +44,6 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:Input
     abstract val toolsVersion: Property<String>
 
-    @get:OutputDirectory
-    abstract val packageScratchDir: DirectoryProperty
-
     @get:Input
     @get:Optional
     abstract val sharedCacheDir: Property<File?>
@@ -59,11 +56,14 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:Optional
     abstract val sharedSecurityDir: Property<File?>
 
+    @get:Input
+    abstract val targetSettings: Property<BridgeSettings>
+
     @get:OutputFile
     abstract val manifestFile: Property<File>
 
-    @get:Input
-    abstract val targetSettings: Property<BridgeSettings>
+    @get:OutputDirectory
+    abstract val packageScratchDir: DirectoryProperty
 
     @get:Inject
     abstract val execOps: ExecOperations

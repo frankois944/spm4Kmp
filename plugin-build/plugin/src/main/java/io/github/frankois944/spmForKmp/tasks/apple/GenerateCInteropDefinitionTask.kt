@@ -51,14 +51,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
     abstract val osVersion: Property<String>
 
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val compiledBinary: RegularFileProperty
-
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val manifestFile: RegularFileProperty
-
     @get:Input
     abstract val scratchDir: Property<File>
 
@@ -66,8 +58,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Optional
     abstract val packageDependencyPrefix: Property<String?>
 
-    @get:Inject
-    abstract val execOps: ExecOperations
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val compiledBinary: RegularFileProperty
+
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val manifestFile: RegularFileProperty
 
     @get:OutputFiles
     val outputFiles: List<File>
@@ -77,6 +74,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     add(currentBuildDirectory().resolve("${moduleName.name}.def"))
                 }
             }
+
+    @get:Inject
+    abstract val execOps: ExecOperations
 
     init {
         description = "Generate the cinterop definitions files"

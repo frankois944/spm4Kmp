@@ -24,28 +24,14 @@ import javax.inject.Inject
 
 @CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val manifestFile: Property<File>
-
     @get:Input
     abstract val target: Property<AppleCompileTarget>
 
     @get:Input
     abstract val debugMode: Property<Boolean>
 
-    @get:OutputDirectory
-    abstract val compiledTargetDir: Property<File>
-
     @get:Input
     abstract val packageScratchDir: Property<File>
-
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val bridgeSourceDir: DirectoryProperty
-
-    @get:OutputDirectory
-    abstract val bridgeSourceBuiltDir: Property<File>
 
     @get:Input
     abstract val osVersion: Property<String>
@@ -62,8 +48,19 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Optional
     abstract val sharedSecurityDir: Property<File?>
 
-    @get:Inject
-    abstract val operation: ExecOperations
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val manifestFile: Property<File>
+
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val bridgeSourceDir: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val bridgeSourceBuiltDir: Property<File>
+
+    @get:OutputDirectory
+    abstract val compiledTargetDir: Property<File>
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -71,12 +68,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     init {
         description = "Compile the Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
-        bridgeSourceBuiltDir.set(
-            manifestFile.map { it.parentFile.resolve("Sources") },
-        )
         onlyIf {
             HostManager.hostIsMac
         }
+        setupVars()
     }
 
     @TaskAction
@@ -116,7 +111,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
         val standardOutput = ByteArrayOutputStream()
         val errorOutput = ByteArrayOutputStream()
-        operation
+        execOps
             .exec {
                 it.executable = "xcrun"
                 it.workingDir = manifestFile.get().parentFile
@@ -152,5 +147,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             logger.debug("Copy Dummy swift file to directory {}", bridgeSourceBuiltDir)
             bridgeSourceBuiltDir.get().resolve("DummySPMFile.swift").writeText("import Foundation")
         }
+    }
+
+    private fun setupVars() {
+        bridgeSourceBuiltDir.set(
+            manifestFile.map { it.parentFile.resolve("Sources") },
+        )
     }
 }
