@@ -9,6 +9,7 @@ internal fun Project.getAndCreateFakeDefinitionFile(): File {
             .get()
             .resolve("spmKmpPlugin/dummy.def")
     if (pathToFile.exists()) return pathToFile
+    pathToFile.mkdirs()
     val content =
         """
         # Dummy Definition File
