@@ -122,7 +122,7 @@ class RemotePackageTest : BaseTest() {
                                 branch = "main",
                                 products = {
                                     add(
-                                        ProductName("CryptoSwift", isIncludedInExportedPackage = true),
+                                        ProductName("CryptoSwift", isIncludedInExportedPackage = false),
                                         exportToKotlin = true,
                                     )
                                 },
