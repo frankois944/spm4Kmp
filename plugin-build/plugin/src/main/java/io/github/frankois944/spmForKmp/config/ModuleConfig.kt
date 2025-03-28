@@ -5,6 +5,7 @@ import java.io.File
 internal data class ModuleConfig(
     var isFramework: Boolean = false,
     var name: String = "",
+    var spmPackageName: String? = null,
     var packageName: String = "",
     var buildDir: File = File(""),
     var definitionFile: File = File(""),

@@ -9,6 +9,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMa
 import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
+import io.github.frankois944.spmForKmp.tasks.utils.findIncludeFolders
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.md5
 import org.gradle.api.DefaultTask
@@ -117,6 +118,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                     ModuleConfig(
                                         name = product.name,
                                         packageName = dependency.packageName,
+                                        spmPackageName = dependency.packageName,
                                         linkerOpts = product.linkerOpts,
                                         compilerOpts = product.compilerOpts,
                                     )
@@ -127,10 +129,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                     name = dependency.packageName,
                                     linkerOpts = dependency.linkerOpts,
                                     compilerOpts = dependency.compilerOpts,
+                                    spmPackageName = dependency.packageName,
                                 ),
                             )
                         } else {
-                            listOf(ModuleConfig(name = dependency.packageName))
+                            listOf(
+                                ModuleConfig(
+                                    name = dependency.packageName,
+                                    spmPackageName = dependency.packageName,
+                                ),
+                            )
                         }
                     },
             )
@@ -249,6 +257,19 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         // Some manifests are heavily customized and use dynamic values.
         val headerSearchPaths =
             buildList {
+                moduleConfig.spmPackageName?.let {
+                    val folderToSearch =
+                        scratchDir
+                            .get()
+                            .resolve("checkouts")
+                            .resolve(it)
+                            .resolve("Sources")
+                    logger.debug("SEARCH IN {}", folderToSearch)
+                    // extract all folder names "include" in checkout package directory
+                    addAll(
+                        findIncludeFolders(folderToSearch),
+                    )
+                }
                 // extract from the current module manifest the `publicHeadersPath` values
                 addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
                 // extract the Public third-party dependencies' for all the modules

@@ -129,6 +129,16 @@ class ImplicitDepPackageTest : BaseTest() {
                                 version = "6.31.0",
                             ),
                         )
+                        add(
+                            SwiftDependency.Package.Remote.Version(
+                                url = URI("https://github.com/bugsnag/bugsnag-cocoa-performance"),
+                                version = "1.11.2",
+                                products = {
+                                    // Can be only used in your "src/swift" code.
+                                    add("BugsnagPerformance", exportToKotlin = true)
+                                },
+                            ),
+                        )
                     },
                 ).withSwiftSources(
                     SwiftSource.of(
@@ -137,6 +147,7 @@ class ImplicitDepPackageTest : BaseTest() {
                             import Foundation
                             import Bugsnag
                             import BugsnagNetworkRequestPlugin
+                            import BugsnagPerformance
                             """.trimIndent(),
                     ),
                 ).build()

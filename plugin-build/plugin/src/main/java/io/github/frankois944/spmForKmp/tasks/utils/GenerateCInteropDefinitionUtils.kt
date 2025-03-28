@@ -7,6 +7,15 @@ import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import java.io.File
 
+internal fun findIncludeFolders(path: File): List<File> =
+    findFilesRecursively(
+        directory = path,
+        criteria = { file ->
+            file.isDirectory && file.name == "include"
+        },
+        withDirectory = true,
+    )
+
 internal fun findHeadersModule(
     path: File,
     forTarget: AppleCompileTarget,
