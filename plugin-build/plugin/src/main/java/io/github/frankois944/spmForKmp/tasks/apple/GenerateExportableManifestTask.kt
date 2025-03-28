@@ -80,6 +80,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             generateManifest(
                 parameters =
                     TemplateParameters(
+                        forExportedPackage = true,
                         dependencies = packageDependencies.get(),
                         generatedPackageDirectory =
                             manifestFile

@@ -5,6 +5,7 @@ import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import java.nio.file.Path
 
 internal data class TemplateParameters(
+    val forExportedPackage: Boolean,
     val dependencies: List<SwiftDependency>,
     val generatedPackageDirectory: Path,
     val productName: String,

@@ -40,13 +40,13 @@ internal fun generateManifest(parameters: TemplateParameters): String {
                     targets: [${getProductsTargets(parameters.productName, parameters.dependencies)}])
             ],
             dependencies: [
-                ${getDependencies(parameters.dependencies)}
+                ${getDependencies(parameters.dependencies, parameters.forExportedPackage)}
             ],
             targets: [
                 .target(
                     name: "${parameters.productName}",
                     dependencies: [
-                        ${getDependenciesTargets(parameters.dependencies)}
+                        ${getDependenciesTargets(parameters.dependencies, parameters.forExportedPackage)}
                     ],
                     path: "Sources"
                     ${getTargetSetting?.let { ",$it" }.orEmpty()}

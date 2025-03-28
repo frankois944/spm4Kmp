@@ -191,6 +191,9 @@ swiftPackageConfig {
                             name.alias?.let { alias ->
                                 append(", alias = \"$alias\"")
                             }
+                            if (!name.isIncludedInExportedPackage) {
+                                append(", isIncludedInExportedPackage = false")
+                            }
                             appendLine(")")
                             if (!isLast) {
                                 appendLine(",")
