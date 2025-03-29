@@ -48,10 +48,10 @@ jobs:
           installer -pkg swiftly.pkg -target CurrentUserHomeDirectory && \
           ~/.swiftly/bin/swiftly init --quiet-shell-followup && \
           . ~/.swiftly/env.sh && \
+          hash -r && \
+          swiftly install 5.9.0 && \
+          swiftly use 5.9.0 && \
           hash -r \
-          swiftly install 5.9.0 \
-          swiftly use 5.9.0 \
-          hash -r
       - name: Get swift version
         run: swift --version
       - name: Checkout Repo
