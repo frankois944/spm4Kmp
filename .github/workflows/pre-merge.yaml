@@ -36,9 +36,11 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: 15.4
-      - uses: swift-actions/setup-swift@v2
+      - uses: vapor/swiftly-action@v0.1
+        with:
+          toolchain: latest # optional
       - name: Get swift version
-        run: swift --version # Swift 5.1.0
+        run: swift --version
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
