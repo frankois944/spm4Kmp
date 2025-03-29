@@ -49,6 +49,8 @@ jobs:
           installer -pkg swiftly.pkg -target CurrentUserHomeDirectory
           ~/.swiftly/bin/swiftly init --quiet-shell-followup && \
           . ~/.swiftly/env.sh && \
+          hash -r && \
+          swiftly use latest && \
           hash -r
       - name: Get swift version
         run: swift --version
