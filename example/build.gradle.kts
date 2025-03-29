@@ -1,4 +1,3 @@
-import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
 
@@ -106,7 +105,7 @@ swiftPackageConfig {
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         dependency {
-            remotePackageVersion(
+            /*remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
                 products = {
@@ -140,13 +139,13 @@ swiftPackageConfig {
                     // Can be only used in your "src/swift" code.
                     add("CryptoSwift")
                 },
-            )
+            )*/
             remotePackageVersion(
-                url = URI("https://github.com/appmetrica/appmetrica-sdk-ios"),
-                version = "5.0.0",
+                url = URI("https://github.com/bugsnag/bugsnag-cocoa-performance"),
+                version = "1.11.2",
                 products = {
                     // Can be only used in your "src/swift" code.
-                    add("AppMetricaCore", exportToKotlin = true)
+                    add("BugsnagPerformance", exportToKotlin = true)
                 },
             )
         }
