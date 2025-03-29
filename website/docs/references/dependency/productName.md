@@ -10,6 +10,7 @@ Represents the name of a product, with an optional alias and more to come.
   Some Package use indirect name for a product.
 - **linkerOpts** Add custom linker flag when exporting the product to kotlin
 - **compilerOpts** Add custom compiler flag when exporting the product to kotlin
+- **isIncludedInExportedPackage** By default, true declare the product in the exported local package
 
 ```Kotlin
 data class ProductName(
@@ -17,5 +18,6 @@ data class ProductName(
     val alias: String? = null,
     var linkerOpts: List<String> = emptyList(),
     var compilerOpts: List<String> = emptyList(),
+    var isIncludedInExportedPackage: Boolean = true,
 ) : Serializable
 ```
