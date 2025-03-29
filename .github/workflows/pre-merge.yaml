@@ -44,14 +44,12 @@ jobs:
           key: ${{ runner.os }}-swiftly-swift
       - name: install swift
         run: |
+          test ! -e ~/.swiftly && \
           curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg && \
-          installer -pkg swiftly.pkg -target CurrentUserHomeDirectory && \
+          installer -pkg swiftly.pkg -target CurrentUserHomeDirectory
           ~/.swiftly/bin/swiftly init --quiet-shell-followup && \
           . ~/.swiftly/env.sh && \
-          hash -r && \
-          swiftly install 5.9.0 && \
-          swiftly use 5.9.0 && \
-          hash -r \
+          hash -r
       - name: Get swift version
         run: swift --version
       - name: Checkout Repo
