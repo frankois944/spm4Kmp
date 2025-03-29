@@ -36,9 +36,22 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: 15.4
-      - uses: vapor/swiftly-action@v0.1
+      - name: Swiftly Cache
+        id: cache-swiftly
+        uses: actions/cache@v4
         with:
-          toolchain: latest # optional
+          path: ~/.swiftly
+          key: ${{ runner.os }}-swiftly-swift
+      - name: install swift
+        run: |
+          curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg && \
+          installer -pkg swiftly.pkg -target CurrentUserHomeDirectory && \
+          ~/.swiftly/bin/swiftly init --quiet-shell-followup && \
+          . ~/.swiftly/env.sh && \
+          hash -r \
+          swiftly install 5.9.0 \
+          swiftly use 5.9.0 \
+          hash -r
       - name: Get swift version
         run: swift --version
       - name: Checkout Repo
