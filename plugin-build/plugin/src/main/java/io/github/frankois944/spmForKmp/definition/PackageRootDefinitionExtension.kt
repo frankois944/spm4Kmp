@@ -205,4 +205,12 @@ public abstract class PackageRootDefinitionExtension
         public fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit) {
             bridgeSettings.apply(setting)
         }
+
+        /**
+         * The path of the Swift command line used to build the bridge
+         * You can change the version of swift used for building the bridge by setting another binary
+         *
+         * Default : uses the command `xcrun --sdk macosx swift` by default
+         */
+        public var swiftBinPath: String? = null
     }

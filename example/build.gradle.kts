@@ -1,3 +1,4 @@
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
 
@@ -104,8 +105,9 @@ swiftPackageConfig {
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
+        swiftBinPath = "/Users/francoisdabonot/.swiftly/bin/swift"
         dependency {
-            /*remotePackageVersion(
+            remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
                 products = {
@@ -138,14 +140,6 @@ swiftPackageConfig {
                 products = {
                     // Can be only used in your "src/swift" code.
                     add("CryptoSwift")
-                },
-            )*/
-            remotePackageVersion(
-                url = URI("https://github.com/bugsnag/bugsnag-cocoa-performance"),
-                version = "1.11.2",
-                products = {
-                    // Can be only used in your "src/swift" code.
-                    add("BugsnagPerformance", exportToKotlin = true)
                 },
             )
         }
