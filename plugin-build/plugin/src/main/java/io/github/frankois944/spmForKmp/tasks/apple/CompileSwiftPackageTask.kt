@@ -48,6 +48,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Optional
     abstract val sharedSecurityDir: Property<File?>
 
+    @get:Input
+    @get:Optional
+    abstract val swiftBinPath: Property<String?>
+
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: Property<File>
@@ -81,9 +85,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
         val args =
             buildList {
-                add("--sdk")
-                add("macosx")
-                add("swift")
+                if (swiftBinPath.orNull == null) {
+                    add("--sdk")
+                    add("macosx")
+                    add("swift")
+                }
                 add("build")
                 add("--sdk")
                 add(execOps.getSDKPath(target.get(), logger))
@@ -113,7 +119,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         val errorOutput = ByteArrayOutputStream()
         execOps
             .exec {
-                it.executable = "xcrun"
+                it.executable = swiftBinPath.orNull ?: "xcrun"
                 it.workingDir = manifestFile.get().parentFile
                 it.args = args
                 it.standardOutput = standardOutput

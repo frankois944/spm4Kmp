@@ -63,4 +63,25 @@ fun getView(): UIView = TestClass().getViewWithNSObject() as UIView
 fun setView(view: UIView) = TestClass().setViewWithNSObject(view)
 ```
 
+## Support Xcode 15 and earlier
 
+!!! warning "Experimental"
+
+    This is experimental; this tips is not fully tested for every use cases.
+    You can create an issue if needed.
+
+
+As Xcode < 16 is unstable with Swift Package and has some weird behavior.
+It's recommended to use the latest version of the IDE.
+
+But, it is possible to support older versions of Xcode by using a more recent version of the Swift Compiler than the Xcode one.
+
+The property [swiftBinPath](references/swiftPackageConfig.md#swiftbinpath) has been added to change the swift command used by the plugin.
+
+This official tool [swiftly](https://www.swift.org/blog/introducing-swiftly_10/) has been recently added to easily install another version of swift on macOS.
+
+So follow the swiftly guide to install another swift version and set the swiftBinPath property correctly.
+
+```kotlin
+swiftBinPath = "/path/to/.swiftly/bin/swift"
+```

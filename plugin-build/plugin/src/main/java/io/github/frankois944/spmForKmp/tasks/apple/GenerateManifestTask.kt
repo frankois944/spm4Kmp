@@ -59,6 +59,10 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:Input
     abstract val targetSettings: Property<BridgeSettings>
 
+    @get:Input
+    @get:Optional
+    abstract val swiftBinPath: Property<String?>
+
     @get:OutputFile
     abstract val manifestFile: Property<File>
 
@@ -110,7 +114,8 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 sharedCachePath = sharedCacheDir.orNull,
                 sharedConfigPath = sharedConfigDir.orNull,
                 sharedSecurityPath = sharedSecurityDir.orNull,
-                logger,
+                logger = logger,
+                swiftBinPath = swiftBinPath.orNull,
             )
         } catch (ex: Exception) {
             logger.error(

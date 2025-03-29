@@ -105,6 +105,7 @@ swiftPackageConfig {
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
+        // swiftBinPath = "/path/to/.swiftly/bin/swift"
         dependency {
             remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
@@ -139,14 +140,6 @@ swiftPackageConfig {
                 products = {
                     // Can be only used in your "src/swift" code.
                     add("CryptoSwift")
-                },
-            )
-            remotePackageVersion(
-                url = URI("https://github.com/appmetrica/appmetrica-sdk-ios"),
-                version = "5.0.0",
-                products = {
-                    // Can be only used in your "src/swift" code.
-                    add("AppMetricaCore", exportToKotlin = true)
                 },
             )
         }

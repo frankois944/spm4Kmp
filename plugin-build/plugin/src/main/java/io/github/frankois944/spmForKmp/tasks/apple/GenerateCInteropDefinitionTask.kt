@@ -59,6 +59,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Optional
     abstract val packageDependencyPrefix: Property<String?>
 
+    @get:Input
+    @get:Optional
+    abstract val swiftBinPath: Property<String?>
+
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val compiledBinary: RegularFileProperty
@@ -279,6 +283,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                             workingDir = manifestFile.asFile.get().parentFile,
                             scratchPath = scratchDir.get(),
                             logger = logger,
+                            swiftBinPath = swiftBinPath.orNull,
                         ).getPublicFolders(),
                 )
                 // extract the header from the SPM artifacts, which there are xcframework

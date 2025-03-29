@@ -185,6 +185,7 @@ private fun GenerateManifestTask.configureManifestTask(
     this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.targetSettings.set(swiftPackageEntry.bridgeSettings as BridgeSettings)
+    this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
 }
 
 private fun GenerateExportableManifestTask.configureExportableManifestTask(
@@ -220,6 +221,7 @@ private fun CompileSwiftPackageTask.configureCompileTask(
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir)
     this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
+    this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
 }
 
 private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTask(
@@ -242,6 +244,7 @@ private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTa
     this.packageDependencyPrefix.set(swiftPackageEntry.packageDependencyPrefix)
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)
+    this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
 }
 
 private fun createCInteropTask(

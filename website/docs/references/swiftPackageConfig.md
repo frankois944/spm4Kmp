@@ -211,3 +211,14 @@ The block allows specifying various compiler and linker settings needed for the 
 ```kotlin
 fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit)
 ```
+
+## swiftBinPath
+
+The path of the Swift command line used to build the bridge
+You can change the version of swift used for building the bridge by setting another binary
+
+Default : uses the command `xcrun --sdk macosx swift` by default
+
+```kotlin
+var swiftBinPath: String? = null
+```

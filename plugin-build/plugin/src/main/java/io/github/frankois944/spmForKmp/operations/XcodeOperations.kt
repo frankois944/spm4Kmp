@@ -15,36 +15,39 @@ internal fun ExecOperations.resolvePackage(
     sharedConfigPath: File?,
     sharedSecurityPath: File?,
     logger: Logger,
+    swiftBinPath: String?,
 ) {
     val args =
-        mutableListOf(
-            "--sdk",
-            "macosx",
-            "swift",
-            "package",
-            "resolve",
-            "--scratch-path",
-            scratchPath.path,
-            "--jobs",
-            getNbJobs(logger),
-        )
-    sharedCachePath?.let {
-        args.add("--cache-path")
-        args.add(it.path)
-    }
-    sharedConfigPath?.let {
-        args.add("--config-path")
-        args.add(it.path)
-    }
-    sharedSecurityPath?.let {
-        args.add("--security-path")
-        args.add(it.path)
-    }
+        buildList {
+            if (swiftBinPath == null) {
+                add("--sdk")
+                add("macosx")
+                add("swift")
+            }
+            add("package")
+            add("resolve")
+            add("--scratch-path")
+            add(scratchPath.path)
+            add("--jobs")
+            add(getNbJobs(logger))
+            sharedCachePath?.let {
+                add("--cache-path")
+                add(it.path)
+            }
+            sharedConfigPath?.let {
+                add("--config-path")
+                add(it.path)
+            }
+            sharedSecurityPath?.let {
+                add("--security-path")
+                add(it.path)
+            }
+        }
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
     exec {
-        it.executable = "xcrun"
+        it.executable = swiftBinPath ?: "xcrun"
         it.args = args
         it.workingDir = workingDir
         it.standardOutput = standardOutput
@@ -127,24 +130,27 @@ internal fun ExecOperations.getPackageImplicitDependencies(
     workingDir: File,
     scratchPath: File,
     logger: Logger,
+    swiftBinPath: String?,
 ): PackageImplicitDependencies {
     val args =
-        listOf(
-            "--sdk",
-            "macosx",
-            "swift",
-            "package",
-            "show-dependencies",
-            "--scratch-path",
-            scratchPath.path,
-            "--format",
-            "json",
-        )
+        buildList {
+            if (swiftBinPath == null) {
+                add("--sdk")
+                add("macosx")
+                add("swift")
+            }
+            add("package")
+            add("show-dependencies")
+            add("--scratch-path")
+            add(scratchPath.path)
+            add("--format")
+            add("json")
+        }
 
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
     exec {
-        it.executable = "xcrun"
+        it.executable = swiftBinPath ?: "xcrun"
         it.workingDir = workingDir
         it.args = args
         it.standardOutput = standardOutput
