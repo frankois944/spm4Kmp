@@ -827,6 +827,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#swiftbinpath" class="md-nav__link">
+    <span class="md-ellipsis">
+      swiftBinPath
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1333,6 +1342,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#swiftbinpath" class="md-nav__link">
+    <span class="md-ellipsis">
+      swiftBinPath
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1477,6 +1495,12 @@ and linker options. These settings adjust the behavior of the bridge during the 
 </ul>
 <p>The block allows specifying various compiler and linker settings needed for the package build.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">bridgeSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">BridgeSettingsConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="swiftbinpath">swiftBinPath</h2>
+<p>The path of the Swift command line used to build the bridge
+You can change the version of swift used for building the bridge by setting another binary</p>
+<p>Default : uses the command <code>xcrun --sdk macosx swift</code> by default</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">swiftBinPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
 </span></code></pre></div>
 
 

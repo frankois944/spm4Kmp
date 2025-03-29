@@ -546,6 +546,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#support-xcode-15-and-earlier" class="md-nav__link">
+    <span class="md-ellipsis">
+      Support Xcode 15 and earlier
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1111,6 +1120,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#support-xcode-15-and-earlier" class="md-nav__link">
+    <span class="md-ellipsis">
+      Support Xcode 15 and earlier
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1180,6 +1198,20 @@
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">getView</span><span class="p">():</span><span class="w"> </span><span class="n">UIView</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TestClass</span><span class="p">().</span><span class="na">getViewWithNSObject</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">UIView</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">setView</span><span class="p">(</span><span class="n">view</span><span class="p">:</span><span class="w"> </span><span class="n">UIView</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TestClass</span><span class="p">().</span><span class="na">setViewWithNSObject</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
 </span></code></pre></div></p>
+<h2 id="support-xcode-15-and-earlier">Support Xcode 15 and earlier</h2>
+<div class="admonition warning">
+<p class="admonition-title">Experimental</p>
+<p>This is experimental; this tips is not fully tested for every use cases.
+You can create an issue if needed.</p>
+</div>
+<p>As Xcode &lt; 16 is unstable with Swift Package and has some weird behavior.
+It's recommended to use the latest version of the IDE.</p>
+<p>But, it is possible to support older versions of Xcode by using a more recent version of the Swift Compiler than the Xcode one.</p>
+<p>The property <a href="../references/swiftPackageConfig/#swiftbinpath">swiftBinPath</a> has been added to change the swift command used by the plugin.</p>
+<p>This official tool <a href="https://www.swift.org/blog/introducing-swiftly_10/">swiftly</a> has been recently added to easily install another version of swift on macOS.</p>
+<p>So follow the swiftly guide to install another swift version and set the swiftBinPath property correctly.</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">swiftBinPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/path/to/.swiftly/bin/swift&quot;</span>
+</span></code></pre></div>
 
 
 
