@@ -105,7 +105,7 @@ swiftPackageConfig {
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
-        swiftBinPath = "/Users/francoisdabonot/.swiftly/bin/swift"
+        // swiftBinPath = "/path/to/.swiftly/bin/swift"
         dependency {
             remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
