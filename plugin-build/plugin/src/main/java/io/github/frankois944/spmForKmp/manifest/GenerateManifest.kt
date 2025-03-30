@@ -26,25 +26,33 @@ internal fun generateManifest(parameters: TemplateParameters): String {
             settings = parameters.targetSettings,
         ).takeIf { it.isNotEmpty() }
 
+    val name = parameters.exportedPackage?.name ?: parameters.productName
+    val type =
+        parameters.exportedPackage?.isStatic?.let {
+            if (it) ".static" else ".dynamic"
+        } ?: run {
+            ".static"
+        }
+
     return """
         // swift-tools-version: ${parameters.toolsVersion}
         import PackageDescription
 
         let package = Package(
-            name: "${parameters.productName}",
+            name: "$name",
             $platforms,
             products: [
                 .library(
-                    name: "${parameters.productName}",
-                    type: .static,
-                    targets: [${getProductsTargets(parameters.productName, parameters.dependencies)}])
+                    name: "$name",
+                    type: $type,
+                    targets: [${getProductsTargets(name, parameters.dependencies)}])
             ],
             dependencies: [
                 ${getDependencies(parameters.dependencies, parameters.forExportedPackage)}
             ],
             targets: [
                 .target(
-                    name: "${parameters.productName}",
+                    name: "$name",
                     dependencies: [
                         ${getDependenciesTargets(parameters.dependencies, parameters.forExportedPackage)}
                     ],

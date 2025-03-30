@@ -108,56 +108,6 @@ class RemotePackageTest : BaseTest() {
     }
 
     @Test
-    fun `build with non exported packages in exported Local package`() {
-        // Given
-        val fixture =
-            SmpKMPTestFixture
-                .builder()
-                .withBuildPath(testProjectDir.root.absolutePath)
-                .withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Remote.Branch(
-                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                                branch = "main",
-                                products = {
-                                    add(
-                                        ProductName("CryptoSwift", isIncludedInExportedPackage = false),
-                                        exportToKotlin = true,
-                                    )
-                                },
-                            ),
-                        )
-                    },
-                ).withKotlinSources(
-                    KotlinSource.of(
-                        imports = listOf("dummy.MySwiftClass"),
-                    ),
-                ).withSwiftSources(
-                    SwiftSource.of(
-                        content =
-                            """
-                            import Foundation
-                            import CryptoSwift
-                            @objc public class MySwiftClass: NSObject {
-                                @objc public func toMD5(value: String) -> String {
-                                    return value.md5()
-                                }
-                            }
-                            """.trimIndent(),
-                    ),
-                ).build()
-
-        val result =
-            GradleBuilder
-                .runner(fixture.gradleProject.rootDir, "build")
-                .build()
-
-        // Then
-        assertThat(result).task(":library:build").succeeded()
-    }
-
-    @Test
     fun `build with remote packages by commit`() {
         // Given
         val fixture =

@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.manifest
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import java.nio.file.Path
 
@@ -15,4 +16,5 @@ internal data class TemplateParameters(
     val minWatchos: String,
     val toolsVersion: String,
     val targetSettings: BridgeSettings?,
+    val exportedPackage: ExportedPackage?,
 )

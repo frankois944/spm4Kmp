@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.swiftFormat
@@ -39,6 +40,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
 
     @get:Input
     abstract val toolsVersion: Property<String>
+
+    @get:Input
+    abstract val exportedPackage: Property<ExportedPackage>
 
     @get:OutputFile
     abstract val manifestFile: RegularFileProperty
@@ -94,6 +98,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                         minWatchos = minWatchos.get(),
                         toolsVersion = toolsVersion.get(),
                         targetSettings = null,
+                        exportedPackage = exportedPackage.get(),
                     ),
             )
         manifestFile.asFile.get().writeText(manifest)

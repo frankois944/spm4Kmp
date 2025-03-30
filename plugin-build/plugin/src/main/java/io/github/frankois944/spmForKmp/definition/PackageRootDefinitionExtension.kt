@@ -9,6 +9,8 @@ import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_WATCH_OS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_TOOL_VERSION
 import io.github.frankois944.spmForKmp.definition.dependency.Dependency
 import io.github.frankois944.spmForKmp.definition.dependency.DependencyConfig
+import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
+import io.github.frankois944.spmForKmp.definition.exported.ExportedPackageConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettingsConfig
 import org.gradle.api.Project
@@ -199,7 +201,7 @@ public abstract class PackageRootDefinitionExtension
          * a configuration block where settings can be defined for compilers (C, C++, Swift)
          * and linker options. These settings adjust the behavior of the bridge during the build process.
          *
-         * @param bridgeSettings A configuration block of type `PackageSettingConfig`. The block allows
+         * @param setting A configuration block of type `PackageSettingConfig`. The block allows
          * specifying various compiler and linker settings needed for the bridge build.
          */
         public fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit) {
@@ -210,7 +212,19 @@ public abstract class PackageRootDefinitionExtension
          * The path of the Swift command line used to build the bridge
          * You can change the version of swift used for building the bridge by setting another binary
          *
-         * Default : uses the command `xcrun --sdk macosx swift` by default
+         * Default : uses the command `xcrun --sdk macosx swift` to find the Swift binary
          */
         public var swiftBinPath: String? = null
+
+        internal var exportedPackageSettings: ExportedPackageConfig = ExportedPackage()
+
+        /**
+         * Exported package settings
+         *
+         * @param setting
+         * @receiver
+         */
+        public fun exportedPackageSettings(setting: ExportedPackageConfig.() -> Unit) {
+            exportedPackageSettings.apply(setting)
+        }
     }

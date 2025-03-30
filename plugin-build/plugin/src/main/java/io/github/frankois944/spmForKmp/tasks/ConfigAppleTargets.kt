@@ -10,6 +10,7 @@ import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.dependency.Dependency
+import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
@@ -202,6 +203,7 @@ private fun GenerateExportableManifestTask.configureExportableManifestTask(
     this.toolsVersion.set(swiftPackageEntry.toolsVersion)
     manifestDir.mkdirs()
     this.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
+    this.exportedPackage.set(swiftPackageEntry.exportedPackageSettings as ExportedPackage)
 }
 
 @Suppress("LongParameterList")

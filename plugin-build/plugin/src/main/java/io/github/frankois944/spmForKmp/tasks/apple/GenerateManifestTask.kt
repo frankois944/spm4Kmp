@@ -100,6 +100,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                         minWatchos = minWatchos.get(),
                         toolsVersion = toolsVersion.get(),
                         targetSettings = targetSettings.get(),
+                        exportedPackage = null,
                     ),
             )
         manifestFile.get().writeText(manifest)
