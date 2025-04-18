@@ -209,7 +209,7 @@ and linker options. These settings adjust the behavior of the bridge during the 
 The block allows specifying various compiler and linker settings needed for the package build.
 
 ```kotlin
-fun bridgeSettings(setting: BridgeSettingsConfig.() -> Unit)
+fun targetSettings(setting: BridgeSettingsConfig.() -> Unit)
 ```
 
 ## swiftBinPath
@@ -221,4 +221,14 @@ Default : uses the command `xcrun --sdk macosx swift` by default
 
 ```kotlin
 var swiftBinPath: String? = null
+```
+
+## exportedPackageSettings
+
+Customize the local package used by Xcode
+
+- **[setting](./exportedPackageConfig.md)** A configuration block of type `ExportedPackageConfig`.
+
+```kotlin
+fun exportedPackageSettings(setting: ExportedPackageConfig.() -> Unit)
 ```

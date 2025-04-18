@@ -46,6 +46,8 @@ nav:
           - references/dependency/productPackageConfig.md
           - references/dependency/productName.md
           - references/dependency/swiftDependency.md
+      - ExportedPackage:
+          - references/exportedPackageConfig.md
       - BridgeSettings:
           - references/bridgeSettingsConfig.md
           - references/targetSettingsConfigs/CSettingConfig.md
