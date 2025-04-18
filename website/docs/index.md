@@ -28,9 +28,10 @@ The plugin uses the embedded Swift Package Manager, so **no third-party dependen
 
 ## Support My Project ⭐️
 
-If you find this project useful, please consider giving it a star!
+If you find this project useful, please consider giving it a star or a coffe!
 
-[![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/frankois944)[![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
+
 
 ## Feedback
 
