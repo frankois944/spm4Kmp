@@ -4,12 +4,14 @@ import org.gradle.api.Project
 import java.io.File
 
 internal fun Project.getAndCreateFakeDefinitionFile(): File {
-    val pathToFile =
-        layout.buildDirectory.asFile
-            .get()
-            .resolve("spmKmpPlugin/dummy.def")
-    if (pathToFile.exists()) return pathToFile
-    pathToFile.mkdirs()
+    val pluginDir = layout.buildDirectory.asFile
+        .get()
+        .resolve("spmKmpPlugin")
+    if (!pluginDir.exists()) {
+        pluginDir.mkdirs()
+    }
+    val defFile = pluginDir.resolve("dummy.def")
+    if (defFile.exists()) return defFile
     val content =
         """
         # Dummy Definition File
@@ -20,6 +22,6 @@ internal fun Project.getAndCreateFakeDefinitionFile(): File {
         linkerOpts =
         package = com.example.dummy
         """.trimIndent()
-    pathToFile.writeText(content)
-    return pathToFile
+    defFile.writeText(content)
+    return defFile
 }
