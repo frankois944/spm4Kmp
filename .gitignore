@@ -26,3 +26,5 @@ website/site
 website/.cache
 example/SPM
 secret-key.gpg
+.cache
+website
