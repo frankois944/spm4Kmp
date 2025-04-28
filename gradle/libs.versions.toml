@@ -8,7 +8,7 @@ autonomousapps-testkit = "0.13"
 junit = "5.12.2"
 publish="0.32.0"
 agp = "8.7.3"
-jackson = "2.18.3"
+jackson = "2.19.0"
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
