@@ -819,9 +819,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#targetsettings" class="md-nav__link">
+  <a href="#bridgesettings" class="md-nav__link">
     <span class="md-ellipsis">
-      targetSettings
+      bridgeSettings
     </span>
   </a>
   
@@ -1411,9 +1411,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#targetsettings" class="md-nav__link">
+  <a href="#bridgesettings" class="md-nav__link">
     <span class="md-ellipsis">
-      targetSettings
+      bridgeSettings
     </span>
   </a>
   
@@ -1571,16 +1571,16 @@ remote, branch-based remote, or commit-based remote dependencies.</p>
 <p>Default : <code>{buildDirectory}/spmKmpPlugin/</code></p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">spmWorkingPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span>
 </span></code></pre></div>
-<h2 id="targetsettings">targetSettings</h2>
+<h2 id="bridgesettings">bridgeSettings</h2>
 <p>Configures the bridge settings by applying the specified configuration options.</p>
 <p>This method allows customization of the bridge's build settings by providing
 a configuration block where settings can be defined for compilers (C, C++, Swift)
 and linker options. These settings adjust the behavior of the bridge during the build process.</p>
 <ul>
-<li><strong><a href="../bridgeSettingsConfig/">setting</a></strong> A configuration block of type <code>PackageSettingConfig</code>.</li>
+<li><strong><a href="../bridgeSettingsConfig/">setting</a></strong> A configuration block of type <code>BridgeSettingsConfig</code>.</li>
 </ul>
 <p>The block allows specifying various compiler and linker settings needed for the package build.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">targetSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">BridgeSettingsConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">bridgeSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">BridgeSettingsConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="swiftbinpath">swiftBinPath</h2>
 <p>The path of the Swift command line used to build the bridge
