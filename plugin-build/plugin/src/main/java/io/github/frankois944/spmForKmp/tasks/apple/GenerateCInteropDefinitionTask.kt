@@ -11,13 +11,16 @@ import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
 import io.github.frankois944.spmForKmp.tasks.utils.findIncludeFolders
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
-import io.github.frankois944.spmForKmp.utils.md5
+import io.github.frankois944.spmForKmp.utils.Hashing
+import io.github.frankois944.spmForKmp.utils.checkSum
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
@@ -71,12 +74,23 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: RegularFileProperty
 
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val bridgeSourceDir: DirectoryProperty
+
+    private val currentBridgeHash: String
+        get() = Hashing.hashDirectory(bridgeSourceDir.get().asFile)
+
     @get:OutputFiles
     val outputFiles: List<File>
         get() =
             buildList {
-                getModuleConfigs().forEach { moduleName ->
-                    add(currentBuildDirectory().resolve("${moduleName.name}.def"))
+                getModuleConfigs().forEachIndexed { index, moduleName ->
+                    if (index == 0) {
+                        add(currentBuildDirectory().resolve("${moduleName.name}_${currentBridgeHash}_default.def"))
+                    } else {
+                        add(currentBuildDirectory().resolve("${moduleName.name}.def"))
+                    }
                 }
             }
 
@@ -114,35 +128,41 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     .also {
                         logger.debug("Filtered exportable dependency: {}", it)
                     }.flatMap { dependency ->
-                        if (dependency is SwiftDependency.Package) {
-                            dependency.productsConfig.productPackages
-                                .flatMap { product ->
-                                    product.products
-                                }.map { product ->
+                        when (dependency) {
+                            is SwiftDependency.Package -> {
+                                dependency.productsConfig.productPackages
+                                    .flatMap { product ->
+                                        product.products
+                                    }.map { product ->
+                                        ModuleConfig(
+                                            name = product.name,
+                                            packageName = dependency.packageName,
+                                            spmPackageName = dependency.packageName,
+                                            linkerOpts = product.linkerOpts,
+                                            compilerOpts = product.compilerOpts,
+                                        )
+                                    }
+                            }
+
+                            is SwiftDependency.Binary -> {
+                                listOf(
                                     ModuleConfig(
-                                        name = product.name,
-                                        packageName = dependency.packageName,
+                                        name = dependency.packageName,
+                                        linkerOpts = dependency.linkerOpts,
+                                        compilerOpts = dependency.compilerOpts,
                                         spmPackageName = dependency.packageName,
-                                        linkerOpts = product.linkerOpts,
-                                        compilerOpts = product.compilerOpts,
-                                    )
-                                }
-                        } else if (dependency is SwiftDependency.Binary) {
-                            listOf(
-                                ModuleConfig(
-                                    name = dependency.packageName,
-                                    linkerOpts = dependency.linkerOpts,
-                                    compilerOpts = dependency.compilerOpts,
-                                    spmPackageName = dependency.packageName,
-                                ),
-                            )
-                        } else {
-                            listOf(
-                                ModuleConfig(
-                                    name = dependency.packageName,
-                                    spmPackageName = dependency.packageName,
-                                ),
-                            )
+                                    ),
+                                )
+                            }
+
+                            else -> {
+                                listOf(
+                                    ModuleConfig(
+                                        name = dependency.packageName,
+                                        spmPackageName = dependency.packageName,
+                                    ),
+                                )
+                            }
                         }
                     },
             )
@@ -161,11 +181,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
+        removeOldDefinition()
         val moduleConfigs = getModuleConfigs()
         val buildDirContent = getModulesInBuildDirectory(currentBuildDirectory())
         // find the build directory of the declared module in the manifest
         moduleConfigs
-            .forEach { moduleInfo ->
+            .forEachIndexed { index, moduleInfo ->
                 logger.debug("LOOKING for module dir {}", moduleInfo.name)
                 buildDirContent
                     .find {
@@ -174,7 +195,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     }?.let { buildDir ->
                         moduleInfo.isFramework = buildDir.extension == "framework"
                         moduleInfo.buildDir = buildDir
-                        moduleInfo.definitionFile = currentBuildDirectory().resolve("${moduleInfo.name}.def")
+                        moduleInfo.definitionFile = if (index == 0) {
+                            currentBuildDirectory().resolve("${moduleInfo.name}_${currentBridgeHash}_default.def")
+                        } else {
+                            currentBuildDirectory().resolve("${moduleInfo.name}.def")
+                        }
                     }
             }
         logger.debug(
@@ -201,7 +226,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     }.let { def ->
                         // Append staticLibraries for the first index which is the bridge
                         val libName = compiledBinary.asFile.get().name
-                        val checksum = compiledBinary.asFile.get().md5()
+                        val checksum = compiledBinary.asFile.get().checkSum()
                         val md5 = "#checksum: $checksum"
                         if (index == 0) "$def\n$md5\nstaticLibraries = $libName" else def
                     }
@@ -306,5 +331,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${currentBuildDirectory().path}"
             linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
             """.trimIndent()
+    }
+
+    private fun removeOldDefinition() {
+        currentBuildDirectory().listFiles()?.forEach { file ->
+            if (file.name.endsWith("_default.def")) {
+                file.delete()
+            }
+        }
     }
 }
