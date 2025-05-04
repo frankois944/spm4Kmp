@@ -138,7 +138,7 @@ internal fun Project.configAppleTargets(
                     if (index > 0) {
                         file.nameWithoutExtension + swiftPackageEntry.name.capitalized()
                     } else {
-                        file.nameWithoutExtension
+                        file.nameWithoutExtension.split("_").first()
                     }
 
                 if (index > 0) {
@@ -247,6 +247,7 @@ private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTa
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
+    this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
 }
 
 private fun createCInteropTask(
@@ -262,5 +263,5 @@ private fun createCInteropTask(
 private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> {
     val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies.toList()
     val oldDependency = swiftPackageEntry.packageDependencies.toList()
-    return if (newDependency.isNotEmpty()) newDependency else oldDependency
+    return newDependency.ifEmpty { oldDependency }
 }
