@@ -335,8 +335,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     private fun removeOldDefinition() {
         currentBuildDirectory().listFiles()?.forEach { file ->
-            if (file.name.endsWith("_default.def")) {
-                file.delete()
+            if (file.name.endsWith("_default.def") && file.exists() && file.delete()) {
+                logger.debug("Removing old definition {}", file)
             }
         }
     }
