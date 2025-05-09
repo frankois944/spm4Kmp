@@ -21,6 +21,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
+import io.github.frankois944.spmForKmp.utils.Hashing
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
@@ -247,7 +248,7 @@ private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTa
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-    this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
+    this.currentBridgeHash.set(Hashing.hashDirectory(packageDirectoriesConfig.bridgeSourceDir))
 }
 
 private fun createCInteropTask(

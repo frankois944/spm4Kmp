@@ -74,12 +74,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: RegularFileProperty
 
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val bridgeSourceDir: DirectoryProperty
-
-    private val currentBridgeHash: String
-        get() = Hashing.hashDirectory(bridgeSourceDir.get().asFile)
+    @get:Input
+    abstract val currentBridgeHash: Property<String>
 
     @get:OutputFiles
     val outputFiles: List<File>
@@ -87,7 +83,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             buildList {
                 getModuleConfigs().forEachIndexed { index, moduleName ->
                     if (index == 0) {
-                        add(currentBuildDirectory().resolve("${moduleName.name}_${currentBridgeHash}_default.def"))
+                        add(currentBuildDirectory().resolve("${moduleName.name}_${currentBridgeHash.get()}_default.def"))
                     } else {
                         add(currentBuildDirectory().resolve("${moduleName.name}.def"))
                     }
@@ -154,15 +150,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                     ),
                                 )
                             }
-
-                            else -> {
-                                listOf(
-                                    ModuleConfig(
-                                        name = dependency.packageName,
-                                        spmPackageName = dependency.packageName,
-                                    ),
-                                )
-                            }
                         }
                     },
             )
@@ -196,7 +183,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         moduleInfo.isFramework = buildDir.extension == "framework"
                         moduleInfo.buildDir = buildDir
                         moduleInfo.definitionFile = if (index == 0) {
-                            currentBuildDirectory().resolve("${moduleInfo.name}_${currentBridgeHash}_default.def")
+                            currentBuildDirectory().resolve("${moduleInfo.name}_${currentBridgeHash.get()}_default.def")
                         } else {
                             currentBuildDirectory().resolve("${moduleInfo.name}.def")
                         }
