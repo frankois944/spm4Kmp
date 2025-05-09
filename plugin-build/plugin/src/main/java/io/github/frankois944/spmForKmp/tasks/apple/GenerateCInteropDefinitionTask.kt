@@ -83,9 +83,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             buildList {
                 getModuleConfigs().forEachIndexed { index, moduleName ->
                     if (index == 0) {
-                        add(currentBuildDirectory().resolve("${moduleName.name}_${currentBridgeHash.get()}_default.def"))
+                        add(currentBuildDirectory()
+                            .resolve("${moduleName.name}_${currentBridgeHash.get()}_default.def"))
                     } else {
-                        add(currentBuildDirectory().resolve("${moduleName.name}.def"))
+                        add(currentBuildDirectory()
+                            .resolve("${moduleName.name}.def"))
                     }
                 }
             }
