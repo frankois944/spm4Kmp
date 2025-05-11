@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "6A5FA0AC-1DA3-4B50-8D8C-F470BA915750",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:iosApp.xcodeproj",
+      "identifier" : "7555FF7A242A565900829871",
+      "name" : "iosApp"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:iosApp.xcodeproj",
+        "identifier" : "07348FC02DD13A5E005296B2",
+        "name" : "iosAppUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

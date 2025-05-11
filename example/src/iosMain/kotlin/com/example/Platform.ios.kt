@@ -2,6 +2,7 @@
 
 package com.example
 
+import DummyFramework.MyDummyFramework
 import FirebaseAnalytics.FIRConsentStatusGranted
 import FirebaseCore.FIRApp
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -11,6 +12,12 @@ import platform.UIKit.UIDevice
 import platform.UIKit.UIView
 
 class IOSPlatform : Platform {
+
+    init {
+        println("Load data from framework" + MyDummyFramework().getMyResource())
+        println("Load data from package" + LocalSourceDummyFramework.LocalSourceDummy().getMyInternalResource())
+    }
+
     override val name: String =
         UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
 }
