@@ -20,27 +20,6 @@
         "printedName": "MyDummyFramework",
         "children": [
           {
-            "kind": "Constructor",
-            "name": "init",
-            "printedName": "init()",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "MyDummyFramework",
-                "printedName": "DummyFramework.MyDummyFramework",
-                "usr": "s:14DummyFramework02MyaB0C"
-              }
-            ],
-            "declKind": "Constructor",
-            "usr": "s:14DummyFramework02MyaB0CACycfc",
-            "mangledName": "$s14DummyFramework02MyaB0CACycfc",
-            "moduleName": "DummyFramework",
-            "declAttributes": [
-              "AccessControl"
-            ],
-            "init_kind": "Designated"
-          },
-          {
             "kind": "Function",
             "name": "printSomeValue",
             "printedName": "printSomeValue()",
@@ -52,22 +31,106 @@
               }
             ],
             "declKind": "Func",
-            "usr": "s:14DummyFramework02MyaB0C14printSomeValueyyF",
+            "usr": "c:@M@DummyFramework@objc(cs)MyDummyFramework(im)printSomeValue",
             "mangledName": "$s14DummyFramework02MyaB0C14printSomeValueyyF",
             "moduleName": "DummyFramework",
             "declAttributes": [
-              "AccessControl"
+              "AccessControl",
+              "ObjC"
             ],
             "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "getMyResource",
+            "printedName": "getMyResource()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@DummyFramework@objc(cs)MyDummyFramework(im)getMyResource",
+            "mangledName": "$s14DummyFramework02MyaB0C03getC8ResourceSSyF",
+            "moduleName": "DummyFramework",
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "MyResourceIsMissing",
+            "printedName": "MyResourceIsMissing()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@DummyFramework@objc(cs)MyDummyFramework(im)MyResourceIsMissing",
+            "mangledName": "$s14DummyFramework02MyaB0C0C17ResourceIsMissingSSSgyF",
+            "moduleName": "DummyFramework",
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "MyDummyFramework",
+                "printedName": "DummyFramework.MyDummyFramework",
+                "usr": "c:@M@DummyFramework@objc(cs)MyDummyFramework"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@DummyFramework@objc(cs)MyDummyFramework(im)init",
+            "mangledName": "$s14DummyFramework02MyaB0CACycfc",
+            "moduleName": "DummyFramework",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "init",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override"
+            ],
+            "init_kind": "Designated"
           }
         ],
         "declKind": "Class",
-        "usr": "s:14DummyFramework02MyaB0C",
+        "usr": "c:@M@DummyFramework@objc(cs)MyDummyFramework",
         "mangledName": "$s14DummyFramework02MyaB0C",
         "moduleName": "DummyFramework",
-        "isOpen": true,
         "declAttributes": [
-          "AccessControl"
+          "AccessControl",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
         ],
         "conformances": [
           {
@@ -83,11 +146,68 @@
             "printedName": "Escapable",
             "usr": "s:s9EscapableP",
             "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
           }
         ]
       }
     ],
     "json_format_version": 8
   },
-  "ConstValues": []
+  "ConstValues": [
+    {
+      "filePath": "\/Users\/francoisdabonot\/devs\/spm4Kmp\/BinaryPackageSource\/DummyFramework\/DummyFramework.swift",
+      "kind": "StringLiteral",
+      "offset": 212,
+      "length": 26,
+      "value": "\"com.dummy.DummyFramework\""
+    }
+  ]
 }

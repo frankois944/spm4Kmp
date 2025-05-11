@@ -27,9 +27,9 @@ dependency {
       url = URI(
                 "https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/" +
                     "plugin-build/plugin/src/functionalTest/" +
-                    "resources/DummyFramework.xcframework.zip",
+                    "resources/DummyFramework.xcframeworkV2.zip",
             ),
-        checksum = "20f6264c95e80b6e2da7d2c9b9abe44b4426dac799927ea49fb7a4982f1affdb",
+        checksum = "6facba54c14298441318c479a466fd1eeefb6a9893d546076bda6b71301240f4",
         packageName = "DummyFramework",
         exportToKotlin = true,
     )

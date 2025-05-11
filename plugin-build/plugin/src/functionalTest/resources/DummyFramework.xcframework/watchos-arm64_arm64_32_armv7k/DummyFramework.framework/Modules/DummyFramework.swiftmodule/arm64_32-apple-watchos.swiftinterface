@@ -1,14 +1,17 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 6.0.2 effective-5.10 (swiftlang-6.0.2.1.2 clang-1600.0.26.4)
+// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
 // swift-module-flags: -target arm64_32-apple-watchos8.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name DummyFramework
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
 @_exported import DummyFramework
 import Foundation
 import Swift
 import _Concurrency
 import _StringProcessing
 import _SwiftConcurrencyShims
-open class MyDummyFramework {
-  public init()
-  public func printSomeValue()
+@_inheritsConvenienceInitializers @objc public class MyDummyFramework : ObjectiveC.NSObject {
+  @objc public func printSomeValue()
+  @objc public func getMyResource() -> Swift.String
+  @objc public func MyResourceIsMissing() -> Swift.String?
+  @objc override dynamic public init()
   @objc deinit
 }

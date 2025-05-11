@@ -1,10 +1,14 @@
 #!/bin/sh
 
 outputDir="../plugin-build/plugin/src/functionalTest/resources"
+packageVersion="2"
 
-rm -rf "$outputDir/DummyFramework.xcframework"
-rm -rf "$outputDir/DummyFramework.xcframework.zip"
-
+rm -rf "DummyFramework.xcframework" \
+&& \
+rm -rf "DummyFramework.xcframework.zip" \
+&& \
+rm -rf "archives" \
+&& \
 xcodebuild archive \
 -scheme DummyFramework \
 -destination "generic/platform=iOS" \
@@ -68,11 +72,10 @@ zip -r DummyFramework.xcframework.zip DummyFramework.xcframework \
 && \
 echo "Use the checksum to update the correct test" \
 && \
-swift package compute-checksum DummyFramework.xcframework.zip \
+xcrun swift package compute-checksum DummyFramework.xcframework.zip \
 && \
-mv DummyFramework.xcframework.zip "$outputDir/DummyFramework.xcframework.zip" \
+rm -rf "${outputDir:?}/*" \
 && \
-mv DummyFramework.xcframework "$outputDir/DummyFramework.xcframework"
-
-
-
+mv -f DummyFramework.xcframework.zip "$outputDir/DummyFrameworkV$packageVersion.xcframework.zip" \
+&& \
+mv -f DummyFramework.xcframework "$outputDir/DummyFramework.xcframework"

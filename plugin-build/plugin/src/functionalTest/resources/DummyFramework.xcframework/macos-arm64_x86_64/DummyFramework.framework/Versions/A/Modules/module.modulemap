@@ -4,3 +4,8 @@ framework module DummyFramework {
 
   module * { export * }
 }
+
+module DummyFramework.Swift {
+  header "DummyFramework-Swift.h"
+  requires objc
+}
