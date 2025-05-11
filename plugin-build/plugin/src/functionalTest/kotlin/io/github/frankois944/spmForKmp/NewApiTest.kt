@@ -24,12 +24,13 @@ class NewApiTest : BaseTest() {
                             """
 dependency {
     remoteBinary(
-      url = URI(
-                "https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/" +
-                    "plugin-build/plugin/src/functionalTest/" +
-                    "resources/DummyFramework.xcframeworkV2.zip",
+        url =
+            URI(
+                "https://raw.githubusercontent.com/" +
+                    "frankois944/spm4Kmp/refs/heads/main/plugin-build/" +
+                    "plugin/src/functionalTest/resources/DummyFrameworkV2.xcframework.zip",
             ),
-        checksum = "6facba54c14298441318c479a466fd1eeefb6a9893d546076bda6b71301240f4",
+        checksum = "ce79ee72991d40620f156e407e47145ba3279cc15ebf20bb2560c7882d69e56e",
         packageName = "DummyFramework",
         exportToKotlin = true,
     )
