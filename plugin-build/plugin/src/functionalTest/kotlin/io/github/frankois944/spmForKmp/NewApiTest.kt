@@ -24,8 +24,7 @@ class NewApiTest : BaseTest() {
                             """
 dependency {
     remoteBinary(
-        url =
-            URI(
+       url = URI(
                 "https://raw.githubusercontent.com/" +
                     "frankois944/spm4Kmp/refs/heads/main/plugin-build/" +
                     "plugin/src/functionalTest/resources/DummyFrameworkV2.xcframework.zip",
