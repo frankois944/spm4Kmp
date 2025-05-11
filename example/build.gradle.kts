@@ -122,7 +122,7 @@ swiftPackageConfig {
                 version = "11.8.1",
             )
             localBinary(
-                path = "$testResources/DummyFramework.xcframework.zip",
+                path = "$testResources/DummyFrameworkV2.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
             )

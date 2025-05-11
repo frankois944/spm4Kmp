@@ -32,6 +32,7 @@ let package = Package(
     ),
     .binaryTarget(
       name: "DummyFramework",
-      path: "../../plugin-build/plugin/src/functionalTest/resources/DummyFramework.xcframework.zip"),
+      path:
+        "../../plugin-build/plugin/src/functionalTest/resources/DummyFrameworkV2.xcframework.zip"),
   ]
 )
