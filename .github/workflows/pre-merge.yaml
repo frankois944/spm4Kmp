@@ -70,7 +70,7 @@ jobs:
       - name: Run Gradle tasks
         run: ./gradlew :preMerge :plugin-build:plugin:jacocoTestReport --continue
       - name: build iosExampleApp
-        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'name=iPhone Xs' ARCHS=arm64 -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" test | xcpretty
+        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone Xs' -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" test | xcpretty
         working-directory: "example/iosApp"
       - name: Archive test results
         uses: actions/upload-artifact@v4
