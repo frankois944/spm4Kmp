@@ -17,11 +17,10 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:iosApp.xcodeproj",
-        "identifier" : "07348FC02DD13A5E005296B2",
-        "name" : "iosAppUITests"
+        "identifier" : "078F1E522DD1B6A70011CCF8",
+        "name" : "iosAppTests"
       }
     }
   ],
