@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.definition.dependency
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfig
+import io.github.frankois944.spmForKmp.utils.ExperimentalAPI
 import java.io.Serializable
 import java.net.URI
 
@@ -16,6 +17,7 @@ internal class Dependency :
         exportToKotlin: Boolean,
         linkerOpts: List<String>,
         compilerOpts: List<String>,
+        copyResourcesToApp: Boolean
     ) {
         packageDependencies.add(
             SwiftDependency.Binary.Local(
@@ -24,6 +26,7 @@ internal class Dependency :
                 exportToKotlin = exportToKotlin,
                 linkerOpts = linkerOpts,
                 compilerOpts = compilerOpts,
+                copyResourcesToApp = copyResourcesToApp
             ),
         )
     }
@@ -35,6 +38,7 @@ internal class Dependency :
         checksum: String,
         linkerOpts: List<String>,
         compilerOpts: List<String>,
+        copyResourcesToApp: Boolean
     ) {
         packageDependencies.add(
             SwiftDependency.Binary.Remote(
@@ -44,6 +48,7 @@ internal class Dependency :
                 checksum = checksum,
                 linkerOpts = linkerOpts,
                 compilerOpts = compilerOpts,
+                copyResourcesToApp = copyResourcesToApp
             ),
         )
     }

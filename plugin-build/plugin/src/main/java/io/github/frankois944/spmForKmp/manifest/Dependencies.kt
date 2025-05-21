@@ -33,7 +33,7 @@ internal fun getDependenciesTargets(
                     dependency.productsConfig.productPackages.forEach { config ->
                         config.products
                             .filter {
-                                !forExportedPackage || it.isIncludedInExportedPackage
+                                !forExportedPackage || !it.copyResourcesToApp
                             }.forEach { product ->
                                 val name = product.alias ?: product.name
                                 add(".product(name: \"$name\", package: \"${dependency.packageName}\")")
@@ -46,7 +46,7 @@ internal fun getDependenciesTargets(
 internal fun hasExportedDependencyProduct(dependency: SwiftDependency): Boolean {
     if (dependency is SwiftDependency.Package) {
         return dependency.productsConfig.productPackages.any { config ->
-            config.products.any { it.isIncludedInExportedPackage }
+            config.products.any { !it.copyResourcesToApp }
         }
     }
 

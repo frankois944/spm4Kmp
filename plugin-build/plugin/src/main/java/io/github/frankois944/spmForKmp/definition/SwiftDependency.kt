@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.definition
 
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfigImpl
+import io.github.frankois944.spmForKmp.utils.ExperimentalAPI
 import java.io.Serializable
 import java.net.URI
 
@@ -54,6 +55,11 @@ public sealed interface SwiftDependency : Serializable {
          */
         public var compilerOpts: List<String>
 
+        /**
+         *  Copy the product's resources into the application (only when running from xcode); also, it won't be included inside the local package.
+         */
+        public var copyResourcesToApp: Boolean
+
         @Suppress("MaxLineLength")
         /**
          * Represents a local binary dependency in the Kotlin Multiplatform project.
@@ -63,8 +69,8 @@ public sealed interface SwiftDependency : Serializable {
          * @property path The local file URL (file://...) to the xcFramework.
          * @property packageName The name of the package associated with this binary.
          * @property exportToKotlin Defines whether the dependency should be exported for use in Kotlin code.
-         * @property linkerOpts
-         * @property compilerOpts
+         * @property linkerOpts Add custom linker flag when exporting the product to kotlin
+         * @property compilerOpts Add custom compiler flag when exporting the product to kotlin
          *
          * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
          */
@@ -75,6 +81,7 @@ public sealed interface SwiftDependency : Serializable {
             override val exportToKotlin: Boolean = false,
             override var linkerOpts: List<String> = emptyList(),
             override var compilerOpts: List<String> = emptyList(),
+            override var copyResourcesToApp: Boolean = false,
         ) : Binary
 
         @Suppress("MaxLineLength")
@@ -87,8 +94,9 @@ public sealed interface SwiftDependency : Serializable {
          * @property packageName The name of the package associated with this binary dependency.
          * @property exportToKotlin Defines whether this dependency should be exported for use in Kotlin code.
          * @property checksum The checksum of the remote binary to verify its integrity.
-         * @property linkerOpts
-         * @property compilerOpts
+         * @property linkerOpts Add custom linker flag when exporting the product to kotlin
+         * @property compilerOpts Add custom compiler flag when exporting the product to kotlin
+         * @property copyResourcesToApp Copy the product's resources into the application (only when running from xcode); also, it won't be included inside the local package.
          *
          * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
          */
@@ -100,6 +108,7 @@ public sealed interface SwiftDependency : Serializable {
             val checksum: String,
             override var linkerOpts: List<String> = emptyList(),
             override var compilerOpts: List<String> = emptyList(),
+            override var copyResourcesToApp: Boolean = false,
         ) : Binary
     }
 

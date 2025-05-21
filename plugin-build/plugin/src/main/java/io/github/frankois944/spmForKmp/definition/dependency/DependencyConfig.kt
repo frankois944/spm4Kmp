@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.definition.dependency
 
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfig
+import io.github.frankois944.spmForKmp.utils.ExperimentalAPI
 import java.io.Serializable
 import java.net.URI
 
@@ -16,6 +17,7 @@ public interface DependencyConfig : Serializable {
      * @property exportToKotlin Defines whether the dependency should be exported for use in Kotlin code.
      * @property linkerOpts
      * @property compilerOpts
+     * @property copyResourcesToApp `EXPERIMENTAL` Copy the product's resources into the application (only when running from xcode); also, it won't be included inside the local package.
      */
     public fun localBinary(
         path: String,
@@ -23,6 +25,7 @@ public interface DependencyConfig : Serializable {
         exportToKotlin: Boolean = false,
         linkerOpts: List<String> = emptyList(),
         compilerOpts: List<String> = emptyList(),
+        copyResourcesToApp: Boolean = false
     )
 
     @Suppress("LongParameterList", "MaxLineLength")
@@ -37,6 +40,7 @@ public interface DependencyConfig : Serializable {
      * @property checksum The checksum of the remote binary to verify its integrity.
      * @property linkerOpts
      * @property compilerOpts
+     * @property copyResourcesToApp `EXPERIMENTAL` Copy the product's resources into the application (only when running from xcode); also, it won't be included inside the local package.
      */
     public fun remoteBinary(
         url: URI,
@@ -45,6 +49,7 @@ public interface DependencyConfig : Serializable {
         checksum: String,
         linkerOpts: List<String> = emptyList(),
         compilerOpts: List<String> = emptyList(),
+        copyResourcesToApp: Boolean = false
     )
 
     /**
