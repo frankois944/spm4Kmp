@@ -55,6 +55,8 @@ swiftPackageConfig {
 
     Note : When updating your configuration, reset the package cache to apply the modification.
 
+    [Learn more about the local package](https://github.com/frankois944/spm4Kmp/discussions/108)
+
 ## Example
 
 ``` kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
