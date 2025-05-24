@@ -1507,6 +1507,7 @@ enabling customized project structure organization.</p>
 within the Kotlin Multiplatform project. Modifying this value adjusts the generated build configuration
 and compatibility of the resulting package with iOS devices and emulators.</p>
 <p>Default value: <code>12.0</code></p>
+<p>If <code>null</code>, the platform is skipped inside the Package manifest.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">minIos</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_MIN_IOS_VERSION</span>
 </span></code></pre></div>
 <h2 id="minmacos">minMacos</h2>
@@ -1515,6 +1516,7 @@ and compatibility of the resulting package with iOS devices and emulators.</p>
 Used during the generation of SPM manifests and the compilation of Swift packages to ensure compatibility
 with the specified macOS version.</p>
 <p>Default value: <code>10.13</code></p>
+<p>If <code>null</code>, the platform is skipped inside the Package manifest.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">minMacos</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_MIN_MAC_OS_VERSION</span>
 </span></code></pre></div>
 <h2 id="mintvos">minTvos</h2>
@@ -1523,6 +1525,7 @@ with the specified macOS version.</p>
 dependencies and targets must support.
 [
 Default value: <code>12.0</code></p>
+<p>If <code>null</code>, the platform is skipped inside the Package manifest.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">minTvos</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_MIN_TV_OS_VERSION</span>
 </span></code></pre></div>
 <h2 id="minwatchos">minWatchos</h2>
@@ -1531,6 +1534,7 @@ Default value: <code>12.0</code></p>
 when building or running tasks involving watchOS-specific code. It ensures compatibility
 with the defined platform version during build processes or runtime configurations.</p>
 <p>Default value: <code>4.0</code></p>
+<p>If <code>null</code>, the platform is skipped inside the Package manifest.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">minWatchos</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_MIN_WATCH_OS_VERSION</span>
 </span></code></pre></div>
 <h2 id="toolsversion">toolsVersion</h2>
@@ -1539,6 +1543,7 @@ This version determines the compatibility and features available for the Swift P
 <p>The <code>toolsVersion</code> value impacts the structure of the <code>Package.swift</code> manifest file and
 the behavior of the Swift package dependencies during resolution and compilation.</p>
 <p>Default value: <code>5.9</code></p>
+<p>If <code>null</code>, the platform is skipped inside the Package manifest.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">toolsVersion</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_TOOL_VERSION</span>
 </span></code></pre></div>
 <h2 id="debug">debug</h2>
