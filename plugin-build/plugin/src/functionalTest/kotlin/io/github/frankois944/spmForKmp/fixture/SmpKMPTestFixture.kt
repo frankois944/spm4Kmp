@@ -27,10 +27,10 @@ abstract class SmpKMPTestFixture private constructor(
         val buildPath: String = "build/functionalTest",
         var customPackageSourcePath: String = "src/swift",
         var cinteropsName: String = "dummy",
-        var minIos: String = "12.0",
-        var minMacos: String = "10.15",
-        var minTvos: String = "12.0",
-        var minWatchos: String = "4.0",
+        var minIos: String? = "12.0",
+        var minMacos: String? = "10.15",
+        var minTvos: String? = "12.0",
+        var minWatchos: String? = "4.0",
         var toolsVersion: String = "5.9",
         var packageDependencyPrefix: String? = null,
         var targets: List<AppleCompileTarget> = listOf(AppleCompileTarget.iosSimulatorArm64),
@@ -159,26 +159,45 @@ swiftPackageConfig {
     create("${extension.cinteropsName}") {
     customPackageSourcePath = "${extension.customPackageSourcePath}"
     toolsVersion = "${extension.toolsVersion}"
-    minIos = "${extension.minIos}"
-    minMacos = "${extension.minMacos}"
-    minTvos = "${extension.minTvos}"
-    minWatchos = "${extension.minWatchos}"
-""",
+"""
                     )
+                    extension.minIos?.let {
+                        appendLine("minIos = \"${extension.minIos}\"")
+                    } ?: run {
+                        appendLine("minIos = null")
+                    }
+
+                    extension.minMacos?.let {
+                        appendLine("minMacos = \"${extension.minMacos}\"")
+                    } ?: run {
+                        appendLine("minMacos = null")
+                    }
+
+                    extension.minTvos?.let {
+                        appendLine("minTvos = \"${extension.minTvos}\"")
+                    } ?: run {
+                        appendLine("minTvos = null")
+                    }
+
+                    extension.minWatchos?.let {
+                        appendLine("minWatchos = \"${extension.minWatchos}\"")
+                    } ?: run {
+                        appendLine("minWatchos = null")
+                    }
                     extension.packageDependencyPrefix?.let {
-                        append("packageDependencyPrefix = \"${extension.packageDependencyPrefix}\"\n")
+                        appendLine("packageDependencyPrefix = \"${extension.packageDependencyPrefix}\"")
                     }
                     extension.sharedCachePath?.let {
-                        append("sharedCachePath = \"${extension.sharedCachePath}\"\n")
+                        appendLine("sharedCachePath = \"${extension.sharedCachePath}\"")
                     }
                     extension.sharedConfigPath?.let {
-                        append("sharedConfigPath = \"${extension.sharedConfigPath}\"\n")
+                        appendLine("sharedConfigPath = \"${extension.sharedConfigPath}\"")
                     }
                     extension.sharedSecurityPath?.let {
-                        append("sharedSecurityPath = \"${extension.sharedSecurityPath}\"\n")
+                        appendLine("sharedSecurityPath = \"${extension.sharedSecurityPath}\"")
                     }
                     extension.customSPMPath?.let {
-                        append("spmWorkingPath = \"${extension.customSPMPath}\"\n")
+                        appendLine("spmWorkingPath = \"${extension.customSPMPath}\"")
                     }
 
                     fun buildProductBlock(
@@ -417,14 +436,24 @@ swiftPackageConfig {
                 config = config.copy(customSPMPath = path)
             }
 
-        fun withMacos(minMacos: String) =
+        fun withMinMacos(minMacos: String?) =
             apply {
                 config = config.copy(minMacos = minMacos)
             }
 
-        fun withMinIos(minIos: String) =
+        fun withMinIos(minIos: String?) =
             apply {
                 config = config.copy(minIos = minIos)
+            }
+
+        fun withMinWatchOs(minWatchOs: String?) =
+            apply {
+                config = config.copy(minWatchos = minWatchOs)
+            }
+
+        fun withMinTvos(minTvOs: String?) =
+            apply {
+                config = config.copy(minTvos = minTvOs)
             }
 
         fun withRawDependencies(vararg sources: KotlinSource) =

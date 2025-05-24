@@ -24,7 +24,7 @@ internal fun getBuildMode(extension: PackageRootDefinitionExtension) = if (exten
 internal fun computeOsVersion(
     target: AppleCompileTarget,
     extension: PackageRootDefinitionExtension,
-): String =
+): String? =
     target.getOsVersion(
         minIos = extension.minIos,
         minWatchos = extension.minWatchos,

@@ -40,7 +40,7 @@ internal fun generateManifest(parameters: TemplateParameters): String {
 
         let package = Package(
             name: "$name",
-            $platforms,
+            $platforms
             products: [
                 .library(
                     name: "$name",
@@ -78,7 +78,7 @@ private fun getPlatformBlock(
             ".tvOS(\"$minTvos\")".takeIf { minTvos.isNotEmpty() },
             ".watchOS(\"$minWatchos\")".takeIf { minWatchos.isNotEmpty() },
         ).joinToString(",")
-    return "platforms: [$entries]"
+    return  if (entries.isNotEmpty()) "platforms: [$entries]," else ""
 }
 
 private fun getProductsTargets(

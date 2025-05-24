@@ -34,7 +34,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     abstract val packageScratchDir: Property<File>
 
     @get:Input
-    abstract val osVersion: Property<String>
+    @get:Optional
+    abstract val osVersion: Property<String?>
 
     @get:Input
     @get:Optional
@@ -94,7 +95,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 add("--sdk")
                 add(execOps.getSDKPath(target.get(), logger))
                 add("--triple")
-                add(target.get().triple(osVersion.get()))
+                add(target.get().triple(osVersion.orNull.orEmpty()))
                 add("--scratch-path")
                 add(packageScratchDir.get().path)
                 add("-c")

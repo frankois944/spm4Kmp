@@ -11,6 +11,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
@@ -27,16 +28,20 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     abstract val packageName: Property<String>
 
     @get:Input
-    abstract val minIos: Property<String>
+    @get:Optional
+    abstract val minIos: Property<String?>
 
     @get:Input
-    abstract val minMacos: Property<String>
+    @get:Optional
+    abstract val minMacos: Property<String?>
 
     @get:Input
-    abstract val minTvos: Property<String>
+    @get:Optional
+    abstract val minTvos: Property<String?>
 
     @get:Input
-    abstract val minWatchos: Property<String>
+    @get:Optional
+    abstract val minWatchos: Property<String?>
 
     @get:Input
     abstract val toolsVersion: Property<String>
@@ -92,10 +97,10 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                                 .asFile.parentFile
                                 .toPath(),
                         productName = packageName.get(),
-                        minIos = minIos.get(),
-                        minMacos = minMacos.get(),
-                        minTvos = minTvos.get(),
-                        minWatchos = minWatchos.get(),
+                        minIos = minIos.orNull ?: "",
+                        minMacos = minMacos.orNull ?: "",
+                        minTvos = minTvos.orNull ?: "",
+                        minWatchos = minWatchos.orNull ?: "",
                         toolsVersion = toolsVersion.get(),
                         targetSettings = null,
                         exportedPackage = exportedPackage.get(),

@@ -53,8 +53,10 @@ public abstract class PackageRootDefinitionExtension
          * and compatibility of the resulting package with iOS devices and emulators.
          *
          * Default value: [DEFAULT_MIN_IOS_VERSION]
+         *
+         * If `null`, the platform is skipped inside the Package manifest.
          */
-        public var minIos: String = DEFAULT_MIN_IOS_VERSION
+        public var minIos: String? = DEFAULT_MIN_IOS_VERSION
 
         /**
          * Specifies the minimum supported macOS version for the Swift Package Manager (SPM) integration.
@@ -64,8 +66,10 @@ public abstract class PackageRootDefinitionExtension
          * with the specified macOS version.
          *
          * Default value: [DEFAULT_MIN_MAC_OS_VERSION]
+         *
+         * If `null`, the platform is skipped inside the Package manifest.
          */
-        public var minMacos: String = DEFAULT_MIN_MAC_OS_VERSION
+        public var minMacos: String? = DEFAULT_MIN_MAC_OS_VERSION
 
         /**
          * Specifies the minimum required version of tvOS for the Swift package definition.
@@ -74,8 +78,10 @@ public abstract class PackageRootDefinitionExtension
          * dependencies and targets must support.
          *
          * Default value: [DEFAULT_MIN_TV_OS_VERSION]
+         *
+         * If `null`, the platform is skipped inside the Package manifest.
          */
-        public var minTvos: String = DEFAULT_MIN_TV_OS_VERSION
+        public var minTvos: String? = DEFAULT_MIN_TV_OS_VERSION
 
         /**
          * Minimum watchOS version required for the Swift package.
@@ -85,8 +91,10 @@ public abstract class PackageRootDefinitionExtension
          * with the defined platform version during build processes or runtime configurations.
          *
          * Default value: [DEFAULT_MIN_WATCH_OS_VERSION]
+         *
+         * If `null`, the platform is skipped inside the Package manifest.
          */
-        public var minWatchos: String = DEFAULT_MIN_WATCH_OS_VERSION
+        public var minWatchos: String? = DEFAULT_MIN_WATCH_OS_VERSION
 
         /**
          * Specifies the version of Swift tools that will be utilized.

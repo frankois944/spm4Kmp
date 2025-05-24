@@ -13,6 +13,8 @@ import io.github.frankois944.spmForKmp.tasks.utils.findIncludeFolders
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.Hashing
 import io.github.frankois944.spmForKmp.utils.checkSum
+import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
+import io.github.frankois944.spmForKmp.utils.getFakeDefinitionFile
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -53,7 +55,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     abstract val debugMode: Property<Boolean>
 
     @get:Input
-    abstract val osVersion: Property<String>
+    @get:Optional
+    abstract val osVersion: Property<String?>
 
     @get:Input
     abstract val scratchDir: Property<File>

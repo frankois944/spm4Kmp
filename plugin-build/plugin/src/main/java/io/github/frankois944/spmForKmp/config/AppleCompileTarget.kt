@@ -98,11 +98,11 @@ public enum class AppleCompileTarget : Serializable {
         }
 
     internal fun getOsVersion(
-        minIos: String,
-        minWatchos: String,
-        minTvos: String,
-        minMacos: String,
-    ): String =
+        minIos: String?,
+        minWatchos: String?,
+        minTvos: String?,
+        minMacos: String?,
+    ): String? =
         when (this) {
             iosX64,
             iosArm64,
