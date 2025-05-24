@@ -22,6 +22,8 @@ and compatibility of the resulting package with iOS devices and emulators.
 
 Default value: `12.0`
 
+If `null`, the platform is skipped inside the Package manifest.
+
 ```kotlin
 var minIos: String = DEFAULT_MIN_IOS_VERSION
 ```
@@ -36,6 +38,8 @@ with the specified macOS version.
 
 Default value: `10.13`
 
+If `null`, the platform is skipped inside the Package manifest.
+
 ```kotlin
 var minMacos: String = DEFAULT_MIN_MAC_OS_VERSION
 ```
@@ -48,6 +52,8 @@ This property is used to configure the minimum tvOS version that the Swift packa
 dependencies and targets must support.
 [
 Default value: `12.0`
+
+If `null`, the platform is skipped inside the Package manifest.
 
 ```kotlin
 var minTvos: String = DEFAULT_MIN_TV_OS_VERSION
@@ -63,6 +69,8 @@ with the defined platform version during build processes or runtime configuratio
 
 Default value: `4.0`
 
+If `null`, the platform is skipped inside the Package manifest.
+
 ```kotlin
 var minWatchos: String = DEFAULT_MIN_WATCH_OS_VERSION
 ```
@@ -76,6 +84,8 @@ The `toolsVersion` value impacts the structure of the `Package.swift` manifest f
 the behavior of the Swift package dependencies during resolution and compilation.
 
 Default value: `5.9`
+
+If `null`, the platform is skipped inside the Package manifest.
 
 ```kotlin
 var toolsVersion: String = DEFAULT_TOOL_VERSION
