@@ -2,7 +2,6 @@ package io.github.frankois944.spmForKmp.definition
 
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfig
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfigImpl
-import io.github.frankois944.spmForKmp.utils.ExperimentalAPI
 import java.io.Serializable
 import java.net.URI
 
@@ -17,6 +16,7 @@ import java.net.URI
  */
 public sealed interface SwiftDependency : Serializable {
     public val packageName: String
+    public val isIncludedInExportedPackage: Boolean
 
     private companion object {
         /**
@@ -55,11 +55,6 @@ public sealed interface SwiftDependency : Serializable {
          */
         public var compilerOpts: List<String>
 
-        /**
-         *  Copy the product's resources into the application (only when running from xcode); also, it won't be included inside the local package.
-         */
-        public var copyResourcesToApp: Boolean
-
         @Suppress("MaxLineLength")
         /**
          * Represents a local binary dependency in the Kotlin Multiplatform project.
@@ -79,9 +74,9 @@ public sealed interface SwiftDependency : Serializable {
             val path: String,
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
+            override var isIncludedInExportedPackage: Boolean = true,
             override var linkerOpts: List<String> = emptyList(),
             override var compilerOpts: List<String> = emptyList(),
-            override var copyResourcesToApp: Boolean = false,
         ) : Binary
 
         @Suppress("MaxLineLength")
@@ -96,7 +91,6 @@ public sealed interface SwiftDependency : Serializable {
          * @property checksum The checksum of the remote binary to verify its integrity.
          * @property linkerOpts Add custom linker flag when exporting the product to kotlin
          * @property compilerOpts Add custom compiler flag when exporting the product to kotlin
-         * @property copyResourcesToApp Copy the product's resources into the application (only when running from xcode); also, it won't be included inside the local package.
          *
          * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
          */
@@ -106,9 +100,9 @@ public sealed interface SwiftDependency : Serializable {
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
             val checksum: String,
+            override var isIncludedInExportedPackage: Boolean = true,
             override var linkerOpts: List<String> = emptyList(),
             override var compilerOpts: List<String> = emptyList(),
-            override var copyResourcesToApp: Boolean = false,
         ) : Binary
     }
 
@@ -132,6 +126,7 @@ public sealed interface SwiftDependency : Serializable {
         public data class Local(
             val path: String,
             override var packageName: String = "",
+            override val isIncludedInExportedPackage: Boolean = true,
             override val products: ProductPackageConfig.() -> Unit,
         ) : Package() {
             init {
@@ -143,6 +138,13 @@ public sealed interface SwiftDependency : Serializable {
                             .products
                             .first()
                             .name
+                }
+                if (!isIncludedInExportedPackage) {
+                    productsConfig.productPackages.forEach { productPackage ->
+                        productPackage.products.forEach { product ->
+                            product.isIncludedInExportedPackage = false
+                        }
+                    }
                 }
             }
         }
@@ -168,6 +170,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: URI,
                 public override var packageName: String = "",
                 public val version: String,
+                override val isIncludedInExportedPackage: Boolean,
                 public override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
@@ -175,6 +178,13 @@ public sealed interface SwiftDependency : Serializable {
                         packageName = buildPackageName(url)
                     }
                     productsConfig.apply(products)
+                    if (!isIncludedInExportedPackage) {
+                        productsConfig.productPackages.forEach { productPackage ->
+                            productPackage.products.forEach { product ->
+                                product.isIncludedInExportedPackage = false
+                            }
+                        }
+                    }
                 }
             }
 
@@ -193,6 +203,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: URI,
                 public override var packageName: String = "",
                 public val branch: String,
+                override val isIncludedInExportedPackage: Boolean,
                 override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
@@ -200,6 +211,13 @@ public sealed interface SwiftDependency : Serializable {
                         packageName = buildPackageName(url)
                     }
                     productsConfig.apply(products)
+                    if (!isIncludedInExportedPackage) {
+                        productsConfig.productPackages.forEach { productPackage ->
+                            productPackage.products.forEach { product ->
+                                product.isIncludedInExportedPackage = false
+                            }
+                        }
+                    }
                 }
             }
 
@@ -218,6 +236,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: URI,
                 public override var packageName: String = "",
                 public val revision: String,
+                override val isIncludedInExportedPackage: Boolean,
                 override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
@@ -225,16 +244,23 @@ public sealed interface SwiftDependency : Serializable {
                         packageName = buildPackageName(url)
                     }
                     productsConfig.apply(products)
+                    if (!isIncludedInExportedPackage) {
+                        productsConfig.productPackages.forEach { productPackage ->
+                            productPackage.products.forEach { product ->
+                                product.isIncludedInExportedPackage = false
+                            }
+                        }
+                    }
                 }
             }
 
             internal companion object {
-                private const val serialVersionUID: Long = 2
+                private const val serialVersionUID: Long = 3
             }
         }
 
         internal companion object {
-            private const val serialVersionUID: Long = 2
+            private const val serialVersionUID: Long = 3
         }
     }
 }

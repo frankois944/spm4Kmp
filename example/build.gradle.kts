@@ -20,7 +20,7 @@ kotlin {
     }
 
     listOf(
-        iosX64(),
+        //  iosX64(),
         iosSimulatorArm64(),
     ).forEach {
         it.binaries.framework {
@@ -34,7 +34,7 @@ kotlin {
         }
     }
 
-    listOf(
+    /*listOf(
         macosArm64(),
     ).forEach {
         it.binaries.framework {
@@ -46,7 +46,7 @@ kotlin {
                 cinterops.create("nativeMacosShared")
             }
         }
-    }
+    }*/
 
     sourceSets {
         commonMain.dependencies {
@@ -106,15 +106,17 @@ swiftPackageConfig {
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         // swiftBinPath = "/path/to/.swiftly/bin/swift"
+        copyDependenciesToApp = true
         dependency {
             remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
                 products = {
                     // Export to Kotlin for use in shared Kotlin code
-                    add("FirebaseCore", "FirebaseAnalytics", exportToKotlin = true)
+                    add("FirebaseAnalytics", exportToKotlin = true)
+                    add(ProductName("FirebaseCore", isIncludedInExportedPackage = false), exportToKotlin = true)
                     // add FirebaseDatabase to your own swift code but don't export it
-                    add(ProductName("FirebaseDatabase"))
+                    add(ProductName("FirebaseDatabase", isIncludedInExportedPackage = false))
                 },
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
@@ -125,13 +127,18 @@ swiftPackageConfig {
                 path = "$testResources/DummyFrameworkV2.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
+                isIncludedInExportedPackage = false,
             )
             localPackage(
                 path = "$testResources/LocalSourceDummyFramework",
                 packageName = "LocalSourceDummyFramework",
                 products = {
                     // Export to Kotlin for use in shared Kotlin code, false by default
-                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                    add(
+                        "LocalSourceDummyFramework",
+                        exportToKotlin = true,
+                        isIncludedInExportedPackage = false,
+                    )
                 },
             )
             remotePackageVersion(
@@ -139,12 +146,12 @@ swiftPackageConfig {
                 version = "1.8.1",
                 products = {
                     // Can be only used in your "src/swift" code.
-                    add("CryptoSwift")
+                    add("CryptoSwift", isIncludedInExportedPackage = false)
                 },
             )
         }
     }
-    create("nativeMacosShared") {
+    /*create("nativeMacosShared") {
         dependency {
             localPackage(
                 path = "$testResources/LocalSourceDummyFramework",
@@ -155,5 +162,5 @@ swiftPackageConfig {
                 },
             )
         }
-    }
+    }*/
 }

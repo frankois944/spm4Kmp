@@ -27,13 +27,13 @@ internal fun getDependenciesTargets(
     buildList {
         dependencies
             .forEach { dependency ->
-                if (dependency.isBinaryDependency) {
+                if (dependency.isBinaryDependency && dependency.isIncludedInExportedPackage) {
                     add("\"${dependency.packageName}\"")
                 } else if (dependency is SwiftDependency.Package) {
                     dependency.productsConfig.productPackages.forEach { config ->
                         config.products
                             .filter {
-                                !forExportedPackage || !it.copyResourcesToApp
+                                !forExportedPackage || it.isIncludedInExportedPackage
                             }.forEach { product ->
                                 val name = product.alias ?: product.name
                                 add(".product(name: \"$name\", package: \"${dependency.packageName}\")")
@@ -46,7 +46,7 @@ internal fun getDependenciesTargets(
 internal fun hasExportedDependencyProduct(dependency: SwiftDependency): Boolean {
     if (dependency is SwiftDependency.Package) {
         return dependency.productsConfig.productPackages.any { config ->
-            config.products.any { !it.copyResourcesToApp }
+            config.products.any { it.isIncludedInExportedPackage }
         }
     }
 
@@ -60,6 +60,7 @@ internal fun getLocaleBinary(
     buildList {
         dependencies
             .filterIsInstance<SwiftDependency.Binary.Local>()
+            .filter { it.isIncludedInExportedPackage }
             .forEach { dependency ->
                 // package path MUST be relative to somewhere, let's choose the swiftBuildDir
                 val path = Path.of(dependency.path).relativeToOrSelf(swiftBuildDir)
@@ -71,6 +72,7 @@ internal fun getRemoteBinary(dependencies: List<SwiftDependency>): String =
     buildList {
         dependencies
             .filterIsInstance<SwiftDependency.Binary.Remote>()
+            .filter { it.isIncludedInExportedPackage }
             .forEach { dependency ->
                 // checksum is MANDATORY
                 add(

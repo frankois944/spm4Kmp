@@ -78,7 +78,7 @@ private fun getPlatformBlock(
             ".tvOS(\"$minTvos\")".takeIf { minTvos.isNotEmpty() },
             ".watchOS(\"$minWatchos\")".takeIf { minWatchos.isNotEmpty() },
         ).joinToString(",")
-    return  if (entries.isNotEmpty()) "platforms: [$entries]," else ""
+    return if (entries.isNotEmpty()) "platforms: [$entries]," else ""
 }
 
 private fun getProductsTargets(
@@ -88,7 +88,7 @@ private fun getProductsTargets(
     buildList {
         add("\"$cinteropName\"")
         dependencies
-            .filter { it.isBinaryDependency }
+            .filter { it.isBinaryDependency && it.isIncludedInExportedPackage }
             .forEach { dependency ->
                 add("\"${dependency.packageName}\"")
             }
