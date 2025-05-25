@@ -170,7 +170,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: URI,
                 public override var packageName: String = "",
                 public val version: String,
-                override val isIncludedInExportedPackage: Boolean,
+                override val isIncludedInExportedPackage: Boolean = true,
                 public override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
@@ -203,7 +203,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: URI,
                 public override var packageName: String = "",
                 public val branch: String,
-                override val isIncludedInExportedPackage: Boolean,
+                override val isIncludedInExportedPackage: Boolean = true,
                 override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
@@ -236,7 +236,7 @@ public sealed interface SwiftDependency : Serializable {
                 public override val url: URI,
                 public override var packageName: String = "",
                 public val revision: String,
-                override val isIncludedInExportedPackage: Boolean,
+                override val isIncludedInExportedPackage: Boolean = true,
                 override val products: ProductPackageConfig.() -> Unit,
             ) : Remote() {
                 init {
