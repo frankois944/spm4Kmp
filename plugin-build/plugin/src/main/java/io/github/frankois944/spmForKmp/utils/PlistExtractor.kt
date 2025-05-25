@@ -11,8 +11,7 @@ internal fun getPlistValue(
     try {
         val rootDict = PropertyListParser.parse(file) as NSDictionary
         return rootDict.objectForKey(key).toString()
-    } catch (ex: Exception) {
-        ex.printStackTrace()
+    } catch (_: Exception) {
     }
     return null
 }
