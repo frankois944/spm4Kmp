@@ -11,7 +11,13 @@ internal data class ProductPackageConfigImpl(
     override fun add(
         vararg products: ProductName,
         exportToKotlin: Boolean,
+        isIncludedInExportedPackage: Boolean,
     ) {
+        if (!isIncludedInExportedPackage) {
+            products.forEach {
+                it.isIncludedInExportedPackage = false
+            }
+        }
         this.productPackages.add(
             ProductConfig(
                 products = products.toList(),
@@ -23,16 +29,23 @@ internal data class ProductPackageConfigImpl(
     override fun add(
         vararg names: String,
         exportToKotlin: Boolean,
+        isIncludedInExportedPackage: Boolean,
     ) {
         this.productPackages.add(
             ProductConfig(
-                products = names.map { ProductName(it) },
+                products =
+                    names.map {
+                        ProductName(
+                            it,
+                            isIncludedInExportedPackage = isIncludedInExportedPackage,
+                        )
+                    },
                 exportToKotlin = exportToKotlin,
             ),
         )
     }
 
     internal companion object {
-        private const val serialVersionUID: Long = 1
+        private const val serialVersionUID: Long = 2
     }
 }

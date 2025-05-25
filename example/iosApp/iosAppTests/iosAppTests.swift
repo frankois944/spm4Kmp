@@ -12,8 +12,12 @@ import Testing
 
 struct iosAppTests {
 
-    @Test func example() async throws {
-        let greet: () = await ContentView.testGreet()
+    @Test func examplePackageRes() async throws {
+        await #expect(ContentView.testGetPackageResource(name: "N/A") != nil)
     }
-
+    
+    @Test func exampleFrameworkRes() async throws {
+        await #expect(ContentView.testGetFrameworkResource(name: "N/A") != nil)
+    }
+    
 }

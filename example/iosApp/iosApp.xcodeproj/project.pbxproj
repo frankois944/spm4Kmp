@@ -10,7 +10,7 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		071933DE2D3008430094EBEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 071933DD2D3008420094EBEA /* GoogleService-Info.plist */; };
-		078D6ADA2D394DD700DB6AA1 /* exportedNativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = 078D6AD92D394DD700DB6AA1 /* exportedNativeIosShared */; };
+		07F2CDAE2DE3430800970FD3 /* exportedNativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = 07F2CDAD2DE3430800970FD3 /* exportedNativeIosShared */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -53,7 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				078D6ADA2D394DD700DB6AA1 /* exportedNativeIosShared in Frameworks */,
+				07F2CDAE2DE3430800970FD3 /* exportedNativeIosShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,7 +182,7 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				078D6AD82D394DD700DB6AA1 /* XCLocalSwiftPackageReference "../exportedNativeIosShared" */,
+				07F2CDAC2DE3430800970FD3 /* XCLocalSwiftPackageReference "../exportedNativeIosShared" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -538,14 +538,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		078D6AD82D394DD700DB6AA1 /* XCLocalSwiftPackageReference "../exportedNativeIosShared" */ = {
+		07F2CDAC2DE3430800970FD3 /* XCLocalSwiftPackageReference "../exportedNativeIosShared" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../exportedNativeIosShared;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		078D6AD92D394DD700DB6AA1 /* exportedNativeIosShared */ = {
+		07F2CDAD2DE3430800970FD3 /* exportedNativeIosShared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = exportedNativeIosShared;
 		};

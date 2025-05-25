@@ -1,92 +1,26 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
+import io.github.frankois944.spmForKmp.resources.FrameworkResource
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.logging.Logger
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-import java.io.FileFilter
-import java.nio.file.Path
-import kotlin.io.path.exists
-
-/*
-CONFIGURATION : Debug
-BUILT_PRODUCTS_DIR : /Users/francoisdabonot/Library/Developer/Xcode/DerivedData/iosApp-gonppftpduwfmfbbmejictosfjsk/Build/Products/Debug-iphonesimulator
-CONTENTS_FOLDER_PATH : iosApp.app
-ARCHS : arm64
-PLATFORM_NAME : iphonesimulator
- */
 
 @CacheableTask
 internal abstract class CopyPackageResourcesTask : DefaultTask() {
-
-    companion object {
-        fun getCurrentPackagesBuiltPath(
-            packageScratchDir: File,
-            platformName: String,
-            archs: String,
-            buildPackageMode: String,
-            logger: Logger
-        ): Path {
-            logger.warn("Looking for a match with platformName $platformName")
-            val systemType: String? = when {
-                platformName.contains("iphone") -> {
-                    "ios"
-                }
-
-                platformName.contains("watch") -> {
-                    "watchos"
-                }
-
-                platformName.contains("mac") -> {
-                    "macosx"
-                }
-
-                platformName.contains("tv") -> {
-                    "tvos"
-                }
-
-                else -> {
-                    null
-                }
-            }
-            if (systemType == null) {
-                throw RuntimeException("Not matching package build name with platformName $platformName")
-            }
-            val simulator: String = if (platformName.contains("simulator")) {
-                "-simulator"
-            } else {
-                ""
-            }
-            val buildPackageDirName = "${archs}-apple-$systemType$simulator"
-            logger.warn("buildPackageDir created $buildPackageDirName")
-            val buildPackagePath = packageScratchDir
-                .resolve(buildPackageDirName)
-                .resolve(buildPackageMode).toPath()
-            if (!buildPackagePath.exists()) {
-                logger.error("The buildPackagePath doesn't exist at $buildPackagePath")
-                throw RuntimeException("Can't find the package build dir")
-            } else {
-                logger.warn("Found {} as packages resources path", buildPackagePath)
-            }
-            return buildPackagePath
-        }
-    }
-
+    @get:Input
+    abstract val inputFrameworks: ListProperty<FrameworkResource>
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val inputFrameworks: ListProperty<File>
+    abstract val listOfResourcesToCopy: ListProperty<File>
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -105,26 +39,36 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
 
     @TaskAction
     fun copyResources() {
-      //  val sourcePathWithResource = getCurrentPackagesBuiltPath()
-        //  val bundleDestinationDir = File("${buildProductDir.get()}/${contentFolderPath.get()}")
-
-        // copy on needed bundles
-        /*sourcePathWithResource.toFile().listFiles(FileFilter { it.extension == "bundle" })?.forEach {
-            logger.info("copy resources bundle $it to $bundleDestinationDir")
-            it.copyRecursively(File(bundleDestinationDir, it.name), overwrite = true)
+        inputBundles.get().forEach {
+            val destination = File(outputBundleDirectory.asFile.get(), it.name)
+            logger.warn("copy resources bundle $it to ${outputBundleDirectory.get()}")
+            it.copyRecursively(destination, overwrite = true)
         }
 
-        val frameworkDestination = bundleDestinationDir.resolve("Frameworks")
-
-        // copy frameworks
-        sourcePathWithResource.toFile().listFiles(FileFilter { it.extension == "framework" })?.forEach {
-            if (listOf("Headers", "Modules").contains(it.name)) {
-                return
+        val buildFrameworkDir =
+            outputFrameworkDirectory.asFile
+                .get()
+                .parentFile.parentFile
+        val builtAppDir = outputFrameworkDirectory.asFile.get()
+        listOf(buildFrameworkDir, builtAppDir).forEach { appDir ->
+            inputFrameworks.get().forEach { framework ->
+                val destination =
+                    File(
+                        appDir,
+                        framework.name,
+                    )
+                if (!destination.exists()) {
+                    destination.mkdirs()
+                }
+                logger.warn("copy framework ${framework.name} to $destination")
+                framework.files.forEach { file ->
+                    logger.warn("copy framework file ${file.name} to ${destination.resolve(file.name).path}")
+                    file.copyRecursively(
+                        destination.resolve(file.name),
+                        overwrite = true,
+                    )
+                }
             }
-            logger.info("copy resources framework $it to $frameworkDestination")
-            it.copyRecursively(File(bundleDestinationDir, it.name), overwrite = true)
-        }*/
+        }
     }
-
-
 }

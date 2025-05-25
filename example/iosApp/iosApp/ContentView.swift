@@ -7,6 +7,14 @@ struct ContentView: View {
     static func testGreet() {
         _ = Greeting().greet()
     }
+    
+    static func testGetFrameworkResource(name: String) -> String? {
+        IOSPlatform().getMyFrameworkResource()
+    }
+    
+    static func testGetPackageResource(name: String) -> String? {
+        IOSPlatform().getMyPackageResource()
+    }
 
 	var body: some View {
 		Text(greet)

@@ -13,6 +13,7 @@ import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackageConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettingsConfig
+import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import org.gradle.api.Project
 import javax.inject.Inject
 import kotlin.io.path.Path
@@ -235,4 +236,12 @@ public abstract class PackageRootDefinitionExtension
         public fun exportedPackageSettings(setting: ExportedPackageConfig.() -> Unit) {
             exportedPackageSettings.apply(setting)
         }
+
+        /**
+         *  Copy the **ALL** products into the application (only when running from xcode)
+         *
+         *  EXPERIMENTAL
+         */
+        @ExperimentalSpmForKmpFeature
+        public var copyDependenciesToApp: Boolean = false
     }
