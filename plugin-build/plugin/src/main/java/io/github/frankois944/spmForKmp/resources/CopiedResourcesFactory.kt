@@ -11,8 +11,13 @@ import kotlin.io.path.exists
 internal data class FrameworkResource(
     val name: String,
     var files: MutableList<File> = mutableListOf(),
-) : Serializable
+) : Serializable {
+    internal companion object {
+        private const val serialVersionUID: Long = 1
+    }
+}
 
+@Suppress("LongParameterList")
 internal class CopiedResourcesFactory(
     private val packageScratchDir: File,
     baseDir: File,

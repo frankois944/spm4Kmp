@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.net.URI
 
 public interface DependencyConfig : Serializable {
-    @Suppress("MaxLineLength")
+    @Suppress("MaxLineLength", "LongParameterList")
     /**
      * Represents a local binary dependency.
      *

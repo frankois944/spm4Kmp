@@ -315,6 +315,7 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     logger.warn("archs $archs")
     logger.warn("platformName $platformName")
 
+    @Suppress("ComplexCondition")
     if (platformName == null || archs == null || contentFolderPath == null || buildProductDir == null) {
         logger.debug("Missing variable for coping the resources, skipping the task")
         enabled = false
