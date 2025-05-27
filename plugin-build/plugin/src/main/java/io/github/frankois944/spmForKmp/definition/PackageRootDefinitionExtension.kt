@@ -240,7 +240,7 @@ public abstract class PackageRootDefinitionExtension
         /**
          *  Copy **ALL** products into the application (only when running from xcode)
          *
-         *  The task copyPackageResources[cInteropName] need to be added inside the build phase of your xcode project
+         *  The task [cInteropName]CopyPackageResources need to be added inside the build phase of your xcode project
          *  EXPERIMENTAL
          */
         @ExperimentalSpmForKmpFeature

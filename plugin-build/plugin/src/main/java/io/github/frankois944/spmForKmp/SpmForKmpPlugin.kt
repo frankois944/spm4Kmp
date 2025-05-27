@@ -12,11 +12,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
-import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
-import javax.inject.Inject
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
 
@@ -26,11 +24,10 @@ internal const val TASK_GENERATE_MANIFEST: String = "generateSwiftPackage"
 internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
 internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
-internal const val TASK_COPY_PACKAGE_RESOURCES: String = "copyPackageResources"
+internal const val TASK_COPY_PACKAGE_RESOURCES: String = "CopyPackageResources"
 
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
-
     @Suppress("LongMethod")
     override fun apply(target: Project): Unit =
         with(target) {
