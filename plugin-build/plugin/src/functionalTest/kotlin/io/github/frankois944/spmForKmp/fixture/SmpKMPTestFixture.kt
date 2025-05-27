@@ -251,7 +251,8 @@ swiftPackageConfig {
                                 appendLine("SwiftDependency.Binary.Local(")
                                 append("path = \"${definition.path}\",")
                                 append("packageName = \"${definition.packageName}\",")
-                                append("exportToKotlin = ${definition.exportToKotlin}")
+                                append("exportToKotlin = ${definition.exportToKotlin},")
+                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
                                 append("),")
                             }
 
@@ -260,13 +261,15 @@ swiftPackageConfig {
                                 append("url = URI(\"${definition.url}\"),")
                                 append("checksum = \"${definition.checksum}\",")
                                 append("packageName = \"${definition.packageName}\",")
-                                append("exportToKotlin = ${definition.exportToKotlin}")
+                                append("exportToKotlin = ${definition.exportToKotlin},")
+                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
                                 append("),")
                             }
 
                             is SwiftDependency.Package.Local -> {
                                 appendLine("SwiftDependency.Package.Local(")
                                 append("path = \"${definition.path}\",")
+                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
                                 if (definition.packageName.isNotEmpty()) {
                                     appendLine("packageName = \"${definition.packageName}\",")
                                 }

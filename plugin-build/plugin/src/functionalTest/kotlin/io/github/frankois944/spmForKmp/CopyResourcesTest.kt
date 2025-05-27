@@ -6,10 +6,13 @@ import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.utils.BaseTest
+import io.github.frankois944.spmForKmp.utils.getExportedPackageContent
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.net.URI
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
@@ -34,7 +37,12 @@ class CopyResourcesTest : BaseTest() {
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
                                 products = {
-                                    add("LocalSourceDummyFramework")
+                                    add(
+                                        ProductName(
+                                            "LocalSourceDummyFramework",
+                                            isIncludedInExportedPackage = false,
+                                        ),
+                                    )
                                 },
                             ),
                         )
@@ -42,7 +50,25 @@ class CopyResourcesTest : BaseTest() {
                             SwiftDependency.Binary.Local(
                                 path = xcFrameworkDirectory.absolutePath,
                                 packageName = "DummyFramework",
-                                exportToKotlin = true,
+                                isIncludedInExportedPackage = false,
+                            ),
+                        )
+                        add(
+                            SwiftDependency.Package.Remote.Version(
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                                version = "1.8.3",
+                                products = {
+                                    add("CryptoSwift", isIncludedInExportedPackage = false)
+                                },
+                            ),
+                        )
+                        add(
+                            SwiftDependency.Package.Remote.Branch(
+                                url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
+                                products = {
+                                    add("KeychainAccess")
+                                },
+                                branch = "master",
                             ),
                         )
                     },
@@ -89,6 +115,10 @@ class CopyResourcesTest : BaseTest() {
                 .isNotEmpty(),
         ) { "The output folder must not be empty" }
         assert(destination.toFile().listFiles().isNotEmpty()) { "The output folder must not be empty" }
+        assert(!fixture.getExportedPackageContent().contains("CryptoSwift"))
+        assert(!fixture.getExportedPackageContent().contains("DummyFramework"))
+        assert(!fixture.getExportedPackageContent().contains("LocalSourceDummyFramework"))
+        assert(fixture.getExportedPackageContent().contains("KeychainAccess"))
         if (destination.exists()) {
             destination.deleteRecursively()
         }
