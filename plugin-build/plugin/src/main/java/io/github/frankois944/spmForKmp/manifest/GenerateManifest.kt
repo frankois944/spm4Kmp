@@ -5,8 +5,15 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 internal fun generateManifest(parameters: TemplateParameters): String {
     var binaryDependencies =
         listOfNotNull(
-            getLocaleBinary(parameters.dependencies, parameters.generatedPackageDirectory).takeIf { it.isNotEmpty() },
-            getRemoteBinary(parameters.dependencies).takeIf { it.isNotEmpty() },
+            getLocaleBinary(
+                parameters.dependencies,
+                parameters.generatedPackageDirectory,
+                parameters.forExportedPackage,
+            ).takeIf { it.isNotEmpty() },
+            getRemoteBinary(
+                parameters.dependencies,
+                parameters.forExportedPackage,
+            ).takeIf { it.isNotEmpty() },
         ).joinToString(",")
     if (binaryDependencies.isNotEmpty()) {
         binaryDependencies = ",$binaryDependencies"
@@ -45,7 +52,13 @@ internal fun generateManifest(parameters: TemplateParameters): String {
                 .library(
                     name: "$name",
                     type: $type,
-                    targets: [${getProductsTargets(name, parameters.dependencies)}])
+                    targets: [${
+        getProductsTargets(
+            name,
+            parameters.dependencies,
+            parameters.forExportedPackage,
+        )
+    }])
             ],
             dependencies: [
                 ${getDependencies(parameters.dependencies, parameters.forExportedPackage)}
@@ -84,11 +97,12 @@ private fun getPlatformBlock(
 private fun getProductsTargets(
     cinteropName: String,
     dependencies: List<SwiftDependency>,
+    forExportedPackage: Boolean,
 ): String =
     buildList {
         add("\"$cinteropName\"")
         dependencies
-            .filter { it.isBinaryDependency && it.isIncludedInExportedPackage }
+            .filter { it.isBinaryDependency && (it.isIncludedInExportedPackage || !forExportedPackage) }
             .forEach { dependency ->
                 add("\"${dependency.packageName}\"")
             }
