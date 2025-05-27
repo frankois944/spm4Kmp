@@ -94,7 +94,7 @@ internal fun Project.configAppleTargets(
     val buildMode = getBuildMode(swiftPackageEntry)
 
     tasks.register(
-        TASK_COPY_PACKAGE_RESOURCES + swiftPackageEntry.name.capitalized(),
+        swiftPackageEntry.name + TASK_COPY_PACKAGE_RESOURCES,
         CopyPackageResourcesTask::class.java,
     ) {
         it.configureCopyPackageResourcesTask(

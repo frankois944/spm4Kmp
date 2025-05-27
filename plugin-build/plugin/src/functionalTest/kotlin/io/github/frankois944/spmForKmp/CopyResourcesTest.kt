@@ -54,7 +54,7 @@ class CopyResourcesTest : BaseTest() {
         destination.createDirectories()
         val parameters =
             buildList {
-                add("copyPackageResourcesDummy")
+                add("dummyCopyPackageResources")
                 add("-PPLATFORM_NAME=iphone")
                 add("-PARCHS=arm64")
                 add("-PBUILT_PRODUCTS_DIR=$appBuiltProductDir")
@@ -80,7 +80,7 @@ class CopyResourcesTest : BaseTest() {
                 ).build()
 
         // Then
-        assertThat(copyResourceTask).task(":library:copyPackageResourcesDummy").succeeded()
+        assertThat(copyResourceTask).task(":library:dummyCopyPackageResources").succeeded()
         assert(
             destination
                 .toFile()
