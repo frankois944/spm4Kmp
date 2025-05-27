@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.manifest
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 
+@Suppress("LongMethod")
 internal fun generateManifest(parameters: TemplateParameters): String {
     var binaryDependencies =
         listOfNotNull(
