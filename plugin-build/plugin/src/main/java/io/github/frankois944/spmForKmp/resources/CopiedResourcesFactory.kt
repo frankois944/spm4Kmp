@@ -6,6 +6,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.process.ExecOperations
 import java.io.File
 import java.io.Serializable
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 internal data class FrameworkResource(
@@ -100,7 +101,7 @@ internal class CopiedResourcesFactory(
                     }
             }
 
-        val destinationDir = File("$buildProductDir/$contentFolderPath")
+        val destinationDir = Path(buildProductDir, contentFolderPath).toFile()
 
         outputBundleDirectory = destinationDir.relativeTo(baseDir)
         outputFrameworkDirectory = destinationDir.resolve("Frameworks").relativeTo(baseDir)

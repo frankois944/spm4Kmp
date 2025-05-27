@@ -44,6 +44,7 @@ abstract class SmpKMPTestFixture private constructor(
         val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginRootConfig: String? = null,
+        var copyDependenciesToApp: Boolean = false,
     )
 
     protected abstract fun createProject(): GradleProject
@@ -159,7 +160,8 @@ swiftPackageConfig {
     create("${extension.cinteropsName}") {
     customPackageSourcePath = "${extension.customPackageSourcePath}"
     toolsVersion = "${extension.toolsVersion}"
-"""
+    copyDependenciesToApp = ${extension.copyDependenciesToApp}
+""",
                     )
                     extension.minIos?.let {
                         appendLine("minIos = \"${extension.minIos}\"")
@@ -464,6 +466,11 @@ swiftPackageConfig {
         fun withRawPluginConfiguration(vararg sources: KotlinSource) =
             apply {
                 config = config.copy(rawPluginConfiguration = sources.toList())
+            }
+
+        fun withCopyDependenciesToApp(copyDependenciesToApp: Boolean) =
+            apply {
+                config = config.copy(copyDependenciesToApp = copyDependenciesToApp)
             }
 
         fun appendRawPluginRootConfig(

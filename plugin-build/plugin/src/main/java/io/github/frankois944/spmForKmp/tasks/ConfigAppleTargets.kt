@@ -93,17 +93,16 @@ internal fun Project.configAppleTargets(
 
     val buildMode = getBuildMode(swiftPackageEntry)
 
-    val copyPackageResourcesTask =
-        tasks.register(
-            getTaskName(TASK_COPY_PACKAGE_RESOURCES, swiftPackageEntry.name),
-            CopyPackageResourcesTask::class.java,
-        ) {
-            it.configureCopyPackageResourcesTask(
-                swiftPackageEntry = swiftPackageEntry,
-                packageDirectoriesConfig = packageDirectoriesConfig,
-                buildMode = buildMode,
-            )
-        }
+    tasks.register(
+        TASK_COPY_PACKAGE_RESOURCES + swiftPackageEntry.name.capitalized(),
+        CopyPackageResourcesTask::class.java,
+    ) {
+        it.configureCopyPackageResourcesTask(
+            swiftPackageEntry = swiftPackageEntry,
+            packageDirectoriesConfig = packageDirectoriesConfig,
+            buildMode = buildMode,
+        )
+    }
 
     allTargets.forEach { cinteropTarget ->
         val targetBuildDir =
@@ -173,20 +172,16 @@ internal fun Project.configAppleTargets(
 
         // Explicitly create the dependency tree for the target
         taskGroup[cinteropTarget] =
-            copyPackageResourcesTask
+            definitionTask
                 .get()
                 .dependsOn(
-                    definitionTask
+                    compileTask
                         .get()
                         .dependsOn(
-                            compileTask
-                                .get()
-                                .dependsOn(
-                                    listOfNotNull(
-                                        manifestTask.get(),
-                                        exportedManifestTask?.get(),
-                                    ),
-                                ),
+                            listOfNotNull(
+                                manifestTask.get(),
+                                exportedManifestTask?.get(),
+                            ),
                         ),
                 )
     }
