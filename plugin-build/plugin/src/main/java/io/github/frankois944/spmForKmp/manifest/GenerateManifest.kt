@@ -2,11 +2,19 @@ package io.github.frankois944.spmForKmp.manifest
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 
+@Suppress("LongMethod")
 internal fun generateManifest(parameters: TemplateParameters): String {
     var binaryDependencies =
         listOfNotNull(
-            getLocaleBinary(parameters.dependencies, parameters.generatedPackageDirectory).takeIf { it.isNotEmpty() },
-            getRemoteBinary(parameters.dependencies).takeIf { it.isNotEmpty() },
+            getLocaleBinary(
+                parameters.dependencies,
+                parameters.generatedPackageDirectory,
+                parameters.forExportedPackage,
+            ).takeIf { it.isNotEmpty() },
+            getRemoteBinary(
+                parameters.dependencies,
+                parameters.forExportedPackage,
+            ).takeIf { it.isNotEmpty() },
         ).joinToString(",")
     if (binaryDependencies.isNotEmpty()) {
         binaryDependencies = ",$binaryDependencies"
@@ -45,7 +53,13 @@ internal fun generateManifest(parameters: TemplateParameters): String {
                 .library(
                     name: "$name",
                     type: $type,
-                    targets: [${getProductsTargets(name, parameters.dependencies)}])
+                    targets: [${
+        getProductsTargets(
+            name,
+            parameters.dependencies,
+            parameters.forExportedPackage,
+        )
+    }])
             ],
             dependencies: [
                 ${getDependencies(parameters.dependencies, parameters.forExportedPackage)}
@@ -78,17 +92,18 @@ private fun getPlatformBlock(
             ".tvOS(\"$minTvos\")".takeIf { minTvos.isNotEmpty() },
             ".watchOS(\"$minWatchos\")".takeIf { minWatchos.isNotEmpty() },
         ).joinToString(",")
-    return  if (entries.isNotEmpty()) "platforms: [$entries]," else ""
+    return if (entries.isNotEmpty()) "platforms: [$entries]," else ""
 }
 
 private fun getProductsTargets(
     cinteropName: String,
     dependencies: List<SwiftDependency>,
+    forExportedPackage: Boolean,
 ): String =
     buildList {
         add("\"$cinteropName\"")
         dependencies
-            .filter { it.isBinaryDependency }
+            .filter { it.isBinaryDependency && (it.isIncludedInExportedPackage || !forExportedPackage) }
             .forEach { dependency ->
                 add("\"${dependency.packageName}\"")
             }

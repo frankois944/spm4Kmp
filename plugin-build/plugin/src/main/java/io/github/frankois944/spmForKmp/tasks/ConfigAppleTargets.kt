@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalSpmForKmpFeature::class)
+
 package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
+import io.github.frankois944.spmForKmp.TASK_COPY_PACKAGE_RESOURCES
 import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
@@ -12,7 +15,9 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.dependency.Dependency
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
+import io.github.frankois944.spmForKmp.resources.CopiedResourcesFactory
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.CopyPackageResourcesTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateExportableManifestTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateManifestTask
@@ -21,11 +26,14 @@ import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
+import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import io.github.frankois944.spmForKmp.utils.Hashing
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.internal.extensions.core.serviceOf
 import org.gradle.internal.extensions.stdlib.capitalized
+import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -83,9 +91,20 @@ internal fun Project.configAppleTargets(
             null
         }
 
-    allTargets.forEach { cinteropTarget ->
+    val buildMode = getBuildMode(swiftPackageEntry)
 
-        val buildMode = getBuildMode(swiftPackageEntry)
+    tasks.register(
+        swiftPackageEntry.name + TASK_COPY_PACKAGE_RESOURCES,
+        CopyPackageResourcesTask::class.java,
+    ) {
+        it.configureCopyPackageResourcesTask(
+            swiftPackageEntry = swiftPackageEntry,
+            packageDirectoriesConfig = packageDirectoriesConfig,
+            buildMode = buildMode,
+        )
+    }
+
+    allTargets.forEach { cinteropTarget ->
         val targetBuildDir =
             getTargetBuildDirectory(
                 packageScratchDir = packageDirectoriesConfig.packageScratchDir,
@@ -265,4 +284,55 @@ private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExten
     val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies.toList()
     val oldDependency = swiftPackageEntry.packageDependencies.toList()
     return newDependency.ifEmpty { oldDependency }
+}
+
+@Suppress("LongParameterList")
+private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
+    swiftPackageEntry: PackageRootDefinitionExtension,
+    packageDirectoriesConfig: PackageDirectoriesConfig,
+    buildMode: String,
+) {
+    if (!swiftPackageEntry.copyDependenciesToApp) {
+        logger.debug("copyResourcesToApp is not enabled in configuration, skipping the task")
+        isEnabled = false
+        return
+    }
+
+    val buildProductDir: String? =
+        project.findProperty("BUILT_PRODUCTS_DIR") as? String ?: System.getenv("BUILT_PRODUCTS_DIR")
+    val contentFolderPath: String? =
+        project.findProperty("CONTENTS_FOLDER_PATH") as? String ?: System.getenv("CONTENTS_FOLDER_PATH")
+    val archs: String? = project.findProperty("ARCHS") as? String ?: System.getenv("ARCHS")
+    val platformName: String? = project.findProperty("PLATFORM_NAME") as? String ?: System.getenv("PLATFORM_NAME")
+
+    logger.warn("buildProductDir $buildProductDir")
+    logger.warn("contentFolderPath $contentFolderPath")
+    logger.warn("archs $archs")
+    logger.warn("platformName $platformName")
+
+    @Suppress("ComplexCondition")
+    if (platformName == null || archs == null || contentFolderPath == null || buildProductDir == null) {
+        logger.debug("Missing variable for coping the resources, skipping the task")
+        enabled = false
+        return
+    }
+
+    val copiedResources =
+        CopiedResourcesFactory(
+            packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+            baseDir = project.layout.projectDirectory.asFile,
+            platformName = platformName,
+            archs = archs,
+            buildPackageMode = buildMode,
+            contentFolderPath = contentFolderPath,
+            buildProductDir = buildProductDir,
+            execOp = project.serviceOf<ExecOperations>(),
+            logger = logger,
+        )
+
+    this.outputBundleDirectory.set(copiedResources.outputBundleDirectory)
+    this.outputFrameworkDirectory.set(copiedResources.outputFrameworkDirectory)
+    this.inputBundles.set(copiedResources.bundles)
+    this.inputFrameworks.set(copiedResources.frameworks)
+    this.listOfResourcesToCopy.set(copiedResources.bundles + copiedResources.frameworks.flatMap { it.files })
 }

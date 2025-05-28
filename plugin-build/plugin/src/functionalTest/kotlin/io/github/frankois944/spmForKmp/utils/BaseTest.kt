@@ -40,10 +40,10 @@ open class BaseTest {
 
     fun GradleBuilder.runner(
         path: File,
-        command: String,
+        vararg command: String,
     ): GradleRunner {
         folderTopOpen = path.absolutePath
-        return runner(GradleVersion.current(), path, command)
+        return runner(GradleVersion.current(), path, *command)
             .withPluginClasspath()
             .run {
                 jacocoAgentJar?.let { agent ->

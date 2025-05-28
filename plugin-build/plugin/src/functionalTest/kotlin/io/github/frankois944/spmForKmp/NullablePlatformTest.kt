@@ -12,10 +12,8 @@ import org.junit.jupiter.api.Test
 import java.io.File
 
 class NullablePlatformTest : BaseTest() {
-
     @Test
     fun `build with nullable platform`() {
-
         val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
 
         // Given
@@ -36,11 +34,10 @@ class NullablePlatformTest : BaseTest() {
                     } else {
                         it.withTargets(
                             AppleCompileTarget.macosArm64,
-                            AppleCompileTarget.iosArm64
+                            AppleCompileTarget.iosArm64,
                         )
                     }
-                }
-                .withMinWatchOs(null)
+                }.withMinWatchOs(null)
                 .withMinTvos(null)
                 .withMinMacos(null)
                 .withMinIos(null)

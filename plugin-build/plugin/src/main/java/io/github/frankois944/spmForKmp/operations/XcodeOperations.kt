@@ -227,6 +227,35 @@ internal fun ExecOperations.getNbJobs(logger: Logger): String {
     return standardOutput.toString().trim()
 }
 
+internal fun ExecOperations.isDynamicLibrary(
+    file: File,
+    logger: Logger,
+): Boolean {
+    val args =
+        listOf(
+            file.path,
+        )
+
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
+    exec {
+        it.executable = "file"
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "isDynamicLibrary",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
+    return standardOutput.toString().contains("dynamically linked shared library")
+}
+
 @Suppress("LongParameterList")
 internal fun Logger.printExecLogs(
     action: String,

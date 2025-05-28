@@ -44,6 +44,7 @@ abstract class SmpKMPTestFixture private constructor(
         val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginRootConfig: String? = null,
+        var copyDependenciesToApp: Boolean = false,
     )
 
     protected abstract fun createProject(): GradleProject
@@ -159,7 +160,8 @@ swiftPackageConfig {
     create("${extension.cinteropsName}") {
     customPackageSourcePath = "${extension.customPackageSourcePath}"
     toolsVersion = "${extension.toolsVersion}"
-"""
+    copyDependenciesToApp = ${extension.copyDependenciesToApp}
+""",
                     )
                     extension.minIos?.let {
                         appendLine("minIos = \"${extension.minIos}\"")
@@ -249,7 +251,8 @@ swiftPackageConfig {
                                 appendLine("SwiftDependency.Binary.Local(")
                                 append("path = \"${definition.path}\",")
                                 append("packageName = \"${definition.packageName}\",")
-                                append("exportToKotlin = ${definition.exportToKotlin}")
+                                append("exportToKotlin = ${definition.exportToKotlin},")
+                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
                                 append("),")
                             }
 
@@ -258,13 +261,15 @@ swiftPackageConfig {
                                 append("url = URI(\"${definition.url}\"),")
                                 append("checksum = \"${definition.checksum}\",")
                                 append("packageName = \"${definition.packageName}\",")
-                                append("exportToKotlin = ${definition.exportToKotlin}")
+                                append("exportToKotlin = ${definition.exportToKotlin},")
+                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
                                 append("),")
                             }
 
                             is SwiftDependency.Package.Local -> {
                                 appendLine("SwiftDependency.Package.Local(")
                                 append("path = \"${definition.path}\",")
+                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
                                 if (definition.packageName.isNotEmpty()) {
                                     appendLine("packageName = \"${definition.packageName}\",")
                                 }
@@ -464,6 +469,11 @@ swiftPackageConfig {
         fun withRawPluginConfiguration(vararg sources: KotlinSource) =
             apply {
                 config = config.copy(rawPluginConfiguration = sources.toList())
+            }
+
+        fun withCopyDependenciesToApp(copyDependenciesToApp: Boolean) =
+            apply {
+                config = config.copy(copyDependenciesToApp = copyDependenciesToApp)
             }
 
         fun appendRawPluginRootConfig(

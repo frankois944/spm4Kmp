@@ -12,11 +12,9 @@ import platform.UIKit.UIDevice
 import platform.UIKit.UIView
 
 class IOSPlatform : Platform {
+    fun getMyFrameworkResource(): String? = MyDummyFramework().getMyResource()
 
-    init {
-        println("Load data from framework" + MyDummyFramework().getMyResource())
-        println("Load data from package" + LocalSourceDummyFramework.LocalSourceDummy().getMyInternalResource())
-    }
+    fun getMyPackageResource(): String? = LocalSourceDummyFramework.LocalSourceDummy().getMyInternalResource()
 
     override val name: String =
         UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion

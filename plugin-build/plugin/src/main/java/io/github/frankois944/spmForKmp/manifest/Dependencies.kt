@@ -27,7 +27,7 @@ internal fun getDependenciesTargets(
     buildList {
         dependencies
             .forEach { dependency ->
-                if (dependency.isBinaryDependency) {
+                if (dependency.isBinaryDependency && (dependency.isIncludedInExportedPackage || !forExportedPackage)) {
                     add("\"${dependency.packageName}\"")
                 } else if (dependency is SwiftDependency.Package) {
                     dependency.productsConfig.productPackages.forEach { config ->
@@ -56,10 +56,12 @@ internal fun hasExportedDependencyProduct(dependency: SwiftDependency): Boolean 
 internal fun getLocaleBinary(
     dependencies: List<SwiftDependency>,
     swiftBuildDir: Path,
+    forExportedPackage: Boolean,
 ): String =
     buildList {
         dependencies
             .filterIsInstance<SwiftDependency.Binary.Local>()
+            .filter { it.isIncludedInExportedPackage || !forExportedPackage }
             .forEach { dependency ->
                 // package path MUST be relative to somewhere, let's choose the swiftBuildDir
                 val path = Path.of(dependency.path).relativeToOrSelf(swiftBuildDir)
@@ -67,10 +69,14 @@ internal fun getLocaleBinary(
             }
     }.joinToString(",")
 
-internal fun getRemoteBinary(dependencies: List<SwiftDependency>): String =
+internal fun getRemoteBinary(
+    dependencies: List<SwiftDependency>,
+    forExportedPackage: Boolean,
+): String =
     buildList {
         dependencies
             .filterIsInstance<SwiftDependency.Binary.Remote>()
+            .filter { it.isIncludedInExportedPackage || !forExportedPackage }
             .forEach { dependency ->
                 // checksum is MANDATORY
                 add(

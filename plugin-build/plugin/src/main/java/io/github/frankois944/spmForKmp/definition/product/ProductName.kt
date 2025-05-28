@@ -11,7 +11,8 @@ import java.io.Serializable
  * Some Package use indirect name for a product.
  * @property linkerOpts Add custom linker flag when exporting the product to kotlin
  * @property compilerOpts Add custom compiler flag when exporting the product to kotlin
- * @property isIncludedInExportedPackage By default, true declare the product in the exported local package
+ * @property isIncludedInExportedPackage By default true, declare the product in the exported local package
+ *
  */
 public data class ProductName(
     val name: String,
@@ -21,6 +22,6 @@ public data class ProductName(
     var isIncludedInExportedPackage: Boolean = true,
 ) : Serializable {
     internal companion object {
-        private const val serialVersionUID: Long = 3
+        private const val serialVersionUID: Long = 4
     }
 }
