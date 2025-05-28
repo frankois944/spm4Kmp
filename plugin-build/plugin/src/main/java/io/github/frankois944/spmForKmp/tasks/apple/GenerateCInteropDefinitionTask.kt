@@ -188,9 +188,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         moduleInfo.buildDir = buildDir
                         moduleInfo.definitionFile =
                             if (index == 0) {
-                                currentBuildDirectory().resolve("${moduleInfo.name}_${currentBridgeHash.get()}_default.def")
+                                currentBuildDirectory()
+                                    .resolve("${moduleInfo.name}_${currentBridgeHash.get()}_default.def")
                             } else {
-                                currentBuildDirectory().resolve("${moduleInfo.name}.def")
+                                currentBuildDirectory()
+                                    .resolve("${moduleInfo.name}.def")
                             }
                     }
             }
