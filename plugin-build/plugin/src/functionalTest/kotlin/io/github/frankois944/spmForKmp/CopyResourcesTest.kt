@@ -8,6 +8,7 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
+import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import io.github.frankois944.spmForKmp.utils.getExportedPackageContent
 import org.junit.jupiter.api.Test
@@ -36,6 +37,7 @@ class CopyResourcesTest : BaseTest() {
                         add(
                             SwiftDependency.Package.Local(
                                 path = localPackageDirectory.absolutePath,
+                                isIncludedInExportedPackage = false,
                                 products = {
                                     add(
                                         ProductName(
@@ -57,21 +59,64 @@ class CopyResourcesTest : BaseTest() {
                             SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 version = "1.8.3",
+                                isIncludedInExportedPackage = false,
                                 products = {
                                     add("CryptoSwift", isIncludedInExportedPackage = false)
                                 },
                             ),
                         )
                         add(
-                            SwiftDependency.Package.Remote.Branch(
+                            SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
                                 products = {
                                     add("KeychainAccess")
                                 },
-                                branch = "master",
+                                version = "4.2.2",
+                            ),
+                        )
+                        add(
+                            SwiftDependency.Package.Remote.Version(
+                                url = URI("https://github.com/frankois944/QuickServiceLocator"),
+                                isIncludedInExportedPackage = false,
+                                products = {
+                                    add("QuickServiceLocator")
+                                },
+                                version = "0.2.0",
+                            ),
+                        )
+                        add(
+                            SwiftDependency.Package.Remote.Branch(
+                                url = URI("https://github.com/FluidGroup/JAYSON"),
+                                isIncludedInExportedPackage = false,
+                                products = {
+                                    add("JAYSON", isIncludedInExportedPackage = false)
+                                },
+                                branch = "main",
+                            ),
+                        )
+                        add(
+                            SwiftDependency.Package.Remote.Commit(
+                                url = URI("https://github.com/square/Valet"),
+                                isIncludedInExportedPackage = false,
+                                products = {
+                                    add("Valet")
+                                },
+                                revision = "29bea846b29f9880a07dd1828596953d0fd495ce",
                             ),
                         )
                     },
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import CryptoSwift
+                            import Valet
+                            import JAYSON
+                            import QuickServiceLocator
+                            import KeychainAccess
+                            """,
+                    ),
                 ).build()
 
         val appBuiltProductDir = "/tmp/resource-test/"
@@ -114,11 +159,21 @@ class CopyResourcesTest : BaseTest() {
                 .listFiles()
                 .isNotEmpty(),
         ) { "The output folder must not be empty" }
+        assert(
+            destination
+                .toFile()
+                .resolve("Frameworks")
+                .listFiles { it.nameWithoutExtension == "DummyFramework" }
+                .isNotEmpty(),
+        ) { "The framework folder must contains DummyFramework" }
         assert(destination.toFile().listFiles().isNotEmpty()) { "The output folder must not be empty" }
         assert(!fixture.getExportedPackageContent().contains("CryptoSwift"))
         assert(!fixture.getExportedPackageContent().contains("DummyFramework"))
+        assert(!fixture.getExportedPackageContent().contains("Default"))
+        assert(!fixture.getExportedPackageContent().contains("Valet"))
         assert(!fixture.getExportedPackageContent().contains("LocalSourceDummyFramework"))
         assert(fixture.getExportedPackageContent().contains("KeychainAccess"))
+
         if (destination.exists()) {
             destination.deleteRecursively()
         }
