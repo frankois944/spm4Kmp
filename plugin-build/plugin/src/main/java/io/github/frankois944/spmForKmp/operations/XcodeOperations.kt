@@ -227,8 +227,10 @@ internal fun ExecOperations.getNbJobs(logger: Logger): String {
     return standardOutput.toString().trim()
 }
 
-
-internal fun ExecOperations.isDynamicLibrary(file: File, logger: Logger): Boolean {
+internal fun ExecOperations.isDynamicLibrary(
+    file: File,
+    logger: Logger,
+): Boolean {
     val args =
         listOf(
             file.path,

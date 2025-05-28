@@ -11,20 +11,14 @@ import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
 import io.github.frankois944.spmForKmp.tasks.utils.findIncludeFolders
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
-import io.github.frankois944.spmForKmp.utils.Hashing
 import io.github.frankois944.spmForKmp.utils.checkSum
-import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
-import io.github.frankois944.spmForKmp.utils.getFakeDefinitionFile
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
@@ -87,11 +81,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             buildList {
                 getModuleConfigs().forEachIndexed { index, moduleName ->
                     if (index == 0) {
-                        add(currentBuildDirectory()
-                            .resolve("${moduleName.name}_${currentBridgeHash.get()}_default.def"))
+                        add(
+                            currentBuildDirectory()
+                                .resolve("${moduleName.name}_${currentBridgeHash.get()}_default.def"),
+                        )
                     } else {
-                        add(currentBuildDirectory()
-                            .resolve("${moduleName.name}.def"))
+                        add(
+                            currentBuildDirectory()
+                                .resolve("${moduleName.name}.def"),
+                        )
                     }
                 }
             }
@@ -188,11 +186,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     }?.let { buildDir ->
                         moduleInfo.isFramework = buildDir.extension == "framework"
                         moduleInfo.buildDir = buildDir
-                        moduleInfo.definitionFile = if (index == 0) {
-                            currentBuildDirectory().resolve("${moduleInfo.name}_${currentBridgeHash.get()}_default.def")
-                        } else {
-                            currentBuildDirectory().resolve("${moduleInfo.name}.def")
-                        }
+                        moduleInfo.definitionFile =
+                            if (index == 0) {
+                                currentBuildDirectory().resolve("${moduleInfo.name}_${currentBridgeHash.get()}_default.def")
+                            } else {
+                                currentBuildDirectory().resolve("${moduleInfo.name}.def")
+                            }
                     }
             }
         logger.debug(
