@@ -8,7 +8,6 @@ import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
-import java.lang.Compiler.command
 
 open class BaseTest {
     val isCI = System.getenv("GITHUB_ACTIONS") == "true"

@@ -7,11 +7,7 @@ import java.io.File
 internal fun getPlistValue(
     file: File,
     key: String,
-): String? {
-    try {
-        val rootDict = PropertyListParser.parse(file) as NSDictionary
-        return rootDict.objectForKey(key).toString()
-    } catch (_: Exception) {
-    }
-    return null
+): String {
+    val rootDict = PropertyListParser.parse(file) as NSDictionary
+    return rootDict.objectForKey(key).toString()
 }
