@@ -75,9 +75,9 @@ internal class CopiedResourcesFactory(
                         it.extension == "framework"
                     }.forEach { framework ->
                         val plist = framework.resolve("Info.plist")
-                        logger.warn("Looking inside the Info.plist $plist")
+                        logger.debug("Looking inside the Info.plist {}", plist)
                         val libraryName = getPlistValue(plist, "CFBundleExecutable")
-                        logger.warn("Found libraryName $libraryName")
+                        logger.debug("Found libraryName $libraryName")
                         val libraryFile = framework.resolve(libraryName)
                         // A static library can't contain raw resource files but only bundles.
                         // A dynamic library and his resources must be copied inside the Apple app.
@@ -92,7 +92,7 @@ internal class CopiedResourcesFactory(
                             }
                             add(newFramework)
                         } else {
-                            logger.warn("Ignore $libraryFile because is a static library")
+                            logger.debug("Ignore {} because is a static library", libraryFile)
                         }
                     }
             }
@@ -101,10 +101,10 @@ internal class CopiedResourcesFactory(
 
         outputBundleDirectory = destinationDir.relativeTo(baseDir)
         outputFrameworkDirectory = destinationDir.resolve("Frameworks").relativeTo(baseDir)
-        logger.warn("outputBundleDirectory: $outputBundleDirectory")
-        logger.warn("outputFrameworkDirectory: $outputFrameworkDirectory")
-        logger.warn("inputBundles: ${bundles.map { it.name }}")
-        logger.warn("inputFrameworks: ${frameworks.map { it.name + it.files.map { f -> f.name } }}")
+        logger.debug("outputBundleDirectory: {}", outputBundleDirectory)
+        logger.debug("outputFrameworkDirectory: {}", outputFrameworkDirectory)
+        logger.debug("inputBundles: {}", bundles.map { it.name })
+        logger.debug("inputFrameworks: {}", frameworks.map { it.name + it.files.map { f -> f.name } })
     }
 
     private fun getCurrentPackagesBuiltDir(
@@ -114,7 +114,7 @@ internal class CopiedResourcesFactory(
         buildPackageMode: String,
         logger: Logger,
     ): File {
-        logger.warn("Looking for a match with platformName $platformName")
+        logger.debug("Looking for a match with platformName $platformName")
         val systemType: String? =
             when {
                 platformName.contains("iphone") -> {
@@ -138,7 +138,7 @@ internal class CopiedResourcesFactory(
                 }
             }
         if (systemType == null) {
-            throw RuntimeException("Not matching package build name with platformName $platformName")
+            throw RuntimeException("No matching systemType from platformName $platformName")
         }
         val simulator: String =
             if (platformName.contains("simulator")) {
@@ -147,7 +147,7 @@ internal class CopiedResourcesFactory(
                 ""
             }
         val buildPackageDirName = "$archs-apple-$systemType$simulator"
-        logger.warn("buildPackageDir created $buildPackageDirName")
+        logger.debug("buildPackageDir created $buildPackageDirName")
         val buildPackagePath =
             packageScratchDir
                 .resolve(buildPackageDirName)
@@ -157,7 +157,7 @@ internal class CopiedResourcesFactory(
             logger.error("The buildPackagePath doesn't exist at $buildPackagePath")
             throw RuntimeException("Can't find the package build dir")
         } else {
-            logger.warn("Found {} as packages resources path", buildPackagePath)
+            logger.debug("Found {} as packages resources path", buildPackagePath)
         }
         return buildPackagePath.toFile()
     }

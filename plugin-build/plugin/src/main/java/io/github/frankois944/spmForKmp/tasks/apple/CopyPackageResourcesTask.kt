@@ -39,12 +39,15 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
 
     @TaskAction
     fun copyResources() {
+        logger.debug("Start copy bundle resources")
         inputBundles.get().forEach {
             val destination = File(outputBundleDirectory.asFile.get(), it.name)
-            logger.warn("copy resources bundle $it to ${outputBundleDirectory.get()}")
+            logger.debug("copy resources bundle {} to {}", it, outputBundleDirectory.get())
             it.copyRecursively(destination, overwrite = true)
         }
+        logger.debug("End copy bundle resources")
 
+        logger.debug("Start copy framework resources")
         val buildFrameworkDir =
             outputFrameworkDirectory.asFile
                 .get()
@@ -60,9 +63,9 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
                 if (!destination.exists()) {
                     destination.mkdirs()
                 }
-                logger.warn("copy framework ${framework.name} to $destination")
+                logger.debug("copy framework {} to {}", framework.name, destination)
                 framework.files.forEach { file ->
-                    logger.warn("copy framework file ${file.name} to ${destination.resolve(file.name).path}")
+                    logger.debug("copy framework file ${file.name} to ${destination.resolve(file.name).path}")
                     file.copyRecursively(
                         destination.resolve(file.name),
                         overwrite = true,
@@ -70,5 +73,6 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
                 }
             }
         }
+        logger.debug("End copy framework resources")
     }
 }
