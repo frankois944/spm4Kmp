@@ -17,6 +17,7 @@ class CustomSettingsTest : BaseTest() {
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
                 .withMinIos("16.0")
+                .withToolsVersion("6.0")
                 .withTargets(
                     AppleCompileTarget.iosSimulatorArm64,
                 ).appendRawPluginRootConfig(
@@ -39,9 +40,11 @@ class CustomSettingsTest : BaseTest() {
                         }
                         swiftSettings {
                             defines = listOf("CUSTOM_DEFINE")
+                            unsafeFlags = listOf("")
                             enableExperimentalFeature = "CImplementation"
                             enableUpcomingFeature = "ExistentialAny"
                             interoperabilityMode = "Cxx"
+                            swiftLanguageMode = "5"
                         }
                     }
                     """,

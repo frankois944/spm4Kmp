@@ -249,78 +249,80 @@ swiftPackageConfig {
                         when (definition) {
                             is SwiftDependency.Binary.Local -> {
                                 appendLine("SwiftDependency.Binary.Local(")
-                                append("path = \"${definition.path}\",")
-                                append("packageName = \"${definition.packageName}\",")
-                                append("exportToKotlin = ${definition.exportToKotlin},")
-                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
-                                append("),")
+                                appendLine("path = \"${definition.path}\",")
+                                appendLine("packageName = \"${definition.packageName}\",")
+                                appendLine("exportToKotlin = ${definition.exportToKotlin},")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
+                                appendLine("),")
                             }
 
                             is SwiftDependency.Binary.Remote -> {
                                 appendLine("SwiftDependency.Binary.Remote(")
-                                append("url = URI(\"${definition.url}\"),")
-                                append("checksum = \"${definition.checksum}\",")
-                                append("packageName = \"${definition.packageName}\",")
-                                append("exportToKotlin = ${definition.exportToKotlin},")
-                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
-                                append("),")
+                                appendLine("url = URI(\"${definition.url}\"),")
+                                appendLine("checksum = \"${definition.checksum}\",")
+                                appendLine("packageName = \"${definition.packageName}\",")
+                                appendLine("exportToKotlin = ${definition.exportToKotlin},")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
+                                appendLine("),")
                             }
 
                             is SwiftDependency.Package.Local -> {
                                 appendLine("SwiftDependency.Package.Local(")
-                                append("path = \"${definition.path}\",")
-                                append("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
+                                appendLine("path = \"${definition.path}\",")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
                                 if (definition.packageName.isNotEmpty()) {
                                     appendLine("packageName = \"${definition.packageName}\",")
                                 }
                                 appendLine("products = {")
                                 definition.productsConfig.productPackages.forEach { config ->
-                                    append(
+                                    appendLine(
                                         buildPackageBlock(
                                             config = config,
                                         ),
                                     )
                                 }
                                 appendLine("}")
-                                append("),")
+                                appendLine("),")
                             }
 
                             is SwiftDependency.Package.Remote.Branch -> {
                                 appendLine("SwiftDependency.Package.Remote.Branch(")
                                 appendLine("branch = \"${definition.branch}\",")
                                 appendLine("url = URI(\"${definition.url}\"),")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
                                 if (definition.packageName.isNotEmpty()) {
                                     appendLine("packageName = \"${definition.packageName}\",")
                                 }
                                 appendLine("products = {")
                                 definition.productsConfig.productPackages.forEach { config ->
-                                    append(
+                                    appendLine(
                                         buildPackageBlock(
                                             config = config,
                                         ),
                                     )
                                 }
                                 appendLine("}")
-                                append("),")
+                                appendLine("),")
                             }
 
                             is SwiftDependency.Package.Remote.Commit -> {
                                 appendLine("SwiftDependency.Package.Remote.Commit(")
                                 appendLine("revision = \"${definition.revision}\",")
                                 appendLine("url = URI(\"${definition.url}\"),")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
                                 if (definition.packageName.isNotEmpty()) {
                                     appendLine("packageName = \"${definition.packageName}\",")
                                 }
                                 appendLine("products = {")
                                 definition.productsConfig.productPackages.forEach { config ->
-                                    append(
+                                    appendLine(
                                         buildPackageBlock(
                                             config = config,
                                         ),
                                     )
                                 }
                                 appendLine("}")
-                                append("),")
+                                appendLine("),")
                             }
 
                             is SwiftDependency.Package.Remote.Version -> {
@@ -332,14 +334,14 @@ swiftPackageConfig {
                                 }
                                 appendLine("products = {")
                                 definition.productsConfig.productPackages.forEach { config ->
-                                    append(
+                                    appendLine(
                                         buildPackageBlock(
                                             config = config,
                                         ),
                                     )
                                 }
                                 appendLine("}")
-                                append("),")
+                                appendLine("),")
                             }
                         }
                     }
@@ -474,6 +476,11 @@ swiftPackageConfig {
         fun withCopyDependenciesToApp(copyDependenciesToApp: Boolean) =
             apply {
                 config = config.copy(copyDependenciesToApp = copyDependenciesToApp)
+            }
+
+        fun withToolsVersion(toolsVersion: String) =
+            apply {
+                config = config.copy(toolsVersion = toolsVersion)
             }
 
         fun appendRawPluginRootConfig(

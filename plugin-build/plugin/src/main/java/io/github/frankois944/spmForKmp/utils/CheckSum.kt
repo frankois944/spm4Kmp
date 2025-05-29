@@ -16,8 +16,6 @@ internal fun File.checkSum(): String {
 internal object Hashing {
     @Throws(IOException::class)
     fun hashDirectory(directory: File): String {
-        require(directory.isDirectory) { "Path must be a directory" }
-
         val md5Digest = MessageDigest.getInstance("SHA256")
 
         @Suppress("MagicNumber")
