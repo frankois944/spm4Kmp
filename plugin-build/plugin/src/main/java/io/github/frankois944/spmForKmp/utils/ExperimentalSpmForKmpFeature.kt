@@ -1,7 +1,8 @@
 package io.github.frankois944.spmForKmp.utils
 
 @RequiresOptIn(
-    level = RequiresOptIn.Level.WARNING, // or Level.ERROR
+    // or Level.ERROR
+    level = RequiresOptIn.Level.WARNING,
     message = "This API is experimental and may change in the future.",
 )
 @Retention(AnnotationRetention.BINARY)
