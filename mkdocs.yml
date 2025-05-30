@@ -5,6 +5,8 @@ site_description: An alternative to the dying CocoaPods with custom Kotlin/Swift
 site_url: https://frankois944.github.io/spm4Kmp/
 extra:
   social:
+    - icon: material/coffee
+      link: https://buymeacoffee.com/frankois944
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/in/francois-dabonot/
     - icon: fontawesome/brands/github
@@ -27,14 +29,20 @@ extra:
             Thanks for your feedback! Help us improve this page by
             using our <a href="https://github.com/frankois944/spm4Kmp/issues/new/?title=[Feedback]+{title}+-+{url}" target="_blank" rel="noopener">feedback form</a>.
 nav:
-  - index.md
-  - setup.md
-  - bridge.md
-  - bridgeWithDependencies.md
-  - exportingDependencies.md
-  - issues.md
-  - faq.md
-  - tips.md
+  - Swift Package Manager For Kotlin Multiplatform:
+    - index.md
+  - Getting Started:
+    - Setup:
+      - section-setup/index.md
+      - section-setup/experimental.md
+    - bridge.md
+    - bridgeWithDependencies.md
+    - exportingDependencies.md
+    - Help:
+      - section-help/index.md
+      - section-help/issues.md
+      - section-help/faq.md
+      - section-help/tips.md
   - Usages:
     - usages/multiTarget.md
     - usages/distribution.md
@@ -73,6 +81,7 @@ markdown_extensions:
 plugins:
   - search
   - social
+  - tags
 validation:
   omitted_files: warn
   absolute_links: warn
@@ -80,7 +89,9 @@ validation:
   anchors: warn
 theme:
   name: material
+  custom_dir: docs/overrides
   features:
+    - navigation.footer
     - search.suggest
     - search.highlight
     - search.share
@@ -91,6 +102,9 @@ theme:
     - navigation.instant
     - navigation.instant.progress
     - navigation.expand
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
