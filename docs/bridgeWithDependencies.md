@@ -80,7 +80,7 @@ The plugin supports the following configurations :
     )
     ```
 
-[SwiftDependency reference](references/dependency/dependencyConfig.md)
+[SwiftDependency reference](./references/dependency/dependencyConfig.md)
 
 ### XCFramework
 

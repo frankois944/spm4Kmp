@@ -4,7 +4,7 @@
 
 The following configuration is a simple bridge between Kotlin and the Swift Apple Native SDK.
 
-``` kotlin title="build.gradle.kts"
+```kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {
     }
@@ -22,7 +22,7 @@ The content of this folder is your bridge between Swift and Kotlin, **everything
     Your Swift code needs to be marked as [@objc/@objcMembers](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and the visibility set as `public`
     or it won't be exported and available from your Kotlin code.
 
-Some tips [here](tips.md#working-with-objcnamesclasses-types).
+Some tips [here](./section-help/tips.md#working-with-objcnamesclasses-types).
 
 ``` swift title="src/swift/[cinteropname]/mySwiftFile.swift"
 import UIKit
