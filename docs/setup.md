@@ -1,9 +1,9 @@
-# Setup
+# Getting Started
 
 ## Requirement
 
 - macOS With Xcode 16 and later
-    - Using an earlier version of [Xcode is possible](../tips.md#support-xcode-15-and-earlier), but I don't recommend it.
+    - Using an earlier version of [Xcode is possible](section-help/tips.md#support-xcode-15-and-earlier), but I don't recommend it.
 - Kotlin : **2.1.0 and later**
 - Gradle : **8.10 and later**
 
@@ -46,7 +46,7 @@ kotlin {
 }
 ```
 
-[swiftPackageConfig reference](../references/swiftPackageConfig.md)
+[swiftPackageConfig reference](references/swiftPackageConfig.md)
 ``` kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") { // must match with cinterops.create name

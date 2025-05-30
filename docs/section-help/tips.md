@@ -4,7 +4,7 @@
 
 - **Since the version 0.4.0**
 
-[spmWorkingPath](references/swiftPackageConfig.md#spmworkingpath) has been added to change the path to Swift Package working file.
+[spmWorkingPath](../references/swiftPackageConfig.md#spmworkingpath) has been added to change the path to Swift Package working file.
 
 By setting [spmWorkingPath](https://github.com/frankois944/spm4Kmp/blob/cf80e65b3076d9e0bcd94a847e1209d4b9b91141/example/build.gradle.kts#L108C1-L108C104) outside the build folder, the working files won't be removed if you clean the project, and you can **exclude** the folder from [indexing](https://www.jetbrains.com/help/idea/indexing.html#exclude).
 
@@ -76,7 +76,7 @@ It's recommended to use the latest version of the IDE.
 
 But, it is possible to support older versions of Xcode by using a more recent version of the Swift Compiler than the Xcode one.
 
-The property [swiftBinPath](references/swiftPackageConfig.md#swiftbinpath) has been added to change the swift command used by the plugin.
+The property [swiftBinPath](../references/swiftPackageConfig.md#swiftbinpath) has been added to change the swift command used by the plugin.
 
 This official tool [swiftly](https://www.swift.org/blog/introducing-swiftly_10/) has been recently added to easily install another version of swift on macOS.
 

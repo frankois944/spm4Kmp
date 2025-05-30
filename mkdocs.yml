@@ -31,13 +31,14 @@ extra:
 nav:
   - Swift Package Manager For Kotlin Multiplatform:
     - index.md
-  - Getting Started:
-    - Setup:
-      - section-setup/index.md
-      - section-setup/experimental.md
+    - license.md
+  - Setup:
+    - setup.md
     - bridge.md
     - bridgeWithDependencies.md
     - exportingDependencies.md
+    - Experimental:
+      - section-experimental/copyPackageResources.md
     - Help:
       - section-help/index.md
       - section-help/issues.md
@@ -62,13 +63,15 @@ nav:
           - references/targetSettingsConfigs/CxxSettingConfig.md
           - references/targetSettingsConfigs/LinkerSettingConfig.md
           - references/targetSettingsConfigs/SwiftSettingConfig.md
-  - license.md
 markdown_extensions:
   - admonition
   - footnotes
   - pymdownx.details
   - pymdownx.tabbed:
       alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - attr_list
   - pymdownx.highlight:
       use_pygments: true
@@ -105,6 +108,7 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.indexes
+    - content.tabs.link
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"

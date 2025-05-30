@@ -107,7 +107,7 @@ swiftPackageConfig {
 
 #### Bridge
 
-Some tips [here](../tips.md#working-with-objcnamesclasses-types).
+Some tips [here](../section-help/tips.md#working-with-objcnamesclasses-types).
 
 ``` Swift title="src/swift/appleDeps/MEPlayerController.swift"
 import Foundation
