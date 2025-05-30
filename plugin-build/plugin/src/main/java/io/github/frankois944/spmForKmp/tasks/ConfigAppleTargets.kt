@@ -305,10 +305,10 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     val archs: String? = project.findProperty("ARCHS") as? String ?: System.getenv("ARCHS")
     val platformName: String? = project.findProperty("PLATFORM_NAME") as? String ?: System.getenv("PLATFORM_NAME")
 
-    logger.warn("buildProductDir $buildProductDir")
-    logger.warn("contentFolderPath $contentFolderPath")
-    logger.warn("archs $archs")
-    logger.warn("platformName $platformName")
+    logger.debug("buildProductDir $buildProductDir")
+    logger.debug("contentFolderPath $contentFolderPath")
+    logger.debug("archs $archs")
+    logger.debug("platformName $platformName")
 
     @Suppress("ComplexCondition")
     if (platformName == null || archs == null || contentFolderPath == null || buildProductDir == null) {

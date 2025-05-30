@@ -34,7 +34,7 @@ kotlin {
         }
     }
 
-    /*listOf(
+    listOf(
         macosArm64(),
     ).forEach {
         it.binaries.framework {
@@ -46,7 +46,7 @@ kotlin {
                 cinterops.create("nativeMacosShared")
             }
         }
-    }*/
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -151,7 +151,7 @@ swiftPackageConfig {
             )
         }
     }
-    /*create("nativeMacosShared") {
+    create("nativeMacosShared") {
         dependency {
             localPackage(
                 path = "$testResources/LocalSourceDummyFramework",
@@ -162,5 +162,5 @@ swiftPackageConfig {
                 },
             )
         }
-    }*/
+    }
 }
