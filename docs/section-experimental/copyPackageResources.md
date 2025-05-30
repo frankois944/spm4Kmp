@@ -4,6 +4,13 @@
 
 This major feature avoids the mandatory [usage of the exported local package](https://github.com/frankois944/spm4Kmp/discussions/108) by copying the necessary resources directly to the application.
 
+!!! warning "Experimental"
+
+    The goal of this experimental feature is to remove the need to have the exported package included inside your Xcode project.
+
+    Documentation and usage feeback are welcomed.
+
+
 ## Requirement
 
 ### Gradle
@@ -37,20 +44,25 @@ You can call this task with custom parameters and override the Xcode build envir
 
 ## Optional
 
-You can control what's inside the exported package by setting [isIncludedInExportedPackage](https://frankois944.github.io/spm4Kmp/section-experimental/copyPackageResources/?q=isIncludedInExportedPackage) and exclude non needed package.
+You can control what's inside the exported package by setting [isIncludedInExportedPackage](https://frankois944.github.io/spm4Kmp/section-experimental/copyPackageResources/?q=isIncludedInExportedPackage) and exclude non-needed packages.
 
 ## Example
 
 The [example project](https://github.com/frankois944/spm4Kmp/tree/main/example) uses this new feature, and you can take it as a reference for implementing in your project, especially the [Gradle file](https://github.com/frankois944/spm4Kmp/blob/437f6982a9dffa13ad9f1af7bea846a800cc685e/example/build.gradle.kts#L109-L152).
 
+!!! info
+
+    The local package can still be used even if you have enabled this feature. Xcode will overwrite the copied files.
+
+
 
 ## Limitation
 
-- It doesn't work with static frameworks (like FirebaseAnalytics).
+- It doesn't work with static frameworks/dependencies (like FirebaseAnalytics).
 
-You will have the error `Undefined symbol` error message and [need to include the local package](https://github.com/frankois944/spm4Kmp/blob/437f6982a9dffa13ad9f1af7bea846a800cc685e/example/build.gradle.kts#L114-L119).
+- If you have the error `Undefined symbol` error message, you [must include the local package](https://github.com/frankois944/spm4Kmp/blob/437f6982a9dffa13ad9f1af7bea846a800cc685e/example/build.gradle.kts#L114-L119) or the required dependency yourself.
 
-- You lose the capability to use the external dependency inside your application code.
+- You lose the capability to use the external dependency inside your Swift Application code.
 
 ## Feedback
 
