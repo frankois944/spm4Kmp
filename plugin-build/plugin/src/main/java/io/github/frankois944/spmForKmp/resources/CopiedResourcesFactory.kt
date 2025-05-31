@@ -77,8 +77,8 @@ internal class CopiedResourcesFactory(
                         logger.debug("Looking inside the Info.plist {}", plist)
                         val libraryName = getPlistValue(plist, "CFBundleExecutable")
                         logger.debug("Found libraryName $libraryName")
-                        val libraryFile = framework.resolve(libraryName)
-                        val newFramework = FrameworkResource(framework, binaryFile = libraryFile)
+                        val binaryFile = framework.resolve(libraryName)
+                        val newFramework = FrameworkResource(framework, binaryFile = binaryFile)
                         add(newFramework)
                     }
             }
