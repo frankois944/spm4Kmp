@@ -1,20 +1,20 @@
 package io.github.frankois944.spmForKmp.resources
 
-import io.github.frankois944.spmForKmp.operations.isDynamicLibrary
 import io.github.frankois944.spmForKmp.utils.getPlistValue
 import org.gradle.api.logging.Logger
-import org.gradle.process.ExecOperations
 import java.io.File
 import java.io.Serializable
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 internal data class FrameworkResource(
-    val name: String,
+    val framework: File,
+    val name: String = framework.name,
+    val binaryFile: File,
     var files: MutableList<File> = mutableListOf(),
 ) : Serializable {
     internal companion object {
-        private const val serialVersionUID: Long = 1
+        private const val serialVersionUID: Long = 2
     }
 }
 
@@ -27,7 +27,6 @@ internal class CopiedResourcesFactory(
     private val buildPackageMode: String,
     contentFolderPath: String,
     buildProductDir: String,
-    private val execOp: ExecOperations,
     private val logger: Logger,
 ) {
     val outputBundleDirectory: File
@@ -79,21 +78,8 @@ internal class CopiedResourcesFactory(
                         val libraryName = getPlistValue(plist, "CFBundleExecutable")
                         logger.debug("Found libraryName $libraryName")
                         val libraryFile = framework.resolve(libraryName)
-                        // A static library can't contain raw resource files but only bundles.
-                        // A dynamic library and his resources must be copied inside the Apple app.
-                        if (execOp.isDynamicLibrary(libraryFile, logger)) {
-                            val newFramework = FrameworkResource(name = framework.name)
-                            framework.listFiles()?.forEach {
-                                if (!it.isDirectory) {
-                                    newFramework.files.add(it)
-                                } else if (!listOf("Modules", "Headers", "_CodeSignature").contains(it.name)) {
-                                    newFramework.files.add(it)
-                                }
-                            }
-                            add(newFramework)
-                        } else {
-                            logger.debug("Ignore {} because is a static library", libraryFile)
-                        }
+                        val newFramework = FrameworkResource(framework, binaryFile = libraryFile)
+                        add(newFramework)
                     }
             }
 
