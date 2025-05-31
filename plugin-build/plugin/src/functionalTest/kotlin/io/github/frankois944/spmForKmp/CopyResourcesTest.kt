@@ -166,7 +166,7 @@ class CopyResourcesTest : BaseTest() {
                 .listFiles { it.nameWithoutExtension == "DummyFramework" }
                 .isNotEmpty(),
         ) { "The framework folder must contains DummyFramework" }
-        assert(destination.toFile().listFiles().isNotEmpty()) { "The output folder must not be empty" }
+        assert(destination.toFile().listFiles().size == 3) { "The output folder must contains 3 folders" }
         assert(!fixture.getExportedPackageContent().contains("CryptoSwift"))
         assert(!fixture.getExportedPackageContent().contains("DummyFramework"))
         assert(!fixture.getExportedPackageContent().contains("Default"))
