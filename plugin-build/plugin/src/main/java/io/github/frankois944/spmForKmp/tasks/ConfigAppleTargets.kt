@@ -31,9 +31,7 @@ import io.github.frankois944.spmForKmp.utils.Hashing
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.internal.extensions.core.serviceOf
 import org.gradle.internal.extensions.stdlib.capitalized
-import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -326,7 +324,6 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
             buildPackageMode = buildMode,
             contentFolderPath = contentFolderPath,
             buildProductDir = buildProductDir,
-            execOp = project.serviceOf<ExecOperations>(),
             logger = logger,
         )
 
