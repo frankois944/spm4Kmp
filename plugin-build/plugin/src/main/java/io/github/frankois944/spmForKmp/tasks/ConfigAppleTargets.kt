@@ -15,7 +15,7 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.dependency.Dependency
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
-import io.github.frankois944.spmForKmp.resources.CopiedResourcesFactory
+import io.github.frankois944.spmForKmp.resources.getCurrentPackagesBuiltDir
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.CopyPackageResourcesTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
@@ -91,16 +91,17 @@ internal fun Project.configAppleTargets(
 
     val buildMode = getBuildMode(swiftPackageEntry)
 
-    tasks.register(
-        swiftPackageEntry.name + TASK_COPY_PACKAGE_RESOURCES,
-        CopyPackageResourcesTask::class.java,
-    ) {
-        it.configureCopyPackageResourcesTask(
-            swiftPackageEntry = swiftPackageEntry,
-            packageDirectoriesConfig = packageDirectoriesConfig,
-            buildMode = buildMode,
-        )
-    }
+    val copyPackageResourcesTask =
+        tasks.register(
+            swiftPackageEntry.name + TASK_COPY_PACKAGE_RESOURCES,
+            CopyPackageResourcesTask::class.java,
+        ) {
+            it.configureCopyPackageResourcesTask(
+                swiftPackageEntry = swiftPackageEntry,
+                packageDirectoriesConfig = packageDirectoriesConfig,
+                buildMode = buildMode,
+            )
+        }
 
     allTargets.forEach { cinteropTarget ->
         val targetBuildDir =
@@ -173,13 +174,17 @@ internal fun Project.configAppleTargets(
             definitionTask
                 .get()
                 .dependsOn(
-                    compileTask
+                    copyPackageResourcesTask
                         .get()
                         .dependsOn(
-                            listOfNotNull(
-                                manifestTask.get(),
-                                exportedManifestTask?.get(),
-                            ),
+                            compileTask
+                                .get()
+                                .dependsOn(
+                                    listOfNotNull(
+                                        manifestTask.get(),
+                                        exportedManifestTask?.get(),
+                                    ),
+                                ),
                         ),
                 )
     }
@@ -291,45 +296,41 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     buildMode: String,
 ) {
     if (!swiftPackageEntry.copyDependenciesToApp) {
+        enabled = false
         logger.debug("copyResourcesToApp is not enabled in configuration, skipping the task")
-        isEnabled = false
         return
     }
-
     val buildProductDir: String? =
-        project.findProperty("BUILT_PRODUCTS_DIR") as? String ?: System.getenv("BUILT_PRODUCTS_DIR")
+        project.findProperty("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String ?: System.getenv("BUILT_PRODUCTS_DIR")
     val contentFolderPath: String? =
-        project.findProperty("CONTENTS_FOLDER_PATH") as? String ?: System.getenv("CONTENTS_FOLDER_PATH")
-    val archs: String? = project.findProperty("ARCHS") as? String ?: System.getenv("ARCHS")
-    val platformName: String? = project.findProperty("PLATFORM_NAME") as? String ?: System.getenv("PLATFORM_NAME")
+        project.findProperty("io.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH") as? String ?: System.getenv("CONTENTS_FOLDER_PATH")
+    val archs: String? = project.findProperty("io.github.frankois944.spmForKmp.ARCHS") as? String ?: System.getenv("ARCHS")
+    val platformName: String? =
+        project.findProperty("io.github.frankois944.spmForKmp.PLATFORM_NAME") as? String ?: System.getenv("PLATFORM_NAME")
 
     logger.debug("buildProductDir $buildProductDir")
     logger.debug("contentFolderPath $contentFolderPath")
     logger.debug("archs $archs")
     logger.debug("platformName $platformName")
 
-    @Suppress("ComplexCondition")
-    if (platformName == null || archs == null || contentFolderPath == null || buildProductDir == null) {
-        logger.debug("Missing variable for coping the resources, skipping the task")
+    if (archs.isNullOrEmpty() ||
+        platformName.isNullOrEmpty() ||
+        buildProductDir.isNullOrEmpty() ||
+        contentFolderPath.isNullOrEmpty()
+    ) {
         enabled = false
+        logger.debug("Missing variable for coping the resources, skipping the task")
         return
     }
-
-    val copiedResources =
-        CopiedResourcesFactory(
+    this.builtDirectory.set(
+        getCurrentPackagesBuiltDir(
             packageScratchDir = packageDirectoriesConfig.packageScratchDir,
-            baseDir = project.layout.projectDirectory.asFile,
             platformName = platformName,
             archs = archs,
             buildPackageMode = buildMode,
-            contentFolderPath = contentFolderPath,
-            buildProductDir = buildProductDir,
             logger = logger,
-        )
-
-    this.outputBundleDirectory.set(copiedResources.outputBundleDirectory)
-    this.outputFrameworkDirectory.set(copiedResources.outputFrameworkDirectory)
-    this.inputBundles.set(copiedResources.bundles)
-    this.inputFrameworks.set(copiedResources.frameworks)
-    this.listOfResourcesToCopy.set(copiedResources.bundles + copiedResources.frameworks.flatMap { it.files })
+        ),
+    )
+    this.buildProductDir.set(buildProductDir)
+    this.contentFolderPath.set(contentFolderPath)
 }

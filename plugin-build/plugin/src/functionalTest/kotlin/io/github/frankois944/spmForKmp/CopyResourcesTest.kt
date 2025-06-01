@@ -126,10 +126,10 @@ class CopyResourcesTest : BaseTest() {
         val parameters =
             buildList {
                 add("dummyCopyPackageResources")
-                add("-PPLATFORM_NAME=iphone")
-                add("-PARCHS=arm64")
-                add("-PBUILT_PRODUCTS_DIR=$appBuiltProductDir")
-                add("-PCONTENTS_FOLDER_PATH=$appContentFolderPath")
+                add("-Pio.github.frankois944.spmForKmp.PLATFORM_NAME=iphone")
+                add("-Pio.github.frankois944.spmForKmp.ARCHS=arm64")
+                add("-Pio.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR=$appBuiltProductDir")
+                add("-Pio.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH=$appContentFolderPath")
             }
 
         // When I build the project
