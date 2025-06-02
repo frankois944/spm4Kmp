@@ -56,12 +56,18 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+val isSnapshot = hasProperty("snapshot")
+
 gradlePlugin {
     plugins {
         create(property("ID").toString()) {
             id = property("ID").toString()
             implementationClass = property("IMPLEMENTATION_CLASS").toString()
-            version = property("VERSION").toString()
+            version =
+                when {
+                    isSnapshot -> "${property("VERSION")}-SNAPSHOT-${getTimestamp()}"
+                    else -> property("VERSION").toString()
+                }
             description = property("DESCRIPTION").toString()
             displayName = property("DISPLAY_NAME").toString()
             // Note: tags cannot include "plugin" or "gradle" when publishing
@@ -69,13 +75,6 @@ gradlePlugin {
         }
     }
 }
-
-val isSnapshot = hasProperty("snapshot")
-version =
-    when {
-        isSnapshot -> "${property("VERSION")}-SNAPSHOT-${getTimestamp()}"
-        else -> property("VERSION").toString()
-    }
 
 fun getTimestamp(): String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
 
