@@ -301,18 +301,24 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
         return
     }
     val buildProductDir: String? =
-        project.findProperty("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String ?: System.getenv("BUILT_PRODUCTS_DIR")
+        project.findProperty("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String
+            ?: System.getenv("BUILT_PRODUCTS_DIR")
     val contentFolderPath: String? =
-        project.findProperty("io.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH") as? String ?: System.getenv("CONTENTS_FOLDER_PATH")
-    val archs: String? = project.findProperty("io.github.frankois944.spmForKmp.ARCHS") as? String ?: System.getenv("ARCHS")
+        project.findProperty("io.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH") as? String
+            ?: System.getenv("CONTENTS_FOLDER_PATH")
+    val archs: String? =
+        project.findProperty("io.github.frankois944.spmForKmp.ARCHS") as? String
+            ?: System.getenv("ARCHS")
     val platformName: String? =
-        project.findProperty("io.github.frankois944.spmForKmp.PLATFORM_NAME") as? String ?: System.getenv("PLATFORM_NAME")
+        project.findProperty("io.github.frankois944.spmForKmp.PLATFORM_NAME") as? String
+            ?: System.getenv("PLATFORM_NAME")
 
     logger.debug("buildProductDir $buildProductDir")
     logger.debug("contentFolderPath $contentFolderPath")
     logger.debug("archs $archs")
     logger.debug("platformName $platformName")
 
+    @Suppress("ComplexCondition")
     if (archs.isNullOrEmpty() ||
         platformName.isNullOrEmpty() ||
         buildProductDir.isNullOrEmpty() ||
