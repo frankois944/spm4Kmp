@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.Serializable
 import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Properties
 
 plugins {
@@ -64,6 +66,30 @@ gradlePlugin {
             displayName = property("DISPLAY_NAME").toString()
             // Note: tags cannot include "plugin" or "gradle" when publishing
             tags.set(listOf("kmp", "SPM", "cinterop", "apple", "multiplatform", "ios", "swiftpackagemanager"))
+        }
+    }
+}
+
+val isSnapshot = hasProperty("snapshot")
+version =
+    when {
+        isSnapshot -> "${property("VERSION")}-SNAPSHOT-${getTimestamp()}"
+        else -> property("VERSION").toString()
+    }
+
+fun getTimestamp(): String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+
+// Add this task to publish snapshots
+tasks.register("publishSnapshot") {
+    group = "publishing"
+    description = "Publishes a snapshot version to the Gradle Plugin Portal"
+
+    dependsOn("setupPluginUploadFromEnvironment")
+    dependsOn("publishPlugins")
+
+    doFirst {
+        if (!isSnapshot) {
+            throw GradleException("Publishing snapshot requires -Psnapshot flag")
         }
     }
 }
