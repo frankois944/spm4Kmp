@@ -1,6 +1,14 @@
 name: Build and Tests
 
 on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'website/**'
+      - 'BinaryPackageSource/**'
+      - '.idea/**'
   pull_request:
     branches:
       - '*'

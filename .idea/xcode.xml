@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="XcodeMetaData" PROJECT_FILE="$PROJECT_DIR$/BinaryPackageSource/DummyFramework.xcodeproj">
-    <contentRoot DIR="$PROJECT_DIR$/BinaryPackageSource" />
-  </component>
+  <component name="XcodeMetaData" PROJECT_DIR="$PROJECT_DIR$/BinaryPackageSource" PROJECT_FILE="$PROJECT_DIR$/BinaryPackageSource/DummyFramework.xcodeproj" />
 </project>
