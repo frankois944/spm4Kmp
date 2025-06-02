@@ -231,7 +231,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/../../\"\n./gradlew :example:nativeIosSharedCopyPackageResources\n";
+			shellScript = "#cd \"$SRCROOT/../../\"\n#./gradlew :example:nativeIosSharedCopyPackageResources\n";
 		};
 		7555FFB5242A651A00829871 /* build framework */ = {
 			isa = PBXShellScriptBuildPhase;
