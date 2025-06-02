@@ -773,30 +773,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#xcode" class="md-nav__link">
-    <span class="md-ellipsis">
-      Xcode
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Xcode">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#custom-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Custom configuration
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1667,30 +1643,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#xcode" class="md-nav__link">
-    <span class="md-ellipsis">
-      Xcode
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Xcode">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#custom-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Custom configuration
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1752,7 +1704,7 @@
 
 
 <h1 id="avoid-the-usage-of-the-exported-local-package">Avoid the usage of the exported local package</h1>
-<p><strong>Introduced in version 0.10.0</strong></p>
+<p><strong>Introduced in version 0.11.0</strong></p>
 <p>This major feature avoids the mandatory <a href="https://github.com/frankois944/spm4Kmp/discussions/108">usage of the exported local package</a> by copying the necessary resources directly to the application.</p>
 <div class="admonition warning">
 <p class="admonition-title">Experimental</p>
@@ -1762,21 +1714,7 @@
 <h2 id="requirement">Requirement</h2>
 <h3 id="gradle">Gradle</h3>
 <p>Set the <a href="../../references/swiftPackageConfig/#copydependenciestoapp"><code>copyDependenciesToApp</code></a> at <code>true</code> inside your plugin configuration.</p>
-<h3 id="xcode">Xcode</h3>
-<p>Call the following gradle task after the build of your KMP library inside the build phase of Xcode.</p>
-<p>:<strong>yourKotlinModule</strong>:<strong>cInteropName</strong>CopyPackageResources</p>
-<p>Example :</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>./gradlew :example:embedAndSignAppleFrameworkForXcode // build the library
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>./gradlew :example:nativeIosSharedCopyPackageResources // copy the SPM resources
-</span></code></pre></div>
-<h4 id="custom-configuration">Custom configuration</h4>
-<p>You can call this task with custom parameters and override the Xcode build environment.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>./gradlew :example:nativeIosSharedCopyPackageResources \
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                                -PPLATFORM_NAME=iphone \
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>                                -PARCHS=arm64 \
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>                                -PBUILT_PRODUCTS_DIR=... \
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                                -PCONTENTS_FOLDER_PATH=... \
-</span></code></pre></div>
+<p>That's all!</p>
 <h2 id="optional">Optional</h2>
 <p>You can control what's inside the exported package by setting <a href="https://frankois944.github.io/spm4Kmp/section-experimental/copyPackageResources/?q=isIncludedInExportedPackage">isIncludedInExportedPackage</a> and exclude non-needed packages.</p>
 <h2 id="example">Example</h2>
@@ -1794,11 +1732,11 @@
 <p>If you have the error <code>Undefined symbol</code> error message, you <a href="https://github.com/frankois944/spm4Kmp/blob/437f6982a9dffa13ad9f1af7bea846a800cc685e/example/build.gradle.kts#L114-L119">must include the local package</a> or the required dependency yourself.</p>
 </li>
 <li>
-<p>You lose the capability to use the external dependency inside your Swift Application code.</p>
+<p>You lose the access of the external dependency inside your Swift Application code.</p>
 </li>
 </ul>
 <h2 id="feedback">Feedback</h2>
-<p>As this feature is experimental, create an issue if needed :) </p>
+<p>As this feature is experimental, create an issue if needed :)</p>
 
 
 
