@@ -247,10 +247,9 @@ fun exportedPackageSettings(setting: ExportedPackageConfig.() -> Unit)
 
 Copy **ALL** products into the application (only when running from xcode)
 
-The task [cInteropName]CopyPackageResources need to be added inside the build phase of your xcode project
 EXPERIMENTAL
 
 ```kotlin
 @ExperimentalSpmForKmpFeature
-var copyDependenciesToApp: Boolean = false
+var copyDependenciesToApp = false
 ```
