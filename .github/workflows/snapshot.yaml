@@ -1,9 +1,9 @@
-name: Build and Tests
+name: Snapshot build
 
 on:
-  pull_request:
+  push:
     branches:
-      - '*'
+      - main
     paths-ignore:
       - 'README.md'
       - 'website/**'
@@ -22,7 +22,6 @@ jobs:
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
       GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
@@ -54,33 +53,12 @@ jobs:
             example/iosApp/spm
             example/iosApp/build
             example/SPM
-          key: ${{ runner.os }}-example-scratch
+          key: ${{ runner.os }}-example-snapshot
       - name: Cache Gradle Caches
         uses: gradle/actions/setup-gradle@v4
-      - name: Linter
-        run: ./gradlew :plugin-build:plugin:ktlintCheck :plugin-build:plugin:detektMain --continue
-      - name: Run Gradle tasks
-        run: ./gradlew :preMerge :plugin-build:plugin:jacocoTestReport --continue
-      - name: build iosExampleApp
-        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" test | xcpretty
+      - name: test iosExampleApp
+        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" clean test | xcpretty
         working-directory: "example/iosApp"
-      - name: Archive test results
-        uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: test-pre-merge-report
-          path: plugin-build/plugin/build/reports/
-      - name: Publish Test Report
-        uses: test-summary/action@v2
-        if: ${{ !cancelled() }}
-        with:
-          paths: '**/build/test-results/**/TEST-*.xml'
-          show: 'all'
-      - name: SonarQubeScan
-        uses: SonarSource/sonarqube-scan-action@v4.2.1
-        with:
-          args: >
-            -Dsonar.organization=frankois944
-            -Dsonar.projectKey=frankois944_spm4Kmp
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Publish Snapshot on Plugin Portal
+        run: ./gradlew :plugin-build:plugin:setupPluginUploadFromEnvironment :plugin-build:plugin:publishSnapshot -Psnapshot
+        if: success()
