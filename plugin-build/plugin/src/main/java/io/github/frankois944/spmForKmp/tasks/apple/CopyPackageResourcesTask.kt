@@ -41,7 +41,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     }
 
     private companion object {
-        val EXCLUDED_FRAMEWORK_DIRS = setOf("Modules", "Headers", "_CodeSignature")
+        val EXCLUDED_FRAMEWORK_DIRS = setOf("Modules", "Headers")
     }
 
     @TaskAction
@@ -128,7 +128,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
         logger.debug("copy framework {} to {}", framework.name, destination)
         framework.files.forEach { file ->
             val destFile = destination.resolve(file.name)
-            logger.debug("copy framework file ${file.name} to $destFile")
+            logger.debug("copy framework file {} to {}", file.name, destFile)
             file.copyRecursively(destFile, overwrite = true)
         }
     }
