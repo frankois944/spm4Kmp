@@ -256,6 +256,42 @@ internal fun ExecOperations.isDynamicLibrary(
     return standardOutput.toString().contains("dynamically linked shared library")
 }
 
+internal fun ExecOperations.signFramework(
+    file: File,
+    signIdentityName: String,
+    logger: Logger,
+) {
+    val args =
+        listOf(
+            "--sdk",
+            "macosx",
+            "codesign",
+            "--force",
+            "--sign",
+            signIdentityName,
+            "--preserve-metadata=identifier,entitlements",
+            "--timestamp=none",
+            file.absolutePath,
+        )
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
+    exec {
+        it.executable = "xcrun"
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "signFramework",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
+}
+
 @Suppress("LongParameterList")
 internal fun Logger.printExecLogs(
     action: String,

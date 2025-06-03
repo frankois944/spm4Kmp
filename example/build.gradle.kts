@@ -20,7 +20,7 @@ kotlin {
     }
 
     listOf(
-        //  iosX64(),
+        iosArm64(),
         iosSimulatorArm64(),
     ).forEach {
         it.binaries.framework {
@@ -127,6 +127,12 @@ swiftPackageConfig {
                 path = "$testResources/DummyFrameworkV2.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
+                isIncludedInExportedPackage = false,
+            )
+            localBinary(
+                path = "${layout.projectDirectory.asFile.path}/../example/xcframework/Sentry-Dynamic.xcframework.zip",
+                packageName = "Sentry",
+                exportToKotlin = false,
                 isIncludedInExportedPackage = false,
             )
             localPackage(

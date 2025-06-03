@@ -1,10 +1,12 @@
 package io.github.frankois944.spmForKmp.tasks.apple
 
 import io.github.frankois944.spmForKmp.operations.isDynamicLibrary
+import io.github.frankois944.spmForKmp.operations.signFramework
 import io.github.frankois944.spmForKmp.resources.CopiedResourcesFactory
 import io.github.frankois944.spmForKmp.resources.FrameworkResource
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -23,14 +25,17 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val builtDirectory: DirectoryProperty
 
-    @get:Inject
-    abstract val execOps: ExecOperations
+    @get:Input
+    abstract val signableBinary: ListProperty<String>
 
     @get:Input
     abstract val buildProductDir: Property<String>
 
     @get:Input
     abstract val contentFolderPath: Property<String>
+
+    @get:Inject
+    abstract val execOps: ExecOperations
 
     init {
         description = "Copy package resource to application"
@@ -74,29 +79,54 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     private fun copyFrameworkResources(copiedResources: CopiedResourcesFactory) {
         logger.debug("Start copy framework resources")
 
-        val targetDirectories =
-            listOf(
-                copiedResources.outputFrameworkDirectory.parentFile.parentFile,
-                copiedResources.outputFrameworkDirectory,
+        copiedResources.outputFrameworkDirectory.parentFile.parentFile.let { targetDir ->
+            copyDynamicFrameworksTo(
+                targetDir = targetDir,
+                copiedResources = copiedResources,
+                canSignFrameworkResource = false,
             )
-
-        targetDirectories.forEach { targetDir ->
-            copyDynamicFrameworksTo(targetDir, copiedResources)
         }
 
+        copyDynamicFrameworksTo(
+            targetDir = copiedResources.outputFrameworkDirectory,
+            copiedResources = copiedResources,
+            canSignFrameworkResource = true,
+        )
         logger.debug("End copy framework resources")
     }
 
     private fun copyDynamicFrameworksTo(
         targetDir: File,
         copiedResources: CopiedResourcesFactory,
+        canSignFrameworkResource: Boolean,
     ) {
         copiedResources.frameworks
             .filter { isDynamicFramework(it) }
             .onEach { collectFrameworkFiles(it) }
             .forEach { framework ->
                 copyFrameworkFiles(framework, targetDir)
+                if (canSignFrameworkResource) {
+                    signFrameworkResources(targetDir.resolve(framework.name))
+                }
             }
+    }
+
+    private fun signFrameworkResources(file: File) {
+        System.getenv("EXPANDED_CODE_SIGN_IDENTITY_NAME")?.let { identity ->
+            if (identity == "Sign to Run Locally" || identity.isEmpty()) {
+                logger.debug("Ignore framework signing because of local run")
+                return@let
+            }
+            logger.debug("Found sign identity $identity")
+            logger.debug("Signing framework at {}", file)
+            execOps.signFramework(
+                file = file,
+                logger = logger,
+                signIdentityName = identity,
+            )
+        } ?: run {
+            logger.debug("Can't resign framework, no signature identity found (EXPANDED_CODE_SIGN_IDENTITY_NAME)")
+        }
     }
 
     private fun isDynamicFramework(framework: FrameworkResource): Boolean {
