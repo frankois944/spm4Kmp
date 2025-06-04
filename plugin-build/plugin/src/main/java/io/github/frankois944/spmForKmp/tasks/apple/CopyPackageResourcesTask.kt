@@ -6,11 +6,11 @@ import io.github.frankois944.spmForKmp.resources.CopiedResourcesFactory
 import io.github.frankois944.spmForKmp.resources.FrameworkResource
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -26,7 +26,8 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     abstract val builtDirectory: DirectoryProperty
 
     @get:Input
-    abstract val signableBinary: ListProperty<String>
+    @get:Optional
+    abstract val codeSignIdentityName: Property<String?>
 
     @get:Input
     abstract val buildProductDir: Property<String>
@@ -112,7 +113,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     }
 
     private fun signFrameworkResources(file: File) {
-        System.getenv("EXPANDED_CODE_SIGN_IDENTITY_NAME")?.let { identity ->
+        codeSignIdentityName.orNull?.let { identity ->
             if (identity == "Sign to Run Locally" || identity.isEmpty()) {
                 logger.debug("Ignore framework signing because of local run")
                 return@let

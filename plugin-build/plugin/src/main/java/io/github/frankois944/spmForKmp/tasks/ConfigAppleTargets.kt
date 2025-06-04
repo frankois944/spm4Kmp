@@ -273,22 +273,6 @@ private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTa
     this.currentBridgeHash.set(Hashing.hashDirectory(packageDirectoriesConfig.bridgeSourceDir))
 }
 
-private fun createCInteropTask(
-    mainCompilation: KotlinNativeCompilation,
-    cinteropName: String,
-    file: File,
-) {
-    mainCompilation.cinterops.create(cinteropName) { settings ->
-        settings.definitionFile.set(file)
-    }
-}
-
-private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> {
-    val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies.toList()
-    val oldDependency = swiftPackageEntry.packageDependencies.toList()
-    return newDependency.ifEmpty { oldDependency }
-}
-
 @Suppress("LongParameterList")
 private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
@@ -337,6 +321,23 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
             logger = logger,
         ),
     )
+    this.codeSignIdentityName.set(System.getenv("EXPANDED_CODE_SIGN_IDENTITY_NAME"))
     this.buildProductDir.set(buildProductDir)
     this.contentFolderPath.set(contentFolderPath)
+}
+
+private fun createCInteropTask(
+    mainCompilation: KotlinNativeCompilation,
+    cinteropName: String,
+    file: File,
+) {
+    mainCompilation.cinterops.create(cinteropName) { settings ->
+        settings.definitionFile.set(file)
+    }
+}
+
+private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> {
+    val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies.toList()
+    val oldDependency = swiftPackageEntry.packageDependencies.toList()
+    return newDependency.ifEmpty { oldDependency }
 }
