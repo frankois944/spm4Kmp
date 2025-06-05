@@ -148,7 +148,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             if (bridgeSourceBuiltDir.get().toPath().exists()) {
                 logger.debug("bridgeSourceBuiltDir exist")
                 if (!Files.isSymbolicLink(bridgeSourceBuiltDir.get().toPath())) {
-                    logger.debug("bridgeSourceBuiltDir is not a symbolic link, it must be deleted and be a symbolic link")
+                    logger.debug("bridgeSourceBuiltDir is not a symbolic link")
+                    logger.debug("it must be deleted and be a symbolic link")
                     bridgeSourceBuiltDir.get().deleteRecursively()
                     Files.createSymbolicLink(
                         bridgeSourceBuiltDir.get().toPath(),
