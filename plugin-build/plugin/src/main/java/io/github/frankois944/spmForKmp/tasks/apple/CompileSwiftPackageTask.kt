@@ -20,7 +20,9 @@ import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.file.Files
 import javax.inject.Inject
+import kotlin.io.path.exists
 
 @CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
@@ -138,21 +140,28 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     }
 
     private fun prepareWorkingDir() {
-        if (bridgeSourceBuiltDir.get().exists()) {
-            bridgeSourceBuiltDir.get().deleteRecursively()
-        }
-        bridgeSourceBuiltDir.get().mkdirs()
-        if (!bridgeSourceDir.get().asFileTree.isEmpty) {
-            logger.debug(
-                """
-                Copy User Swift files to directory $bridgeSourceBuiltDir
-                ${bridgeSourceDir.get().asFile.list()?.toList()}
-                """.trimIndent(),
-            )
-            bridgeSourceDir.get().asFile.copyRecursively(bridgeSourceBuiltDir.get())
-        } else {
+        if (bridgeSourceDir.get().asFileTree.isEmpty) {
             logger.debug("Copy Dummy swift file to directory {}", bridgeSourceBuiltDir)
+            bridgeSourceBuiltDir.get().mkdirs()
             bridgeSourceBuiltDir.get().resolve("DummySPMFile.swift").writeText("import Foundation")
+        } else {
+            if (bridgeSourceBuiltDir.get().toPath().exists()) {
+                logger.debug("bridgeSourceBuiltDir exist")
+                if (!Files.isSymbolicLink(bridgeSourceBuiltDir.get().toPath())) {
+                    logger.debug("bridgeSourceBuiltDir is not a symbolic link, it must be deleted and be a symbolic link")
+                    bridgeSourceBuiltDir.get().deleteRecursively()
+                    Files.createSymbolicLink(
+                        bridgeSourceBuiltDir.get().toPath(),
+                        bridgeSourceDir.get().asFile.toPath(),
+                    )
+                }
+            } else {
+                logger.debug("bridgeSourceBuiltDir doesn't exist, create a symbolic Link")
+                Files.createSymbolicLink(
+                    bridgeSourceBuiltDir.get().toPath(),
+                    bridgeSourceDir.get().asFile.toPath(),
+                )
+            }
         }
     }
 
