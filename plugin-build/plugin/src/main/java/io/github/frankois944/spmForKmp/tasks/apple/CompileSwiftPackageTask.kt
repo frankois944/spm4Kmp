@@ -141,9 +141,12 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     private fun prepareWorkingDir() {
         if (bridgeSourceDir.get().asFileTree.isEmpty) {
-            logger.debug("Copy Dummy swift file to directory {}", bridgeSourceBuiltDir)
-            bridgeSourceBuiltDir.get().mkdirs()
-            bridgeSourceBuiltDir.get().resolve("DummySPMFile.swift").writeText("import Foundation")
+            val dummyFile = bridgeSourceBuiltDir.get().resolve("DummySPMFile.swift")
+            if (!dummyFile.exists()) {
+                logger.debug("Copy Dummy swift file to directory {}", bridgeSourceBuiltDir)
+                bridgeSourceBuiltDir.get().mkdirs()
+                dummyFile.writeText("import Foundation")
+            }
         } else {
             if (bridgeSourceBuiltDir.get().toPath().exists()) {
                 logger.debug("bridgeSourceBuiltDir exist")
