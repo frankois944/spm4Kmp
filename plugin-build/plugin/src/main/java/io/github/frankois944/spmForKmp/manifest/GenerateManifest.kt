@@ -103,7 +103,7 @@ private fun getProductsTargets(
     buildList {
         add("\"$cinteropName\"")
         dependencies
-            .filter { it.isBinaryDependency && (it.isIncludedInExportedPackage || !forExportedPackage) }
+            .filter { it.isBinaryDependency && !forExportedPackage }
             .forEach { dependency ->
                 add("\"${dependency.packageName}\"")
             }

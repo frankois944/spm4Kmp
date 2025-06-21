@@ -7,6 +7,6 @@ public class ProductConfig internal constructor(
     public val exportToKotlin: Boolean = false,
 ) : Serializable {
     internal companion object {
-        private const val serialVersionUID: Long = 1
+        private const val serialVersionUID: Long = 2
     }
 }
