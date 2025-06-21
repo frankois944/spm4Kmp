@@ -152,7 +152,7 @@ localPackage(
     products = {
         add("LocalSourceDummyFramework", exportToKotlin = true)
     },
-),
+)
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
