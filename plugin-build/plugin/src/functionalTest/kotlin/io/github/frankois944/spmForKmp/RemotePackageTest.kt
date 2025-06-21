@@ -166,7 +166,7 @@ remotePackageCommit(
                     KotlinSource.of(
                         content =
                             """
-remotePackageCommit(
+remotePackageVersion(
     url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
     version = "11.6.0",
     packageName = "",
