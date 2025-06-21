@@ -99,7 +99,7 @@ localPackage(
                     KotlinSource.of(
                         content =
                             """
-                            localBinary(
+                            localPackage(
                                 path = "${localPackageDirectory.absolutePath}",
                                 products = {
                                     add("LocalSourceDummyFramework", exportToKotlin = true)
@@ -146,7 +146,7 @@ localPackage(
                     KotlinSource.of(
                         content =
                             """
-localBinary(
+localPackage(
     path = "${localPackageDirectory.absolutePath}",
     packageName = "LocalSourceDummyFramework",
     products = {
