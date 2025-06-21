@@ -39,7 +39,7 @@ class LocalPackageTest : BaseTest() {
                         content =
                             """
 localPackage(
-    path = ${localPackageDirectory.absolutePath},
+    path = "${localPackageDirectory.absolutePath}",
     products = {
       add("LocalSourceDummyFramework", exportToKotlin = true)
     },
@@ -147,7 +147,7 @@ localPackage(
                         content =
                             """
 localBinary(
-    path = ${localPackageDirectory.absolutePath},
+    path = "${localPackageDirectory.absolutePath}",
     packageName = "LocalSourceDummyFramework",
     products = {
         add("LocalSourceDummyFramework", exportToKotlin = true)
@@ -184,7 +184,7 @@ localBinary(
                         content =
                             """
 localPackage(
-  path = ${localPackageDirectory.absolutePath},
+  path = "${localPackageDirectory.absolutePath}",
   packageName = "LocalSourceDummyFramework",
   products = {
       add("LocalSourceDummyFramework", exportToKotlin = true)

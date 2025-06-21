@@ -45,7 +45,7 @@ class NullablePlatformTest : BaseTest() {
                         content =
                             """
 localPackage(
-    path = ${localPackageDirectory.absolutePath},
+    path = "${localPackageDirectory.absolutePath}",
     products = {
         add("LocalSourceDummyFramework", exportToKotlin = true)
     },

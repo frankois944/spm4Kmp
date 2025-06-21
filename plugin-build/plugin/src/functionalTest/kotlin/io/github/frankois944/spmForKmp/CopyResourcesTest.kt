@@ -43,7 +43,7 @@ remotePackageVersion(
     version = "11.8.1",
 )
 localPackage(
-   path = ${localPackageDirectory.absolutePath},
+   path = "${localPackageDirectory.absolutePath}",
    products = {
        add(
            ProductName(
@@ -53,7 +53,7 @@ localPackage(
    },
 )
 localBinary(
-   path = ${xcFrameworkDirectory.absolutePath},
+   path = "${xcFrameworkDirectory.absolutePath}",
    packageName = "DummyFramework"
 )
 remotePackageVersion(

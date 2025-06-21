@@ -65,14 +65,14 @@ remotePackageCommit(
     revision = "622a6804d39515600ead16e6259cb5d5e50f40df",
 )
 localPackage(
-    path = ${localPackageDirectory.absolutePath},
+    path = "${localPackageDirectory.absolutePath}",
     packageName = "LocalSourceDummyFramework",
     products = {
         add("LocalSourceDummyFramework", exportToKotlin = true)
     },
 )
 localBinary(
-    path = ${xcFrameworkDirectory.absolutePath},
+    path = "${xcFrameworkDirectory.absolutePath}",
     packageName = "DummyFramework",
     exportToKotlin = true,
 )
