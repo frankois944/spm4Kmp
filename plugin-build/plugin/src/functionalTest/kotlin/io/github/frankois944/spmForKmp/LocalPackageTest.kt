@@ -3,7 +3,6 @@ package io.github.frankois944.spmForKmp
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
@@ -35,17 +34,18 @@ class LocalPackageTest : BaseTest() {
                             AppleCompileTarget.macosArm64,
                         )
                     }
-                }.withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Local(
-                                path = localPackageDirectory.absolutePath,
-                                products = {
-                                    add("LocalSourceDummyFramework", exportToKotlin = true)
-                                },
-                            ),
-                        )
-                    },
+                }.withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+localPackage(
+    path = ${localPackageDirectory.absolutePath},
+    products = {
+      add("LocalSourceDummyFramework", exportToKotlin = true)
+    },
+)
+                            """.trimIndent(),
+                    ),
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),
@@ -99,7 +99,7 @@ class LocalPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-                            SwiftDependency.Package.Local(
+                            localBinary(
                                 path = "${localPackageDirectory.absolutePath}",
                                 products = {
                                     add("LocalSourceDummyFramework", exportToKotlin = true)
@@ -142,18 +142,19 @@ class LocalPackageTest : BaseTest() {
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
                 .withTargets(AppleCompileTarget.iosSimulatorArm64)
-                .withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Local(
-                                path = localPackageDirectory.absolutePath,
-                                packageName = "LocalSourceDummyFramework",
-                                products = {
-                                    add("LocalSourceDummyFramework", exportToKotlin = true)
-                                },
-                            ),
-                        )
-                    },
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+localBinary(
+    path = ${localPackageDirectory.absolutePath},
+    packageName = "LocalSourceDummyFramework",
+    products = {
+        add("LocalSourceDummyFramework", exportToKotlin = true)
+    },
+),
+                            """.trimIndent(),
+                    ),
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),
@@ -178,18 +179,19 @@ class LocalPackageTest : BaseTest() {
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
                 .withPackageDependencyPrefix("custom")
-                .withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Local(
-                                path = localPackageDirectory.absolutePath,
-                                packageName = "LocalSourceDummyFramework",
-                                products = {
-                                    add("LocalSourceDummyFramework", exportToKotlin = true)
-                                },
-                            ),
-                        )
-                    },
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+localPackage(
+  path = ${localPackageDirectory.absolutePath},
+  packageName = "LocalSourceDummyFramework",
+  products = {
+      add("LocalSourceDummyFramework", exportToKotlin = true)
+  },
+)
+                            """.trimIndent(),
+                    ),
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("custom.LocalSourceDummyFramework.LocalSourceDummy"),

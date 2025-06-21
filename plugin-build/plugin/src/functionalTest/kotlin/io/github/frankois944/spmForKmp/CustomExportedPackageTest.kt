@@ -2,8 +2,6 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
@@ -12,7 +10,6 @@ import io.github.frankois944.spmForKmp.utils.getExportedPackageContent
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.net.URI
 
 class CustomExportedPackageTest : BaseTest() {
     @Test
@@ -22,41 +19,37 @@ class CustomExportedPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Remote.Branch(
-                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                                branch = "main",
-                                products = {
-                                    add(
-                                        ProductName("CryptoSwift", isIncludedInExportedPackage = false),
-                                    )
-                                },
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Package.Remote.Branch(
-                                url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
-                                products = {
-                                    add("KeychainAccess")
-                                },
-                                branch = "master",
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Package.Remote.Version(
-                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-                                version = "11.6.0",
-                                products = {
-                                    add(
-                                        ProductName("FirebaseCore", isIncludedInExportedPackage = false),
-                                        ProductName("FirebaseAnalytics"),
-                                    )
-                                },
-                            ),
-                        )
-                    },
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+remotePackageBranch(
+    url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+    branch = "main",
+    products = {
+        add(
+            ProductName("CryptoSwift"),
+        )
+    },
+)
+remotePackageBranch(
+    url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
+    products = {
+        add("KeychainAccess")
+    },
+    branch = "master",
+)
+remotePackageVersion(
+    url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+    version = "11.6.0",
+    products = {
+        add(
+            ProductName("FirebaseAnalytics"),
+        )
+    }
+)
+                            """.trimIndent(),
+                    ),
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("dummy.MySwiftClass"),
@@ -67,6 +60,8 @@ class CustomExportedPackageTest : BaseTest() {
                             """
                             import Foundation
                             import CryptoSwift
+                            import FirebaseAnalytics
+
                             @objc public class MySwiftClass: NSObject {
                                 @objc public func toMD5(value: String) -> String {
                                     return value.md5()
@@ -92,9 +87,9 @@ class CustomExportedPackageTest : BaseTest() {
             exportedContent.contains("FirebaseCore"),
             "FirebaseCore should not be exported",
         )
-        assertTrue(
+        assertFalse(
             exportedContent.contains("KeychainAccess"),
-            "KeychainAccess should be exported",
+            "KeychainAccess should not be exported",
         )
         assertTrue(
             exportedContent.contains("FirebaseAnalytics"),
@@ -116,20 +111,21 @@ class CustomExportedPackageTest : BaseTest() {
                         isStatic = false
                     }
                     """.trimIndent(),
-                ).withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Remote.Branch(
-                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                                branch = "main",
-                                products = {
-                                    add(
-                                        ProductName("CryptoSwift"),
-                                    )
-                                },
-                            ),
-                        )
-                    },
+                ).withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+remotePackageBranch(
+   url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+   branch = "main",
+   products = {
+       add(
+           ProductName("CryptoSwift"),
+       )
+   },
+)
+                            """.trimIndent(),
+                    ),
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("dummy.MySwiftClass"),

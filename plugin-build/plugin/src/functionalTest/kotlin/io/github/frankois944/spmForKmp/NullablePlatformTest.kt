@@ -3,7 +3,6 @@ package io.github.frankois944.spmForKmp
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
@@ -41,17 +40,18 @@ class NullablePlatformTest : BaseTest() {
                 .withMinTvos(null)
                 .withMinMacos(null)
                 .withMinIos(null)
-                .withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Local(
-                                path = localPackageDirectory.absolutePath,
-                                products = {
-                                    add("LocalSourceDummyFramework", exportToKotlin = true)
-                                },
-                            ),
-                        )
-                    },
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+localPackage(
+    path = ${localPackageDirectory.absolutePath},
+    products = {
+        add("LocalSourceDummyFramework", exportToKotlin = true)
+    },
+)
+                            """.trimIndent(),
+                    ),
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("LocalSourceDummyFramework.LocalSourceDummy"),

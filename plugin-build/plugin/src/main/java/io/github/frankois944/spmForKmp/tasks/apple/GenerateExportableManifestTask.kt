@@ -128,7 +128,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     @TaskAction
     fun generateFile() {
         val requiredDependencies =
-            getRequireproductsDependencies()
+            getRequireProductsDependencies()
 
         if (requiredDependencies.isNotEmpty()) {
             val manifest =
@@ -180,12 +180,15 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             }
         } else {
             logger.debug("No dependencies to export found, delete the old one ${manifestFile.asFile.get().absolutePath}")
-            manifestFile.asFile.get().delete()
+            manifestFile.asFile
+                .get()
+                .parentFile
+                .deleteRecursively()
         }
     }
 
     // the static framework must be included inside the xcode project
-    private fun getRequireproductsDependencies(): List<ModuleConfig> {
+    private fun getRequireProductsDependencies(): List<ModuleConfig> {
         val requireDependencies = mutableListOf<ModuleConfig>()
         val modules = getCurrentModules()
         logger.debug("ALL MODULE {}", modules)
