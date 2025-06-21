@@ -125,6 +125,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
         }
     }
 
+    @Suppress("LongMethod")
     @TaskAction
     fun generateFile() {
         val requiredDependencies =
@@ -179,7 +180,10 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 throw ex
             }
         } else {
-            logger.debug("No dependencies to export found, delete the old one ${manifestFile.asFile.get().absolutePath}")
+            logger.debug(
+                "No dependencies to export found, " +
+                    "delete the old one ${manifestFile.asFile.get().absolutePath}",
+            )
             manifestFile.asFile
                 .get()
                 .parentFile
