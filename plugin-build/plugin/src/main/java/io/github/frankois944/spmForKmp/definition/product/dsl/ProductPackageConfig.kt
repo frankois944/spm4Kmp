@@ -14,12 +14,10 @@ public interface ProductPackageConfig : Serializable {
      * which includes details such as the name and an optional alias.
      * @param exportToKotlin Determines whether the added products should be exported
      * to Kotlin. Defaults to `false` if not specified.
-     * @param isIncludedInExportedPackage if false, the products will be ignored inside the local package.
      */
     public fun add(
         vararg products: ProductName,
         exportToKotlin: Boolean = false,
-        isIncludedInExportedPackage: Boolean = true,
     )
 
     /**
@@ -29,11 +27,9 @@ public interface ProductPackageConfig : Serializable {
      * Each string corresponds to the name of the product within the Swift package ecosystem.
      * @param exportToKotlin Determines whether the added products should be exported
      * to Kotlin. Defaults to `false` if not specified.
-     * @param isIncludedInExportedPackage if false, the products will be ignored inside the local package.
      */
     public fun add(
         vararg names: String,
         exportToKotlin: Boolean = false,
-        isIncludedInExportedPackage: Boolean = true,
     )
 }

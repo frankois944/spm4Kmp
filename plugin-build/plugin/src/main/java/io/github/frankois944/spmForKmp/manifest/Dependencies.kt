@@ -27,13 +27,13 @@ internal fun getDependenciesTargets(
     buildList {
         dependencies
             .forEach { dependency ->
-                if (dependency.isBinaryDependency && (dependency.isIncludedInExportedPackage || !forExportedPackage)) {
+                if (dependency.isBinaryDependency && !forExportedPackage) {
                     add("\"${dependency.packageName}\"")
                 } else if (dependency is SwiftDependency.Package) {
                     dependency.productsConfig.productPackages.forEach { config ->
                         config.products
                             .filter {
-                                !forExportedPackage || it.isIncludedInExportedPackage
+                                !forExportedPackage
                             }.forEach { product ->
                                 val name = product.alias ?: product.name
                                 add(".product(name: \"$name\", package: \"${dependency.packageName}\")")
@@ -44,11 +44,11 @@ internal fun getDependenciesTargets(
     }.joinToString(",")
 
 internal fun hasExportedDependencyProduct(dependency: SwiftDependency): Boolean {
-    if (dependency is SwiftDependency.Package) {
+    /*if (dependency is SwiftDependency.Package) {
         return dependency.productsConfig.productPackages.any { config ->
             config.products.any { it.isIncludedInExportedPackage }
         }
-    }
+    }*/
 
     return dependency.isBinaryDependency
 }
@@ -61,7 +61,7 @@ internal fun getLocaleBinary(
     buildList {
         dependencies
             .filterIsInstance<SwiftDependency.Binary.Local>()
-            .filter { it.isIncludedInExportedPackage || !forExportedPackage }
+            .filter { !forExportedPackage }
             .forEach { dependency ->
                 // package path MUST be relative to somewhere, let's choose the swiftBuildDir
                 val path = Path.of(dependency.path).relativeToOrSelf(swiftBuildDir)
@@ -76,7 +76,7 @@ internal fun getRemoteBinary(
     buildList {
         dependencies
             .filterIsInstance<SwiftDependency.Binary.Remote>()
-            .filter { it.isIncludedInExportedPackage || !forExportedPackage }
+            .filter { !forExportedPackage }
             .forEach { dependency ->
                 // checksum is MANDATORY
                 add(

@@ -12,8 +12,6 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.definition.dependency.Dependency
-import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.resources.getCurrentPackagesBuiltDir
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
@@ -67,29 +65,30 @@ internal fun Project.configAppleTargets(
             )
         }
 
+    val buildMode = getBuildMode(swiftPackageEntry)
+
     val exportedManifestDirectory =
         layout.projectDirectory
             .asFile
             .resolve("exported${swiftPackageEntry.name.capitalized()}")
 
-    val exportedManifestTask: TaskProvider<GenerateExportableManifestTask>? =
-        if (packageDependencies.isNotEmpty()) {
-            tasks.register(
-                getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, swiftPackageEntry.name),
-                GenerateExportableManifestTask::class.java,
-            ) {
-                it.configureExportableManifestTask(
-                    swiftPackageEntry = swiftPackageEntry,
-                    manifestDir = exportedManifestDirectory,
-                    packageDependencies = packageDependencies,
-                )
-            }
-        } else {
-            exportedManifestDirectory.deleteRecursively()
-            null
+    val exportedManifestTask: TaskProvider<GenerateExportableManifestTask> =
+        tasks.register(
+            getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, swiftPackageEntry.name),
+            GenerateExportableManifestTask::class.java,
+        ) {
+            it.configureExportableManifestTask(
+                swiftPackageEntry = swiftPackageEntry,
+                manifestDir = exportedManifestDirectory,
+                packageDependencies = packageDependencies,
+                targetBuildDir =
+                    getTargetBuildDirectory(
+                        packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+                        cinteropTarget = allTargets.first(),
+                        buildMode = buildMode,
+                    ),
+            )
         }
-
-    val buildMode = getBuildMode(swiftPackageEntry)
 
     val copyPackageResourcesTask =
         tasks.register(
@@ -145,6 +144,8 @@ internal fun Project.configAppleTargets(
         val outputFiles = definitionTask.get().outputFiles
 
         if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
+            extensions
+                .getByType(KotlinMultiplatformExtension::class.java)
             val ktTarget =
                 extensions
                     .getByType(KotlinMultiplatformExtension::class.java)
@@ -180,14 +181,15 @@ internal fun Project.configAppleTargets(
                             compileTask
                                 .get()
                                 .dependsOn(
-                                    listOfNotNull(
-                                        manifestTask.get(),
-                                        exportedManifestTask?.get(),
-                                    ),
+                                    manifestTask.get(),
                                 ),
                         ),
                 )
     }
+    taskGroup[allTargets.first()] =
+        exportedManifestTask
+            .get()
+            .dependsOn(taskGroup[allTargets.first()])
 }
 
 @Suppress("LongParameterList")
@@ -216,6 +218,7 @@ private fun GenerateExportableManifestTask.configureExportableManifestTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
     manifestDir: File,
     packageDependencies: List<SwiftDependency>,
+    targetBuildDir: File,
 ) {
     this.packageDependencies.set(packageDependencies)
     this.packageName.set(manifestDir.name)
@@ -226,7 +229,8 @@ private fun GenerateExportableManifestTask.configureExportableManifestTask(
     this.toolsVersion.set(swiftPackageEntry.toolsVersion)
     manifestDir.mkdirs()
     this.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
-    this.exportedPackage.set(swiftPackageEntry.exportedPackageSettings as ExportedPackage)
+    this.exportedPackage.set(swiftPackageEntry.exportedPackageSettings)
+    this.compiledTargetDir.set(targetBuildDir)
 }
 
 @Suppress("LongParameterList")
@@ -236,7 +240,8 @@ private fun CompileSwiftPackageTask.configureCompileTask(
     targetBuildDir: File,
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
-    this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
+    val manifestFile = packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME)
+    this.manifestFile.set(manifestFile)
     this.target.set(target)
     this.debugMode.set(swiftPackageEntry.debug)
     this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
@@ -247,6 +252,7 @@ private fun CompileSwiftPackageTask.configureCompileTask(
     this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
+    this.bridgeSourceBuiltDir.set(manifestFile.parentFile.resolve("Sources"))
 }
 
 private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTask(
@@ -279,11 +285,6 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     packageDirectoriesConfig: PackageDirectoriesConfig,
     buildMode: String,
 ) {
-    if (!swiftPackageEntry.copyDependenciesToApp) {
-        enabled = false
-        logger.debug("copyResourcesToApp is not enabled in configuration, skipping the task")
-        return
-    }
     val buildProductDir: String? =
         project.findProperty("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String
             ?: System.getenv("BUILT_PRODUCTS_DIR")
@@ -336,8 +337,5 @@ private fun createCInteropTask(
     }
 }
 
-private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> {
-    val newDependency = (swiftPackageEntry.packageDependenciesConfig as Dependency).packageDependencies.toList()
-    val oldDependency = swiftPackageEntry.packageDependencies.toList()
-    return newDependency.ifEmpty { oldDependency }
-}
+private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> =
+    swiftPackageEntry.packageDependenciesConfig.packageDependencies
