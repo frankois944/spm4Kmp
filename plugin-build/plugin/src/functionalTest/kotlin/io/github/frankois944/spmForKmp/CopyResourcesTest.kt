@@ -38,7 +38,8 @@ remotePackageVersion(
     // Libraries from the package
     products = {
     // Export to Kotlin for use in shared Kotlin code
-    add("FirebaseAnalytics", exportToKotlin = true)
+        add("FirebaseAnalytics", exportToKotlin = true)
+    },
     // Package version
     version = "11.8.1",
 )
@@ -71,13 +72,13 @@ remotePackageVersion(
    version = "4.2.2",
 )
 remotePackageVersion(
-   url = URI("https://github.com/frankois944/QuickServiceLocator")
+   url = URI("https://github.com/frankois944/QuickServiceLocator"),
    products = {
        add("QuickServiceLocator")
    },
    version = "0.2.0",
 )
-remotePackageVersion(
+remotePackageBranch(
    url = URI("https://github.com/FluidGroup/JAYSON"),
    products = {
        add("JAYSON")
@@ -114,8 +115,8 @@ remotePackageCommit(
         destination.createDirectories()
         val parameters =
             buildList {
-                add("dummyCopyPackageResources")
-                add("-Pio.github.frankois944.spmForKmp.PLATFORM_NAME=iphone")
+                add("SwiftPackageConfigAppleDummyCopyPackageResourcesIosArm64")
+                add("-Pio.github.frankois944.spmForKmp.PLATFORM_NAME=iphoneos")
                 add("-Pio.github.frankois944.spmForKmp.ARCHS=arm64")
                 add("-Pio.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR=$appBuiltProductDir")
                 add("-Pio.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH=$appContentFolderPath")
@@ -146,7 +147,7 @@ remotePackageCommit(
                 .toFile()
                 .resolve("Frameworks")
                 .listFiles()
-                .isNotEmpty(),
+                .size == 1,
         ) { "The output folder must not be empty" }
         assert(
             destination

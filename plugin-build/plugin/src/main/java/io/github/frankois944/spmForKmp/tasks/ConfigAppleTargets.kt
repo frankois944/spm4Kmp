@@ -90,18 +90,6 @@ internal fun Project.configAppleTargets(
             )
         }
 
-    val copyPackageResourcesTask =
-        tasks.register(
-            swiftPackageEntry.name + TASK_COPY_PACKAGE_RESOURCES,
-            CopyPackageResourcesTask::class.java,
-        ) {
-            it.configureCopyPackageResourcesTask(
-                swiftPackageEntry = swiftPackageEntry,
-                packageDirectoriesConfig = packageDirectoriesConfig,
-                buildMode = buildMode,
-            )
-        }
-
     allTargets.forEach { cinteropTarget ->
         val targetBuildDir =
             getTargetBuildDirectory(
@@ -109,6 +97,19 @@ internal fun Project.configAppleTargets(
                 cinteropTarget = cinteropTarget,
                 buildMode = buildMode,
             )
+
+        val copyPackageResourcesTask =
+            tasks.register(
+                getTaskName(TASK_COPY_PACKAGE_RESOURCES, swiftPackageEntry.name, cinteropTarget),
+                CopyPackageResourcesTask::class.java,
+            ) {
+                it.configureCopyPackageResourcesTask(
+                    swiftPackageEntry = swiftPackageEntry,
+                    packageDirectoriesConfig = packageDirectoriesConfig,
+                    buildMode = buildMode,
+                    cinteropTarget = cinteropTarget,
+                )
+            }
 
         val compileTask =
             tasks.register(
@@ -284,6 +285,7 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
     buildMode: String,
+    cinteropTarget: AppleCompileTarget,
 ) {
     val buildProductDir: String? =
         project.findProperty("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String
@@ -303,6 +305,16 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     logger.debug("archs $archs")
     logger.debug("platformName $platformName")
 
+    if (cinteropTarget.sdk() != platformName) {
+        logger.debug(
+            "The current cinteropTarget {} is different from the xcode platformName {}",
+            cinteropTarget,
+            platformName,
+        )
+        isEnabled = false
+        return
+    }
+
     @Suppress("ComplexCondition")
     if (archs.isNullOrEmpty() ||
         platformName.isNullOrEmpty() ||
@@ -313,6 +325,7 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
         logger.debug("Missing variable for coping the resources, skipping the task")
         return
     }
+
     this.builtDirectory.set(
         getCurrentPackagesBuiltDir(
             packageScratchDir = packageDirectoriesConfig.packageScratchDir,
