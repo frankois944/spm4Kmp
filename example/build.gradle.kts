@@ -1,23 +1,12 @@
 import io.github.frankois944.spmForKmp.definition.product.ProductName
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
 
 plugins {
-    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
     id("io.github.frankois944.spmForKmp")
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_1_8)
-                }
-            }
-        }
-    }
 
     listOf(
         iosArm64(),
@@ -72,17 +61,6 @@ tasks.named("iosSimulatorArm64Test") {
     dependsOn(copyTestResources)
 }
 
-android {
-    namespace = "com.example"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
 val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
     create("nativeIosShared") {

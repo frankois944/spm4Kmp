@@ -124,6 +124,15 @@ remotePackageBranch(
        )
    },
 )
+remotePackageVersion(
+    url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+    version = "11.6.0",
+    products = {
+        add(
+            "FirebaseAnalytics",
+        )
+    },
+)
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -155,7 +164,7 @@ remotePackageBranch(
         val exportedContent = fixture.getExportedPackageContent()
         assertTrue(
             exportedContent.contains("name: \"Customexported\""),
-            "the package must containes custom name",
+            "the package must contains custom name",
         )
         assertTrue(
             exportedContent.contains("type: .dynamic"),

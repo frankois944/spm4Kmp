@@ -10,11 +10,15 @@ let package = Package(
       type: .static,
       targets: ["exportedNativeIosShared"])
   ],
-  dependencies: [],
+  dependencies: [
+    .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "11.8.1")
+  ],
   targets: [
     .target(
       name: "exportedNativeIosShared",
-      dependencies: [],
+      dependencies: [
+        .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk")
+      ],
       path: "Sources"
 
     )

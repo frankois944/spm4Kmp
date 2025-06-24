@@ -1,5 +1,7 @@
 package io.github.frankois944.spmForKmp.manifest
 
+import io.github.frankois944.spmForKmp.config.ModuleConfig
+import io.github.frankois944.spmForKmp.config.containsPackage
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 
 @Suppress("LongMethod")
@@ -10,10 +12,12 @@ internal fun generateManifest(parameters: TemplateParameters): String {
                 parameters.dependencies,
                 parameters.generatedPackageDirectory,
                 parameters.forExportedPackage,
+                parameters.onlyDeps,
             ).takeIf { it.isNotEmpty() },
             getRemoteBinary(
                 parameters.dependencies,
                 parameters.forExportedPackage,
+                parameters.onlyDeps,
             ).takeIf { it.isNotEmpty() },
         ).joinToString(",")
     if (binaryDependencies.isNotEmpty()) {
@@ -58,17 +62,24 @@ internal fun generateManifest(parameters: TemplateParameters): String {
             name,
             parameters.dependencies,
             parameters.forExportedPackage,
+            parameters.onlyDeps,
         )
     }])
             ],
             dependencies: [
-                ${getDependencies(parameters.dependencies, parameters.forExportedPackage)}
+                ${getDependencies(parameters.dependencies, parameters.forExportedPackage, parameters.onlyDeps)}
             ],
             targets: [
                 .target(
                     name: "$name",
                     dependencies: [
-                        ${getDependenciesTargets(parameters.dependencies, parameters.forExportedPackage)}
+                        ${
+        getDependenciesTargets(
+            parameters.dependencies,
+            parameters.forExportedPackage,
+            parameters.onlyDeps,
+        )
+    }
                     ],
                     path: "Sources"
                     ${getTargetSetting?.let { ",$it" }.orEmpty()}
@@ -99,12 +110,18 @@ private fun getProductsTargets(
     cinteropName: String,
     dependencies: List<SwiftDependency>,
     forExportedPackage: Boolean,
+    onlyDeps: List<ModuleConfig>,
 ): String =
     buildList {
         add("\"$cinteropName\"")
         dependencies
-            .filter { it.isBinaryDependency && !forExportedPackage }
-            .forEach { dependency ->
+            .filter {
+                it.isBinaryDependency &&
+                    (
+                        !forExportedPackage ||
+                            onlyDeps.containsPackage(it.packageName)
+                    )
+            }.forEach { dependency ->
                 add("\"${dependency.packageName}\"")
             }
     }.joinToString(",")

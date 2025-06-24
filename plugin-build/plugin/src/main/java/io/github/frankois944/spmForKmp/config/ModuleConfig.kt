@@ -14,3 +14,7 @@ internal data class ModuleConfig(
     var compilerOpts: List<String> = emptyList(),
     var swiftDependency: SwiftDependency? = null,
 )
+
+internal fun List<ModuleConfig>.containsPackage(name: String): Boolean = this.map { it.spmPackageName ?: it.packageName }.contains(name)
+
+internal fun List<ModuleConfig>.containsProduct(name: String) = this.map { it.name }.contains(name)

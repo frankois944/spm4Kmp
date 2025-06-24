@@ -137,7 +137,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                     parameters =
                         TemplateParameters(
                             forExportedPackage = true,
-                            dependencies = requiredDependencies.mapNotNull { it.swiftDependency },
+                            dependencies = packageDependencies.get(),
                             generatedPackageDirectory =
                                 manifestFile
                                     .get()
@@ -151,6 +151,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                             toolsVersion = toolsVersion.get(),
                             targetSettings = null,
                             exportedPackage = exportedPackage.get(),
+                            onlyDeps = requiredDependencies,
                         ),
                 )
             manifestFile.asFile.get().writeText(manifest)
