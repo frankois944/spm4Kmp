@@ -282,7 +282,6 @@ private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTa
 
 @Suppress("LongParameterList")
 private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
-    swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
     buildMode: String,
     cinteropTarget: AppleCompileTarget,
