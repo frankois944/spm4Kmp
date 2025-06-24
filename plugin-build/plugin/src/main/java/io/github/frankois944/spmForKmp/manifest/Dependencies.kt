@@ -32,7 +32,9 @@ internal fun getDependenciesTargets(
     buildList {
         dependencies
             .forEach { dependency ->
-                if (dependency.isBinaryDependency && (onlyDeps.containsPackage(dependency.packageName) || !forExportedPackage)) {
+                if (dependency.isBinaryDependency &&
+                    (onlyDeps.containsPackage(dependency.packageName) || !forExportedPackage)
+                ) {
                     add("\"${dependency.packageName}\"")
                 } else if (dependency is SwiftDependency.Package) {
                     dependency.productsConfig.productPackages.forEach { config ->
