@@ -104,7 +104,6 @@ internal fun Project.configAppleTargets(
                 CopyPackageResourcesTask::class.java,
             ) {
                 it.configureCopyPackageResourcesTask(
-                    swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     buildMode = buildMode,
                     cinteropTarget = cinteropTarget,
