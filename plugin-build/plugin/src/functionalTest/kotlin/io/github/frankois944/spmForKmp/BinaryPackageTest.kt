@@ -67,10 +67,10 @@ remoteBinary(
                         content =
                             """
 localBinary(
-    path = "${xcFrameworkDirectory.absolutePath}"
+    path = "${xcFrameworkDirectory.absolutePath}",
     packageName = "DummyFramework",
     exportToKotlin = true,
-),
+)
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
