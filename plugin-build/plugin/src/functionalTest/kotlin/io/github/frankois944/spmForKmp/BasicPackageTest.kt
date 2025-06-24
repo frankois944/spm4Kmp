@@ -142,7 +142,7 @@ remotePackageVersion(
     },
 )
 localPackage(
-    path = ${localPackageDirectory.absolutePath},
+    path = "${localPackageDirectory.absolutePath}",
     packageName = "LocalSourceDummyFramework",
     products = {
        add(ProductName("LocalSourceDummyFramework"), exportToKotlin = true)
