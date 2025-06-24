@@ -305,16 +305,6 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     logger.debug("archs $archs")
     logger.debug("platformName $platformName")
 
-    if (cinteropTarget.sdk() != platformName) {
-        logger.debug(
-            "The current cinteropTarget {} is different from the xcode platformName {}",
-            cinteropTarget,
-            platformName,
-        )
-        isEnabled = false
-        return
-    }
-
     @Suppress("ComplexCondition")
     if (archs.isNullOrEmpty() ||
         platformName.isNullOrEmpty() ||
@@ -323,6 +313,16 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     ) {
         enabled = false
         logger.debug("Missing variable for coping the resources, skipping the task")
+        return
+    }
+
+    if (cinteropTarget.sdk() != platformName) {
+        logger.debug(
+            "The current cinteropTarget {} is different from the xcode platformName {}",
+            cinteropTarget,
+            platformName,
+        )
+        isEnabled = false
         return
     }
 

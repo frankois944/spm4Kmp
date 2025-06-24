@@ -141,7 +141,7 @@ remotePackageCommit(
                 ).build()
 
         // Then
-        assertThat(copyResourceTask).task(":library:dummyCopyPackageResources").succeeded()
+        assertThat(copyResourceTask).task(":library:SwiftPackageConfigAppleDummyCopyPackageResourcesIosArm64").succeeded()
         assert(
             destination
                 .toFile()
