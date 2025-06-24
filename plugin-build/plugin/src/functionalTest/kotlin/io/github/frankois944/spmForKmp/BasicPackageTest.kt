@@ -134,20 +134,20 @@ class BasicPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-    url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-    version = "1.8.4",
-    products = {
-        add("CryptoSwift")
-    },
-)
-localPackage(
-    path = "${localPackageDirectory.absolutePath}",
-    packageName = "LocalSourceDummyFramework",
-    products = {
-       add(ProductName("LocalSourceDummyFramework"), exportToKotlin = true)
-    },
-)
+                            remotePackageVersion(
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                                version = "1.8.4",
+                                products = {
+                                    add("CryptoSwift")
+                                },
+                            )
+                            localPackage(
+                                path = "${localPackageDirectory.absolutePath}",
+                                packageName = "LocalSourceDummyFramework",
+                                products = {
+                                   add(ProductName("LocalSourceDummyFramework"), exportToKotlin = true)
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).build()

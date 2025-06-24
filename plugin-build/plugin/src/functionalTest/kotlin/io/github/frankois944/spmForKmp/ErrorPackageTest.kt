@@ -21,16 +21,16 @@ class ErrorPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-    url = URI("https://github.com/googlemaps/ios-maps-sdk.git"),
-    version = "9.3.0",
-    products = {
-        add(
-            ProductName(name = "GoogleMapsTarget", alias = "GoogleMaps"),
-            exportToKotlin = true,
-        )
-    },
-)
+                            remotePackageVersion(
+                                url = URI("https://github.com/googlemaps/ios-maps-sdk.git"),
+                                version = "9.3.0",
+                                products = {
+                                    add(
+                                        ProductName(name = "GoogleMapsTarget", alias = "GoogleMaps"),
+                                        exportToKotlin = true,
+                                    )
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(

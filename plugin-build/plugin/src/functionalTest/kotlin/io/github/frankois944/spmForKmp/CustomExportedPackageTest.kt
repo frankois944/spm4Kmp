@@ -23,31 +23,31 @@ class CustomExportedPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-remotePackageBranch(
-    url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-    branch = "main",
-    products = {
-        add(
-            ProductName("CryptoSwift"),
-        )
-    },
-)
-remotePackageBranch(
-    url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
-    products = {
-        add("KeychainAccess")
-    },
-    branch = "master",
-)
-remotePackageVersion(
-    url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-    version = "11.6.0",
-    products = {
-        add(
-            ProductName("FirebaseAnalytics"),
-        )
-    }
-)
+                            remotePackageBranch(
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                                branch = "main",
+                                products = {
+                                    add(
+                                        ProductName("CryptoSwift"),
+                                    )
+                                },
+                            )
+                            remotePackageBranch(
+                                url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
+                                products = {
+                                    add("KeychainAccess")
+                                },
+                                branch = "master",
+                            )
+                            remotePackageVersion(
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                                version = "11.6.0",
+                                products = {
+                                    add(
+                                        ProductName("FirebaseAnalytics"),
+                                    )
+                                }
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -115,24 +115,24 @@ remotePackageVersion(
                     KotlinSource.of(
                         content =
                             """
-remotePackageBranch(
-   url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-   branch = "main",
-   products = {
-       add(
-           ProductName("CryptoSwift"),
-       )
-   },
-)
-remotePackageVersion(
-    url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-    version = "11.6.0",
-    products = {
-        add(
-            "FirebaseAnalytics",
-        )
-    },
-)
+                            remotePackageBranch(
+                               url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                               branch = "main",
+                               products = {
+                                   add(
+                                       ProductName("CryptoSwift"),
+                                   )
+                               },
+                            )
+                            remotePackageVersion(
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                                version = "11.6.0",
+                                products = {
+                                    add(
+                                        "FirebaseAnalytics",
+                                    )
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(

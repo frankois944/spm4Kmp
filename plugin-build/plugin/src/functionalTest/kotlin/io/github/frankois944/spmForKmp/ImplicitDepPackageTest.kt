@@ -20,13 +20,13 @@ class ImplicitDepPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-   url = URI("https://github.com/google/GoogleSignIn-iOS"),
-   products = {
-       add("GoogleSignIn", exportToKotlin = true)
-   },
-   version = "8.0.0",
-)
+                            remotePackageVersion(
+                               url = URI("https://github.com/google/GoogleSignIn-iOS"),
+                               products = {
+                                   add("GoogleSignIn", exportToKotlin = true)
+                               },
+                               version = "8.0.0",
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -62,25 +62,25 @@ remotePackageVersion(
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-    url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-    products = {
-        add(
-            ProductName(
-                name = "FirebaseAppDistribution",
-                alias = "FirebaseAppDistribution-Beta",
-            ),
-            exportToKotlin = true,
-        )
-        add(
-            ProductName(
-                "FirebaseStorage",
-            ),
-            exportToKotlin = true,
-        )
-    },
-    version = "11.6.0",
-)
+                            remotePackageVersion(
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                                products = {
+                                    add(
+                                        ProductName(
+                                            name = "FirebaseAppDistribution",
+                                            alias = "FirebaseAppDistribution-Beta",
+                                        ),
+                                        exportToKotlin = true,
+                                    )
+                                    add(
+                                        ProductName(
+                                            "FirebaseStorage",
+                                        ),
+                                        exportToKotlin = true,
+                                    )
+                                },
+                                version = "11.6.0",
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -117,25 +117,25 @@ remotePackageVersion(
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-    url = URI("https://github.com/bugsnag/bugsnag-cocoa"),
-    products = {
-        add(
-            "Bugsnag",
-            "BugsnagNetworkRequestPlugin",
-            exportToKotlin = true,
-        )
-    },
-    version = "6.31.0",
-)
-remotePackageVersion(
-    url = URI("https://github.com/bugsnag/bugsnag-cocoa-performance"),
-    version = "1.11.2",
-    products = {
-        // Can be only used in your "src/swift" code.
-        add("BugsnagPerformance", exportToKotlin = true)
-    },
-)
+                            remotePackageVersion(
+                                url = URI("https://github.com/bugsnag/bugsnag-cocoa"),
+                                products = {
+                                    add(
+                                        "Bugsnag",
+                                        "BugsnagNetworkRequestPlugin",
+                                        exportToKotlin = true,
+                                    )
+                                },
+                                version = "6.31.0",
+                            )
+                            remotePackageVersion(
+                                url = URI("https://github.com/bugsnag/bugsnag-cocoa-performance"),
+                                version = "1.11.2",
+                                products = {
+                                    // Can be only used in your "src/swift" code.
+                                    add("BugsnagPerformance", exportToKotlin = true)
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).withSwiftSources(

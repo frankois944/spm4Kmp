@@ -44,12 +44,12 @@ class NullablePlatformTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-localPackage(
-    path = "${localPackageDirectory.absolutePath}",
-    products = {
-        add("LocalSourceDummyFramework", exportToKotlin = true)
-    },
-)
+                            localPackage(
+                                path = "${localPackageDirectory.absolutePath}",
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(

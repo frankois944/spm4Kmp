@@ -25,65 +25,65 @@ class ComplexPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-    url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-    packageName = "",
-    products = {
-        add(
-            ProductName("CryptoSwift"),
-            exportToKotlin = false,
-        )
-    },
-    version = "1.8.3",
-)
-remotePackageBranch(
-    url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
-    products = {
-        add("KeychainAccess")
-    },
-    branch = "master",
-)
-remotePackageBranch(
-    url = URI("https://github.com/FluidGroup/JAYSON"),
-    products = {
-        add("JAYSON", exportToKotlin = true)
-    },
-    branch = "main",
-)
-remotePackageCommit(
-    url = URI("https://github.com/square/Valet"),
-    products = {
-        add("Valet")
-    },
-    revision = "e900692d551b1986fc80aa3968d40e7af3b1e858",
-)
-remotePackageCommit(
-    url = URI("https://github.com/venmo/Static"),
-    products = {
-        add("Static", exportToKotlin = true)
-    },
-    revision = "622a6804d39515600ead16e6259cb5d5e50f40df",
-)
-localPackage(
-    path = "${localPackageDirectory.absolutePath}",
-    packageName = "LocalSourceDummyFramework",
-    products = {
-        add("LocalSourceDummyFramework", exportToKotlin = true)
-    },
-)
-localBinary(
-    path = "${xcFrameworkDirectory.absolutePath}",
-    packageName = "DummyFramework",
-    exportToKotlin = true,
-)
-remotePackageVersion(
-    url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-    products = {
-        add("FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics")
-    },
-    version = "11.6.0",
-    packageName = "firebase-ios-sdk",
-)
+                            remotePackageVersion(
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                                packageName = "",
+                                products = {
+                                    add(
+                                        ProductName("CryptoSwift"),
+                                        exportToKotlin = false,
+                                    )
+                                },
+                                version = "1.8.3",
+                            )
+                            remotePackageBranch(
+                                url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
+                                products = {
+                                    add("KeychainAccess")
+                                },
+                                branch = "master",
+                            )
+                            remotePackageBranch(
+                                url = URI("https://github.com/FluidGroup/JAYSON"),
+                                products = {
+                                    add("JAYSON", exportToKotlin = true)
+                                },
+                                branch = "main",
+                            )
+                            remotePackageCommit(
+                                url = URI("https://github.com/square/Valet"),
+                                products = {
+                                    add("Valet")
+                                },
+                                revision = "e900692d551b1986fc80aa3968d40e7af3b1e858",
+                            )
+                            remotePackageCommit(
+                                url = URI("https://github.com/venmo/Static"),
+                                products = {
+                                    add("Static", exportToKotlin = true)
+                                },
+                                revision = "622a6804d39515600ead16e6259cb5d5e50f40df",
+                            )
+                            localPackage(
+                                path = "${localPackageDirectory.absolutePath}",
+                                packageName = "LocalSourceDummyFramework",
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
+                            )
+                            localBinary(
+                                path = "${xcFrameworkDirectory.absolutePath}",
+                                packageName = "DummyFramework",
+                                exportToKotlin = true,
+                            )
+                            remotePackageVersion(
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                                products = {
+                                    add("FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics")
+                                },
+                                version = "11.6.0",
+                                packageName = "firebase-ios-sdk",
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(

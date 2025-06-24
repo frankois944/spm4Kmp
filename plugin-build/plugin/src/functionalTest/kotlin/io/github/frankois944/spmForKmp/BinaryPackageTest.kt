@@ -21,12 +21,12 @@ class BinaryPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-remoteBinary(
-    url = URI("https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/plugin-build/plugin/src/functionalTest/resources/DummyFrameworkV2.xcframework.zip"),
-    checksum = "ce79ee72991d40620f156e407e47145ba3279cc15ebf20bb2560c7882d69e56e",
-    packageName = "DummyFramework",
-    exportToKotlin = true
-)
+                            remoteBinary(
+                                url = URI("https://raw.githubusercontent.com/frankois944/spm4Kmp/refs/heads/main/plugin-build/plugin/src/functionalTest/resources/DummyFrameworkV2.xcframework.zip"),
+                                checksum = "ce79ee72991d40620f156e407e47145ba3279cc15ebf20bb2560c7882d69e56e",
+                                packageName = "DummyFramework",
+                                exportToKotlin = true
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -66,11 +66,11 @@ remoteBinary(
                     KotlinSource.of(
                         content =
                             """
-localBinary(
-    path = "${xcFrameworkDirectory.absolutePath}",
-    packageName = "DummyFramework",
-    exportToKotlin = true,
-)
+                            localBinary(
+                                path = "${xcFrameworkDirectory.absolutePath}",
+                                packageName = "DummyFramework",
+                                exportToKotlin = true,
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(

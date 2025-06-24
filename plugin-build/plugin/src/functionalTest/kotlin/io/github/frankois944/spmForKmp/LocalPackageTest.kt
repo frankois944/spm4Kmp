@@ -38,12 +38,12 @@ class LocalPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-localPackage(
-    path = "${localPackageDirectory.absolutePath}",
-    products = {
-      add("LocalSourceDummyFramework", exportToKotlin = true)
-    },
-)
+                            localPackage(
+                                path = "${localPackageDirectory.absolutePath}",
+                                products = {
+                                  add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -146,13 +146,13 @@ localPackage(
                     KotlinSource.of(
                         content =
                             """
-localPackage(
-    path = "${localPackageDirectory.absolutePath}",
-    packageName = "LocalSourceDummyFramework",
-    products = {
-        add("LocalSourceDummyFramework", exportToKotlin = true)
-    },
-)
+                            localPackage(
+                                path = "${localPackageDirectory.absolutePath}",
+                                packageName = "LocalSourceDummyFramework",
+                                products = {
+                                    add("LocalSourceDummyFramework", exportToKotlin = true)
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -183,13 +183,13 @@ localPackage(
                     KotlinSource.of(
                         content =
                             """
-localPackage(
-  path = "${localPackageDirectory.absolutePath}",
-  packageName = "LocalSourceDummyFramework",
-  products = {
-      add("LocalSourceDummyFramework", exportToKotlin = true)
-  },
-)
+                            localPackage(
+                              path = "${localPackageDirectory.absolutePath}",
+                              packageName = "LocalSourceDummyFramework",
+                              products = {
+                                  add("LocalSourceDummyFramework", exportToKotlin = true)
+                              },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(

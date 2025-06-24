@@ -21,13 +21,13 @@ class RemotePackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-    url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-    version = "1.8.3",
-    products = {
-        add("CryptoSwift")
-    },
-)
+                            remotePackageVersion(
+                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                                version = "1.8.3",
+                                products = {
+                                    add("CryptoSwift")
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -69,13 +69,13 @@ remotePackageVersion(
                     KotlinSource.of(
                         content =
                             """
-remotePackageBranch(
-   url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-   branch = "main",
-   products = {
-       add("CryptoSwift")
-   },
-)
+                            remotePackageBranch(
+                               url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                               branch = "main",
+                               products = {
+                                   add("CryptoSwift")
+                               },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -117,13 +117,13 @@ remotePackageBranch(
                     KotlinSource.of(
                         content =
                             """
-remotePackageCommit(
-   url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-   revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
-   products = {
-       add("CryptoSwift")
-   },
-)
+                            remotePackageCommit(
+                               url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                               revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
+                               products = {
+                                   add("CryptoSwift")
+                               },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -166,19 +166,19 @@ remotePackageCommit(
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-    url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-    version = "11.6.0",
-    products = {
-        add(
-            ProductName("FirebaseCore"),
-            ProductName("FirebaseAnalytics"),
-            exportToKotlin = true,
-        )
-        add("FirebasePerformance", exportToKotlin = true)
-        add("FirebaseCrashlytics")
-    },
-)
+                            remotePackageVersion(
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                                version = "11.6.0",
+                                products = {
+                                    add(
+                                        ProductName("FirebaseCore"),
+                                        ProductName("FirebaseAnalytics"),
+                                        exportToKotlin = true,
+                                    )
+                                    add("FirebasePerformance", exportToKotlin = true)
+                                    add("FirebaseCrashlytics")
+                                },
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(

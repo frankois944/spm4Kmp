@@ -33,65 +33,65 @@ class CopyResourcesTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-remotePackageVersion(
-    url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-    // Libraries from the package
-    products = {
-    // Export to Kotlin for use in shared Kotlin code
-        add("FirebaseAnalytics", exportToKotlin = true)
-    },
-    // Package version
-    version = "11.8.1",
-)
-localPackage(
-   path = "${localPackageDirectory.absolutePath}",
-   products = {
-       add(
-           ProductName(
-               "LocalSourceDummyFramework"
-           ),
-       )
-   },
-)
-localBinary(
-   path = "${xcFrameworkDirectory.absolutePath}",
-   packageName = "DummyFramework"
-)
-remotePackageVersion(
-   url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-   version = "1.8.3",
-   products = {
-       add("CryptoSwift")
-   },
-)
-remotePackageVersion(
-   url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
-   products = {
-       add("KeychainAccess")
-   },
-   version = "4.2.2",
-)
-remotePackageVersion(
-   url = URI("https://github.com/frankois944/QuickServiceLocator"),
-   products = {
-       add("QuickServiceLocator")
-   },
-   version = "0.2.0",
-)
-remotePackageBranch(
-   url = URI("https://github.com/FluidGroup/JAYSON"),
-   products = {
-       add("JAYSON")
-   },
-   branch = "main",
-)
-remotePackageCommit(
-   url = URI("https://github.com/square/Valet"),
-   products = {
-       add("Valet")
-   },
-   revision = "29bea846b29f9880a07dd1828596953d0fd495ce",
-)
+                            remotePackageVersion(
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                                // Libraries from the package
+                                products = {
+                                // Export to Kotlin for use in shared Kotlin code
+                                    add("FirebaseAnalytics", exportToKotlin = true)
+                                },
+                                // Package version
+                                version = "11.8.1",
+                            )
+                            localPackage(
+                               path = "${localPackageDirectory.absolutePath}",
+                               products = {
+                                   add(
+                                       ProductName(
+                                           "LocalSourceDummyFramework"
+                                       ),
+                                   )
+                               },
+                            )
+                            localBinary(
+                               path = "${xcFrameworkDirectory.absolutePath}",
+                               packageName = "DummyFramework"
+                            )
+                            remotePackageVersion(
+                               url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                               version = "1.8.3",
+                               products = {
+                                   add("CryptoSwift")
+                               },
+                            )
+                            remotePackageVersion(
+                               url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
+                               products = {
+                                   add("KeychainAccess")
+                               },
+                               version = "4.2.2",
+                            )
+                            remotePackageVersion(
+                               url = URI("https://github.com/frankois944/QuickServiceLocator"),
+                               products = {
+                                   add("QuickServiceLocator")
+                               },
+                               version = "0.2.0",
+                            )
+                            remotePackageBranch(
+                               url = URI("https://github.com/FluidGroup/JAYSON"),
+                               products = {
+                                   add("JAYSON")
+                               },
+                               branch = "main",
+                            )
+                            remotePackageCommit(
+                               url = URI("https://github.com/square/Valet"),
+                               products = {
+                                   add("Valet")
+                               },
+                               revision = "29bea846b29f9880a07dd1828596953d0fd495ce",
+                            )
                             """.trimIndent(),
                     ),
                 ).withSwiftSources(
