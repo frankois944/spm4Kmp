@@ -156,7 +156,7 @@ remotePackageCommit(
                 .listFiles { it.nameWithoutExtension == "DummyFramework" }
                 .isNotEmpty(),
         ) { "The framework folder must contains DummyFramework" }
-        assert(destination.toFile().listFiles().size == 3) { "The output folder must contains 3 folders" }
+        assert(destination.toFile().listFiles().size == 16) { "The output folder must contains 16 folders" }
         assert(!fixture.getExportedPackageContent().contains("CryptoSwift"))
         assert(!fixture.getExportedPackageContent().contains("DummyFramework"))
         assert(!fixture.getExportedPackageContent().contains("Default"))
