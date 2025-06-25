@@ -102,6 +102,7 @@ class CustomExportedPackageTest : BaseTest() {
                     exportedPackageSettings {
                         name = "Customexported"
                         isStatic = false
+                        includeProduct = listOf("CryptoSwift")
                     }
                     """.trimIndent(),
                 ).withRawDependencies(
