@@ -63,6 +63,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val compiledTargetDir: DirectoryProperty
 
+    @get:Input
+    abstract val includeProduct: ListProperty<String>
+
     @get:OutputFile
     val exportedSource: File
         get() =
@@ -197,26 +200,34 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
         val requireDependencies = mutableListOf<ModuleConfig>()
         val modules = getCurrentModules()
         logger.debug("ALL MODULE {}", modules)
+        val moduleToInclude = includeProduct.get().map { it.lowercase() }
         modules.forEach { module ->
-            compiledTargetDir
-                .asFile
-                .get()
-                .listFiles { it.extension == "framework" }
-                .firstOrNull {
-                    logger.debug("checking module {} at {}", module.name, it)
-                    it.nameWithoutExtension.lowercase() == module.name.lowercase()
-                }?.let { moduleLocation ->
-                    // if the module is inside the compiled build directory
-                    val plist = moduleLocation.resolve("Info.plist")
-                    logger.debug("Looking inside the Info.plist {}", plist)
-                    val libraryName = getPlistValue(plist, "CFBundleExecutable")
-                    logger.debug("Found libraryName $libraryName")
-                    val binaryFile = moduleLocation.resolve(libraryName)
-                    if (!execOps.isDynamicLibrary(binaryFile, logger)) {
-                        logger.debug("Found static framework {} add it to the require dependency list", moduleLocation)
-                        requireDependencies.add(module)
+            if (moduleToInclude.contains(module.name.lowercase())) {
+                requireDependencies.add(module)
+            } else {
+                compiledTargetDir
+                    .asFile
+                    .get()
+                    .listFiles { it.extension == "framework" }
+                    .firstOrNull {
+                        logger.debug("checking module {} at {}", module.name, it)
+                        it.nameWithoutExtension.lowercase() == module.name.lowercase()
+                    }?.let { moduleLocation ->
+                        // if the module is inside the compiled build directory
+                        val plist = moduleLocation.resolve("Info.plist")
+                        logger.debug("Looking inside the Info.plist {}", plist)
+                        val libraryName = getPlistValue(plist, "CFBundleExecutable")
+                        logger.debug("Found libraryName $libraryName")
+                        val binaryFile = moduleLocation.resolve(libraryName)
+                        if (!execOps.isDynamicLibrary(binaryFile, logger)) {
+                            logger.debug(
+                                "Found static framework {} add it to the require dependency list",
+                                moduleLocation,
+                            )
+                            requireDependencies.add(module)
+                        }
                     }
-                }
+            }
         }
         return requireDependencies
     }

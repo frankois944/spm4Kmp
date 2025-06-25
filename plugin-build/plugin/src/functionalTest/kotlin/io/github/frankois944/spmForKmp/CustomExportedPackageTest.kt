@@ -19,7 +19,13 @@ class CustomExportedPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withRawDependencies(
+                .appendRawPluginRootConfig(
+                    """
+                    exportedPackageSettings {
+                        includeProduct = listOf("KeychainAccess")
+                    }
+                    """.trimIndent(),
+                ).withRawDependencies(
                     KotlinSource.of(
                         content =
                             """
@@ -39,15 +45,6 @@ class CustomExportedPackageTest : BaseTest() {
                                 },
                                 branch = "master",
                             )
-                            remotePackageVersion(
-                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-                                version = "11.6.0",
-                                products = {
-                                    add(
-                                        ProductName("FirebaseAnalytics"),
-                                    )
-                                }
-                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -60,7 +57,7 @@ class CustomExportedPackageTest : BaseTest() {
                             """
                             import Foundation
                             import CryptoSwift
-                            import FirebaseAnalytics
+                            import KeychainAccess
 
                             @objc public class MySwiftClass: NSObject {
                                 @objc public func toMD5(value: String) -> String {
@@ -83,17 +80,13 @@ class CustomExportedPackageTest : BaseTest() {
             exportedContent.contains("CryptoSwift"),
             "CryptoSwift should not be exported",
         )
-        assertFalse(
-            exportedContent.contains("FirebaseCore"),
-            "FirebaseCore should not be exported",
-        )
-        assertFalse(
+        assertTrue(
             exportedContent.contains("KeychainAccess"),
-            "KeychainAccess should not be exported",
+            "KeychainAccess should be exported",
         )
         assertTrue(
-            exportedContent.contains("FirebaseAnalytics"),
-            "FirebaseAnalytics should be exported",
+            exportedContent.contains("KeychainAccess.git"),
+            "KeychainAccess.git should be exported",
         )
     }
 
@@ -123,15 +116,6 @@ class CustomExportedPackageTest : BaseTest() {
                                        ProductName("CryptoSwift"),
                                    )
                                },
-                            )
-                            remotePackageVersion(
-                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-                                version = "11.6.0",
-                                products = {
-                                    add(
-                                        "FirebaseAnalytics",
-                                    )
-                                },
                             )
                             """.trimIndent(),
                     ),

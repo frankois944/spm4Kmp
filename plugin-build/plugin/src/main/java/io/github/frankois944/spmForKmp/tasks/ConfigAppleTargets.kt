@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import kotlin.text.set
 
 @Suppress("LongMethod")
 internal fun Project.configAppleTargets(
@@ -231,6 +232,7 @@ private fun GenerateExportableManifestTask.configureExportableManifestTask(
     this.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
     this.exportedPackage.set(swiftPackageEntry.exportedPackageSettings)
     this.compiledTargetDir.set(targetBuildDir)
+    this.includeProduct.set(swiftPackageEntry.exportedPackageSettings.includeProduct)
 }
 
 @Suppress("LongParameterList")
