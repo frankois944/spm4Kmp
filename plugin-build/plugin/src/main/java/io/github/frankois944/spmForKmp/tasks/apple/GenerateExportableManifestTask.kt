@@ -196,6 +196,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     }
 
     // the static framework must be included inside the xcode project
+    @Suppress("NestedBlockDepth")
     private fun getRequireProductsDependencies(): List<ModuleConfig> {
         val requireDependencies = mutableListOf<ModuleConfig>()
         val modules = getCurrentModules()
