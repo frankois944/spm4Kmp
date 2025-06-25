@@ -12,26 +12,28 @@
         <meta name="author" content="François Dabonot">
       
       
-        <link rel="canonical" href="https://frankois944.github.io/spm4Kmp/">
+        <link rel="canonical" href="https://frankois944.github.io/spm4Kmp/usages/largebridge/">
       
       
+        <link rel="prev" href="../distribution/">
       
-        <link rel="next" href="license/">
+      
+        <link rel="next" href="../../references/swiftPackageConfig/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
-        <title>Swift Package Manager For Kotlin Multiplatform - SPM For KMP documentation</title>
+        <title>Working With Large Bridge - SPM For KMP documentation</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.342714a4.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -50,7 +52,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -69,11 +71,11 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="Swift Package Manager For Kotlin Multiplatform - SPM For KMP documentation" >
+        <meta  property="og:title"  content="Working With Large Bridge - SPM For KMP documentation" >
       
         <meta  property="og:description"  content="An alternative to the dying CocoaPods with custom Kotlin/Swift bridge for KMP." >
       
-        <meta  property="og:image"  content="https://frankois944.github.io/spm4Kmp/assets/images/social/index.png" >
+        <meta  property="og:image"  content="https://frankois944.github.io/spm4Kmp/assets/images/social/usages/largebridge.png" >
       
         <meta  property="og:image:type"  content="image/png" >
       
@@ -81,15 +83,15 @@
       
         <meta  property="og:image:height"  content="630" >
       
-        <meta  property="og:url"  content="https://frankois944.github.io/spm4Kmp/" >
+        <meta  property="og:url"  content="https://frankois944.github.io/spm4Kmp/usages/largebridge/" >
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="Swift Package Manager For Kotlin Multiplatform - SPM For KMP documentation" >
+        <meta  name="twitter:title"  content="Working With Large Bridge - SPM For KMP documentation" >
       
         <meta  name="twitter:description"  content="An alternative to the dying CocoaPods with custom Kotlin/Swift bridge for KMP." >
       
-        <meta  name="twitter:image"  content="https://frankois944.github.io/spm4Kmp/assets/images/social/index.png" >
+        <meta  name="twitter:image"  content="https://frankois944.github.io/spm4Kmp/assets/images/social/usages/largebridge.png" >
       
     
     
@@ -114,7 +116,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#swift-package-manager-for-kotlin-multiplatform" class="md-skip">
+        <a href="#working-with-large-bridge" class="md-skip">
           Skip to content
         </a>
       
@@ -129,12 +131,12 @@
             <div class="md-banner__inner md-grid md-typeset">
               
 You're not viewing the latest version.
-<a href="../.">
+<a href="../../..">
     <strong>Click here to go to latest.</strong>
 </a>
 
             </div>
-            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../.."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
           </aside>
         
       </div>
@@ -146,7 +148,7 @@ You're not viewing the latest version.
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="SPM For KMP documentation" class="md-header__button md-logo" aria-label="SPM For KMP documentation" data-md-component="logo">
+    <a href="../.." title="SPM For KMP documentation" class="md-header__button md-logo" aria-label="SPM For KMP documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -166,7 +168,7 @@ You're not viewing the latest version.
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Swift Package Manager For Kotlin Multiplatform
+              Working With Large Bridge
             
           </span>
         </div>
@@ -286,13 +288,11 @@ You're not viewing the latest version.
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="." class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../.." class="md-tabs__link">
           
   
   
@@ -314,7 +314,7 @@ You're not viewing the latest version.
     
     
       <li class="md-tabs__item">
-        <a href="setup/" class="md-tabs__link">
+        <a href="../../setup/" class="md-tabs__link">
           
   
   
@@ -332,11 +332,13 @@ You're not viewing the latest version.
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="usages/multiTarget/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../multiTarget/" class="md-tabs__link">
           
   
   
@@ -358,7 +360,7 @@ You're not viewing the latest version.
     
     
       <li class="md-tabs__item">
-        <a href="references/swiftPackageConfig/" class="md-tabs__link">
+        <a href="../../references/swiftPackageConfig/" class="md-tabs__link">
           
   
   
@@ -400,7 +402,7 @@ You're not viewing the latest version.
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="SPM For KMP documentation" class="md-nav__button md-logo" aria-label="SPM For KMP documentation" data-md-component="logo">
+    <a href="../.." title="SPM For KMP documentation" class="md-nav__button md-logo" aria-label="SPM For KMP documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -427,8 +429,6 @@ You're not viewing the latest version.
       
   
   
-    
-  
   
   
     
@@ -444,21 +444,20 @@ You're not viewing the latest version.
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="." class="md-nav__link md-nav__link--active">
+            <a href="../.." class="md-nav__link ">
               
   
   
@@ -471,13 +470,13 @@ You're not viewing the latest version.
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_1" id="__nav_1_label" tabindex="">
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_1">
             <span class="md-nav__icon md-icon"></span>
             Swift Package Manager For Kotlin Multiplatform
@@ -493,7 +492,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="license/" class="md-nav__link">
+      <a href="../../license/" class="md-nav__link">
         
   
   
@@ -580,7 +579,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="setup/" class="md-nav__link">
+      <a href="../../setup/" class="md-nav__link">
         
   
   
@@ -603,7 +602,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="bridge/" class="md-nav__link">
+      <a href="../../bridge/" class="md-nav__link">
         
   
   
@@ -626,7 +625,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="bridgeWithDependencies/" class="md-nav__link">
+      <a href="../../bridgeWithDependencies/" class="md-nav__link">
         
   
   
@@ -649,7 +648,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="exportingDependencies/" class="md-nav__link">
+      <a href="../../exportingDependencies/" class="md-nav__link">
         
   
   
@@ -719,7 +718,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="section-experimental/copyPackageResources/" class="md-nav__link">
+      <a href="../../section-experimental/copyPackageResources/" class="md-nav__link">
         
   
   
@@ -779,7 +778,7 @@ You're not viewing the latest version.
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="section-help/" class="md-nav__link ">
+            <a href="../../section-help/" class="md-nav__link ">
               
   
   
@@ -814,7 +813,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="section-help/issues/" class="md-nav__link">
+      <a href="../../section-help/issues/" class="md-nav__link">
         
   
   
@@ -837,7 +836,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="section-help/faq/" class="md-nav__link">
+      <a href="../../section-help/faq/" class="md-nav__link">
         
   
   
@@ -860,7 +859,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="section-help/tips/" class="md-nav__link">
+      <a href="../../section-help/tips/" class="md-nav__link">
         
   
   
@@ -895,8 +894,10 @@ You're not viewing the latest version.
       
   
   
+    
   
   
+  
     
     
       
@@ -910,19 +911,20 @@ You're not viewing the latest version.
     
     
       
+        
+        
+      
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -935,7 +937,7 @@ You're not viewing the latest version.
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             Usages
@@ -949,7 +951,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="usages/multiTarget/" class="md-nav__link">
+      <a href="../multiTarget/" class="md-nav__link">
         
   
   
@@ -972,7 +974,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="usages/distribution/" class="md-nav__link">
+      <a href="../distribution/" class="md-nav__link">
         
   
   
@@ -992,10 +994,32 @@ You're not viewing the latest version.
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="usages/largebridge/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Working With Large Bridge
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1006,6 +1030,125 @@ You're not viewing the latest version.
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-local-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create A Local Package
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choose-your-editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Choose Your Editor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#package-manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Package Manifest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Package Manifest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#package-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Package Source
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Package Source">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugin Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugin Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dont-store-sensitive-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Don't Store Sensitive Data
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1078,7 +1221,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/swiftPackageConfig/" class="md-nav__link">
+      <a href="../../references/swiftPackageConfig/" class="md-nav__link">
         
   
   
@@ -1154,7 +1297,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/dependency/dependencyConfig/" class="md-nav__link">
+      <a href="../../references/dependency/dependencyConfig/" class="md-nav__link">
         
   
   
@@ -1177,7 +1320,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/dependency/productPackageConfig/" class="md-nav__link">
+      <a href="../../references/dependency/productPackageConfig/" class="md-nav__link">
         
   
   
@@ -1200,7 +1343,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/dependency/productName/" class="md-nav__link">
+      <a href="../../references/dependency/productName/" class="md-nav__link">
         
   
   
@@ -1223,7 +1366,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/dependency/swiftDependency/" class="md-nav__link">
+      <a href="../../references/dependency/swiftDependency/" class="md-nav__link">
         
   
   
@@ -1301,7 +1444,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/exportedPackageConfig/" class="md-nav__link">
+      <a href="../../references/exportedPackageConfig/" class="md-nav__link">
         
   
   
@@ -1387,7 +1530,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/bridgeSettingsConfig/" class="md-nav__link">
+      <a href="../../references/bridgeSettingsConfig/" class="md-nav__link">
         
   
   
@@ -1410,7 +1553,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/targetSettingsConfigs/CSettingConfig/" class="md-nav__link">
+      <a href="../../references/targetSettingsConfigs/CSettingConfig/" class="md-nav__link">
         
   
   
@@ -1433,7 +1576,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/targetSettingsConfigs/CxxSettingConfig/" class="md-nav__link">
+      <a href="../../references/targetSettingsConfigs/CxxSettingConfig/" class="md-nav__link">
         
   
   
@@ -1456,7 +1599,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/targetSettingsConfigs/LinkerSettingConfig/" class="md-nav__link">
+      <a href="../../references/targetSettingsConfigs/LinkerSettingConfig/" class="md-nav__link">
         
   
   
@@ -1479,7 +1622,7 @@ You're not viewing the latest version.
   
   
     <li class="md-nav__item">
-      <a href="references/targetSettingsConfigs/SwiftSettingConfig/" class="md-nav__link">
+      <a href="../../references/targetSettingsConfigs/SwiftSettingConfig/" class="md-nav__link">
         
   
   
@@ -1537,36 +1680,99 @@ You're not viewing the latest version.
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
+  <a href="#create-a-local-package" class="md-nav__link">
     <span class="md-ellipsis">
-      Features
+      Create A Local Package
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#support-my-project" class="md-nav__link">
+  <a href="#choose-your-editor" class="md-nav__link">
     <span class="md-ellipsis">
-      Support My Project ⭐️
+      Choose Your Editor
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#feedback" class="md-nav__link">
+  <a href="#package-manifest" class="md-nav__link">
     <span class="md-ellipsis">
-      Feedback
+      Package Manifest
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Package Manifest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
       Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#package-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Package Source
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Package Source">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugin Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugin Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dont-store-sensitive-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Don't Store Sensitive Data
     </span>
   </a>
   
@@ -1591,33 +1797,108 @@ You're not viewing the latest version.
   
 
 
-<h1 id="swift-package-manager-for-kotlin-multiplatform">Swift Package Manager For Kotlin Multiplatform</h1>
-<p><a href="https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp"><img alt="Gradle Plugin Portal Version" src="https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp" /></a>
-<a href="https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml"><img alt="build&amp;tests" src="https://github.com/frankois944/spm4Kmp/actions/workflows/pre-merge.yaml/badge.svg" /></a>
-<a href="https://sonarcloud.io/summary/new_code?id=frankois944_spm4Kmp"><img alt="Coverage" src="https://sonarcloud.io/api/project_badges/measure?project=frankois944_spm4Kmp&amp;metric=coverage" /></a>
-<a href="https://sonarcloud.io/summary/new_code?id=frankois944_spm4Kmp"><img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=frankois944_spm4Kmp&amp;metric=alert_status" /></a>
-<a href="https://github.com/frankois944/spm4Kmp/blob/main/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/frankois944/spm4kmp" /></a></p>
-<p>The Swift Package Manager for Kotlin Multiplatform Plugin, aka <code>spmForKmp</code> Gradle Plugin, is an <strong>alternative of the <a href="https://blog.cocoapods.org/CocoaPods-Specs-Repo/">dying</a> CocoaPods Plugin</strong> used by <a href="https://kotlinlang.org/docs/native-cocoapods.html#set-up-an-environment-to-work-with-cocoapods">KMP cocoapods plugin</a>.</p>
-<p>It will help you to integrate Swift Package and simplify communication between Swift/Kotlin Multiplatform projects targeting the <strong>Apple platform</strong>.</p>
-<p>The plugin uses the embedded Swift Package Manager, so <strong>no third-party dependency is needed</strong>, and it's less intrusive than CocoaPods.</p>
-<div class="admonition warning">
-<p class="admonition-title">Please Be Aware</p>
-<p><a href="section-help/faq/#whats-a-pure-swift-package">Pure Swift packages can't be exported to Kotlin</a>; the plugin will help you to create a bridge to bypass this issue.</p>
-<p>It's a manual job, but until the Swift-import is (not currently planned) available in KMP, it's the only way.</p>
-</div>
-<h2 id="features">Features</h2>
+<h1 id="working-with-large-bridge">Working With Large Bridge</h1>
+<p>If you plan to have a large bridge for using a particular Pure Swift Package, like Stripe, working with an editor without code completion can be difficult.</p>
+<p>The solution is to work with a <strong>local package</strong> you will add to your plugin configuration.</p>
+<p><strong>The big advantage is that you can test your code before adding it to your KMP project</strong>.</p>
+<h2 id="create-a-local-package">Create A Local Package</h2>
 <ul>
-<li><strong>Create a Swift&lt;-&gt;Kotlin bridge</strong>: Import your own Swift code for functionality that can't be done in Kotlin.</li>
-<li><strong>Use SPM third-Party Dependency</strong>: Add external dependency and use it inside your bridge</li>
-<li><strong>Import Swift-compatible code to Kotlin</strong>: Enable SPM dependencies and your own Swift code to be exposed directly in your Kotlin code (<a href="section-help/faq/#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code">if compatible</a>).</li>
+<li>From command line : <code>swift package init --name YouPackageName</code></li>
+<li>From Xcode : File -&gt; New -&gt; Package -&gt; Library</li>
 </ul>
-<h2 id="support-my-project">Support My Project ⭐️</h2>
-<p>If you find this project useful, please consider giving it a star or a coffe!</p>
-<p><a href="https://www.buymeacoffee.com/frankois944"><img alt="&quot;Buy Me A Coffee&quot;" src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" /></a><a href="https://github.com/frankois944/spm4Kmp"><img alt="GitHub stars" src="https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social" /></a></p>
-<h2 id="feedback">Feedback</h2>
-<p>This project greatly needs feedback, feature requests, and information about the edge case for progressing; let's <a href="https://github.com/frankois944/spm4Kmp/discussions">talk</a>.</p>
-<h2 id="example">Example</h2>
-<p>A <a href="https://github.com/frankois944/spm4Kmp/tree/main/example">sample</a> is available for people wanted to see the usage.</p>
+<h2 id="choose-your-editor">Choose Your Editor</h2>
+<p>You can either use <strong>Xcode</strong> or <strong>VSCode with the Swift Plugin</strong>; both are fine.</p>
+<h2 id="package-manifest">Package Manifest</h2>
+<p>A Swift Package is based on a Manifest, the Package.swift (<a href="https://docs.swift.org/package-manager/PackageDescription/PackageDescription.html">official documentation</a>)</p>
+<h3 id="example">Example</h3>
+<div class="language-Swift highlight"><span class="filename">Package.swift</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// swift-tools-version: 5.9</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1">// The swift-tools-version declares the minimum version of Swift required to build this package.</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kd">import</span><span class="w"> </span><span class="nc">PackageDescription</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kd">let</span><span class="w"> </span><span class="nv">package</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Package</span><span class="p">(</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyStripeSDK&quot;</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="n">platforms</span><span class="p">:</span><span class="w"> </span><span class="p">[.</span><span class="n">iOS</span><span class="p">(.</span><span class="n">v14</span><span class="p">)],</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="n">products</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">        </span><span class="c1">// Products define the executables and libraries a package produces, making them visible to other packages.</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">        </span><span class="p">.</span><span class="n">library</span><span class="p">(</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">            </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyStripeSDK&quot;</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">            </span><span class="n">targets</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;MyStripeSDK&quot;</span><span class="p">]),</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">],</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="n">dependencies</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">        </span><span class="p">.</span><span class="n">package</span><span class="p">(</span><span class="n">url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://github.com/stripe/stripe-ios-spm&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">upToNextMajor</span><span class="p">(</span><span class="n">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;24.5.0&quot;</span><span class="p">)),</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="p">],</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="n">targets</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">        </span><span class="c1">// Targets are the basic building blocks of a package, defining a module or a test suite.</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">        </span><span class="c1">// Targets can depend on other targets in this package and products from dependencies.</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="p">.</span><span class="n">target</span><span class="p">(</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">            </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyStripeSDK&quot;</span><span class="p">,</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">            </span><span class="n">dependencies</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">                </span><span class="p">.</span><span class="n">product</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Stripe&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">package</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;stripe-ios-spm&quot;</span><span class="p">),</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">                </span><span class="p">.</span><span class="n">product</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;StripePaymentSheet&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">package</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;stripe-ios-spm&quot;</span><span class="p">)</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">            </span><span class="p">]),</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">        </span><span class="p">.</span><span class="n">testTarget</span><span class="p">(</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">            </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyStripeSDKTests&quot;</span><span class="p">,</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">            </span><span class="n">dependencies</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">                </span><span class="s">&quot;MyStripeSDK&quot;</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">            </span><span class="p">]</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">        </span><span class="p">),</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="w">    </span><span class="p">]</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="package-source">Package Source</h2>
+<p>Usually located at <code>Sources/[packageName]</code>, it has the same requirement as the plugin's bridge source files.</p>
+<div class="admonition warning">
+<p class="admonition-title">Make your Swift code compatible with Kotlin.</p>
+<p>Your Swift code needs to be marked as <a href="https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute">@objc/@objcMembers</a> and the visibility set as <code>public</code>
+or it won't be exported and available from your Kotlin code.</p>
+</div>
+<h3 id="example_1">Example</h3>
+<div class="language-Swift highlight"><span class="filename">Sources/MyStripeSDK/Package.swift</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">import</span><span class="w"> </span><span class="nc">StripePaymentSheet</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">@</span><span class="n">objcMembers</span><span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">MyStripeSDK</span><span class="p">:</span><span class="w"> </span><span class="bp">NSObject</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">paymentSheet</span><span class="p">:</span><span class="w"> </span><span class="n">PaymentSheet</span><span class="p">?</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">paymentIntentClientSecret</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">backendCheckoutUrl</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">URL</span><span class="p">(</span><span class="n">string</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Your backend endpoint/payment-sheet&quot;</span><span class="p">)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">init</span><span class="p">(</span><span class="n">paymentIntentClientSecret</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">        </span><span class="kc">self</span><span class="p">.</span><span class="n">paymentIntentClientSecret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">paymentIntentClientSecret</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">func</span><span class="w"> </span><span class="nf">doStripeJob</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="nv">configuration</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">PaymentSheet</span><span class="p">.</span><span class="n">Configuration</span><span class="p">()</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">        </span><span class="n">configuration</span><span class="p">.</span><span class="n">merchantDisplayName</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;Example, Inc.&quot;</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">        </span><span class="kc">self</span><span class="p">.</span><span class="n">paymentSheet</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">PaymentSheet</span><span class="p">(</span><span class="n">paymentIntentClientSecret</span><span class="p">:</span><span class="w"> </span><span class="kc">self</span><span class="p">.</span><span class="n">paymentIntentClientSecret</span><span class="p">,</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">                                         </span><span class="n">configuration</span><span class="p">:</span><span class="w"> </span><span class="n">configuration</span><span class="p">)</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="plugin-configuration">Plugin Configuration</h2>
+<p>Add your local package to your plugin configuration, follow the <a href="../../exportingDependencies/">guide</a>.</p>
+<h3 id="example_2">Example</h3>
+<div class="language-Kotlin highlight"><span class="filename">build.gradle.kts</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">swiftPackageConfig</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">create</span><span class="p">(</span><span class="s">&quot;MyStripeSDKLibs&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="n">dependency</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">            </span><span class="n">localPackage</span><span class="p">(</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">                </span><span class="c1">// absolute path to your Local Package</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">                </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;</span><span class="si">$</span><span class="n">projectDir</span><span class="s">/../MyStripeSDK&quot;</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">                </span><span class="n">packageName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;MyStripeSDK&quot;</span><span class="p">,</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">                </span><span class="n">products</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">                    </span><span class="c1">// Export to Kotlin for use in shared Kotlin code, false by default</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">                    </span><span class="n">add</span><span class="p">(</span><span class="s">&quot;MyStripeSDK&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">exportToKotlin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">                </span><span class="p">}</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">            </span><span class="p">)</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="dont-store-sensitive-data">Don't Store Sensitive Data</h2>
+<div class="admonition warning">
+<p class="admonition-title">The local package source is visible</p>
+<p>If you share this package, don't put sensitive data inside, as it needs to be <a href="https://frankois944.github.io/spm4Kmp/bridgeWithDependencies/#gradle">added to the Xcode project</a>.</p>
+</div>
+<p>You can use the default plugin's bridge if needed, as it's not visible from the application or your shared Kotlin library.</p>
 
 
 
@@ -1676,7 +1957,7 @@ You're not viewing the latest version.
                 
                 
               
-              Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/frankois944/spm4Kmp/issues/new/?title=[Feedback]+Swift%20Package%20Manager%20For%20Kotlin%20Multiplatform+-+/" target="_blank" rel="noopener">feedback form</a>.
+              Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/frankois944/spm4Kmp/issues/new/?title=[Feedback]+Working%20With%20Large%20Bridge+-+/usages/largebridge/" target="_blank" rel="noopener">feedback form</a>.
             </div>
           
         </div>
@@ -1709,15 +1990,31 @@ You're not viewing the latest version.
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
+          
+          <a href="../distribution/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Distribute Kotlin Library">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Distribute Kotlin Library
+              </div>
+            </div>
+          </a>
+        
         
           
-          <a href="license/" class="md-footer__link md-footer__link--next" aria-label="Next: License">
+          <a href="../../references/swiftPackageConfig/" class="md-footer__link md-footer__link--next" aria-label="Next: SwiftPackageConfig">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                License
+                SwiftPackageConfig
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1792,10 +2089,10 @@ You're not viewing the latest version.
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": ["navigation.footer", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.tabs.link", "content.code.annotate", "navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.expand", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link"], "search": "assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": ["latest"], "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.footer", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.tabs.link", "content.code.annotate", "navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.expand", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": ["latest"], "provider": "mike"}}</script>
     
     
-      <script src="assets/javascripts/bundle.13a4f30d.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
     
   </body>
