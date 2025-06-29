@@ -152,26 +152,6 @@ remote, branch-based remote, or commit-based remote dependencies.
 fun dependency(dependencies: DependencyConfig.() -> Unit)
 ```
 
-## dependency (Deprecated)
-
-!!! warning "Please Be Aware"
-
-    Will be removed on version 1.0.0 and replaced by [DependencyConfig](swiftPackageConfig.md#dependency)
-
-Adds one or more Swift dependencies to the dependencies list.
-
-- **[dependency](dependency/swiftDependency.md)** A variable number of `SwiftDependency` instances to be added.
-
-This can include local or remote dependencies in the form of
-Swift packages or binary `xcframework` bundles.
-
-It supports different dependency models such as local, versioned
-remote, branch-based remote, or commit-based remote dependencies.
-
-```kotlin
-fun dependency(vararg dependency: SwiftDependency)
-```
-
 ## sharedCachePath
 
 Specify the shared cache directory path
@@ -241,15 +221,4 @@ Customize the local package used by Xcode
 
 ```kotlin
 fun exportedPackageSettings(setting: ExportedPackageConfig.() -> Unit)
-```
-
-## copyDependenciesToApp
-
-Copy **ALL** products into the application (only when running from xcode)
-
-EXPERIMENTAL
-
-```kotlin
-@ExperimentalSpmForKmpFeature
-var copyDependenciesToApp = false
 ```

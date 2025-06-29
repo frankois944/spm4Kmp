@@ -28,13 +28,11 @@ Adds one or more products to the product package configuration.
   which includes details such as the name and an optional alias.
 - **exportToKotlin** Determines whether the added products should be exported
   to Kotlin. Defaults to `false` if not specified.
-- **isIncludedInExportedPackage** if false, the products will be ignored inside the local package.
 
 ```Kotlin
 fun add(
     vararg products: ProductName,
     exportToKotlin: Boolean = false,
-    isIncludedInExportedPackage: Boolean = true,
 )
 ```
 
@@ -46,12 +44,10 @@ Adds one or more product names to the product package configuration using their 
   Each string corresponds to the name of the product within the Swift package ecosystem.
 - **exportToKotlin** Determines whether the added products should be exported
   to Kotlin. Defaults to `false` if not specified.
-- **isIncludedInExportedPackage** if false, the products will be ignored inside the local package.
 
 ```Kotlin
 fun add(
     vararg names: String,
     exportToKotlin: Boolean = false,
-    isIncludedInExportedPackage: Boolean = true,
 )
 ```

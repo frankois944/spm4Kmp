@@ -21,7 +21,7 @@ The plugin uses the embedded Swift Package Manager, so **no third-party dependen
 
 ## Features
 
-- **Create a Swift<->Kotlin bridge**: Import your own Swift code for functionality that can't be done in Kotlin.
+- **Create a Swift↔Kotlin bridge**: Import your own Swift code for functionality that can't be done in Kotlin.
 - **Use SPM third-Party Dependency**: Add external dependency and use it inside your bridge
 - **Import Swift-compatible code to Kotlin**: Enable SPM dependencies and your own Swift code to be exposed directly in your Kotlin code ([if compatible](./section-help/faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code)).
 
@@ -30,7 +30,9 @@ The plugin uses the embedded Swift Package Manager, so **no third-party dependen
 
 If you find this project useful, please consider giving it a star or a coffe!
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/frankois944)[![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/frankois944)
+
+[![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
 
 
 ## Feedback

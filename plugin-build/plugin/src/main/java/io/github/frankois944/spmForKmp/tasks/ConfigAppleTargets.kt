@@ -36,7 +36,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
-import kotlin.text.set
 
 @Suppress("LongMethod")
 internal fun Project.configAppleTargets(
