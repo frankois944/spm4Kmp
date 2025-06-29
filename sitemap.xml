@@ -25,10 +25,6 @@
          <lastmod>2025-06-29</lastmod>
     </url>
     <url>
-         <loc>https://frankois944.github.io/spm4Kmp/migration/migration_from_0.x/</loc>
-         <lastmod>2025-06-29</lastmod>
-    </url>
-    <url>
          <loc>https://frankois944.github.io/spm4Kmp/references/bridgeSettingsConfig/</loc>
          <lastmod>2025-06-29</lastmod>
     </url>
@@ -53,6 +49,10 @@
          <lastmod>2025-06-29</lastmod>
     </url>
     <url>
+         <loc>https://frankois944.github.io/spm4Kmp/references/dependency/swiftDependency/</loc>
+         <lastmod>2025-06-29</lastmod>
+    </url>
+    <url>
          <loc>https://frankois944.github.io/spm4Kmp/references/targetSettingsConfigs/CSettingConfig/</loc>
          <lastmod>2025-06-29</lastmod>
     </url>
@@ -66,6 +66,10 @@
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/references/targetSettingsConfigs/SwiftSettingConfig/</loc>
+         <lastmod>2025-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://frankois944.github.io/spm4Kmp/section-experimental/copyPackageResources/</loc>
          <lastmod>2025-06-29</lastmod>
     </url>
     <url>
