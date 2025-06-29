@@ -3,15 +3,12 @@ package io.github.frankois944.spmForKmp
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.net.URI
 
 class BasicPackageTest : BaseTest() {
     @Test
@@ -62,19 +59,14 @@ class BasicPackageTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-                            SwiftDependency.Package.Local(
+                            localPackage(
                                 path = "${localPackageDirectory.absolutePath}",
                                 packageName = "LocalSourceDummyFramework",
                                 products = {
                                     add("LocalSourceDummyFramework", exportToKotlin = true)
                                 },
                             )
-                            """.trimIndent(),
-                    ),
-                    KotlinSource.of(
-                        content =
-                            """
-                            SwiftDependency.Package.Remote.Version(
+                            remotePackageVersion(
                                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
                                 version = "1.8.3",
                                 products = {
@@ -138,30 +130,26 @@ class BasicPackageTest : BaseTest() {
                             """
                             """.trimIndent(),
                     ),
-                ).withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Remote.Version(
+                ).withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+                            remotePackageVersion(
                                 url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                                version = "1.8.3",
+                                version = "1.8.4",
                                 products = {
                                     add("CryptoSwift")
                                 },
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Package.Local(
-                                path = localPackageDirectory.absolutePath,
+                            )
+                            localPackage(
+                                path = "${localPackageDirectory.absolutePath}",
                                 packageName = "LocalSourceDummyFramework",
                                 products = {
-                                    add(
-                                        ProductName("LocalSourceDummyFramework"),
-                                        exportToKotlin = true,
-                                    )
+                                   add(ProductName("LocalSourceDummyFramework"), exportToKotlin = true)
                                 },
-                            ),
-                        )
-                    },
+                            )
+                            """.trimIndent(),
+                    ),
                 ).build()
 
         // When
@@ -180,7 +168,7 @@ class BasicPackageTest : BaseTest() {
                 .resolve("spmKmpPlugin")
                 .resolve("dummy")
                 .resolve("scratch")
-        assert(scratchDir.listFiles().isNullOrEmpty() == false)
+        assert(!scratchDir.listFiles().isNullOrEmpty())
         cache.deleteRecursively()
         config.deleteRecursively()
         security.deleteRecursively()
