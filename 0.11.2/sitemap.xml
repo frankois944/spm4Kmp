@@ -2,102 +2,98 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/bridge/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/bridgeWithDependencies/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/exportingDependencies/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/license/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/setup/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://frankois944.github.io/spm4Kmp/0.11.2/migration/migration_from_0.x/</loc>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/bridgeSettingsConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/exportedPackageConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/swiftPackageConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/dependency/dependencyConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/dependency/productName/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/dependency/productPackageConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/dependency/swiftDependency/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/targetSettingsConfigs/CSettingConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/targetSettingsConfigs/CxxSettingConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/targetSettingsConfigs/LinkerSettingConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/references/targetSettingsConfigs/SwiftSettingConfig/</loc>
-         <lastmod>2025-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://frankois944.github.io/spm4Kmp/0.11.2/section-experimental/copyPackageResources/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/section-help/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/section-help/faq/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/section-help/issues/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/section-help/tips/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/usages/distribution/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/usages/largebridge/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
     <url>
          <loc>https://frankois944.github.io/spm4Kmp/0.11.2/usages/multiTarget/</loc>
-         <lastmod>2025-06-25</lastmod>
+         <lastmod>2025-06-29</lastmod>
     </url>
 </urlset>
