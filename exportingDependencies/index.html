@@ -18,7 +18,7 @@
         <link rel="prev" href="../bridgeWithDependencies/">
       
       
-        <link rel="next" href="../section-experimental/copyPackageResources/">
+        <link rel="next" href="../migration/migration_from_0.x/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -124,6 +124,10 @@
     <div data-md-component="announce">
       
     </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
     
     
       
@@ -703,6 +707,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#local-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Package
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -741,73 +754,18 @@
   
   
   
-    
-    
-      
-        
-      
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Experimental
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_5">
-            <span class="md-nav__icon md-icon"></span>
-            Experimental
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../section-experimental/copyPackageResources/" class="md-nav__link">
+      <a href="../migration/migration_from_0.x/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Avoid the usage of the exported local package
+    Migration from versions &lt; 1.0
     
   </span>
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -1179,8 +1137,6 @@
       
         
       
-        
-      
     
     
     
@@ -1276,29 +1232,6 @@
   
   <span class="md-ellipsis">
     ProductName
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../references/dependency/swiftDependency/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    SwiftDependency (Deprecated)
     
   </span>
   
@@ -1625,6 +1558,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#local-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Package
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1669,49 +1611,45 @@
 
 <h1 id="export-dependencies-to-kotlin">Export Dependencies To Kotlin</h1>
 <h2 id="how-it-works">How It works</h2>
-<p>On completion with <a href="../bridgeWithDependencies/">using external dependencies</a>, it's possible to export them to Kotlin, if they are <a href="../section-help/faq/#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code">compatible</a>.</p>
-<p>Exported dependency can be used inside the bridge, the Swift &amp; Kotlin App.</p>
+<p>On completion with <a href="../bridgeWithDependencies/">using external dependencies</a>, it's possible to export them to your Kotlin module, if they are <a href="../section-help/faq/#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code">compatible</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If your package doesn't work with the plugin, please create an <a href="https://github.com/frankois944/spm4Kmp/issues">issue</a>.</p>
 </div>
 <h3 id="bridge-incompatible-dependencies">Bridge Incompatible Dependencies</h3>
 <p>In a case the exported dependency is written in <a href="../section-help/faq/">Swift</a>, <strong>manual work needs to be done</strong> like <a href="../bridgeWithDependencies/#example">this</a>.</p>
-<p>For example, the <a href="https://github.com/krzyzanowskim/CryptoSwift">CryptoSwift</a> can't work directly on Kotlin, so the Plugin's bridge is here to fill the hole between Kotlin and Swift.</p>
+<p>For example, the <a href="https://github.com/krzyzanowskim/CryptoSwift">CryptoSwift</a> can't work directly on Kotlin, so the Plugin's bridge is here to fill the gape between Kotlin and Swift.</p>
+<h3 id="local-package">Local Package</h3>
+<p>Some <em>specific</em> dependencies <strong>require</strong> to be declared on the Xcode side; in that case, you will see the following message during the build:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Spm4Kmp: The following dependencies [some_dependency_name] need to be added to your xcode project
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>A local Swift package has been generated at
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>/path/to/the/local/package
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Please add it to your xcode project as a local package dependency; it will add the missing content.
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>****You can ignore this messaging if you have already added these dependencies to your Xcode project****
+</span></code></pre></div></p>
 <h2 id="gradle">Gradle</h2>
-<p>The following configuration export to Kotlin the package <a href="https://github.com/firebase/firebase-ios-sdk">FirebaseAnalytics</a> which is a ObjC library.</p>
+<p>The following configuration exports to Kotlin the package <a href="https://github.com/firebase/firebase-ios-sdk">FirebaseAnalytics</a> which is a ObjC library.</p>
 <div class="admonition warning">
 <p class="admonition-title">Don't export incompatible library</p>
 <p>Exporting an incompatible library is useless and will only increase build time.</p>
 </div>
-<div class="language-kotlin highlight"><span class="filename">build.gradle.kts</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">swiftPackageConfig</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">create</span><span class="p">(</span><span class="s">&quot;[cinteropName]&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="n">dependency</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">            </span><span class="n">remotePackageVersion</span><span class="p">(</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">                </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="s">&quot;https://github.com/firebase/firebase-ios-sdk.git&quot;</span><span class="p">),</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">                </span><span class="n">products</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">                    </span><span class="n">add</span><span class="p">(</span><span class="s">&quot;FirebaseAnalytics&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">exportToKotlin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span><span class="w"> </span><span class="c1">// exported</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">                    </span><span class="n">add</span><span class="p">(</span><span class="s">&quot;FirebaseCore&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// non-exported</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">                </span><span class="p">},</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;11.8.0&quot;</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">            </span><span class="p">)</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">            </span><span class="c1">// Another SwiftDependency</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">            </span><span class="c1">// ...</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">        </span><span class="p">)</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">}</span>
+<div class="language-kotlin highlight"><span class="filename">build.gradle.kts</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">swiftPackageConfig</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">create</span><span class="p">(</span><span class="s">&quot;[cinteropName]&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="n">dependency</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">            </span><span class="n">remotePackageVersion</span><span class="p">(</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">                </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="s">&quot;https://github.com/firebase/firebase-ios-sdk&quot;</span><span class="p">),</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">                </span><span class="n">products</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">                    </span><span class="n">add</span><span class="p">(</span><span class="s">&quot;FirebaseAnalytics&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">exportToKotlin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span><span class="w"> </span><span class="c1">// exported</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">                    </span><span class="n">add</span><span class="p">(</span><span class="s">&quot;FirebaseCore&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// non-exported</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">                </span><span class="p">},</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;11.8.0&quot;</span><span class="p">,</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">            </span><span class="p">)</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">            </span><span class="c1">// Another SwiftDependency</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">            </span><span class="c1">// ...</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">        </span><span class="p">)</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>A local swift package is being generated during the build and this message displayed
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Spm4Kmp: A local Swift package has been generated at
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/path/to/the/local/package
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Please add it to your xcode project as a local package dependency.
-</span></code></pre></div>
-Add the folder to your Xcode project as a Local package, that's all.</p>
-<p>Note : When updating your configuration, reset the package cache to apply the modification.</p>
-<p><a href="https://github.com/frankois944/spm4Kmp/discussions/108">Learn more about the local package</a></p>
-</div>
 <h2 id="example">Example</h2>
 <div class="language-kotlin highlight"><span class="filename">iosMain/kotlin/com/example/myKotlinFile.kt</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="nn">FirebaseAnalytics.FIRConsentStatusGranted</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
@@ -1831,13 +1769,13 @@ Add the folder to your Xcode project as a Local package, that's all.</p>
         
         
           
-          <a href="../section-experimental/copyPackageResources/" class="md-footer__link md-footer__link--next" aria-label="Next: Avoid the usage of the exported local package">
+          <a href="../migration/migration_from_0.x/" class="md-footer__link md-footer__link--next" aria-label="Next: Migration from versions &amp;lt; 1.0">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Avoid the usage of the exported local package
+                Migration from versions &lt; 1.0
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1912,7 +1850,7 @@ Add the folder to your Xcode project as a Local package, that's all.</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.footer", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.tabs.link", "content.code.annotate", "navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.expand", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.footer", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.tabs.link", "content.code.annotate", "navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.expand", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link", "versioning"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": ["legacy"], "provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>

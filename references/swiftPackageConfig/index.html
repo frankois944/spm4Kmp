@@ -125,6 +125,10 @@
       
     </div>
     
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
     
       
 
@@ -654,73 +658,18 @@
   
   
   
-    
-    
-      
-        
-      
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Experimental
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_5">
-            <span class="md-nav__icon md-icon"></span>
-            Experimental
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../../section-experimental/copyPackageResources/" class="md-nav__link">
+      <a href="../../migration/migration_from_0.x/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Avoid the usage of the exported local package
+    Migration from versions &lt; 1.0
     
   </span>
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -1213,15 +1162,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dependency-deprecated" class="md-nav__link">
-    <span class="md-ellipsis">
-      dependency (Deprecated)
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#sharedcachepath" class="md-nav__link">
     <span class="md-ellipsis">
       sharedCachePath
@@ -1284,15 +1224,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#copydependenciestoapp" class="md-nav__link">
-    <span class="md-ellipsis">
-      copyDependenciesToApp
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1310,8 +1241,6 @@
   
     
     
-      
-        
       
         
       
@@ -1414,29 +1343,6 @@
   
   <span class="md-ellipsis">
     ProductName
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dependency/swiftDependency/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    SwiftDependency (Deprecated)
     
   </span>
   
@@ -1844,15 +1750,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dependency-deprecated" class="md-nav__link">
-    <span class="md-ellipsis">
-      dependency (Deprecated)
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#sharedcachepath" class="md-nav__link">
     <span class="md-ellipsis">
       sharedCachePath
@@ -1910,15 +1807,6 @@
   <a href="#exportedpackagesettings" class="md-nav__link">
     <span class="md-ellipsis">
       exportedPackageSettings
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#copydependenciestoapp" class="md-nav__link">
-    <span class="md-ellipsis">
-      copyDependenciesToApp
     </span>
   </a>
   
@@ -2031,37 +1919,22 @@ Swift packages or binary <code>xcframework</code> bundles.</p>
 remote, branch-based remote, or commit-based remote dependencies.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">dependency</span><span class="p">(</span><span class="n">dependencies</span><span class="p">:</span><span class="w"> </span><span class="n">DependencyConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
 </span></code></pre></div>
-<h2 id="dependency-deprecated">dependency (Deprecated)</h2>
-<div class="admonition warning">
-<p class="admonition-title">Please Be Aware</p>
-<p>Will be removed on version 1.0.0 and replaced by <a href="./#dependency">DependencyConfig</a></p>
-</div>
-<p>Adds one or more Swift dependencies to the dependencies list.</p>
-<ul>
-<li><strong><a href="../dependency/swiftDependency/">dependency</a></strong> A variable number of <code>SwiftDependency</code> instances to be added.</li>
-</ul>
-<p>This can include local or remote dependencies in the form of
-Swift packages or binary <code>xcframework</code> bundles.</p>
-<p>It supports different dependency models such as local, versioned
-remote, branch-based remote, or commit-based remote dependencies.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">dependency</span><span class="p">(</span><span class="k">vararg</span><span class="w"> </span><span class="n">dependency</span><span class="p">:</span><span class="w"> </span><span class="n">SwiftDependency</span><span class="p">)</span>
-</span></code></pre></div>
 <h2 id="sharedcachepath">sharedCachePath</h2>
 <p>Specify the shared cache directory path</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">sharedCachePath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">sharedCachePath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
 </span></code></pre></div>
 <h2 id="sharedconfigpath">sharedConfigPath</h2>
 <p>Specify the shared configuration directory path</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">sharedConfigPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">sharedConfigPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
 </span></code></pre></div>
 <h2 id="sharedsecuritypath">sharedSecurityPath</h2>
 <p>Specify the shared security directory path</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">sharedSecurityPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">sharedSecurityPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
 </span></code></pre></div>
 <h2 id="spmworkingpath">spmWorkingPath</h2>
 <p>The path of the directory where working SPM file(s) will be written.</p>
 <p>Default : <code>{buildDirectory}/spmKmpPlugin/</code></p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">spmWorkingPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">spmWorkingPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span>
 </span></code></pre></div>
 <h2 id="bridgesettings">bridgeSettings</h2>
 <p>Configures the bridge settings by applying the specified configuration options.</p>
@@ -2072,26 +1945,20 @@ and linker options. These settings adjust the behavior of the bridge during the 
 <li><strong><a href="../bridgeSettingsConfig/">setting</a></strong> A configuration block of type <code>BridgeSettingsConfig</code>.</li>
 </ul>
 <p>The block allows specifying various compiler and linker settings needed for the package build.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">bridgeSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">BridgeSettingsConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">bridgeSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">BridgeSettingsConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="swiftbinpath">swiftBinPath</h2>
 <p>The path of the Swift command line used to build the bridge
 You can change the version of swift used for building the bridge by setting another binary</p>
 <p>Default : uses the command <code>xcrun --sdk macosx swift</code> by default</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">swiftBinPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">var</span><span class="w"> </span><span class="nv">swiftBinPath</span><span class="p">:</span><span class="w"> </span><span class="kt">String?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
 </span></code></pre></div>
 <h2 id="exportedpackagesettings">exportedPackageSettings</h2>
 <p>Customize the local package used by Xcode</p>
 <ul>
 <li><strong><a href="../exportedPackageConfig/">setting</a></strong> A configuration block of type <code>ExportedPackageConfig</code>.</li>
 </ul>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">exportedPackageSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">ExportedPackageConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
-</span></code></pre></div>
-<h2 id="copydependenciestoapp">copyDependenciesToApp</h2>
-<p>Copy <strong>ALL</strong> products into the application (only when running from xcode)</p>
-<p>EXPERIMENTAL</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nd">@ExperimentalSpmForKmpFeature</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="kd">var</span><span class="w"> </span><span class="nv">copyDependenciesToApp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">exportedPackageSettings</span><span class="p">(</span><span class="n">setting</span><span class="p">:</span><span class="w"> </span><span class="n">ExportedPackageConfig</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span>
 </span></code></pre></div>
 
 
@@ -2283,7 +2150,7 @@ You can change the version of swift used for building the bridge by setting anot
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.footer", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.tabs.link", "content.code.annotate", "navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.expand", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.footer", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.tabs.link", "content.code.annotate", "navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.expand", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link", "versioning"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": ["legacy"], "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
