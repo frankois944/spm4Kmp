@@ -26,12 +26,18 @@ one</a>
 * **path** The local file URL (file://...) to the xcFramework.
 * **packageName** The name of the package associated with this binary.
 * **exportToKotlin** Defines whether the dependency should be exported for use in Kotlin code.
+* **isIncludedInExportedPackage** if false, the whole package will be skipped inside the local package.
+* **linkerOpts**
+* **compilerOpts**
 
 ```kotlin
 fun localBinary(
     path: String,
     packageName: String,
-    exportToKotlin: Boolean = false
+    exportToKotlin: Boolean = false,
+    isIncludedInExportedPackage: Boolean = true,
+    linkerOpts: List<String> = emptyList(),
+    compilerOpts: List<String> = emptyList(),
 )
 ```
 
@@ -45,13 +51,19 @@ Represents a remote binary dependency as a zipped xcFramework
 * **packageName** The name of the package associated with this binary dependency.
 * **exportToKotlin** Defines whether this dependency should be exported for use in Kotlin code.
 * **checksum** The checksum of the remote binary to verify its integrity.
+* **isIncludedInExportedPackage** if false, the whole package will be skipped inside the local package.
+* **linkerOpts**
+* **compilerOpts**
 
 ```kotlin
 fun remoteBinary(
     url: URI,
     packageName: String,
     exportToKotlin: Boolean = false,
-    checksum: String
+    checksum: String,
+    isIncludedInExportedPackage: Boolean = true,
+    linkerOpts: List<String> = emptyList(),
+    compilerOpts: List<String> = emptyList(),
 )
 ```
 
@@ -63,12 +75,14 @@ Represents a local Swift package dependency.
 
 * **path** The local file URL (file://...) to the local Swift package folder.
 * **packageName** The name of the package, by default the first product name.
+* **isIncludedInExportedPackage** if false, the whole package will be skipped inside the local package.
 * **[products](productPackageConfig.md)** A list of the product's package used during dependency configuration.
 
 ```kotlin
 fun localPackage(
     path: String,
     packageName: String = "",
+    isIncludedInExportedPackage: Boolean = true,
     products: ProductPackageConfig.() -> Unit,
 )
 ```
@@ -80,6 +94,7 @@ Represents a specific version of a remote Swift package.a
 * **url** The URL of the remote Git repository where the package is hosted.
 * **packageName** The name of the package, by default base of the url.
 * **version** The specific version of the Swift package to be imported.
+* **isIncludedInExportedPackage** if false, the whole package will be skipped inside the local package.
 * **[products](productPackageConfig.md)** A list of the product's package used during dependency configuration.
 
 ```kotlin
@@ -87,6 +102,7 @@ fun remotePackageVersion(
     url: URI,
     packageName: String = "",
     version: String,
+    isIncludedInExportedPackage: Boolean = true,
     products: ProductPackageConfig.() -> Unit,
 )
 ```
@@ -98,6 +114,7 @@ Represents a branch-based remote Swift dependency.
 * **url** The URL of the remote Git repository where the package is hosted.
 * **packageName** The name of the package, by default base of the url.
 * **branch** The branch name of the remote Git repository used for the dependency.
+* **isIncludedInExportedPackage** if false, the whole package will be skipped inside the local package.
 * **[products](productPackageConfig.md)** A list of the product's package used during dependency configuration.
 
 ```kotlin
@@ -105,6 +122,7 @@ fun remotePackageBranch(
     url: URI,
     packageName: String = "",
     branch: String,
+    isIncludedInExportedPackage: Boolean = true,
     products: ProductPackageConfig.() -> Unit,
 )
 ```
@@ -116,6 +134,7 @@ Represents a specific remote commit dependency.
 * **url** The URL of the remote Git repository where the package is hosted.
 * **packageName** The name of the package, by default base of the url.
 * **revision** A specific commit hash representing the dependency version.
+* **isIncludedInExportedPackage** if false, the whole package will be skipped inside the local package.
 * **[products](productPackageConfig.md)** A list of the product's package used during dependency configuration.
 
 ```kotlin
@@ -123,6 +142,7 @@ fun remotePackageCommit(
     url: URI,
     packageName: String = "",
     revision: String,
+    isIncludedInExportedPackage: Boolean = true,
     products: ProductPackageConfig.() -> Unit,
 )
 ```

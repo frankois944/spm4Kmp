@@ -2,11 +2,14 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
+import java.net.URI
 
 class ImplicitDepPackageTest : BaseTest() {
     @Test
@@ -16,19 +19,18 @@ class ImplicitDepPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withRawDependencies(
-                    KotlinSource.of(
-                        content =
-                            """
-                            remotePackageVersion(
-                               url = URI("https://github.com/google/GoogleSignIn-iOS"),
-                               products = {
-                                   add("GoogleSignIn", exportToKotlin = true)
-                               },
-                               version = "8.0.0",
-                            )
-                            """.trimIndent(),
-                    ),
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Remote.Version(
+                                url = URI("https://github.com/google/GoogleSignIn-iOS"),
+                                products = {
+                                    add("GoogleSignIn", exportToKotlin = true)
+                                },
+                                version = "8.0.0",
+                            ),
+                        )
+                    },
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("GoogleSignIn.GIDSignIn"),
@@ -58,11 +60,10 @@ class ImplicitDepPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withRawDependencies(
-                    KotlinSource.of(
-                        content =
-                            """
-                            remotePackageVersion(
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                                 products = {
                                     add(
@@ -80,9 +81,9 @@ class ImplicitDepPackageTest : BaseTest() {
                                     )
                                 },
                                 version = "11.6.0",
-                            )
-                            """.trimIndent(),
-                    ),
+                            ),
+                        )
+                    },
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("FirebaseAppDistribution.FIRAppDistribution", "FirebaseStorage.FIRStorage"),
@@ -113,11 +114,10 @@ class ImplicitDepPackageTest : BaseTest() {
             SmpKMPTestFixture
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
-                .withRawDependencies(
-                    KotlinSource.of(
-                        content =
-                            """
-                            remotePackageVersion(
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/bugsnag/bugsnag-cocoa"),
                                 products = {
                                     add(
@@ -127,17 +127,19 @@ class ImplicitDepPackageTest : BaseTest() {
                                     )
                                 },
                                 version = "6.31.0",
-                            )
-                            remotePackageVersion(
+                            ),
+                        )
+                        add(
+                            SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/bugsnag/bugsnag-cocoa-performance"),
                                 version = "1.11.2",
                                 products = {
                                     // Can be only used in your "src/swift" code.
                                     add("BugsnagPerformance", exportToKotlin = true)
                                 },
-                            )
-                            """.trimIndent(),
-                    ),
+                            ),
+                        )
+                    },
                 ).withSwiftSources(
                     SwiftSource.of(
                         content =

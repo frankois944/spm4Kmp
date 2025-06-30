@@ -2,11 +2,14 @@ package io.github.frankois944.spmForKmp
 
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
+import java.net.URI
 
 class ErrorPackageTest : BaseTest() {
     @Test
@@ -17,11 +20,10 @@ class ErrorPackageTest : BaseTest() {
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
                 .withMinIos("15.0")
-                .withRawDependencies(
-                    KotlinSource.of(
-                        content =
-                            """
-                            remotePackageVersion(
+                .withDependencies(
+                    buildList {
+                        add(
+                            SwiftDependency.Package.Remote.Version(
                                 url = URI("https://github.com/googlemaps/ios-maps-sdk.git"),
                                 version = "9.3.0",
                                 products = {
@@ -30,9 +32,9 @@ class ErrorPackageTest : BaseTest() {
                                         exportToKotlin = true,
                                     )
                                 },
-                            )
-                            """.trimIndent(),
-                    ),
+                            ),
+                        )
+                    },
                 ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("GoogleMapsTarget.*"),

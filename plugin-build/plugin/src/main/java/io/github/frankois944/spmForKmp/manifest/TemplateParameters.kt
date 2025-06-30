@@ -1,6 +1,5 @@
 package io.github.frankois944.spmForKmp.manifest
 
-import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
@@ -18,5 +17,4 @@ internal data class TemplateParameters(
     val toolsVersion: String,
     val targetSettings: BridgeSettings?,
     val exportedPackage: ExportedPackage?,
-    val onlyDeps: List<ModuleConfig> = emptyList(),
 )

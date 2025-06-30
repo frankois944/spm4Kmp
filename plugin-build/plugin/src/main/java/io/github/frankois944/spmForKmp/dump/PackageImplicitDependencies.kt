@@ -8,17 +8,17 @@ import java.io.File
 
 @Keep
 internal data class PackageImplicitDependencies(
-    @param:JsonProperty("dependencies")
+    @JsonProperty("dependencies")
     val dependencies: List<PackageImplicitDependencies>?,
-    @param:JsonProperty("identity")
+    @JsonProperty("identity")
     val identity: String?,
-    @param:JsonProperty("name")
+    @JsonProperty("name")
     val name: String?,
-    @param:JsonProperty("path")
+    @JsonProperty("path")
     val path: String?,
-    @param:JsonProperty("url")
+    @JsonProperty("url")
     val url: String?,
-    @param:JsonProperty("version")
+    @JsonProperty("version")
     val version: String?,
 ) {
     companion object {

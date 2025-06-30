@@ -4,8 +4,6 @@
 
 The following configuration is a simple bridge between Kotlin and the Swift Apple Native SDK.
 
-The plug-in uses the [cinterop feature of KMP](https://kotlinlang.org/docs/native-get-started.html) to export the compatible code to your Apple target code.
-
 ```kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {

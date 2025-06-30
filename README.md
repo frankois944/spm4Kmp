@@ -14,53 +14,9 @@ The plugin uses the embedded Swift Package Manager, so **no third-party dependen
 
 # [DOCUMENTATION](https://frankois944.github.io/spm4Kmp/)
 
-# QuickStart
-
-## Gradle Plugin
-
-``` kotlin title="build.gradle.kts"
-plugins {
-    id("org.jetbrains.kotlin.multiplatform")
-    id("io.github.frankois944.spmForKmp") version "[version]"
-}
-```
-
-## Gradle Properties
-
-``` title="gradle.properties"
-kotlin.mpp.enableCInteropCommonization=true
-```
-
-## Initial Configuration
-
-``` kotlin title="build.gradle.kts"
-kotlin {
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-        // and more Apple targets...
-    ).forEach {
-        it.compilations {
-            val main by getting {
-                // Choose the cinterop name
-                cinterops.create("nativeBridge")
-            }
-        }
-    }
-}
-```
-
-``` kotlin title="build.gradle.kts"
-swiftPackageConfig {
-    create("nativeBridge") { // must match with cinterops.create name
-        // your bridge and native dependencies
-    }
-}
-```
-
 ### ⭐️ Support My Project ⭐️
 
-If you find this project useful, please consider giving it a star!
+If you find this project useful, please consider giving it a star!  
 
 [![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
 
