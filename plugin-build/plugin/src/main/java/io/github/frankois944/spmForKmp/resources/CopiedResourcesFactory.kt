@@ -5,7 +5,6 @@ import org.gradle.api.logging.Logger
 import java.io.File
 import java.io.Serializable
 import kotlin.io.path.Path
-import kotlin.io.path.exists
 
 internal data class FrameworkResource(
     val framework: File,
@@ -124,11 +123,5 @@ internal fun getCurrentPackagesBuiltDir(
             .resolve(buildPackageDirName)
             .resolve(buildPackageMode)
             .toPath()
-    if (!buildPackagePath.exists()) {
-        logger.error("The buildPackagePath doesn't exist at $buildPackagePath")
-        throw RuntimeException("Can't find the package build dir")
-    } else {
-        logger.debug("Found {} as packages resources path", buildPackagePath)
-    }
     return buildPackagePath.toFile()
 }
