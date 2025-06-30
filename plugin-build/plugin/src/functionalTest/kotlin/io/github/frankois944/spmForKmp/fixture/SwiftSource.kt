@@ -4,7 +4,7 @@ import org.intellij.lang.annotations.Language
 
 class SwiftSource private constructor(
     val filename: String,
-    @param:Language("Swift") val content: String,
+    @Language("Swift") val content: String,
 ) {
     companion object {
         fun of(

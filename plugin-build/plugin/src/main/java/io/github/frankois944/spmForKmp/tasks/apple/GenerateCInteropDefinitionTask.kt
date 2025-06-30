@@ -138,6 +138,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                             name = product.name,
                                             packageName = dependency.packageName,
                                             spmPackageName = dependency.packageName,
+                                            linkerOpts = product.linkerOpts,
+                                            compilerOpts = product.compilerOpts,
                                         )
                                     }
                             }
@@ -146,6 +148,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 listOf(
                                     ModuleConfig(
                                         name = dependency.packageName,
+                                        linkerOpts = dependency.linkerOpts,
+                                        compilerOpts = dependency.compilerOpts,
                                         spmPackageName = dependency.packageName,
                                     ),
                                 )
@@ -215,14 +219,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         generateNonFrameworkDefinition(moduleName, moduleConfig)
                     }.let { def ->
                         // Append staticLibraries for the first index which is the bridge
-                        if (index == 0) {
-                            val libName = compiledBinary.asFile.get().name
-                            val checksum = compiledBinary.asFile.get().checkSum()
-                            val md5 = "#checksum: $checksum"
-                            "$def\n$md5\nstaticLibraries = $libName"
-                        } else {
-                            def
-                        }
+                        val libName = compiledBinary.asFile.get().name
+                        val checksum = compiledBinary.asFile.get().checkSum()
+                        val md5 = "#checksum: $checksum"
+                        if (index == 0) "$def\n$md5\nstaticLibraries = $libName" else def
                     }
                 moduleConfig.definitionFile.writeText(definition.trimIndent())
                 logger.debug(
@@ -241,6 +241,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     Can't generate definition for ${moduleConfig.name}
                     Expected file: ${moduleConfig.definitionFile.path}
                     Config: $moduleConfig
+                    -> Set the `export` parameter to `false` to ignore this module
                     ######
                     """.trimIndent(),
                     ex,
@@ -258,13 +259,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             packageDependencyPrefix.orNull?.let {
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
+        val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
+        val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
         return """
             language = Objective-C
             modules = $moduleName
             package = $packageName
             libraryPaths = "${currentBuildDirectory().path}"
-            compilerOpts = -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
-            linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+            compilerOpts = $compilerOpts -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+            linkerOpts = $linkerOps ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
             """.trimIndent()
     }
 

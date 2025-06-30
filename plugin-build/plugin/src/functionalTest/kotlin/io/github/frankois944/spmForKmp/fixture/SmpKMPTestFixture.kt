@@ -8,6 +8,9 @@ import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.definition.product.ProductConfig
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.gradle.internal.cc.base.logger
 import org.intellij.lang.annotations.Language
 
@@ -33,13 +36,15 @@ abstract class SmpKMPTestFixture private constructor(
         var targets: List<AppleCompileTarget> = listOf(AppleCompileTarget.iosSimulatorArm64),
         val swiftSources: List<SwiftSource> = emptyList(),
         val kotlinSources: List<KotlinSource> = emptyList(),
+        val packages: List<SwiftDependency> = emptyList(),
         val sharedCachePath: String? = null,
         val sharedConfigPath: String? = null,
         val sharedSecurityPath: String? = null,
         val customSPMPath: String? = null,
-        val rawDependencyConfiguration: KotlinSource? = null,
+        val rawDependencyConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginRootConfig: String? = null,
+        var copyDependenciesToApp: Boolean = false,
     )
 
     protected abstract fun createProject(): GradleProject
@@ -107,6 +112,7 @@ org.gradle.caching=true
         withBuildScript {
             imports =
                 Imports.of(
+                    "io.github.frankois944.spmForKmp.definition.SwiftDependency",
                     "java.net.URI",
                     "java.lang.management.ManagementFactory",
                     "javax.management.ObjectName",
@@ -154,6 +160,7 @@ swiftPackageConfig {
     create("${extension.cinteropsName}") {
     customPackageSourcePath = "${extension.customPackageSourcePath}"
     toolsVersion = "${extension.toolsVersion}"
+    copyDependenciesToApp = ${extension.copyDependenciesToApp}
 """,
                     )
                     extension.minIos?.let {
@@ -194,14 +201,151 @@ swiftPackageConfig {
                     extension.customSPMPath?.let {
                         appendLine("spmWorkingPath = \"${extension.customSPMPath}\"")
                     }
+
+                    fun buildProductBlock(
+                        name: ProductName,
+                        isLast: Boolean,
+                    ): String =
+                        buildString {
+                            append("ProductName(")
+                            append("name = \"${name.name}\"")
+                            name.alias?.let { alias ->
+                                append(", alias = \"$alias\"")
+                            }
+                            if (!name.isIncludedInExportedPackage) {
+                                append(", isIncludedInExportedPackage = false")
+                            }
+                            appendLine(")")
+                            if (!isLast) {
+                                appendLine(",")
+                            }
+                        }
+
+                    fun buildPackageBlock(config: ProductConfig): String =
+                        buildString {
+                            appendLine("add(")
+                            config.products.forEachIndexed { index, name ->
+                                append(
+                                    buildProductBlock(
+                                        name = name,
+                                        isLast = name == config.products.last(),
+                                    ),
+                                )
+                            }
+                            if (config.exportToKotlin) {
+                                appendLine(", exportToKotlin = ${config.exportToKotlin}")
+                            }
+                            appendLine(")")
+                        }
+
                     extension.rawPluginRootConfig?.let {
                         appendLine(it)
                     }
-                    appendLine("    dependency {     ")
-                    extension.rawDependencyConfiguration?.let { rawDependency ->
-                        appendLine(rawDependency.content)
+                    appendLine("    dependency(     ")
+                    extension.rawDependencyConfiguration.forEach { rawDependency ->
+                        appendLine(rawDependency.content + ",")
                     }
-                    appendLine("}")
+                    extension.packages.forEach { definition ->
+                        when (definition) {
+                            is SwiftDependency.Binary.Local -> {
+                                appendLine("SwiftDependency.Binary.Local(")
+                                appendLine("path = \"${definition.path}\",")
+                                appendLine("packageName = \"${definition.packageName}\",")
+                                appendLine("exportToKotlin = ${definition.exportToKotlin},")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
+                                appendLine("),")
+                            }
+
+                            is SwiftDependency.Binary.Remote -> {
+                                appendLine("SwiftDependency.Binary.Remote(")
+                                appendLine("url = URI(\"${definition.url}\"),")
+                                appendLine("checksum = \"${definition.checksum}\",")
+                                appendLine("packageName = \"${definition.packageName}\",")
+                                appendLine("exportToKotlin = ${definition.exportToKotlin},")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage}")
+                                appendLine("),")
+                            }
+
+                            is SwiftDependency.Package.Local -> {
+                                appendLine("SwiftDependency.Package.Local(")
+                                appendLine("path = \"${definition.path}\",")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
+                                if (definition.packageName.isNotEmpty()) {
+                                    appendLine("packageName = \"${definition.packageName}\",")
+                                }
+                                appendLine("products = {")
+                                definition.productsConfig.productPackages.forEach { config ->
+                                    appendLine(
+                                        buildPackageBlock(
+                                            config = config,
+                                        ),
+                                    )
+                                }
+                                appendLine("}")
+                                appendLine("),")
+                            }
+
+                            is SwiftDependency.Package.Remote.Branch -> {
+                                appendLine("SwiftDependency.Package.Remote.Branch(")
+                                appendLine("branch = \"${definition.branch}\",")
+                                appendLine("url = URI(\"${definition.url}\"),")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
+                                if (definition.packageName.isNotEmpty()) {
+                                    appendLine("packageName = \"${definition.packageName}\",")
+                                }
+                                appendLine("products = {")
+                                definition.productsConfig.productPackages.forEach { config ->
+                                    appendLine(
+                                        buildPackageBlock(
+                                            config = config,
+                                        ),
+                                    )
+                                }
+                                appendLine("}")
+                                appendLine("),")
+                            }
+
+                            is SwiftDependency.Package.Remote.Commit -> {
+                                appendLine("SwiftDependency.Package.Remote.Commit(")
+                                appendLine("revision = \"${definition.revision}\",")
+                                appendLine("url = URI(\"${definition.url}\"),")
+                                appendLine("isIncludedInExportedPackage = ${definition.isIncludedInExportedPackage},")
+                                if (definition.packageName.isNotEmpty()) {
+                                    appendLine("packageName = \"${definition.packageName}\",")
+                                }
+                                appendLine("products = {")
+                                definition.productsConfig.productPackages.forEach { config ->
+                                    appendLine(
+                                        buildPackageBlock(
+                                            config = config,
+                                        ),
+                                    )
+                                }
+                                appendLine("}")
+                                appendLine("),")
+                            }
+
+                            is SwiftDependency.Package.Remote.Version -> {
+                                appendLine("SwiftDependency.Package.Remote.Version(")
+                                appendLine("version = \"${definition.version}\",")
+                                appendLine("url = URI(\"${definition.url}\"),")
+                                if (definition.packageName.isNotEmpty()) {
+                                    appendLine("packageName = \"${definition.packageName}\",")
+                                }
+                                appendLine("products = {")
+                                definition.productsConfig.productPackages.forEach { config ->
+                                    appendLine(
+                                        buildPackageBlock(
+                                            config = config,
+                                        ),
+                                    )
+                                }
+                                appendLine("}")
+                                appendLine("),")
+                            }
+                        }
+                    }
+                    appendLine(")")
                     appendLine("}")
                     appendLine("}")
                 }
@@ -274,6 +418,11 @@ swiftPackageConfig {
                 config = config.copy(targets = targets.toList())
             }
 
+        fun withDependencies(definitions: List<SwiftDependency>) =
+            apply {
+                config = config.copy(packages = definitions)
+            }
+
         fun withCache(path: String) =
             apply {
                 config = config.copy(sharedCachePath = path)
@@ -314,14 +463,19 @@ swiftPackageConfig {
                 config = config.copy(minTvos = minTvOs)
             }
 
-        fun withRawDependencies(sources: KotlinSource) =
+        fun withRawDependencies(vararg sources: KotlinSource) =
             apply {
-                config = config.copy(rawDependencyConfiguration = sources)
+                config = config.copy(rawDependencyConfiguration = sources.toList())
             }
 
         fun withRawPluginConfiguration(vararg sources: KotlinSource) =
             apply {
                 config = config.copy(rawPluginConfiguration = sources.toList())
+            }
+
+        fun withCopyDependenciesToApp(copyDependenciesToApp: Boolean) =
+            apply {
+                config = config.copy(copyDependenciesToApp = copyDependenciesToApp)
             }
 
         fun withToolsVersion(toolsVersion: String) =

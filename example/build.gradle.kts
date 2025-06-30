@@ -1,12 +1,23 @@
 import io.github.frankois944.spmForKmp.definition.product.ProductName
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.net.URI
 
 plugins {
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
     id("io.github.frankois944.spmForKmp")
 }
 
 kotlin {
+    androidTarget {
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_1_8)
+                }
+            }
+        }
+    }
 
     listOf(
         iosArm64(),
@@ -61,6 +72,17 @@ tasks.named("iosSimulatorArm64Test") {
     dependsOn(copyTestResources)
 }
 
+android {
+    namespace = "com.example"
+    compileSdk = 34
+    defaultConfig {
+        minSdk = 24
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+}
 val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
     create("nativeIosShared") {
@@ -84,6 +106,7 @@ swiftPackageConfig {
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         // swiftBinPath = "/path/to/.swiftly/bin/swift"
+        copyDependenciesToApp = true
         dependency {
             remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
@@ -91,9 +114,9 @@ swiftPackageConfig {
                 products = {
                     // Export to Kotlin for use in shared Kotlin code
                     add("FirebaseAnalytics", exportToKotlin = true)
-                    add(ProductName("FirebaseCore"), exportToKotlin = true)
+                    add(ProductName("FirebaseCore", isIncludedInExportedPackage = false), exportToKotlin = true)
                     // add FirebaseDatabase to your own swift code but don't export it
-                    add(ProductName("FirebaseDatabase"))
+                    add(ProductName("FirebaseDatabase", isIncludedInExportedPackage = false))
                 },
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
@@ -104,11 +127,13 @@ swiftPackageConfig {
                 path = "$testResources/DummyFrameworkV2.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
+                isIncludedInExportedPackage = false,
             )
             localBinary(
                 path = "${layout.projectDirectory.asFile.path}/../example/xcframework/Sentry-Dynamic.xcframework.zip",
                 packageName = "Sentry",
                 exportToKotlin = false,
+                isIncludedInExportedPackage = false,
             )
             localPackage(
                 path = "$testResources/LocalSourceDummyFramework",
@@ -118,6 +143,7 @@ swiftPackageConfig {
                     add(
                         "LocalSourceDummyFramework",
                         exportToKotlin = true,
+                        isIncludedInExportedPackage = false,
                     )
                 },
             )
@@ -126,7 +152,7 @@ swiftPackageConfig {
                 version = "1.8.1",
                 products = {
                     // Can be only used in your "src/swift" code.
-                    add("CryptoSwift")
+                    add("CryptoSwift", isIncludedInExportedPackage = false)
                 },
             )
         }
