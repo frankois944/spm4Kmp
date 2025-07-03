@@ -79,11 +79,12 @@ jobs:
           name: test-pre-merge-report
           path: plugin-build/plugin/build/reports/
       - name: Publish Test Report
-        uses: test-summary/action@v2
+        uses: dorny/test-reporter@v2
         if: ${{ !cancelled() }}
         with:
-          paths: '**/build/test-results/**/TEST-*.xml'
-          show: 'all'
+          name: Resporting Tests
+          path: '**/build/test-results/**/TEST-*.xml,example/iosApp/spm/junit.xml'
+          reporter: jest-junit
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
         with:
