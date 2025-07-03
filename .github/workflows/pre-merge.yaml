@@ -84,7 +84,6 @@ jobs:
         with:
           name: Resporting Tests
           path: '**/build/test-results/**/TEST-*.xml,example/iosApp/spm/junit.xml'
-          reporter: jest-junit
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
         with:
