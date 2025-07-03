@@ -1,10 +1,11 @@
 package io.github.frankois944.spmForKmp
 
+import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class IOSAppTest {
+class IOSAppTest : BaseTest() {
     @Test
     fun `build and test example app`() {
         val xcodebuild =
@@ -31,18 +32,24 @@ class IOSAppTest {
         // Create xcpretty process with output capture
         val xcpretty =
             (
-                if (System.getenv("GITHUB_ACTIONS") == "true") {
+                if (isCI) {
                     ProcessBuilder(
                         "xcbeautify",
                         "--renderer",
                         "github-actions",
+                        "--is-ci",
+                        "--report",
+                        "junit",
+                        "--report-path",
+                        ".",
                     )
                 } else {
                     ProcessBuilder(
                         "xcbeautify",
                     )
                 }
-            ).redirectErrorStream(true)
+            ).directory(File("../../example/iosApp"))
+                .redirectErrorStream(true)
                 .start()
 
         // Pipe xcodebuild output to xcpretty
@@ -65,7 +72,7 @@ class IOSAppTest {
         assert(xcodebuild.exitValue() == 0) {
             "xcodebuild process failed with exit code ${xcodebuild.exitValue()}\nOutput:\n$finalOutput"
         }
-        if (xcodebuild.exitValue() == 0 && System.getenv("GITHUB_ACTIONS") == "true") {
+        if (xcodebuild.exitValue() == 0 && isCI) {
             println(finalOutput)
         }
     }
