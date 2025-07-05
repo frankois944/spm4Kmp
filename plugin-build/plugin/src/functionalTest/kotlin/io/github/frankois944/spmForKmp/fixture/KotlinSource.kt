@@ -6,7 +6,7 @@ class KotlinSource private constructor(
     val packageName: String,
     val className: String,
     val imports: List<String>,
-    @Language("kotlin") val content: String,
+    @param:Language("kotlin") val content: String,
 ) {
     companion object {
         fun of(

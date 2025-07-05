@@ -5,15 +5,13 @@ package io.github.frankois944.spmForKmp
 import com.autonomousapps.kit.GradleBuilder
 import com.autonomousapps.kit.truth.TestKitTruth.Companion.assertThat
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.definition.product.ProductName
+import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import io.github.frankois944.spmForKmp.utils.getExportedPackageContent
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.net.URI
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
@@ -31,80 +29,71 @@ class CopyResourcesTest : BaseTest() {
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
                 .withTargets(AppleCompileTarget.iosArm64)
-                .withCopyDependenciesToApp(true)
-                .withDependencies(
-                    buildList {
-                        add(
-                            SwiftDependency.Package.Local(
-                                path = localPackageDirectory.absolutePath,
-                                isIncludedInExportedPackage = false,
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+                            remotePackageVersion(
+                                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                                // Libraries from the package
                                 products = {
-                                    add(
-                                        ProductName(
-                                            "LocalSourceDummyFramework",
-                                            isIncludedInExportedPackage = false,
-                                        ),
-                                    )
+                                // Export to Kotlin for use in shared Kotlin code
+                                    add("FirebaseAnalytics", exportToKotlin = true)
                                 },
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Binary.Local(
-                                path = xcFrameworkDirectory.absolutePath,
-                                packageName = "DummyFramework",
-                                isIncludedInExportedPackage = false,
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Package.Remote.Version(
-                                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                                version = "1.8.3",
-                                isIncludedInExportedPackage = false,
-                                products = {
-                                    add("CryptoSwift", isIncludedInExportedPackage = false)
-                                },
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Package.Remote.Version(
-                                url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
-                                products = {
-                                    add("KeychainAccess")
-                                },
-                                version = "4.2.2",
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Package.Remote.Version(
-                                url = URI("https://github.com/frankois944/QuickServiceLocator"),
-                                isIncludedInExportedPackage = false,
-                                products = {
-                                    add("QuickServiceLocator")
-                                },
-                                version = "0.2.0",
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Package.Remote.Branch(
-                                url = URI("https://github.com/FluidGroup/JAYSON"),
-                                isIncludedInExportedPackage = false,
-                                products = {
-                                    add("JAYSON", isIncludedInExportedPackage = false)
-                                },
-                                branch = "main",
-                            ),
-                        )
-                        add(
-                            SwiftDependency.Package.Remote.Commit(
-                                url = URI("https://github.com/square/Valet"),
-                                isIncludedInExportedPackage = false,
-                                products = {
-                                    add("Valet")
-                                },
-                                revision = "29bea846b29f9880a07dd1828596953d0fd495ce",
-                            ),
-                        )
-                    },
+                                // Package version
+                                version = "11.8.1",
+                            )
+                            localPackage(
+                               path = "${localPackageDirectory.absolutePath}",
+                               products = {
+                                   add(
+                                       ProductName(
+                                           "LocalSourceDummyFramework"
+                                       ),
+                                   )
+                               },
+                            )
+                            localBinary(
+                               path = "${xcFrameworkDirectory.absolutePath}",
+                               packageName = "DummyFramework"
+                            )
+                            remotePackageVersion(
+                               url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                               version = "1.8.3",
+                               products = {
+                                   add("CryptoSwift")
+                               },
+                            )
+                            remotePackageVersion(
+                               url = URI("https://github.com/kishikawakatsumi/KeychainAccess.git"),
+                               products = {
+                                   add("KeychainAccess")
+                               },
+                               version = "4.2.2",
+                            )
+                            remotePackageVersion(
+                               url = URI("https://github.com/frankois944/QuickServiceLocator"),
+                               products = {
+                                   add("QuickServiceLocator")
+                               },
+                               version = "0.2.0",
+                            )
+                            remotePackageBranch(
+                               url = URI("https://github.com/FluidGroup/JAYSON"),
+                               products = {
+                                   add("JAYSON")
+                               },
+                               branch = "main",
+                            )
+                            remotePackageCommit(
+                               url = URI("https://github.com/square/Valet"),
+                               products = {
+                                   add("Valet")
+                               },
+                               revision = "29bea846b29f9880a07dd1828596953d0fd495ce",
+                            )
+                            """.trimIndent(),
+                    ),
                 ).withSwiftSources(
                     SwiftSource.of(
                         content =
@@ -115,6 +104,7 @@ class CopyResourcesTest : BaseTest() {
                             import JAYSON
                             import QuickServiceLocator
                             import KeychainAccess
+                            import FirebaseAnalytics
                             """,
                     ),
                 ).build()
@@ -125,8 +115,8 @@ class CopyResourcesTest : BaseTest() {
         destination.createDirectories()
         val parameters =
             buildList {
-                add("dummyCopyPackageResources")
-                add("-Pio.github.frankois944.spmForKmp.PLATFORM_NAME=iphone")
+                add("SwiftPackageConfigAppleDummyCopyPackageResourcesIosArm64")
+                add("-Pio.github.frankois944.spmForKmp.PLATFORM_NAME=iphoneos")
                 add("-Pio.github.frankois944.spmForKmp.ARCHS=arm64")
                 add("-Pio.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR=$appBuiltProductDir")
                 add("-Pio.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH=$appContentFolderPath")
@@ -151,13 +141,13 @@ class CopyResourcesTest : BaseTest() {
                 ).build()
 
         // Then
-        assertThat(copyResourceTask).task(":library:dummyCopyPackageResources").succeeded()
+        assertThat(copyResourceTask).task(":library:SwiftPackageConfigAppleDummyCopyPackageResourcesIosArm64").succeeded()
         assert(
             destination
                 .toFile()
                 .resolve("Frameworks")
                 .listFiles()
-                .isNotEmpty(),
+                .size == 1,
         ) { "The output folder must not be empty" }
         assert(
             destination
@@ -166,13 +156,13 @@ class CopyResourcesTest : BaseTest() {
                 .listFiles { it.nameWithoutExtension == "DummyFramework" }
                 .isNotEmpty(),
         ) { "The framework folder must contains DummyFramework" }
-        assert(destination.toFile().listFiles().size == 3) { "The output folder must contains 3 folders" }
+        assert(destination.toFile().listFiles().size == 16) { "The output folder must contains 16 folders" }
         assert(!fixture.getExportedPackageContent().contains("CryptoSwift"))
         assert(!fixture.getExportedPackageContent().contains("DummyFramework"))
         assert(!fixture.getExportedPackageContent().contains("Default"))
         assert(!fixture.getExportedPackageContent().contains("Valet"))
         assert(!fixture.getExportedPackageContent().contains("LocalSourceDummyFramework"))
-        assert(fixture.getExportedPackageContent().contains("KeychainAccess"))
+        assert(fixture.getExportedPackageContent().contains("FirebaseAnalytics"))
 
         if (destination.exists()) {
             destination.deleteRecursively()

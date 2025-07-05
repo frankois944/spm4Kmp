@@ -68,10 +68,10 @@ jobs:
       - name: Linter
         run: ./gradlew :plugin-build:plugin:ktlintCheck :plugin-build:plugin:detektMain --continue
       - name: Run Gradle tasks
-        run: ./gradlew :preMerge :plugin-build:plugin:jacocoTestReport --continue
-      - name: build iosExampleApp
-        run: xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" clean test | xcpretty
-        working-directory: "example/iosApp"
+        run: ./gradlew :example:iosSimulatorArm64Test --tests "com.example.Test" :preMerge :plugin-build:plugin:jacocoTestReport --continue
+      #- name: build iosExampleApp
+      #  run: set -o pipefail && xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" clean test | xcbeautify --renderer github-actions
+      #  working-directory: "example/iosApp"
       - name: Archive test results
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

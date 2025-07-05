@@ -5,10 +5,13 @@ package com.example
 import DummyFramework.MyDummyFramework
 import FirebaseAnalytics.FIRConsentStatusGranted
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.coroutines.runBlocking
 import nativeIosShared.TestClass
+import kotlin.coroutines.suspendCoroutine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 class Test {
@@ -32,13 +35,25 @@ class Test {
         assertNotNull(FIRConsentStatusGranted, "TEST DUMMY FRAMEWORK")
     }
 
-    /*@Test
+    @Test
     fun getResourceFromPackageTest() {
-        assertEquals("please read my content", LocalSourceDummyFramework.LocalSourceDummy().getMyInternalResource())
-    }*/
+        assertEquals("please read my content\n", LocalSourceDummyFramework.LocalSourceDummy().getMyInternalResource())
+    }
 
     @Test
     fun getResourceFromFrameworkTest() {
         assertEquals("please read my content\n", MyDummyFramework().getMyResource())
     }
+
+    @Test
+    fun testAsync() =
+        runBlocking {
+            val isDone =
+                suspendCoroutine { continuation ->
+                    TestClass().doAsyncStuffWithCompletionHandler {
+                        continuation.resumeWith(Result.success(true))
+                    }
+                }
+            assertTrue(isDone)
+        }
 }

@@ -1,33 +1,38 @@
 import io.github.frankois944.spmForKmp.definition.product.ProductName
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.net.URI
 
 plugins {
-    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
     id("io.github.frankois944.spmForKmp")
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_1_8)
-                }
-            }
-        }
-    }
 
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
-    ).forEach {
-        it.binaries.framework {
+    ).forEach { target ->
+        target.binaries.getTest("debug").apply {
+            val scratchDir =
+                if (target.name == "iosSimulatorArm64") {
+                    "arm64-apple-ios-simulator"
+                } else {
+                    "arm64-apple-ios"
+                }
+            linkerOpts +=
+                listOf(
+                    "-rpath",
+                    "${projectDir.path}/SPM/spmKmpPlugin/nativeIosShared/scratch/$scratchDir/release/",
+                )
+            freeCompilerArgs +=
+                listOf(
+                    "-Xoverride-konan-properties=osVersionMin.ios_simulator_arm64=16.0",
+                )
+        }
+        target.binaries.framework {
             baseName = "shared"
             isStatic = true
         }
-        it.compilations {
+        target.compilations {
             val main by getting {
                 cinterops.create("nativeIosShared")
             }
@@ -36,12 +41,19 @@ kotlin {
 
     listOf(
         macosArm64(),
-    ).forEach {
-        it.binaries.framework {
+    ).forEach { target ->
+        target.binaries.getTest("debug").apply {
+            linkerOpts +=
+                listOf(
+                    "-rpath",
+                    "${projectDir.path}/build/spmKmpPlugin/nativeMacosShared/scratch/arm64-apple-macosx/release/",
+                )
+        }
+        target.binaries.framework {
             baseName = "shared"
             isStatic = true
         }
-        it.compilations {
+        target.compilations {
             val main by getting {
                 cinterops.create("nativeMacosShared")
             }
@@ -53,36 +65,11 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
         }
     }
 }
 
-val copyTestResources =
-    tasks.register<Copy>("copyTestResources") {
-        from(
-            "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources" +
-                "/DummyFramework.xcframework/ios-arm64_x86_64-simulator/",
-        ) {
-            include("*.framework/**")
-        }
-        into("${layout.projectDirectory.asFile.path}/build/bin/iosSimulatorArm64/debugTest/Frameworks/")
-    }
-
-tasks.named("iosSimulatorArm64Test") {
-    dependsOn(copyTestResources)
-}
-
-android {
-    namespace = "com.example"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
 val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
 swiftPackageConfig {
     create("nativeIosShared") {
@@ -106,17 +93,17 @@ swiftPackageConfig {
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         // swiftBinPath = "/path/to/.swiftly/bin/swift"
-        copyDependenciesToApp = true
+        minIos = "16.0"
         dependency {
             remotePackageVersion(
-                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
                 products = {
                     // Export to Kotlin for use in shared Kotlin code
                     add("FirebaseAnalytics", exportToKotlin = true)
-                    add(ProductName("FirebaseCore", isIncludedInExportedPackage = false), exportToKotlin = true)
+                    add(ProductName("FirebaseCore"), exportToKotlin = true)
                     // add FirebaseDatabase to your own swift code but don't export it
-                    add(ProductName("FirebaseDatabase", isIncludedInExportedPackage = false))
+                    add(ProductName("FirebaseDatabase"))
                 },
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
@@ -127,13 +114,11 @@ swiftPackageConfig {
                 path = "$testResources/DummyFrameworkV2.xcframework.zip",
                 packageName = "DummyFramework",
                 exportToKotlin = true,
-                isIncludedInExportedPackage = false,
             )
             localBinary(
                 path = "${layout.projectDirectory.asFile.path}/../example/xcframework/Sentry-Dynamic.xcframework.zip",
                 packageName = "Sentry",
                 exportToKotlin = false,
-                isIncludedInExportedPackage = false,
             )
             localPackage(
                 path = "$testResources/LocalSourceDummyFramework",
@@ -143,16 +128,15 @@ swiftPackageConfig {
                     add(
                         "LocalSourceDummyFramework",
                         exportToKotlin = true,
-                        isIncludedInExportedPackage = false,
                     )
                 },
             )
             remotePackageVersion(
-                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 version = "1.8.1",
                 products = {
                     // Can be only used in your "src/swift" code.
-                    add("CryptoSwift", isIncludedInExportedPackage = false)
+                    add("CryptoSwift")
                 },
             )
         }
