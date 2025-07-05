@@ -1,5 +1,4 @@
 import io.github.frankois944.spmForKmp.definition.product.ProductName
-import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -11,12 +10,29 @@ kotlin {
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
-    ).forEach {
-        it.binaries.framework {
+    ).forEach { target ->
+        target.binaries.getTest("debug").apply {
+            val scratchDir =
+                if (target.name == "iosSimulatorArm64") {
+                    "arm64-apple-ios-simulator"
+                } else {
+                    "arm64-apple-ios"
+                }
+            linkerOpts +=
+                listOf(
+                    "-rpath",
+                    "${projectDir.path}/SPM/spmKmpPlugin/nativeIosShared/scratch/$scratchDir/release/",
+                )
+            freeCompilerArgs +=
+                listOf(
+                    "-Xoverride-konan-properties=osVersionMin.ios_simulator_arm64=16.0",
+                )
+        }
+        target.binaries.framework {
             baseName = "shared"
             isStatic = true
         }
-        it.compilations {
+        target.compilations {
             val main by getting {
                 cinterops.create("nativeIosShared")
             }
@@ -25,12 +41,19 @@ kotlin {
 
     listOf(
         macosArm64(),
-    ).forEach {
-        it.binaries.framework {
+    ).forEach { target ->
+        target.binaries.getTest("debug").apply {
+            linkerOpts +=
+                listOf(
+                    "-rpath",
+                    "${projectDir.path}/build/spmKmpPlugin/nativeMacosShared/scratch/arm64-apple-macosx/release/",
+                )
+        }
+        target.binaries.framework {
             baseName = "shared"
             isStatic = true
         }
-        it.compilations {
+        target.compilations {
             val main by getting {
                 cinterops.create("nativeMacosShared")
             }
@@ -42,23 +65,9 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
         }
     }
-}
-
-val copyTestResources =
-    tasks.register<Copy>("copyTestResources") {
-        from(
-            "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources" +
-                "/DummyFramework.xcframework/ios-arm64_x86_64-simulator/",
-        ) {
-            include("*.framework/**")
-        }
-        into("${layout.projectDirectory.asFile.path}/build/bin/iosSimulatorArm64/debugTest/Frameworks/")
-    }
-
-tasks.named("iosSimulatorArm64Test") {
-    dependsOn(copyTestResources)
 }
 
 val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
@@ -84,9 +93,10 @@ swiftPackageConfig {
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         // swiftBinPath = "/path/to/.swiftly/bin/swift"
+        minIos = "16.0"
         dependency {
             remotePackageVersion(
-                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
                 // Libraries from the package
                 products = {
                     // Export to Kotlin for use in shared Kotlin code
@@ -122,7 +132,7 @@ swiftPackageConfig {
                 },
             )
             remotePackageVersion(
-                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
                 version = "1.8.1",
                 products = {
                     // Can be only used in your "src/swift" code.
