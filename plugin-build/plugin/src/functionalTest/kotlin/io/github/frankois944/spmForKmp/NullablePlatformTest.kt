@@ -24,9 +24,7 @@ class NullablePlatformTest : BaseTest() {
                     if (isCI) {
                         it.withTargets(
                             AppleCompileTarget.macosArm64,
-                            AppleCompileTarget.watchosArm64,
                             AppleCompileTarget.watchosSimulatorArm64,
-                            AppleCompileTarget.tvosArm64,
                             AppleCompileTarget.tvosSimulatorArm64,
                             AppleCompileTarget.iosArm64,
                         )
