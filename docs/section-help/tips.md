@@ -85,3 +85,28 @@ So follow the swiftly guide to install another swift version and set the swiftBi
 ```kotlin
 swiftBinPath = "/path/to/.swiftly/bin/swift"
 ```
+
+## Support concurrency in KMP iOS Test
+
+If you're trying to test your code and your bridge contains async method, you will face a compiler error like
+
+```
+Failed to look up symbolic reference at 0x10497d0f5 - offset 342419 - symbol symbolic _____y___________pG ScC 4Nats10ServerInfoV s5ErrorP in .../debugTest/test.kexe
+```
+
+That's because the deployment target of the KMP test is too low, iOS 12 for physical device and iOS 14 for simulator.
+
+Swift concurrency is available only from iOS 15.0, that can be fixed:
+
+example :
+
+```kotlin
+iosSimulatorArm64().binaries.getTest("debug").apply {
+freeCompilerArgs +=
+    listOf(
+        "-Xoverride-konan-properties=osVersionMin.ios_simulator_arm64=16.0",
+    )
+}
+```
+
+
