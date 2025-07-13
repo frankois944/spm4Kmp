@@ -20,7 +20,7 @@ Also, check my [GitHub action workflow](https://github.com/frankois944/spm4Kmp/b
 
 An [full example](https://github.com/frankois944/FirebaseKmpDemo) of how to implement Firebase with the plugin
 
-## Working With 'objcnames.classes' Types
+## Working With _objcnames.classes_ Types
 
 For example, when using a UIView (work with any ObjC Types, ex: UIViewController...).
 
@@ -94,7 +94,7 @@ If you're trying to test your code and your bridge contains async method, you wi
 Failed to look up symbolic reference at 0x10497d0f5 - offset 342419 - symbol symbolic _____y___________pG ScC 4Nats10ServerInfoV s5ErrorP in .../debugTest/test.kexe
 ```
 
-That's because the deployment target of the KMP test is too low, iOS 12 for physical device and iOS 14 for simulator.
+That's because the minimal target of the KMP test is too low, iOS 12 for physical device and iOS 14 for simulator.
 
 Swift concurrency is available only from iOS 15.0, that can be fixed:
 
