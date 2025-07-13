@@ -31,6 +31,10 @@ import FirebaseDatabase
     public func getValueFromCrypt() -> String {
         return "123".md5()
     }
+
+    public func doAsyncStuff() async {
+        print("Nothing")
+    }
 }
 
 
