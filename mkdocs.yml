@@ -2,7 +2,7 @@ site_name: SPM For KMP documentation
 repo_url: https://github.com/frankois944/spm4Kmp
 site_author: François Dabonot
 site_description: An alternative to the dying CocoaPods with custom Kotlin/Swift bridge for KMP.
-site_url: https://frankois944.github.io/spm4Kmp/
+site_url: https://spmforkmp.eu/
 extra:
   social:
     - icon: material/coffee
