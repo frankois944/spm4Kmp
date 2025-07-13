@@ -2,9 +2,7 @@
 
 ## How It works
 
-On completion with [using external dependencies](bridgeWithDependencies.md), it's possible to export them to Kotlin, if they are [compatible](./section-help/faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code).
-
-Exported dependency can be used inside the bridge, the Swift & Kotlin App.
+On completion with [using external dependencies](bridgeWithDependencies.md), it's possible to export them to your Kotlin module, if they are [compatible](./section-help/faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code).
 
 !!! note
 
@@ -14,11 +12,22 @@ Exported dependency can be used inside the bridge, the Swift & Kotlin App.
 
 In a case the exported dependency is written in [Swift](./section-help/faq.md), **manual work needs to be done** like [this](bridgeWithDependencies.md#example).
 
-For example, the [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) can't work directly on Kotlin, so the Plugin's bridge is here to fill the hole between Kotlin and Swift.
+For example, the [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) can't work directly on Kotlin, so the Plugin's bridge is here to fill the gape between Kotlin and Swift.
+
+### Local Package
+
+Some _specific_ dependencies **require** to be declared on the Xcode side; in that case, you will see the following message during the build:
+```
+Spm4Kmp: The following dependencies [some_dependency_name] need to be added to your xcode project
+A local Swift package has been generated at
+/path/to/the/local/package
+Please add it to your xcode project as a local package dependency; it will add the missing content.
+****You can ignore this messaging if you have already added these dependencies to your Xcode project****
+```
 
 ## Gradle
 
-The following configuration export to Kotlin the package [FirebaseAnalytics](https://github.com/firebase/firebase-ios-sdk) which is a ObjC library.
+The following configuration exports to Kotlin the package [FirebaseAnalytics](https://github.com/firebase/firebase-ios-sdk) which is a ObjC library.
 
 !!! warning "Don't export incompatible library"
 
@@ -29,7 +38,7 @@ swiftPackageConfig {
     create("[cinteropName]") {
         dependency {
             remotePackageVersion(
-                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                url = URI("https://github.com/firebase/firebase-ios-sdk"),
                 products = {
                     add("FirebaseAnalytics", exportToKotlin = true), // exported
                     add("FirebaseCore") // non-exported
@@ -42,20 +51,6 @@ swiftPackageConfig {
     }
 }
 ```
-
-!!! warning
-
-    A local swift package is being generated during the build and this message displayed
-    ```
-    Spm4Kmp: A local Swift package has been generated at
-    /path/to/the/local/package
-    Please add it to your xcode project as a local package dependency.
-    ```
-    Add the folder to your Xcode project as a Local package, that's all.
-
-    Note : When updating your configuration, reset the package cache to apply the modification.
-
-    [Learn more about the local package](https://github.com/frankois944/spm4Kmp/discussions/108)
 
 ## Example
 

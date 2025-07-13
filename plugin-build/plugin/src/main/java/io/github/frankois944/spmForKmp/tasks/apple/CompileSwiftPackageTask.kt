@@ -78,7 +78,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         onlyIf {
             HostManager.hostIsMac
         }
-        setupVars()
     }
 
     @TaskAction
@@ -167,11 +166,5 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 )
             }
         }
-    }
-
-    private fun setupVars() {
-        bridgeSourceBuiltDir.set(
-            manifestFile.map { it.parentFile.resolve("Sources") },
-        )
     }
 }

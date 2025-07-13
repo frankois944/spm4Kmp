@@ -13,7 +13,6 @@ import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackageConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettingsConfig
-import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import org.gradle.api.Project
 import javax.inject.Inject
 import kotlin.io.path.Path
@@ -139,17 +138,7 @@ public abstract class PackageRootDefinitionExtension
          */
         public var compilerOpts: List<String> = emptyList()
 
-        internal val packageDependencies: MutableList<SwiftDependency> = mutableListOf()
-
-        @Deprecated("Use dependency(dependency: DependencyConfig.() -> Unit)")
-        /**
-         * @see <a href="https://github.com/frankois944/spm4Kmp/releases/tag/0.6.0">Deprecated</a>
-         */
-        public fun dependency(vararg dependencies: SwiftDependency) {
-            packageDependencies.addAll(dependencies)
-        }
-
-        internal val packageDependenciesConfig: DependencyConfig = Dependency()
+        internal val packageDependenciesConfig: Dependency = Dependency()
 
         /**
          * Adds one or more Swift dependencies to the dependencies list.
@@ -225,7 +214,7 @@ public abstract class PackageRootDefinitionExtension
          */
         public var swiftBinPath: String? = null
 
-        internal var exportedPackageSettings: ExportedPackageConfig = ExportedPackage()
+        internal var exportedPackageSettings: ExportedPackage = ExportedPackage()
 
         /**
          * Exported package settings
@@ -236,13 +225,4 @@ public abstract class PackageRootDefinitionExtension
         public fun exportedPackageSettings(setting: ExportedPackageConfig.() -> Unit) {
             exportedPackageSettings.apply(setting)
         }
-
-        /**
-         *  Copy **ALL** products into the application (only when running from xcode)
-         *
-         *  The task [cInteropName]CopyPackageResources need to be added inside the build phase of your xcode project
-         *  EXPERIMENTAL
-         */
-        @ExperimentalSpmForKmpFeature
-        public var copyDependenciesToApp: Boolean = false
     }
