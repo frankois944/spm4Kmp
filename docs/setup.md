@@ -11,7 +11,7 @@
 
 ## Plugins
 
-[![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp)
+[![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp?filter=0.*)](https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp)
 
 ``` kotlin title="build.gradle.kts"
 plugins {
