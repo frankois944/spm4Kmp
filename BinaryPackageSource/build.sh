@@ -76,6 +76,8 @@ xcrun swift package compute-checksum DummyFramework.xcframework.zip \
 && \
 rm -rf "${outputDir:?}/*" \
 && \
-mv DummyFramework.xcframework.zip "$outputDir/DummyFrameworkV$packageVersion.xcframework.zip" \
+mv -f DummyFramework.xcframework.zip "$outputDir/DummyFrameworkV$packageVersion.xcframework.zip" \
 && \
-mv DummyFramework.xcframework "$outputDir/DummyFramework.xcframework"
+rm -rf "$outputDir/DummyFramework.xcframework" \
+&& \
+mv DummyFramework.xcframework "$outputDir/"
