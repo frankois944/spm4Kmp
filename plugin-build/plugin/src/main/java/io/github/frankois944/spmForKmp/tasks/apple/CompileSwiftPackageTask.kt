@@ -93,6 +93,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add("swift")
                 }
                 add("build")
+                add("-q")
                 add("--sdk")
                 add(execOps.getSDKPath(target.get(), logger))
                 add("--triple")
