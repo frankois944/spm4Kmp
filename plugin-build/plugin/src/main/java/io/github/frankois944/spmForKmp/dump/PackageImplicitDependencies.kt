@@ -60,6 +60,7 @@ internal data class PackageImplicitDependencies(
         try {
             File(path)
                 .walk()
+                .maxDepth(5)
                 .filter { file ->
                     file.isDirectory && names.contains(file.name)
                 }.toSet()
