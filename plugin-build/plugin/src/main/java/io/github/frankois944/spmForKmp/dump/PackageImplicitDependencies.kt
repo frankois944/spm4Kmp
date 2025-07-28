@@ -6,6 +6,8 @@ import org.gradle.internal.cc.base.logger
 import org.gradle.internal.impldep.com.google.errorprone.annotations.Keep
 import java.io.File
 
+internal const val MAX_WALK_DEPTH = 3
+
 @Keep
 internal data class PackageImplicitDependencies(
     @param:JsonProperty("dependencies")
@@ -60,7 +62,7 @@ internal data class PackageImplicitDependencies(
         try {
             File(path)
                 .walk()
-                .maxDepth(5)
+                .maxDepth(MAX_WALK_DEPTH)
                 .filter { file ->
                     file.isDirectory && names.contains(file.name)
                 }.toSet()
