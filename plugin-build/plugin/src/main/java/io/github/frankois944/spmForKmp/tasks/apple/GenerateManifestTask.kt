@@ -12,8 +12,8 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
@@ -70,8 +70,8 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:OutputFile
     abstract val manifestFile: Property<File>
 
-    @get:OutputDirectory
-    abstract val packageScratchDir: DirectoryProperty
+    @Internal
+    val packageScratchDir: DirectoryProperty = project.objects.directoryProperty()
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -124,11 +124,9 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             )
         } catch (ex: Exception) {
             logger.error(
-                """
-                Manifest file generated :
-                ${manifestFile.get()}
-                ${manifestFile.get().readText()}
-                """.trimIndent(),
+                "Manifest file generated :\n{}\n{}",
+                manifestFile.get(),
+                manifestFile.get().readText(),
             )
             throw ex
         }

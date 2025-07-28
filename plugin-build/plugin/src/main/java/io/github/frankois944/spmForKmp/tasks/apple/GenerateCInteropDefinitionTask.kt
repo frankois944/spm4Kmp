@@ -28,6 +28,7 @@ import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.log
 
 @CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
@@ -177,7 +178,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 logger.debug("LOOKING for module dir {}", moduleInfo.name)
                 buildDirContent
                     .find {
-                        logger.debug("CHECK ${moduleInfo.name} == ${it.nameWithoutExtension}")
+                        logger.debug("CHECK {} == {}", moduleInfo.name, it.nameWithoutExtension)
                         it.nameWithoutExtension.lowercase() == moduleInfo.name.lowercase()
                     }?.let { buildDir ->
                         moduleInfo.isFramework = buildDir.extension == "framework"
@@ -193,10 +194,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     }
             }
         logger.debug(
-            """
-            Modules configured
-            ${moduleConfigs.joinToString("\n")}
-            """.trimIndent(),
+            "Modules configured\n{}",
+            moduleConfigs.joinToString("\n"),
         )
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
@@ -225,26 +224,17 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         }
                     }
                 moduleConfig.definitionFile.writeText(definition.trimIndent())
-                logger.debug(
-                    """
-                    ######
-                    Definition File : ${moduleConfig.definitionFile.name}
-                    At Path: ${moduleConfig.definitionFile.path}
-                    ${moduleConfig.definitionFile.readText()}
-                    ######
-                    """.trimIndent(),
-                )
+                logger.debug("######")
+                logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
+                logger.debug("At Path: {}", moduleConfig.definitionFile.path)
+                logger.debug("{}", moduleConfig.definitionFile.readText())
+                logger.debug("######")
             } catch (ex: Exception) {
-                logger.error(
-                    """
-                    ######
-                    Can't generate definition for ${moduleConfig.name}
-                    Expected file: ${moduleConfig.definitionFile.path}
-                    Config: $moduleConfig
-                    ######
-                    """.trimIndent(),
-                    ex,
-                )
+                logger.error("######")
+                logger.error("Can't generate definition for  {}", moduleConfig.name)
+                logger.error("Expected file: {}", moduleConfig.definitionFile.path)
+                logger.error("Config: {}", moduleConfig)
+                logger.error("######", ex)
             }
         }
     }
@@ -277,6 +267,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         // Some manifests are heavily customized and use dynamic values.
         val headerSearchPaths =
             buildList {
+                logger.debug("SEARCH IN {}", scratchDir.get())
+                logger.debug("spmPackageName IN {}", moduleConfig.spmPackageName)
                 moduleConfig.spmPackageName?.let {
                     val folderToSearch =
                         scratchDir
@@ -290,9 +282,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         findIncludeFolders(folderToSearch),
                     )
                 }
+                logger.debug("SEARCH IN extractPublicHeaderFromCheckout")
                 // extract from the current module manifest the `publicHeadersPath` values
                 addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
                 // extract the Public third-party dependencies' for all the modules
+                logger.debug("getPackageImplicitDependencies")
                 addAll(
                     execOps
                         .getPackageImplicitDependencies(
