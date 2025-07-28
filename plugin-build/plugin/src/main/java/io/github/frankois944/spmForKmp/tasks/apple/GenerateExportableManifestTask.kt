@@ -175,18 +175,16 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 )
             } catch (ex: Exception) {
                 logger.error(
-                    """
-                    Manifest file generated :
-                    ${manifestFile.get().asFile}
-                    ${manifestFile.get().asFile.readText()}
-                    """.trimIndent(),
+                    "Manifest file generated : \n{}\n{}",
+                    manifestFile.get().asFile,
+                    manifestFile.get().asFile.readText(),
                 )
                 throw ex
             }
         } else {
             logger.debug(
-                "No dependencies to export found, " +
-                    "delete the old one ${manifestFile.asFile.get().absolutePath}",
+                "No dependencies to export found; delete the old one {}",
+                manifestFile.asFile.get().absolutePath,
             )
             manifestFile.asFile
                 .get()
@@ -218,7 +216,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                         val plist = moduleLocation.resolve("Info.plist")
                         logger.debug("Looking inside the Info.plist {}", plist)
                         val libraryName = getPlistValue(plist, "CFBundleExecutable")
-                        logger.debug("Found libraryName $libraryName")
+                        logger.debug("Found libraryName {}", libraryName)
                         val binaryFile = moduleLocation.resolve(libraryName)
                         if (!execOps.isDynamicLibrary(binaryFile, logger)) {
                             logger.debug(

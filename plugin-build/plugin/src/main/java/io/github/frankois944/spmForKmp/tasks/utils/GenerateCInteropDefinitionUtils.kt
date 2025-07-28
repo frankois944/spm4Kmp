@@ -39,7 +39,7 @@ internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
     fromDir: File,
     module: ModuleConfig,
 ): Set<File> {
-    logger.debug("Looking for public header for ${module.name}")
+    logger.debug("Looking for public header for {}", module.name)
 
     val checkoutsDir = "checkouts"
     val packageSwift = "Package.swift"
@@ -50,7 +50,7 @@ internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
     val result = mutableSetOf<File>()
 
     if (!manifestFile.exists()) {
-        logger.debug("No manifest found at ${manifestFile.path}")
+        logger.debug("No manifest found at {}", manifestFile.path)
         return result
     }
 
@@ -60,9 +60,9 @@ internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
     targets.forEach { target ->
         val name = extractFirstMatch(target, """name:\s*"([^"]+)"""")
         val targetPath = extractFirstMatch(target, """path:\s*"([^"]+)"""")
-        logger.debug("targetPath: $targetPath")
+        logger.debug("targetPath {}", targetPath)
         val publicHeadersPath = extractFirstMatch(target, """publicHeadersPath:\s*"([^"]+)"""")
-        logger.debug("publicHeadersPath: $publicHeadersPath")
+        logger.debug("publicHeadersPath: {}", publicHeadersPath)
         var resolvedIncludeDir =
             if (targetPath != null) {
                 packageDir.resolve(targetPath)

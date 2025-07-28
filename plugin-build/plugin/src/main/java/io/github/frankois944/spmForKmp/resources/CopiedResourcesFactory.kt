@@ -35,7 +35,7 @@ internal class CopiedResourcesFactory(
                     val plist = framework.resolve("Info.plist")
                     logger.debug("Looking inside the Info.plist {}", plist)
                     val libraryName = getPlistValue(plist, "CFBundleExecutable")
-                    logger.debug("Found libraryName $libraryName")
+                    logger.debug("Found libraryName {}", libraryName)
                     val binaryFile = framework.resolve(libraryName)
                     val newFramework = FrameworkResource(framework, binaryFile = binaryFile)
                     add(newFramework)
@@ -84,7 +84,7 @@ internal fun getCurrentPackagesBuiltDir(
     buildPackageMode: String,
     logger: Logger,
 ): File {
-    logger.debug("Looking for a match with platformName $platformName")
+    logger.debug("Looking for a match with platformName {}", platformName)
     val systemType: String? =
         when {
             platformName.contains("iphone") -> {
@@ -117,7 +117,7 @@ internal fun getCurrentPackagesBuiltDir(
             ""
         }
     val buildPackageDirName = "$archs-apple-$systemType$simulator"
-    logger.debug("buildPackageDir created $buildPackageDirName")
+    logger.debug("buildPackageDir created {}", buildPackageDirName)
     val buildPackagePath =
         packageScratchDir
             .resolve(buildPackageDirName)
