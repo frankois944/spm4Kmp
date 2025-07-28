@@ -118,7 +118,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
                 logger.debug("Ignore framework signing because of local run")
                 return@let
             }
-            logger.debug("Found sign identity $identity")
+            logger.debug("Found sign identity {}", identity)
             logger.debug("Signing framework at {}", file)
             execOps.signFramework(
                 file = file,
