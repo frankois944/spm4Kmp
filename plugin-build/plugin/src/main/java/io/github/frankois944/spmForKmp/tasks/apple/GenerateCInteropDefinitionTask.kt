@@ -28,7 +28,6 @@ import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject
-import kotlin.math.log
 
 @CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
