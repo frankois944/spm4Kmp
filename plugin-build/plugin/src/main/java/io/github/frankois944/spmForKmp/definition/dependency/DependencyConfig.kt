@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.net.URI
 
 public interface DependencyConfig : Serializable {
-    @Suppress("MaxLineLength", "LongParameterList")
+    @Suppress("MaxLineLength")
     /**
      * Represents a local binary dependency.
      *
@@ -21,7 +21,7 @@ public interface DependencyConfig : Serializable {
         exportToKotlin: Boolean = false,
     )
 
-    @Suppress("LongParameterList", "MaxLineLength")
+    @Suppress("MaxLineLength")
     /**
      * Represents a remote binary dependency as a zipped xcFramework
      *
