@@ -266,13 +266,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
         return """
-            language = Objective-C
-            modules = $moduleName
-            package = $packageName
-            libraryPaths = "${currentBuildDirectory().path}"
-            compilerOpts = -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
-            linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
-            ${getCustomizedDefinitionConfig()}
+language = Objective-C
+modules = $moduleName
+package = $packageName
+libraryPaths = "${currentBuildDirectory().path}"
+compilerOpts = -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+${getCustomizedDefinitionConfig()}
             """.trimIndent()
     }
 
@@ -327,13 +327,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
         return """
-            language = Objective-C
-            modules = $moduleName
-            package = $packageName
-            libraryPaths = "${currentBuildDirectory().path}"
-            compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${currentBuildDirectory().path}"
-            linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
-            ${getCustomizedDefinitionConfig()}
+language = Objective-C
+modules = $moduleName
+package = $packageName
+libraryPaths = "${currentBuildDirectory().path}"
+compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${currentBuildDirectory().path}"
+linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
+${getCustomizedDefinitionConfig()}
             """.trimIndent()
     }
 
