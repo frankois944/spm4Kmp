@@ -278,6 +278,11 @@ private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTa
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
     this.currentBridgeHash.set(Hashing.hashDirectory(packageDirectoriesConfig.bridgeSourceDir))
+    this.strictEnums.set(swiftPackageEntry.strictEnums)
+    this.nonStrictEnums.set(swiftPackageEntry.nonStrictEnums)
+    this.foreignExceptionMode.set(swiftPackageEntry.foreignExceptionMode)
+    this.disableDesignatedInitializerChecks.set(swiftPackageEntry.disableDesignatedInitializerChecks)
+    this.userSetupHint.set(swiftPackageEntry.userSetupHint)
 }
 
 @Suppress("LongParameterList")
