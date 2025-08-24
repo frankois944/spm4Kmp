@@ -5,7 +5,6 @@ import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
-import org.gradle.internal.cc.base.logger
 import java.io.File
 
 internal fun findIncludeFolders(path: File): List<File> =
