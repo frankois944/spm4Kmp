@@ -7,9 +7,10 @@
         <option value="DIRECTORY:BinaryPackageSource" />
         <option value="DIRECTORY:example" />
         <option value="DIRECTORY:plugin-build/plugin/src/functionalTest" />
+        <option value="DIRECTORY:kotlin/io/github/frankois944/spmForKmp" />
       </list>
     </option>
     <option name="projectKey" value="frankois944_spm4Kmp" />
-    <option name="serverId" value="frankois944" />
+    <option name="serverId" value="cloud" />
   </component>
 </project>
