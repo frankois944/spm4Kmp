@@ -345,8 +345,8 @@ ${getCustomizedDefinitionConfig()}
         }
     }
 
-    private fun getCustomizedDefinitionConfig(): String {
-        return buildString {
+    private fun getCustomizedDefinitionConfig(): String =
+        buildString {
             if (strictEnums.get().isNotEmpty()) {
                 appendLine("strictEnums = ${strictEnums.get().joinToString(" ")}")
             }
@@ -363,5 +363,4 @@ ${getCustomizedDefinitionConfig()}
                 appendLine("userSetupHint = \"$it\"")
             }
         }
-    }
 }
