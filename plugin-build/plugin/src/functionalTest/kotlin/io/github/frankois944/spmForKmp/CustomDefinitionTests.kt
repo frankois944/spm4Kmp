@@ -24,8 +24,7 @@ class CustomDefinitionTests : BaseTest() {
                     disableDesignatedInitializerChecks = false
                     userSetupHint = "Some Hint"
                     """.trimIndent(),
-                )
-                .withSwiftSources(
+                ).withSwiftSources(
                     SwiftSource.of(
                         content =
                             """
