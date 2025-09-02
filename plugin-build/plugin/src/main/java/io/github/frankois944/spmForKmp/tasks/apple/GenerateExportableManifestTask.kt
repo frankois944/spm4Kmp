@@ -215,7 +215,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                         // if the module is inside the compiled build directory
                         var plist = moduleLocation.resolve("Info.plist")
                         if (!plist.exists()) {
-                            logger.debug("The plist is not at the root of the framework, try the Resource folder instead")
+                            logger.debug(
+                                "The plist is not at the root of the framework, try the Resource folder instead",
+                            )
                             plist = moduleLocation.resolve("Resources").resolve("Info.plist")
                         }
                         logger.debug("Looking inside the Info.plist {}", plist)
