@@ -32,7 +32,11 @@ internal class CopiedResourcesFactory(
                 .listFiles {
                     it.extension == "framework"
                 }.forEach { framework ->
-                    val plist = framework.resolve("Info.plist")
+                    var plist = framework.resolve("Info.plist")
+                    if (!plist.exists()) {
+                        logger.debug("The plist is not at the root of the framework, try the Resource folder instead")
+                        plist = framework.resolve("Resources").resolve("Info.plist")
+                    }
                     logger.debug("Looking inside the Info.plist {}", plist)
                     val libraryName = getPlistValue(plist, "CFBundleExecutable")
                     logger.debug("Found libraryName {}", libraryName)

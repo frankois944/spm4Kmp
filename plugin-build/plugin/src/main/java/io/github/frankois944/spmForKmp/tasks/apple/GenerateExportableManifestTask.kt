@@ -210,10 +210,14 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                     .listFiles { it.extension == "framework" }
                     .firstOrNull {
                         logger.debug("checking module {} at {}", module.name, it)
-                        it.nameWithoutExtension.lowercase() == module.name.lowercase()
+                        it.nameWithoutExtension.equals(module.name, ignoreCase = true)
                     }?.let { moduleLocation ->
                         // if the module is inside the compiled build directory
-                        val plist = moduleLocation.resolve("Info.plist")
+                        var plist = moduleLocation.resolve("Info.plist")
+                        if (!plist.exists()) {
+                            logger.debug("The plist is not at the root of the framework, try the Resource folder instead")
+                            plist = moduleLocation.resolve("Resources").resolve("Info.plist")
+                        }
                         logger.debug("Looking inside the Info.plist {}", plist)
                         val libraryName = getPlistValue(plist, "CFBundleExecutable")
                         logger.debug("Found libraryName {}", libraryName)
