@@ -27,6 +27,12 @@ class BinaryPackageTest : BaseTest() {
                                 packageName = "DummyFramework",
                                 exportToKotlin = true
                             )
+                            remoteBinary(
+                                url = uri("https://github.com/wanliyunyan/LibXray/releases/download/25.8.3/LibXray.xcframework.zip"),
+                                packageName = "LibXray",
+                                exportToKotlin = true,
+                                checksum = "1f478c370bbe9cce12ed7f2f6101853a74c3a2220253dbaf5abcc446260c393d",
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -39,6 +45,7 @@ class BinaryPackageTest : BaseTest() {
                             """
                             import Foundation
                             import DummyFramework
+                            import LibXray
                             @objc public class MySwiftClass: NSObject {
                             }
                             """.trimIndent(),
