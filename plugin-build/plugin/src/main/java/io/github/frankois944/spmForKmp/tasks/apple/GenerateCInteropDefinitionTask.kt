@@ -75,6 +75,24 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
     abstract val currentBridgeHash: Property<String>
 
+    @get:Input
+    abstract val strictEnums: ListProperty<String>
+
+    @get:Input
+    abstract val nonStrictEnums: ListProperty<String>
+
+    @get:Input
+    @get:Optional
+    abstract val foreignExceptionMode: Property<String?>
+
+    @get:Input
+    @get:Optional
+    abstract val disableDesignatedInitializerChecks: Property<Boolean?>
+
+    @get:Input
+    @get:Optional
+    abstract val userSetupHint: Property<String?>
+
     @get:OutputFiles
     val outputFiles: List<File>
         get() =
@@ -248,12 +266,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 "$it.${moduleConfig.name}"
             } ?: moduleConfig.name
         return """
-            language = Objective-C
-            modules = $moduleName
-            package = $packageName
-            libraryPaths = "${currentBuildDirectory().path}"
-            compilerOpts = -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
-            linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+language = Objective-C
+modules = $moduleName
+package = $packageName
+libraryPaths = "${currentBuildDirectory().path}"
+compilerOpts = -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+${getCustomizedDefinitionConfig()}
             """.trimIndent()
     }
 
@@ -308,12 +327,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
         return """
-            language = Objective-C
-            modules = $moduleName
-            package = $packageName
-            libraryPaths = "${currentBuildDirectory().path}"
-            compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${currentBuildDirectory().path}"
-            linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
+language = Objective-C
+modules = $moduleName
+package = $packageName
+libraryPaths = "${currentBuildDirectory().path}"
+compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${currentBuildDirectory().path}"
+linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
+${getCustomizedDefinitionConfig()}
             """.trimIndent()
     }
 
@@ -324,4 +344,23 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             }
         }
     }
+
+    private fun getCustomizedDefinitionConfig(): String =
+        buildString {
+            if (strictEnums.get().isNotEmpty()) {
+                appendLine("strictEnums = ${strictEnums.get().joinToString(" ")}")
+            }
+            if (nonStrictEnums.get().isNotEmpty()) {
+                appendLine("nonStrictEnums = ${nonStrictEnums.get().joinToString(" ")}")
+            }
+            foreignExceptionMode.orNull?.let {
+                appendLine("foreignExceptionMode = $it")
+            }
+            disableDesignatedInitializerChecks.orNull?.let {
+                appendLine("disableDesignatedInitializerChecks = $it")
+            }
+            userSetupHint.orNull?.let {
+                appendLine("userSetupHint = \"$it\"")
+            }
+        }
 }

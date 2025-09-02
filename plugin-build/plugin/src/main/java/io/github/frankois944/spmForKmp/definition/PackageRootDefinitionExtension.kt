@@ -43,7 +43,8 @@ public abstract class PackageRootDefinitionExtension
          * This property allows defining a different directory for the Swift package source files,
          * enabling customized project structure organization.
          */
-        public var customPackageSourcePath: String = Path(project.projectDir.path, "src", "swift").pathString
+        public var customPackageSourcePath: String =
+            Path(project.projectDir.path, "src", "swift").pathString
 
         /**
          * Specifies the minimum iOS platform version required for the Swift package integration.
@@ -225,4 +226,50 @@ public abstract class PackageRootDefinitionExtension
         public fun exportedPackageSettings(setting: ExportedPackageConfig.() -> Unit) {
             exportedPackageSettings.apply(setting)
         }
+
+        /**
+         * A space-separated list of enums that should be generated as Kotlin enums.
+         *
+         * Default : emptyList()
+         *
+         * [configure-enums-generation](https://kotlinlang.org/docs/native-definition-file.html#configure-enums-generation)
+         */
+        public var strictEnums: List<String> = emptyList()
+
+        /**
+         * Non A space-separated list of enums that should be generated as integral values.strict enums
+         *
+         * Default : emptyList()
+         *
+         * [configure-enums-generation](https://kotlinlang.org/docs/native-definition-file.html#configure-enums-generation)
+         */
+        public var nonStrictEnums: List<String> = emptyList()
+
+        /**
+         * Wraps exceptions from Objective-C code into Kotlin exceptions with the ForeignException type
+         *
+         * Default : null
+         *
+         * [handle-objective-c-exceptions](https://kotlinlang.org/docs/native-definition-file.html#handle-objective-c-exceptions)
+         */
+        public var foreignExceptionMode: String? = null
+
+        @Suppress("MaxLineLength")
+        /**
+         * Disables the compiler check that doesn't allow calling a non-designated Objective-C initializer as a super() constructor
+         *
+         * Default : null
+         *
+         * [allow-calling-a-non-designated-initializer](https://kotlinlang.org/docs/native-definition-file.html#allow-calling-a-non-designated-initializer)
+         */
+        public var disableDesignatedInitializerChecks: Boolean? = null
+
+        /**
+         * Adds a custom message, for example, to help users resolve linker errors
+         *
+         * Default : null
+         *
+         * [help-resolve-linker-errors](https://kotlinlang.org/docs/native-definition-file.html#help-resolve-linker-errors)
+         */
+        public var userSetupHint: String? = null
     }
