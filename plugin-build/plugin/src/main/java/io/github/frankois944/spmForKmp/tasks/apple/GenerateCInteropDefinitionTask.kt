@@ -196,7 +196,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 buildDirContent
                     .find {
                         logger.debug("CHECK {} == {}", moduleInfo.name, it.nameWithoutExtension)
-                        it.nameWithoutExtension.lowercase() == moduleInfo.name.lowercase()
+                        it.nameWithoutExtension.equals(moduleInfo.name, ignoreCase = true)
                     }?.let { buildDir ->
                         moduleInfo.isFramework = buildDir.extension == "framework"
                         moduleInfo.buildDir = buildDir
