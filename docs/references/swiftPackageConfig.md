@@ -230,7 +230,7 @@ A list of enums that should be generated as Kotlin enums.
 [configure-enums-generation](https://kotlinlang.org/docs/native-definition-file.html#configure-enums-generation)
 
 ```kotlin
-public var strictEnums: List<String> = emptyList()
+var strictEnums: List<String> = emptyList()
 ```
 
 ## nonStrictEnums
@@ -250,7 +250,7 @@ Wraps exceptions from Objective-C code into Kotlin exceptions with the ForeignEx
 [handle-objective-c-exceptions](https://kotlinlang.org/docs/native-definition-file.html#handle-objective-c-exceptions)
 
 ```kotlin
-public var foreignExceptionMode: String? = null
+var foreignExceptionMode: String? = null
 ```
 
 ## disableDesignatedInitializerChecks
@@ -260,7 +260,7 @@ Disables the compiler check that doesn't allow calling a non-designated Objectiv
 [allow-calling-a-non-designated-initializer](https://kotlinlang.org/docs/native-definition-file.html#allow-calling-a-non-designated-initializer)
 
 ```kotlin
-public var disableDesignatedInitializerChecks: Boolean? = null
+var disableDesignatedInitializerChecks: Boolean? = null
 ```
 
 ## userSetupHint
@@ -270,5 +270,5 @@ Adds a custom message, for example, to help users resolve linker errors
 [help-resolve-linker-errors](https://kotlinlang.org/docs/native-definition-file.html#help-resolve-linker-errors)
 
 ```kotlin
-public var userSetupHint: String? = null
+var userSetupHint: String? = null
 ```

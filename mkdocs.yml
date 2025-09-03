@@ -31,7 +31,7 @@ extra:
   version:
     provider: mike
     default:
-      - stable
+      - beta
     alias: true
 nav:
   - Swift Package Manager For Kotlin Multiplatform:
