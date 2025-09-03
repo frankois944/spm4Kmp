@@ -228,7 +228,7 @@ public abstract class PackageRootDefinitionExtension
         }
 
         /**
-         * A space-separated list of enums that should be generated as Kotlin enums.
+         * A list of enums that should be generated as Kotlin enums.
          *
          * Default : emptyList()
          *
@@ -237,7 +237,7 @@ public abstract class PackageRootDefinitionExtension
         public var strictEnums: List<String> = emptyList()
 
         /**
-         * Non A space-separated list of enums that should be generated as integral values.strict enums
+         * A list of enums that should be generated as integral values.strict enums
          *
          * Default : emptyList()
          *
