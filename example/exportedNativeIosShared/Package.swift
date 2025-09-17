@@ -11,7 +11,7 @@ let package = Package(
       targets: ["exportedNativeIosShared"])
   ],
   dependencies: [
-    .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "11.8.1")
+    .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "12.3.0")
   ],
   targets: [
     .target(
