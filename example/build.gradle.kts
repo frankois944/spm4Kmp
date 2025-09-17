@@ -104,11 +104,12 @@ swiftPackageConfig {
                     add(ProductName("FirebaseCore"), exportToKotlin = true)
                     // add FirebaseDatabase to your own swift code but don't export it
                     add(ProductName("FirebaseDatabase"))
+                    add("FirebaseAuth", exportToKotlin = true)
                 },
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
                 // Package version
-                version = "11.8.1",
+                version = "12.3.0",
             )
             localBinary(
                 path = "$testResources/DummyFrameworkV2.xcframework.zip",

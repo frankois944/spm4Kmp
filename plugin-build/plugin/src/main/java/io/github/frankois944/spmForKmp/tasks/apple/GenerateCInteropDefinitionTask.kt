@@ -217,10 +217,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
             try {
-                val mapFile =
-                    moduleConfig.buildDir.resolve(
-                        if (moduleConfig.isFramework) "Modules/module.modulemap" else "module.modulemap",
-                    )
+                val mapFile = getModuleMap(moduleConfig)
                 val moduleName =
                     extractModuleNameFromModuleMap(mapFile.readText())
                         ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
@@ -254,6 +251,20 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 logger.error("######", ex)
             }
         }
+    }
+
+    private fun getModuleMap(moduleConfig: ModuleConfig): File {
+        var path =
+            moduleConfig.buildDir.resolve(
+                if (moduleConfig.isFramework) "Modules/module.modulemap" else "module.modulemap",
+            )
+        if (!path.exists()) {
+            path =
+                moduleConfig.buildDir.resolve(
+                    if (moduleConfig.isFramework) "Modules/include/module.modulemap" else "include/module.modulemap",
+                )
+        }
+        return path
     }
 
     private fun generateFrameworkDefinition(
@@ -331,7 +342,7 @@ language = Objective-C
 modules = $moduleName
 package = $packageName
 libraryPaths = "${currentBuildDirectory().path}"
-compilerOpts = $compilerOpts -fmodules $headerSearchPaths -F"${currentBuildDirectory().path}"
+compilerOpts = $compilerOpts -fmodules  $headerSearchPaths -F"${currentBuildDirectory().path}"
 linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
 ${getCustomizedDefinitionConfig()}
             """.trimIndent()
