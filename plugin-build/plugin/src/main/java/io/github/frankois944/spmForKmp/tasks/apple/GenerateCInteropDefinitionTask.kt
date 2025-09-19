@@ -337,12 +337,14 @@ ${getCustomizedDefinitionConfig()}
             } ?: moduleConfig.name
         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
+        val includeModulePath = "${currentBuildDirectory().resolve(moduleConfig.name + ".build").resolve("include")}"
+
         return """
 language = Objective-C
 modules = $moduleName
 package = $packageName
 libraryPaths = "${currentBuildDirectory().path}"
-compilerOpts = $compilerOpts -fmodules  $headerSearchPaths -F"${currentBuildDirectory().path}"
+compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"${currentBuildDirectory().path}"
 linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
 ${getCustomizedDefinitionConfig()}
             """.trimIndent()
