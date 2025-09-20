@@ -337,7 +337,7 @@ ${getCustomizedDefinitionConfig()}
             } ?: moduleConfig.name
         val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
         val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
-        val includeModulePath = "${currentBuildDirectory().resolve(moduleConfig.name + ".build").resolve("include")}"
+        val includeModulePath = "${moduleConfig.buildDir.resolve("include")}"
 
         return """
 language = Objective-C
