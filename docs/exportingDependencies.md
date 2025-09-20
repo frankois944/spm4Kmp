@@ -14,17 +14,6 @@ In a case the exported dependency is written in [Swift](./section-help/faq.md), 
 
 For example, the [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) can't work directly on Kotlin, so the Plugin's bridge is here to fill the gape between Kotlin and Swift.
 
-### Local Package
-
-Some _specific_ dependencies **require** to be declared on the Xcode side; in that case, you will see the following message during the build:
-```
-Spm4Kmp: The following dependencies [some_dependency_name] need to be added to your xcode project
-A local Swift package has been generated at
-/path/to/the/local/package
-Please add it to your xcode project as a local package dependency; it will add the missing content.
-****You can ignore this messaging if you have already added these dependencies to your Xcode project****
-```
-
 ## Gradle
 
 The following configuration exports to Kotlin the package [FirebaseAnalytics](https://github.com/firebase/firebase-ios-sdk) which is a ObjC library.

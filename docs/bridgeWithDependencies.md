@@ -10,13 +10,33 @@ The plug-in uses the Swift Packages features to gather all dependency inside the
 
     If your package doesn't work with the plugin, please create an [issue](https://github.com/frankois944/spm4Kmp/issues).
 
+#### Automatic Dependency Build Inclusion
+
+The plugin will automatically include the dependency requirement in your application, if possible.
+
+Also, it can detect if the dependency [must be included in your Xcode project](./bridgeWithDependencies.md#local-package), **BUT** the detection is not 100% accurate.
+
+!!! warning "I have build error or runtime crash from my native dependency"
+    If you encounter during the compilation an error like `Undefined symbol: ...` or a dependency crash during the runtime
+    please follow the steps below.
+
+    - Run your application on Xcode and check for errors
+        * If you have a `Undefined symbol` build error, you *MUST* add your dependency to Xcode
+        * If you have objc/C++/C runtime crash , you *MUST* add your dependency to Xcode
+
+    - You have two choices:
+        * Use the [includeProduct](./references/exportedPackageConfig.md#includeproduct) option to generate a [local package](./bridgeWithDependencies.md#local-package) to include in your Xcode project
+            * Your Xcode project will be automatically synched with the required dependency
+        * Manually add the dependency to your Xcode project
+
 ### Use Dependencies In Your Application
 
-By default, the dependencies are not available from your application, but if you need them, you can add them inside the [includeProduct](./references/exportedPackageConfig.md#includeproduct) configuration.
+By default, the dependencies are not available from your application, but if you need them, you can add them inside the [includeProduct](./references/exportedPackageConfig.md#includeproduct) configuration,
+and then the dependency will be included inside a local package.
 
 ### Local Package
 
-The _included_ and some _specific_ dependencies **require** to be declared on the Xcode side; in that case, you will see the following message during the build:
+If the dependencies must be declared on the Xcode side; in that case, you will see the following message during the build:
 ```
 Spm4Kmp: The following dependencies [some_dependency_name] need to be added to your xcode project
 A local Swift package has been generated at
@@ -24,9 +44,6 @@ A local Swift package has been generated at
 Please add it to your xcode project as a local package dependency; it will add the missing content.
 ****You can ignore this messaging if you have already added these dependencies to your Xcode project****
 ```
-
-If you encounter a crash or `Undefined symbol error` during the build after adding this package,
-please fill an issue!
 
 ## Supported Dependency Sources
 
