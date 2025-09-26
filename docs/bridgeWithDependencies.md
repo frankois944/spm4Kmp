@@ -16,7 +16,7 @@ The plugin will automatically include the dependency requirement in your applica
 
 Also, it can detect if the dependency [must be included in your Xcode project](./bridgeWithDependencies.md#local-package), **BUT** the detection is not 100% accurate.
 
-!!! warning "I have build error or runtime crash from my native dependency"
+!!! warning "I have a build error or runtime crash from my native dependency"
     If you encounter during the compilation an error like `Undefined symbol: ...` or a dependency crash during the runtime
     please follow the steps below.
 
