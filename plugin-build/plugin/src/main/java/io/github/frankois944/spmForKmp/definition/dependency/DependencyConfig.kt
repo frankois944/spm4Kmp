@@ -1,7 +1,6 @@
 package io.github.frankois944.spmForKmp.definition.dependency
 
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfig
-import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import java.io.Serializable
 import java.net.URI
 
