@@ -9,7 +9,7 @@ internal data class ModuleConfig(
     var name: String = "",
     var spmPackageName: String? = null,
     var packageName: String = "",
-    var buildDir: Path = Path(""),
+    var buildDir: Path = Path.of(""),
     var definitionFile: File = File(""),
     var linkerOpts: List<String> = emptyList(),
     var compilerOpts: List<String> = emptyList(),
