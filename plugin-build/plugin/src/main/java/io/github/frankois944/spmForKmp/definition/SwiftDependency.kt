@@ -34,10 +34,13 @@ internal sealed interface SwiftDependency : Serializable {
          */
         val exportToKotlin: Boolean
 
+        val isCLang: Boolean
+
         data class Local(
             val path: String,
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
+            override val isCLang: Boolean = false,
         ) : Binary
 
         data class Remote(
@@ -45,6 +48,7 @@ internal sealed interface SwiftDependency : Serializable {
             override val packageName: String,
             override val exportToKotlin: Boolean = false,
             val checksum: String,
+            override val isCLang: Boolean = false,
         ) : Binary
     }
 

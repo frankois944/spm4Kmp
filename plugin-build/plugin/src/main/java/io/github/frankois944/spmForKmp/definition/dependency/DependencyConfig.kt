@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.definition.dependency
 
 import io.github.frankois944.spmForKmp.definition.product.dsl.ProductPackageConfig
+import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import java.io.Serializable
 import java.net.URI
 
@@ -14,11 +15,13 @@ public interface DependencyConfig : Serializable {
      * @property path The local file URL (file://...) to the xcFramework.
      * @property packageName The name of the package associated with this binary.
      * @property exportToKotlin Defines whether the dependency should be exported for use in Kotlin code.
+     * @property isCLang Specify if the binary is a C language framework.
      */
     public fun localBinary(
         path: String,
         packageName: String,
         exportToKotlin: Boolean = false,
+        isCLang: Boolean = false,
     )
 
     @Suppress("MaxLineLength")
@@ -31,12 +34,14 @@ public interface DependencyConfig : Serializable {
      * @property packageName The name of the package associated with this binary dependency.
      * @property exportToKotlin Defines whether this dependency should be exported for use in Kotlin code.
      * @property checksum The checksum of the remote binary to verify its integrity.
+     * @property isCLang Specify if the binary is a C language framework.
      */
     public fun remoteBinary(
         url: URI,
         packageName: String,
         exportToKotlin: Boolean = false,
         checksum: String,
+        isCLang: Boolean = false,
     )
 
     /**
