@@ -3,6 +3,7 @@ import UIKit
 
 import CryptoSwift
 import FirebaseDatabase
+import HevSocks5Tunnel
 
 // Force cinterop to include `platform.UIKit.UIView`
 @objcMembers public class MyDummyView: UIView {}
@@ -34,6 +35,10 @@ import FirebaseDatabase
 
     public func doAsyncStuff() async {
         print("Nothing")
+    }
+
+    public func cMethod() {
+        hev_socks5_tunnel_quit()
     }
 }
 

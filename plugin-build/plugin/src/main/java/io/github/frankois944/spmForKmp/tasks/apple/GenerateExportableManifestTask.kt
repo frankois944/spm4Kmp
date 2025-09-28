@@ -103,7 +103,6 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                                     name = product.name,
                                     packageName = dependency.packageName,
                                     spmPackageName = dependency.packageName,
-                                    swiftDependency = dependency,
                                 )
                             }
                     }
@@ -114,6 +113,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                                 name = dependency.packageName,
                                 spmPackageName = dependency.packageName,
                                 swiftDependency = dependency,
+                                isCLang = dependency.isCLang,
                             ),
                         )
                     }
@@ -201,7 +201,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
         logger.debug("ALL MODULE {}", modules)
         val moduleToInclude = includeProduct.get().map { it.lowercase() }
         modules.forEach { module ->
-            if (moduleToInclude.contains(module.name.lowercase())) {
+            if (module.isCLang) {
+                requireDependencies.add(module)
+            } else if (moduleToInclude.contains(module.name.lowercase())) {
                 requireDependencies.add(module)
             } else {
                 compiledTargetDir
