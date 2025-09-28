@@ -3,7 +3,6 @@ package io.github.frankois944.spmForKmp.config
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.Path
 
 internal data class ModuleConfig(
     var isFramework: Boolean = false,

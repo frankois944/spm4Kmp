@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject
 import kotlin.io.path.exists
-import kotlin.io.path.extension
 import kotlin.io.path.nameWithoutExtension
 
 @CacheableTask
@@ -192,100 +191,122 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @TaskAction
     fun generateDefinitions() {
         removeOldDefinition()
-        val moduleConfigs = getModuleConfigs()
-        val buildDirContent = getModulesInBuildDirectory(currentBuildDirectory())
-        // find the build directory of the declared module in the manifest
-        moduleConfigs
-            .forEachIndexed { index, moduleConfig ->
-                logger.debug("LOOKING for module dir {}", moduleConfig.name)
-                if (moduleConfig.isCLang) {
-                    logger.warn(
-                        """
-                        CLang is experimental and not fully tested; please create an issue if you encounter a bug.
-                        Only C language-based xcFramework is currently supported.
-                        """.trimIndent(),
-                    )
 
-                    // CLang framework has dedicated behavior, we need to look inside the artifact folder
-                    // only C xcframework type is supported
-                    moduleConfig.isFramework = true
-                    moduleConfig.buildDir =
-                        getModuleArtifactsPath(
-                            fromPath = scratchDir.get().toPath(),
-                            productName = productName.get(),
-                            moduleConfig = moduleConfig,
-                            target = target.get(),
-                        )
-                    moduleConfig.definitionFile =
-                        currentBuildDirectory()
-                            .resolve("${moduleConfig.name}.def")
-                } else {
-                    buildDirContent
-                        .find {
-                            logger.debug("CHECK {} == {}", moduleConfig.name, it.nameWithoutExtension)
-                            it.nameWithoutExtension.equals(moduleConfig.name, ignoreCase = true)
-                        }?.let { buildDir ->
-                            moduleConfig.isFramework = buildDir.extension == "framework"
-                            moduleConfig.buildDir = buildDir.toPath()
-                            moduleConfig.definitionFile =
-                                if (index == 0) {
-                                    currentBuildDirectory()
-                                        .resolve("${moduleConfig.name}_${currentBridgeHash.get()}_default.def")
-                                } else {
-                                    currentBuildDirectory()
-                                        .resolve("${moduleConfig.name}.def")
-                                }
-                        }
-                }
-            }
+        val currentBuildDir = currentBuildDirectory()
+        val bridgeHash = currentBridgeHash.get()
+        val compiledBinaryFile = compiledBinary.asFile.get()
+
+        val moduleConfigs = getModuleConfigs()
+        val builtModules = getModulesInBuildDirectory(currentBuildDir)
+
+        // Configure les répertoires et fichiers de définition pour chaque module
+        configureModules(moduleConfigs, builtModules, currentBuildDir, bridgeHash)
+
         logger.debug(
             "Modules configured\n{}",
             moduleConfigs.joinToString("\n"),
         )
+
+        // Génère les fichiers de définition
         moduleConfigs.forEachIndexed { index, moduleConfig ->
-            logger.debug("Building definition file for: {}", moduleConfig)
-            try {
-                val moduleName =
-                    if (moduleConfig.isCLang) {
-                        moduleConfig.name
-                    } else {
-                        val mapFile = getModuleMap(moduleConfig)
-                        extractModuleNameFromModuleMap(mapFile.readText())
-                            ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
-                    }
-                val definition =
-                    if (moduleConfig.isFramework) {
-                        if (moduleConfig.isCLang) {
-                            generateCFrameworkDefinition(moduleName, moduleConfig)
-                        } else {
-                            generateFrameworkDefinition(moduleName, moduleConfig)
-                        }
-                    } else {
-                        generateNonFrameworkDefinition(moduleName, moduleConfig)
-                    }.let { def ->
-                        // Append staticLibraries for the first index which is the bridge
-                        if (index == 0) {
-                            val libName = compiledBinary.asFile.get().name
-                            val checksum = compiledBinary.asFile.get().checkSum()
-                            val md5 = "#checksum: $checksum"
-                            "$def\n$md5\nstaticLibraries = $libName"
-                        } else {
-                            def
-                        }
-                    }
+            buildDefinitionFile(index, moduleConfig, compiledBinaryFile)?.let { definition ->
                 moduleConfig.definitionFile.writeText(definition.trimIndent())
-                logger.debug("######")
                 logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
                 logger.debug("At Path: {}", moduleConfig.definitionFile.path)
                 logger.debug("{}", moduleConfig.definitionFile.readText())
-                logger.debug("######")
-            } catch (ex: Exception) {
-                logger.error("######")
-                logger.error("Can't generate definition for  {}", moduleConfig.name)
-                logger.error("Expected file: {}", moduleConfig.definitionFile.path)
-                logger.error("Config: {}", moduleConfig)
-                logger.error("######", ex)
             }
+        }
+    }
+
+    private fun configureModules(
+        moduleConfigs: List<ModuleConfig>,
+        builtModules: List<File>,
+        currentBuildDir: File,
+        bridgeHash: String,
+    ) {
+        moduleConfigs.forEachIndexed { index, moduleConfig ->
+            logger.debug("LOOKING for module dir {}", moduleConfig.name)
+            if (moduleConfig.isCLang) {
+                logger.warn(
+                    """
+                    CLang is experimental and not fully tested; please create an issue if you encounter a bug.
+                    Only C language-based xcFramework is currently supported.
+                    """.trimIndent(),
+                )
+                moduleConfig.isFramework = true
+                moduleConfig.buildDir =
+                    getModuleArtifactsPath(
+                        fromPath = scratchDir.get().toPath(),
+                        productName = productName.get(),
+                        moduleConfig = moduleConfig,
+                        target = target.get(),
+                    )
+                moduleConfig.definitionFile = currentBuildDir.resolve("${moduleConfig.name}.def")
+            } else {
+                builtModules
+                    .find {
+                        logger.debug("CHECK {} == {}", moduleConfig.name, it.nameWithoutExtension)
+                        it.nameWithoutExtension.equals(moduleConfig.name, ignoreCase = true)
+                    }?.let { buildDir ->
+                        moduleConfig.isFramework = buildDir.extension == "framework"
+                        moduleConfig.buildDir = buildDir.toPath()
+                        val definitionFilePath =
+                            if (index == 0) {
+                                currentBuildDir.resolve("${moduleConfig.name}_${bridgeHash}_default.def")
+                            } else {
+                                currentBuildDir.resolve("${moduleConfig.name}.def")
+                            }
+                        moduleConfig.definitionFile = definitionFilePath
+                    }
+            }
+        }
+    }
+
+    private fun buildDefinitionFile(
+        index: Int,
+        moduleConfig: ModuleConfig,
+        compiledBinaryFile: File,
+    ): String? {
+        logger.debug("Building definition file for: {}", moduleConfig)
+        return try {
+            val moduleName =
+                if (moduleConfig.isCLang) {
+                    moduleConfig.name
+                } else {
+                    val mapFile = getModuleMap(moduleConfig)
+                    extractModuleNameFromModuleMap(mapFile.readText())
+                        ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
+                }
+
+            val baseDefinition =
+                when {
+                    moduleConfig.isFramework && moduleConfig.isCLang ->
+                        generateCFrameworkDefinition(moduleConfig)
+
+                    moduleConfig.isFramework ->
+                        generateFrameworkDefinition(moduleName, moduleConfig)
+
+                    else ->
+                        generateNonFrameworkDefinition(moduleName, moduleConfig)
+                }
+
+            val definitionWithBridgeLib =
+                if (index == 0) {
+                    val libName = compiledBinaryFile.name
+                    val checksum = compiledBinaryFile.checkSum()
+                    val md5 = "#checksum: $checksum"
+                    "$baseDefinition\n$md5\nstaticLibraries = $libName"
+                } else {
+                    baseDefinition
+                }
+
+            definitionWithBridgeLib
+        } catch (ex: Exception) {
+            logger.error("Can't generate definition for  {}", moduleConfig.name)
+            logger.error("Expected file: {}", moduleConfig.definitionFile.path)
+            logger.error("Config: {}", moduleConfig)
+            logger.error("Exception: $ex")
+            null
         }
     }
 
@@ -308,11 +329,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         error("Module map file not found for module: ${moduleConfig.name}")
     }
 
-    private fun generateCFrameworkDefinition(
-        moduleName: String,
-        moduleConfig: ModuleConfig,
-    ): String {
-        val frameworkName = moduleConfig.name
+    private fun generateCFrameworkDefinition(moduleConfig: ModuleConfig): String {
         val libraryPaths =
             getModuleArtifactsPath(
                 fromPath = scratchDir.get().toPath(),
