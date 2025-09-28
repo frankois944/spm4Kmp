@@ -245,10 +245,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("Building definition file for: {}", moduleConfig)
             try {
-                val mapFile = getModuleMap(moduleConfig)
                 val moduleName =
-                    extractModuleNameFromModuleMap(mapFile.readText())
-                        ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
+                    if (moduleConfig.isCLang) {
+                        moduleConfig.name
+                    } else {
+                        val mapFile = getModuleMap(moduleConfig)
+                        extractModuleNameFromModuleMap(mapFile.readText())
+                            ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
+                    }
                 val definition =
                     if (moduleConfig.isFramework) {
                         if (moduleConfig.isCLang) {
