@@ -6,6 +6,9 @@ import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTas
 import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import java.io.File
+import java.nio.file.Path
+import kotlin.io.resolve
+import kotlin.text.lowercase
 
 internal fun findIncludeFolders(path: File): List<File> =
     findFilesRecursively(
@@ -28,6 +31,20 @@ internal fun findHeadersModule(
         },
         withDirectory = true,
     )
+
+internal fun getModuleArtifactsPath(
+    fromPath: Path,
+    productName: String,
+    moduleConfig: ModuleConfig,
+    target: AppleCompileTarget,
+): Path =
+    fromPath
+        .resolve("artifacts")
+        .resolve(productName.lowercase())
+        .resolve(moduleConfig.name)
+        .resolve("${moduleConfig.name}.xcframework")
+        .resolve(target.xcFrameworkArchName())
+
 
 internal fun getModulesInBuildDirectory(buildDir: File): List<File> {
     val extensions = listOf("build", "framework")

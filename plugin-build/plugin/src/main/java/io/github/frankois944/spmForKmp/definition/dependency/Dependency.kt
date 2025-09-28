@@ -14,12 +14,14 @@ internal class Dependency :
         path: String,
         packageName: String,
         exportToKotlin: Boolean,
+        isCLang: Boolean,
     ) {
         packageDependencies.add(
             SwiftDependency.Binary.Local(
                 path = path,
                 packageName = packageName,
                 exportToKotlin = exportToKotlin,
+                isCLang = isCLang,
             ),
         )
     }
@@ -29,6 +31,7 @@ internal class Dependency :
         packageName: String,
         exportToKotlin: Boolean,
         checksum: String,
+        isCLang: Boolean,
     ) {
         packageDependencies.add(
             SwiftDependency.Binary.Remote(
@@ -36,6 +39,7 @@ internal class Dependency :
                 packageName = packageName,
                 exportToKotlin = exportToKotlin,
                 checksum = checksum,
+                isCLang = isCLang,
             ),
         )
     }

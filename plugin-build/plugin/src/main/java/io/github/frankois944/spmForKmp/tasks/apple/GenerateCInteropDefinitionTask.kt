@@ -10,6 +10,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromChecko
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
 import io.github.frankois944.spmForKmp.tasks.utils.findIncludeFolders
+import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.checkSum
 import org.gradle.api.DefaultTask
@@ -28,6 +29,9 @@ import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
 
 @CacheableTask
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
@@ -165,6 +169,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                     ModuleConfig(
                                         name = dependency.packageName,
                                         spmPackageName = dependency.packageName,
+                                        isCLang = dependency.isCLang,
                                     ),
                                 )
                             }
@@ -191,24 +196,47 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         val buildDirContent = getModulesInBuildDirectory(currentBuildDirectory())
         // find the build directory of the declared module in the manifest
         moduleConfigs
-            .forEachIndexed { index, moduleInfo ->
-                logger.debug("LOOKING for module dir {}", moduleInfo.name)
-                buildDirContent
-                    .find {
-                        logger.debug("CHECK {} == {}", moduleInfo.name, it.nameWithoutExtension)
-                        it.nameWithoutExtension.equals(moduleInfo.name, ignoreCase = true)
-                    }?.let { buildDir ->
-                        moduleInfo.isFramework = buildDir.extension == "framework"
-                        moduleInfo.buildDir = buildDir
-                        moduleInfo.definitionFile =
-                            if (index == 0) {
-                                currentBuildDirectory()
-                                    .resolve("${moduleInfo.name}_${currentBridgeHash.get()}_default.def")
-                            } else {
-                                currentBuildDirectory()
-                                    .resolve("${moduleInfo.name}.def")
-                            }
-                    }
+            .forEachIndexed { index, moduleConfig ->
+                logger.debug("LOOKING for module dir {}", moduleConfig.name)
+                if (moduleConfig.isCLang) {
+                    logger.warn(
+                        """
+                        CLang is experimental and not fully tested; please create an issue if you encounter a bug.
+                        Only C language-based xcFramework is currently supported.
+                        """.trimIndent(),
+                    )
+
+                    // CLang framework has dedicated behavior, we need to look inside the artifact folder
+                    // only C xcframework type is supported
+                    moduleConfig.isFramework = true
+                    moduleConfig.buildDir =
+                        getModuleArtifactsPath(
+                            fromPath = scratchDir.get().toPath(),
+                            productName = productName.get(),
+                            moduleConfig = moduleConfig,
+                            target = target.get(),
+                        )
+                    moduleConfig.definitionFile =
+                        currentBuildDirectory()
+                            .resolve("${moduleConfig.name}.def")
+                } else {
+                    buildDirContent
+                        .find {
+                            logger.debug("CHECK {} == {}", moduleConfig.name, it.nameWithoutExtension)
+                            it.nameWithoutExtension.equals(moduleConfig.name, ignoreCase = true)
+                        }?.let { buildDir ->
+                            moduleConfig.isFramework = buildDir.extension == "framework"
+                            moduleConfig.buildDir = buildDir.toPath()
+                            moduleConfig.definitionFile =
+                                if (index == 0) {
+                                    currentBuildDirectory()
+                                        .resolve("${moduleConfig.name}_${currentBridgeHash.get()}_default.def")
+                                } else {
+                                    currentBuildDirectory()
+                                        .resolve("${moduleConfig.name}.def")
+                                }
+                        }
+                }
             }
         logger.debug(
             "Modules configured\n{}",
@@ -223,7 +251,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
                 val definition =
                     if (moduleConfig.isFramework) {
-                        generateFrameworkDefinition(moduleName, moduleConfig)
+                        if (moduleConfig.isCLang) {
+                            generateCFrameworkDefinition(moduleName, moduleConfig)
+                        } else {
+                            generateFrameworkDefinition(moduleName, moduleConfig)
+                        }
                     } else {
                         generateNonFrameworkDefinition(moduleName, moduleConfig)
                     }.let { def ->
@@ -254,17 +286,52 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     private fun getModuleMap(moduleConfig: ModuleConfig): File {
-        var path =
-            moduleConfig.buildDir.resolve(
-                if (moduleConfig.isFramework) "Modules/module.modulemap" else "module.modulemap",
+        val moduleMapPossiblePath =
+            listOf(
+                "module.modulemap", // non framework
+                "include/module.modulemap", // non framework
+                "Modules/module.modulemap", // framework
+                "Modules/include/module.modulemap", // framework
             )
-        if (!path.exists()) {
-            path =
-                moduleConfig.buildDir.resolve(
-                    if (moduleConfig.isFramework) "Modules/include/module.modulemap" else "include/module.modulemap",
-                )
+        logger.debug("Looking for modulemap {}", moduleMapPossiblePath)
+        for (modulePath in moduleMapPossiblePath) {
+            val file = moduleConfig.buildDir.resolve(modulePath)
+            if (file.exists()) {
+                logger.debug("modulemap found {}", path)
+                return file.toFile()
+            }
         }
-        return path
+        throw IllegalStateException("Module map file not found for module: ${moduleConfig.name}")
+    }
+
+    private fun generateCFrameworkDefinition(
+        moduleName: String,
+        moduleConfig: ModuleConfig,
+    ): String {
+        val frameworkName = moduleConfig.name
+        val libraryPaths =
+            getModuleArtifactsPath(
+                fromPath = scratchDir.get().toPath(),
+                productName = productName.get(),
+                moduleConfig = moduleConfig,
+                target = target.get(),
+            )
+        val packageName =
+            packageDependencyPrefix.orNull?.let {
+                "$it.${moduleConfig.name}"
+            } ?: moduleConfig.name
+        val headers =
+            libraryPaths.resolve("Headers").toFile().listFiles {
+                it.extension == "h"
+            }
+        return """
+package = $packageName
+headers = ${headers.joinToString { "\"$it\"" }}
+headerFilter = "$libraryPaths/Headers/**"
+libraryPaths = "${currentBuildDirectory()}"
+compilerOpts = -framework "$frameworkName" -F"$libraryPaths"
+linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"$libraryPaths"
+            """.trimIndent()
     }
 
     private fun generateFrameworkDefinition(
@@ -280,7 +347,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 language = Objective-C
 modules = $moduleName
 package = $packageName
-libraryPaths = "${currentBuildDirectory().path}"
+libraryPaths = "${currentBuildDirectory()}"
 compilerOpts = -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
 linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
 ${getCustomizedDefinitionConfig()}
@@ -343,7 +410,7 @@ ${getCustomizedDefinitionConfig()}
 language = Objective-C
 modules = $moduleName
 package = $packageName
-libraryPaths = "${currentBuildDirectory().path}"
+libraryPaths = "${currentBuildDirectory()}"
 compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"${currentBuildDirectory().path}"
 linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
 ${getCustomizedDefinitionConfig()}
