@@ -18,10 +18,18 @@ kotlin {
                 } else {
                     "arm64-apple-ios"
                 }
+            val artifactDir =
+                if (target.name == "iosSimulatorArm64") {
+                    "ios-arm64_x86_64-simulator"
+                } else {
+                    "ios-arm64"
+                }
             linkerOpts +=
                 listOf(
                     "-rpath",
                     "${projectDir.path}/SPM/spmKmpPlugin/nativeIosShared/scratch/$scratchDir/release/",
+                    "-L${projectDir.path}/SPM/spmKmpPlugin/nativeIosShared/scratch/artifacts/nativeiosshared/HevSocks5Tunnel/HevSocks5Tunnel.xcframework/$artifactDir/",
+                    "-lhev-socks5-tunnel",
                 )
             freeCompilerArgs +=
                 listOf(

@@ -332,9 +332,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 package = $packageName
 headers = ${headers.joinToString { "\"$it\"" }}
 headerFilter = "$libraryPaths/Headers/**"
-libraryPaths = "${currentBuildDirectory()}"
-compilerOpts = -framework "$frameworkName" -F"$libraryPaths"
-linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"$libraryPaths"
             """.trimIndent()
     }
 
