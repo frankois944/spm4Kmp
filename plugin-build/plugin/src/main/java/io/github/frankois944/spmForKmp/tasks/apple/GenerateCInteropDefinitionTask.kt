@@ -305,7 +305,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 return file.toFile()
             }
         }
-        throw IllegalStateException("Module map file not found for module: ${moduleConfig.name}")
+        error("Module map file not found for module: ${moduleConfig.name}")
     }
 
     private fun generateCFrameworkDefinition(
