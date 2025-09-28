@@ -33,6 +33,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
 
 @CacheableTask
+@Suppress("TooManyFunctions")
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
     abstract val target: Property<AppleCompileTarget>
