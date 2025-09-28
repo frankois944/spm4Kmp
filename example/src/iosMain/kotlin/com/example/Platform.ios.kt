@@ -5,6 +5,7 @@ package com.example
 import DummyFramework.MyDummyFramework
 import FirebaseAnalytics.FIRConsentStatusGranted
 import FirebaseCore.FIRApp
+import HevSocks5Tunnel.hev_socks5_tunnel_quit
 import kotlinx.cinterop.ExperimentalForeignApi
 import nativeIosShared.MySwiftDummyClass
 import nativeIosShared.TestClass
@@ -18,6 +19,10 @@ class IOSPlatform : Platform {
 
     override val name: String =
         UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
+}
+
+fun test() {
+    hev_socks5_tunnel_quit()
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()

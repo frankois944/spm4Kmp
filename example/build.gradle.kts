@@ -93,6 +93,9 @@ swiftPackageConfig {
         // packageDependencyPrefix = null // default null
         spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         // swiftBinPath = "/path/to/.swiftly/bin/swift"
+        // exportedPackageSettings {
+        //     includeProduct = listOf("HevSocks5Tunnel")
+        // }
         minIos = "16.0"
         dependency {
             remotePackageVersion(
@@ -104,7 +107,6 @@ swiftPackageConfig {
                     add(ProductName("FirebaseCore"), exportToKotlin = true)
                     // add FirebaseDatabase to your own swift code but don't export it
                     add(ProductName("FirebaseDatabase"))
-                    add("FirebaseAuth", exportToKotlin = true)
                 },
                 // (Optional) Package name, can be required in some cases
                 packageName = "firebase-ios-sdk",
@@ -139,6 +141,13 @@ swiftPackageConfig {
                     // Can be only used in your "src/swift" code.
                     add("CryptoSwift")
                 },
+            )
+            remoteBinary(
+                url = uri("https://github.com/wanliyunyan/HevSocks5Tunnel/releases/download/2.10.0/HevSocks5Tunnel.xcframework.zip"),
+                packageName = "HevSocks5Tunnel",
+                exportToKotlin = true,
+                checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
+                isCLang = true,
             )
         }
     }
