@@ -6,7 +6,7 @@ site_url: https://spmforkmp.eu/
 extra:
   social:
     - icon: material/coffee
-      link: https://buymeacoffee.com/frankois944
+      link: https://ko-fi.com/frankois944
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/in/francois-dabonot/
     - icon: fontawesome/brands/github
@@ -52,6 +52,7 @@ nav:
     - usages/multiTarget.md
     - usages/distribution.md
     - usages/largebridge.md
+    - usages/importCLangFramework.md
   - References:
       - references/swiftPackageConfig.md
       - Dependencies:
