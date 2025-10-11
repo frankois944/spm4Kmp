@@ -35,17 +35,20 @@ class IOSAppTest : BaseTest() {
                 if (isCI) {
                     ProcessBuilder(
                         "xcbeautify",
+                        "--disable-logging",
+                        "--preserve-unbeautified",
                         "--renderer",
                         "github-actions",
-                        "--is-ci",
                         "--report",
                         "junit",
-                        "--report-path",
-                        ".",
                     )
                 } else {
                     ProcessBuilder(
                         "xcbeautify",
+                        "--disable-logging",
+                        "--preserve-unbeautified",
+                        "--report",
+                        "junit",
                     )
                 }
             ).directory(File("../../example/iosApp"))
