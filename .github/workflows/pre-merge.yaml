@@ -87,18 +87,16 @@ jobs:
         uses: test-summary/action@v2
         if: ${{ !cancelled() }}
         with:
-          paths: |
-            'example/build/test-results/**/TEST-*.xml'
-            'example/iosApp/build/reports/*.xml'
+          paths: 'plugin-build/plugin/build/test-results/functionalTest/TEST-*.xml'
+          show: "all"
       - name: Print Test Report
         uses: mikepenz/action-junit-report@v5
         if: ${{ !cancelled() }}
         with:
-          report_paths: |
-            'example/build/test-results/**/TEST-*.xml'
-            'example/iosApp/build/reports/*.xml'
+          report_paths: 'plugin-build/plugin/build/test-results/functionalTest/TEST-*.xml'
           comment: true
           pr_id: ${{ github.event.workflow_run.pull_requests[0].number }}
+          include_passed: true
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v6
         with:

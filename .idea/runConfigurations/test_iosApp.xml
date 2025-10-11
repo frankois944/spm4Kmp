@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="build iosApp" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 clean build  | xcbeautify" />
+  <configuration default="false" name="test iosApp" type="ShConfigurationType">
+    <option name="SCRIPT_TEXT" value="xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' ARCHS=arm64 test | xcbeautify --preserve-unbeautified" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />
