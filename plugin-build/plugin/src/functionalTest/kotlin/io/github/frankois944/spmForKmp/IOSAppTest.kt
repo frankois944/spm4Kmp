@@ -27,6 +27,7 @@ class IOSAppTest : BaseTest() {
                     "clean",
                     "test",
                 ).directory(File("../../example/iosApp"))
+                .redirectErrorStream(true)
                 .start()
 
         // Create xcpretty process with output capture
