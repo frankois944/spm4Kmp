@@ -14,6 +14,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.checkSum
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -278,7 +279,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     extractModuleNameFromModuleMap(mapFile.readText())
                         ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
                 }
-
             val baseDefinition =
                 when {
                     moduleConfig.isFramework && moduleConfig.isCLang ->
@@ -307,7 +307,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             logger.error("Expected file: {}", moduleConfig.definitionFile.path)
             logger.error("Config: {}", moduleConfig)
             logger.error("Exception: $ex")
-            null
+            throw GradleException(
+                "spmForKmp failed when generating definition file for ${moduleConfig.name} module",
+                ex,
+            )
         }
     }
 
@@ -338,6 +341,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 moduleConfig = moduleConfig,
                 target = target.get(),
             )
+        check(libraryPaths.exists())
         val packageName =
             packageDependencyPrefix.orNull?.let {
                 "$it.${moduleConfig.name}"

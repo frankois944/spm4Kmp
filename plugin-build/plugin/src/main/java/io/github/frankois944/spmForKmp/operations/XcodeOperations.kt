@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
+import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
@@ -301,7 +302,7 @@ internal fun Logger.printExecLogs(
     errorOutput: ByteArrayOutputStream,
 ) {
     if (isError) {
-        error(
+        val errorString =
             """
 ERROR FOUND WHEN EXEC
 RUN $action
@@ -309,11 +310,12 @@ ARGS xcrun ${args.joinToString(" ")}
 ERROR $errorOutput
 OUTPUT $standardOutput
 ###
-            """.trimMargin(),
-        )
+            """.trimMargin()
+        error(errorString)
         if (!errorOutput.toString().contains("unexpected binary framework")) {
-            throw RuntimeException(
-                "RUN CMD $action failed",
+            throw GradleException(
+                "spmForKmp failed when running $action",
+                Exception(errorString),
             )
         }
     } else {
