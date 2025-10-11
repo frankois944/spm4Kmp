@@ -1,5 +1,9 @@
 name: Build and Tests
 
+permissions:
+  checks: write
+  pull-requests: write
+
 on:
   push:
     branches:
@@ -93,6 +97,8 @@ jobs:
           report_paths: |
             'example/build/test-results/**/TEST-*.xml'
             'example/iosApp/build/reports/*.xml'
+          comment: true
+          pr_id: ${{ github.event.workflow_run.pull_requests[0].number }}
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v6
         with:
