@@ -106,7 +106,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     if (index == 0) {
                         add(
                             currentBuildDirectory()
-                                .resolve("${moduleName.name}_${currentBridgeHash.get()}_default.def"),
+                                .resolve("${moduleName.name}_bridge.def"),
                         )
                     } else {
                         add(
@@ -254,7 +254,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         moduleConfig.buildDir = buildDir.toPath()
                         val definitionFilePath =
                             if (index == 0) {
-                                currentBuildDir.resolve("${moduleConfig.name}_${bridgeHash}_default.def")
+                                currentBuildDir.resolve("${moduleConfig.name}_bridge.def")
                             } else {
                                 currentBuildDir.resolve("${moduleConfig.name}.def")
                             }
@@ -295,7 +295,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 if (index == 0) {
                     val libName = compiledBinaryFile.name
                     val checksum = compiledBinaryFile.checkSum()
-                    val md5 = "#checksum: $checksum"
+                    val md5 = "#checksums: $checksum ${currentBridgeHash.get()}"
                     "$baseDefinition\n$md5\nstaticLibraries = $libName"
                 } else {
                     baseDefinition

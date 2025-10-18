@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.utils
 
+import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -15,13 +16,26 @@ internal fun File.checkSum(): String {
 
 internal object Hashing {
     @Throws(IOException::class)
-    fun hashDirectory(directory: File): String {
+    fun hashDirectory(config: PackageDirectoriesConfig): String {
         val md5Digest = MessageDigest.getInstance("SHA256")
+
+        md5Digest.update(config.bridgeSourceDir.path.toByteArray())
+        md5Digest.update(config.spmWorkingDir.path.toByteArray())
+        md5Digest.update(config.packageScratchDir.path.toByteArray())
+        config.sharedCacheDir?.path?.let {
+            md5Digest.update(it.toByteArray())
+        }
+        config.sharedSecurityDir?.path?.let {
+            md5Digest.update(it.toByteArray())
+        }
+        config.sharedConfigDir?.path?.let {
+            md5Digest.update(it.toByteArray())
+        }
 
         @Suppress("MagicNumber")
         val buffer = ByteArray(8192) // 8KB buffer
-
-        directory
+        config
+            .bridgeSourceDir
             .walk()
             .filter { it.isFile }
             .filter { !it.isHidden }
