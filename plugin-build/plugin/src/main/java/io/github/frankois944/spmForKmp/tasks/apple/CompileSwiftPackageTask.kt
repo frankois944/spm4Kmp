@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Files
 import javax.inject.Inject
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 
 @CacheableTask
@@ -140,6 +141,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     }
 
     private fun prepareWorkingDir() {
+        if (Files.isSymbolicLink(bridgeSourceBuiltDir.get().toPath())) {
+            bridgeSourceBuiltDir.get().toPath().deleteIfExists()
+        }
         if (bridgeSourceDir.get().asFileTree.isEmpty) {
             val dummyFile = bridgeSourceBuiltDir.get().resolve("DummySPMFile.swift")
             if (!dummyFile.exists()) {
