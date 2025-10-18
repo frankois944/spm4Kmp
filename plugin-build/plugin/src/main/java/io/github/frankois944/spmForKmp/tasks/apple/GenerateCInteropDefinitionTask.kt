@@ -202,7 +202,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         val builtModules = getModulesInBuildDirectory(currentBuildDir)
 
         // Configure les répertoires et fichiers de définition pour chaque module
-        configureModules(moduleConfigs, builtModules, currentBuildDir, bridgeHash)
+        configureModules(moduleConfigs, builtModules, currentBuildDir)
 
         logger.debug(
             "Modules configured\n{}",
@@ -224,7 +224,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs: List<ModuleConfig>,
         builtModules: List<File>,
         currentBuildDir: File,
-        bridgeHash: String,
     ) {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("LOOKING for module dir {}", moduleConfig.name)
