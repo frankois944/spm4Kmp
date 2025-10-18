@@ -277,7 +277,7 @@ private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTa
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-    this.currentBridgeHash.set(Hashing.hashDirectory(packageDirectoriesConfig.bridgeSourceDir))
+    this.currentBridgeHash.set(Hashing.hashDirectory(packageDirectoriesConfig))
     this.strictEnums.set(swiftPackageEntry.strictEnums)
     this.nonStrictEnums.set(swiftPackageEntry.nonStrictEnums)
     this.foreignExceptionMode.set(swiftPackageEntry.foreignExceptionMode)
