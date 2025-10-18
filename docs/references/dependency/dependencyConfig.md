@@ -26,12 +26,14 @@ one</a>
 * **path** The local file URL (file://...) to the xcFramework.
 * **packageName** The name of the package associated with this binary.
 * **exportToKotlin** Defines whether the dependency should be exported for use in Kotlin code.
+* **isCLang** Specify if the binary is a C language framework.
 
 ```kotlin
 fun localBinary(
     path: String,
     packageName: String,
-    exportToKotlin: Boolean = false
+    exportToKotlin: Boolean = false,
+    isCLang: Boolean = false,
 )
 ```
 
@@ -45,13 +47,15 @@ Represents a remote binary dependency as a zipped xcFramework
 * **packageName** The name of the package associated with this binary dependency.
 * **exportToKotlin** Defines whether this dependency should be exported for use in Kotlin code.
 * **checksum** The checksum of the remote binary to verify its integrity.
+* **isCLang** Specify if the binary is a C language framework.
 
 ```kotlin
 fun remoteBinary(
     url: URI,
     packageName: String,
     exportToKotlin: Boolean = false,
-    checksum: String
+    checksum: String,
+    isCLang: Boolean = false,
 )
 ```
 

@@ -3,76 +3,114 @@ package io.github.frankois944.spmForKmp
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class IOSAppTest : BaseTest() {
     @Test
     fun `build and test example app`() {
-        val xcodebuild =
-            ProcessBuilder()
-                .command(
-                    "xcodebuild",
-                    "-project",
-                    "iosApp.xcodeproj",
-                    "-scheme",
-                    "iosApp",
-                    "-configuration",
-                    "Debug",
-                    "-destination",
-                    "platform=iOS Simulator,name=iPhone SE (3rd generation)",
-                    "-derivedDataPath",
-                    "./build",
-                    "-clonedSourcePackagesDirPath",
-                    "./spm",
-                    "clean",
-                    "test",
-                ).directory(File("../../example/iosApp"))
-                .start()
+        val xcodeBuildCommand =
+            listOf(
+                "xcodebuild",
+                "-project",
+                "iosApp.xcodeproj",
+                "-scheme",
+                "iosApp",
+                "-configuration",
+                "Debug",
+                "-destination",
+                "platform=iOS Simulator,name=iPhone SE (3rd generation)",
+                "-derivedDataPath",
+                "./build",
+                "-clonedSourcePackagesDirPath",
+                "./spm",
+                "-testPlan",
+                "iosApp",
+                "clean",
+                "test",
+            )
 
-        // Create xcpretty process with output capture
-        val xcpretty =
-            (
-                if (isCI) {
-                    ProcessBuilder(
-                        "xcbeautify",
-                        "--renderer",
-                        "github-actions",
-                        "--is-ci",
-                        "--report",
-                        "junit",
-                        "--report-path",
-                        ".",
-                    )
-                } else {
-                    ProcessBuilder(
-                        "xcbeautify",
-                    )
-                }
-            ).directory(File("../../example/iosApp"))
+        val workDir = File("../../example/iosApp")
+
+        val xcodebuild =
+            ProcessBuilder(xcodeBuildCommand)
+                .directory(workDir)
                 .redirectErrorStream(true)
                 .start()
 
-        // Pipe xcodebuild output to xcpretty
-        xcodebuild.inputStream.copyTo(xcpretty.outputStream)
-        xcpretty.outputStream.close()
+        val xcbeautifyCmd =
+            if (isCI) {
+                listOf(
+                    "xcbeautify",
+                    "--disable-logging",
+                    "--preserve-unbeautified",
+                    "--renderer",
+                    "github-actions",
+                    "--report",
+                    "junit",
+                )
+            } else {
+                listOf(
+                    "xcbeautify",
+                    "--disable-logging",
+                    "--preserve-unbeautified",
+                    "--report",
+                    "junit",
+                )
+            }
 
-        // Capture and print xcpretty output
-        val finalOutput =
-            buildString {
-                xcpretty.inputStream.bufferedReader().forEachLine { line ->
-                    appendLine(line)
+        val xcbeautify =
+            ProcessBuilder(xcbeautifyCmd)
+                .directory(workDir)
+                .redirectErrorStream(true)
+                .start()
+
+        // Pipe xcodebuild -> xcbeautify
+        val ioPool = Executors.newFixedThreadPool(2)
+        val pipeFuture =
+            ioPool.submit {
+                xcodebuild.inputStream.use { src ->
+                    xcbeautify.outputStream.use { sink ->
+                        src.copyTo(sink)
+                        // use{} closes sink to signal EOF to xcbeautify
+                    }
                 }
             }
 
-        // Wait for both processes to complete
-        val xcodeBuildExitCode = xcodebuild.waitFor(30, TimeUnit.MINUTES)
-        val xcprettyExitCode = xcpretty.waitFor(1, TimeUnit.MINUTES)
+        // Capture xcbeautify output concurrently
+        val outputSb = StringBuilder()
+        val readFuture =
+            ioPool.submit {
+                xcbeautify.inputStream.bufferedReader().useLines { lines ->
+                    lines.forEach { line ->
+                        outputSb.appendLine(line)
+                    }
+                }
+            }
 
-        // Check exit codes and output
-        assert(xcodebuild.exitValue() == 0) {
-            "xcodebuild process failed with exit code ${xcodebuild.exitValue()}\nOutput:\n$finalOutput"
+        // Wait for piping to complete before joining processes
+        pipeFuture.get(10, TimeUnit.MINUTES)
+        readFuture.get(10, TimeUnit.MINUTES)
+        ioPool.shutdown()
+
+        val xcodebuildFinished = xcodebuild.waitFor(10, TimeUnit.MINUTES)
+        val xcbeautifyFinished = xcbeautify.waitFor(5, TimeUnit.MINUTES)
+
+        val xcodebuildExit = if (xcodebuildFinished) xcodebuild.exitValue() else -1
+        val xcbeautifyExit = if (xcbeautifyFinished) xcbeautify.exitValue() else -1
+
+        // Emulate `set -o pipefail`: fail if either process failed
+        val finalOutput = outputSb.toString()
+        assert(xcodebuildExit == 0 && xcbeautifyExit == 0) {
+            buildString {
+                appendLine("Pipeline failed:")
+                appendLine("xcodebuild exit=$xcodebuildExit, xcbeautify exit=$xcbeautifyExit")
+                appendLine("Output:")
+                append(finalOutput)
+            }
         }
-        if (xcodebuild.exitValue() == 0 && isCI) {
+
+        if (isCI || xcodebuildExit != 0 || xcbeautifyExit != 0) {
             println(finalOutput)
         }
     }

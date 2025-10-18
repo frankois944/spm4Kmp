@@ -7,6 +7,7 @@ import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.configAppleTargets
 import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
+import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -93,8 +94,9 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         } ?: run {
                             // If there is no task, there is something really wrong somewhere.
                             // the user must make an issue with its configuration
-                            logger.error(
+                            throw GradleException(
                                 """
+                                spmForKmp failed :
                                 No task found for target ${cinteropTarget.name}
                                 make an issue with your plugin configuration
                                 """.trimIndent(),
