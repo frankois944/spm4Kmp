@@ -14,7 +14,9 @@ In a case the exported dependency is written in [Swift](./section-help/faq.md), 
 
 For example, the [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) can't work directly on Kotlin, so the Plugin's bridge is here to fill the gape between Kotlin and Swift.
 
-## Gradle
+## Example
+
+### Gradle
 
 The following configuration exports to Kotlin the package [FirebaseAnalytics](https://github.com/firebase/firebase-ios-sdk) which is a ObjC library.
 
@@ -27,7 +29,7 @@ swiftPackageConfig {
     create("[cinteropName]") {
         dependency {
             remotePackageVersion(
-                url = URI("https://github.com/firebase/firebase-ios-sdk"),
+                url = uri("https://github.com/firebase/firebase-ios-sdk"),
                 products = {
                     add("FirebaseAnalytics", exportToKotlin = true), // exported
                     add("FirebaseCore") // non-exported
@@ -41,7 +43,7 @@ swiftPackageConfig {
 }
 ```
 
-## Example
+### Bridge
 
 ``` kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
 import FirebaseAnalytics.FIRConsentStatusGranted

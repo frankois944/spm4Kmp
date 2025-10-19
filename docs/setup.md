@@ -3,10 +3,10 @@
 ## Requirement
 
 - macOS With Xcode 16 and later
-    - Using an earlier version of [Xcode is possible](section-help/tips.md#support-xcode-15-and-earlier), but I don't recommend it.
+    - Using an earlier version of [Xcode is possible](section-help/tips.md#support-xcode-15-and-earlier-or-another-version-of-swift), but I don't recommend it.
 - Kotlin : **2.1.0 and later**
+    - It's always recommended to use the latest version of Kotlin.
 - Gradle : **8.10 and later**
-
 
 
 ## Plugins
@@ -53,5 +53,3 @@ swiftPackageConfig {
     }
 }
 ```
-
-

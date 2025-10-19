@@ -1,6 +1,14 @@
 # Bridge The Native API
 
-## Gradle
+## How It Works
+
+When syncing the project, the plugin creates a folder at `src/swift/[cinteropname]`.
+
+The content of this folder is your bridge between Swift and Kotlin, **everything inside is copied to the build directory**.
+
+## Example
+
+### Gradle
 
 The following configuration is a simple bridge between Kotlin and the Swift Apple Native SDK.
 
@@ -13,11 +21,7 @@ swiftPackageConfig {
 }
 ```
 
-When syncing the project, the plugin creates a folder at `src/swift/[cinteropname]`.
-
-The content of this folder is your bridge between Swift and Kotlin, **everything inside is copied to the build directory**.
-
-## Example
+### Bridge
 
 !!! warning "Make your Swift code compatible with Kotlin."
 

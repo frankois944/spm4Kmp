@@ -22,7 +22,9 @@ You have two choices:
 - Use Xcode version 16.2 and earlier.
 - Upgrade your Kotlin version to 2.1.21 and later.
 
-## Failed to look up symbolic reference at 0x... - offset ... - symbol symbolic ... in .../debugTest/test.kexe
+If you encounter this error with a later version of Xcode/Kotlin, you **MUST** use the latest version of Kotlin.
+
+## Failed to look up symbolic reference at 0x... - offset ... - symbol symbolic ... in .../debugTest/test.kexe or *Library not loaded: libswift_Concurrency.dylib*
 
 This is an issue about using the bridge with an invalid version of swift.
 
