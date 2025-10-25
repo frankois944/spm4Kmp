@@ -1,3 +1,5 @@
+<img src="docs/assets/img.png" alt="spmForKmp logo" style="width:150px; height:auto;">
+
 # The Swift Package Manager for Kotlin multiplatform Plugin
 
 [![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp)
