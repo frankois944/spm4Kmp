@@ -1,5 +1,6 @@
 [versions]
 detekt = "1.23.8"
+# increase > 2.2.20 for xcode > 26
 kotlin = "2.1.21"
 ktlintGradle = "13.1.0"
 pluginPublish = "2.0.0"
