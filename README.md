@@ -16,7 +16,7 @@ It will help you to integrate Swift Package and simplify communication between S
 
 The plugin uses the embedded Swift Package Manager, so **no third-party dependency is needed**, and it's less intrusive.
 
-# [DOCUMENTATION](https://spmforkmp.eu/)
+# [READ THE DOCUMENTATION](https://spmforkmp.eu/)
 
 # QuickStart
 
