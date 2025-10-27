@@ -393,7 +393,6 @@ ${getCustomizedDefinitionConfig()}
                             .get()
                             .resolve("checkouts")
                             .resolve(it)
-                            .resolve("Sources")
                     logger.debug("SEARCH IN {}", folderToSearch)
                     // extract all folder names "include" in checkout package directory
                     addAll(

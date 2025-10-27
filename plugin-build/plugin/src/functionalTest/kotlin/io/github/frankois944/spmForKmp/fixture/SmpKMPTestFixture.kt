@@ -40,6 +40,7 @@ abstract class SmpKMPTestFixture private constructor(
         val rawDependencyConfiguration: KotlinSource? = null,
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginRootConfig: String? = null,
+        val gradleCaching: Boolean = true,
     )
 
     protected abstract fun createProject(): GradleProject
@@ -47,16 +48,17 @@ abstract class SmpKMPTestFixture private constructor(
     protected fun createDefaultProject(extension: TestConfiguration): GradleProject =
         newGradleProjectBuilder(GradleProject.DslKind.KOTLIN)
             .withRootProject {
-                setupProperties()
+                setupProperties(extension)
             }.withSubproject("library") {
                 setupSources(extension.cinteropsName)
                 setupGradleConfig(extension)
             }.write()
 
-    private fun RootProject.Builder.setupProperties() {
+    private fun RootProject.Builder.setupProperties(extension: TestConfiguration) {
         var content = """
 kotlin.mpp.enableCInteropCommonization=true
-org.gradle.caching=true
+org.gradle.caching=${ if (extension.gradleCaching) "true" else "false" }
+org.gradle.configuration-cache=${if (extension.gradleCaching) "true" else "false"}
 """
         // code coverage
         if (jacocoDestfile != null) {
@@ -327,6 +329,11 @@ swiftPackageConfig {
         fun withToolsVersion(toolsVersion: String) =
             apply {
                 config = config.copy(toolsVersion = toolsVersion)
+            }
+
+        fun withGradleCache(isEnable: Boolean = true) =
+            apply {
+                config = config.copy(gradleCaching = isEnable)
             }
 
         fun appendRawPluginRootConfig(
