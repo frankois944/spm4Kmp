@@ -12,8 +12,6 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/frankois944
   analytics:
-    provider: google
-    property: G-KKDWJKFYV1
     feedback:
       title: Was this page helpful?
       ratings:
@@ -89,6 +87,8 @@ validation:
   absolute_links: warn
   unrecognized_links: warn
   anchors: warn
+extra_javascript:
+  - javascripts/extra.js
 theme:
   name: material
   logo: assets/img.png
