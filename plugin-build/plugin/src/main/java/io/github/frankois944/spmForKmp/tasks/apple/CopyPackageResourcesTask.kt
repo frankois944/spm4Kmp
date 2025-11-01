@@ -72,7 +72,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
         copiedResources.bundles.forEach { bundle ->
             val destination = File(copiedResources.outputBundleDirectory, bundle.name)
             logger.debug("copy resources bundle {} to {}", bundle.absolutePath, destination.absolutePath)
-            bundle.copyRecursively(destination, overwrite = true)
+            bundle.copyRecursively(destination, overwrite = true, followLinks = true)
         }
         logger.debug("End copy bundle resources")
     }
@@ -160,7 +160,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
         framework.files.forEach { file ->
             val destFile = destination.resolve(file.name)
             logger.debug("copy framework file {} to {}", file.name, destFile)
-            file.copyRecursively(destFile, overwrite = true)
+            file.copyRecursively(destFile, overwrite = true, followLinks = true)
         }
     }
 }
