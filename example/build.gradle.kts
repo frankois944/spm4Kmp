@@ -158,7 +158,7 @@ swiftPackageConfig {
                 isCLang = true,
             )
             remotePackageVersion(
-                url = URI("https://github.com/SDWebImage/SDWebImage.git"),
+                url = uri("https://github.com/SDWebImage/SDWebImage.git"),
                 products = {
                     add("SDWebImage")
                 },
