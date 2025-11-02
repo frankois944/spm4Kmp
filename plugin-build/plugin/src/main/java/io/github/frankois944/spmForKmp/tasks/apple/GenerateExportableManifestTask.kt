@@ -22,6 +22,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject
@@ -163,16 +164,23 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                     manifestFile.asFile.get(),
                     logger,
                 )
-                val namesToExport = requiredDependencies.joinToString(",") { it.name }
-                logger.lifecycle(
-                    """
-                    Spm4Kmp: The following dependencies [$namesToExport] need to be added to your xcode project
-                    A local Swift package has been generated at
-                    ${manifestFile.get().asFile.parentFile.path}
-                    Please add it to your xcode project as a local package dependency; it will add the missing content.
-                    ****You can ignore this messaging if you have already added these dependencies to your Xcode project****
-                    """.trimIndent(),
-                )
+                if (!project.extraProperties.properties
+                        .getValue("spmforkmp.hideLocalPackageMessage")
+                        ?.toString()
+                        .toBoolean()
+                ) {
+                    val namesToExport = requiredDependencies.joinToString(",") { it.name }
+                    logger.error(
+                        """
+                        Spm4Kmp: The following dependencies [$namesToExport] need to be added to your xcode project
+                        A local Swift package has been generated at
+                        ${manifestFile.get().asFile.parentFile.path}
+                        Please add it to your xcode project as a local package dependency
+                        Check https://spmforkmp.eu/bridgeWithDependencies/#automatic-dependency-build-inclusion for more details
+                        Set "spmforkmp.hideLocalPackageMessage=true" inside gradle.properties to hide this message
+                        """.trimIndent(),
+                    )
+                }
             } catch (ex: Exception) {
                 logger.error(
                     "Manifest file generated : \n{}\n{}",

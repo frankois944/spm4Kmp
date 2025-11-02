@@ -12,6 +12,8 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/frankois944
   analytics:
+    provider: google
+    property: G-KKDWJKFYV1
     feedback:
       title: Was this page helpful?
       ratings:

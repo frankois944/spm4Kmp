@@ -3,9 +3,6 @@
 
 {% block extrahead %}
 
-{% endblock %}
-
-{% block scripts %}
 <!-- Matomo -->
 <script>
   var _paq = window._paq = window._paq || [];
@@ -13,15 +10,20 @@
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
-    var u="//matomo.spmforkmp.eu/";
+    var u="https://matomo.spmforkmp.eu/";
     _paq.push(['setTrackerUrl', u+'matomo.php']);
     _paq.push(['setSiteId', '4']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
   })();
 </script>
-
 <!-- End Matomo Code -->
+
+
+{% endblock %}
+
+{% block scripts %}
+
   {{ super() }}
   <!-- Add scripts that need to run afterwards here -->
 {% endblock %}

@@ -41,9 +41,11 @@ If the dependencies must be declared on the Xcode side; in that case, you will s
 Spm4Kmp: The following dependencies [some_dependency_name] need to be added to your xcode project
 A local Swift package has been generated at
 /path/to/the/local/package
-Please add it to your xcode project as a local package dependency; it will add the missing content.
-****You can ignore this messaging if you have already added these dependencies to your Xcode project****
+Please add it to your xcode project as a local package dependency
+...
 ```
+
+Set `spmforkmp.hideLocalPackageMessage=true` inside gradle.properties to hide this message
 
 ## Example
 
