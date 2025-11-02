@@ -157,6 +157,13 @@ swiftPackageConfig {
                 checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
                 isCLang = true,
             )
+            remotePackageVersion(
+                url = uri("https://github.com/SDWebImage/SDWebImage.git"),
+                products = {
+                    add("SDWebImage")
+                },
+                version = "5.21.3",
+            )
         }
     }
     create("nativeMacosShared") {

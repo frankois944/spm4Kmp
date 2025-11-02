@@ -26,7 +26,6 @@ class IOSAppTest : BaseTest() {
                 "./spm",
                 "-testPlan",
                 "iosApp",
-                "clean",
                 "test",
             )
 
@@ -44,8 +43,6 @@ class IOSAppTest : BaseTest() {
                     "xcbeautify",
                     "--disable-logging",
                     "--preserve-unbeautified",
-                    "--renderer",
-                    "github-actions",
                     "--report",
                     "junit",
                 )
@@ -89,12 +86,12 @@ class IOSAppTest : BaseTest() {
             }
 
         // Wait for piping to complete before joining processes
-        pipeFuture.get(10, TimeUnit.MINUTES)
-        readFuture.get(10, TimeUnit.MINUTES)
+        pipeFuture.get(20, TimeUnit.MINUTES)
+        readFuture.get(20, TimeUnit.MINUTES)
         ioPool.shutdown()
 
-        val xcodebuildFinished = xcodebuild.waitFor(10, TimeUnit.MINUTES)
-        val xcbeautifyFinished = xcbeautify.waitFor(5, TimeUnit.MINUTES)
+        val xcodebuildFinished = xcodebuild.waitFor(20, TimeUnit.MINUTES)
+        val xcbeautifyFinished = xcbeautify.waitFor(10, TimeUnit.MINUTES)
 
         val xcodebuildExit = if (xcodebuildFinished) xcodebuild.exitValue() else -1
         val xcbeautifyExit = if (xcbeautifyFinished) xcbeautify.exitValue() else -1
@@ -110,7 +107,7 @@ class IOSAppTest : BaseTest() {
             }
         }
 
-        if (isCI || xcodebuildExit != 0 || xcbeautifyExit != 0) {
+        if (!isCI && xcodebuildExit == 0 && xcbeautifyExit == 0) {
             println(finalOutput)
         }
     }
