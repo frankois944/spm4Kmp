@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.OnErrorResult
 import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.name
@@ -80,7 +81,10 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
                     .toPath()
                     .createParentDirectories()
             logger.debug("copy resources bundle {} to {}", bundle, destination)
-            bundle.copyToRecursively(target = destination, overwrite = true, followLinks = true)
+            bundle.copyToRecursively(target = destination, overwrite = true, followLinks = true, onError = { path1, path2, error ->
+                logger.error("SKIP_SUBTREE: Can't copy package resource from {} to {}", path1, path2, error)
+                return@copyToRecursively OnErrorResult.SKIP_SUBTREE
+            })
         }
         logger.debug("End copy bundle resources")
     }
@@ -166,9 +170,12 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
 
         logger.debug("copy framework {} to {}", framework.name, destination)
         framework.files.map { it.toPath() }.forEach { file ->
-            val destFile = destination.resolve(file.name).toPath().createParentDirectories()
-            logger.debug("copy framework file {} to {}", file.name, destFile)
-            file.copyToRecursively(destFile, overwrite = true, followLinks = true)
+            val destDir = destination.resolve(file.name).toPath().createParentDirectories()
+            logger.debug("copy framework file {} to {}", file.name, destDir)
+            file.copyToRecursively(target = destDir, overwrite = true, followLinks = true, onError = { path1, path2, error ->
+                logger.error("SKIP_SUBTREE: Can't copy package resource from {} to {}", path1, path2, error)
+                return@copyToRecursively OnErrorResult.SKIP_SUBTREE
+            })
         }
     }
 }

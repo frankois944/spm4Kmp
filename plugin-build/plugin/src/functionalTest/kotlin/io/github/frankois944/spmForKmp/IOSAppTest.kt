@@ -43,8 +43,6 @@ class IOSAppTest : BaseTest() {
                     "xcbeautify",
                     "--disable-logging",
                     "--preserve-unbeautified",
-                    "--renderer",
-                    "github-actions",
                     "--report",
                     "junit",
                 )
@@ -109,7 +107,7 @@ class IOSAppTest : BaseTest() {
             }
         }
 
-        if (isCI || xcodebuildExit != 0 || xcbeautifyExit != 0) {
+        if (!isCI && xcodebuildExit == 0 && xcbeautifyExit == 0) {
             println(finalOutput)
         }
     }
