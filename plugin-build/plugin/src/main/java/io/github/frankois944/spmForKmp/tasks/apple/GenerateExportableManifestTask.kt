@@ -165,7 +165,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                     logger,
                 )
                 if (!project.extraProperties.properties
-                        .getValue("spmforkmp.hideLocalPackageMessage")
+                        .getOrDefault("spmforkmp.hideLocalPackageMessage", false)
                         ?.toString()
                         .toBoolean()
                 ) {
