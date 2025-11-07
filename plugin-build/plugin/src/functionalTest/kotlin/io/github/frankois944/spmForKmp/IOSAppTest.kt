@@ -26,6 +26,7 @@ class IOSAppTest : BaseTest() {
                 "./spm",
                 "-testPlan",
                 "iosApp",
+                "clean",
                 "test",
             )
 
@@ -107,8 +108,8 @@ class IOSAppTest : BaseTest() {
             }
         }
 
-        if (!isCI && xcodebuildExit == 0 && xcbeautifyExit == 0) {
-            println(finalOutput)
-        }
+//        if (!isCI && xcodebuildExit == 0 && xcbeautifyExit == 0) {
+        //          println(finalOutput)
+        //      }
     }
 }
