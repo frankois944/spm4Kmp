@@ -31,6 +31,7 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
@@ -232,6 +233,12 @@ private fun GenerateExportableManifestTask.configureExportableManifestTask(
     this.exportedPackage.set(swiftPackageEntry.exportedPackageSettings)
     this.compiledTargetDir.set(targetBuildDir)
     this.includeProduct.set(swiftPackageEntry.exportedPackageSettings.includeProduct)
+    this.hideLocalPackageMessage.set(
+        project.extraProperties.properties
+            .getOrDefault("spmforkmp.hideLocalPackageMessage", false)
+            .toString()
+            .toBoolean(),
+    )
 }
 
 @Suppress("LongParameterList")

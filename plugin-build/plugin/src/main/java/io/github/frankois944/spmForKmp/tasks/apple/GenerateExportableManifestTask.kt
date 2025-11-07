@@ -67,6 +67,9 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     @get:Input
     abstract val includeProduct: ListProperty<String>
 
+    @get:Input
+    abstract val hideLocalPackageMessage: Property<Boolean>
+
     @get:OutputFile
     val exportedSource: File
         get() =
@@ -164,11 +167,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                     manifestFile.asFile.get(),
                     logger,
                 )
-                if (!project.extraProperties.properties
-                        .getOrDefault("spmforkmp.hideLocalPackageMessage", false)
-                        ?.toString()
-                        .toBoolean()
-                ) {
+                if (!hideLocalPackageMessage.get()) {
                     val namesToExport = requiredDependencies.joinToString(",") { it.name }
                     logger.error(
                         """
