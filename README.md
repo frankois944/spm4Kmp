@@ -70,6 +70,10 @@ If you find this project useful, please consider giving it a star!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A51MG1Y9)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=frankois944/spm4Kmp&type=date&legend=top-left)](https://www.star-history.com/#frankois944/spm4Kmp&type=date&legend=top-left)
+
 ---
 
 For additional help or detailed documentation, refer to the official repository or contact the plugin maintainers. Happy coding! 🎉
