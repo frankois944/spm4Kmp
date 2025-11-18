@@ -12,6 +12,8 @@ The Swift Package Manager for Kotlin Multiplatform Plugin, aka `spmForKmp` Gradl
 
 It will help you to integrate Swift Package and simplify communication between Swift/Kotlin Multiplatform projects targeting the **Apple platform**.
 
+You can also easily **use your own Swift code** to your Kotlin iOSMain sourceSet!
+
 The plugin uses the embedded Swift Package Manager, so **no third-party dependency is needed**, and it's less intrusive.
 
 # [READ THE DOCUMENTATION](https://spmforkmp.eu/)
