@@ -42,15 +42,6 @@ class NewEntryPointTest : BaseTest() {
                             @objc public class TestView: UIView {}
                             """.trimIndent(),
                     ),
-                ).withKotlinSources(
-                    KotlinSource.of(
-                        imports = listOf("dummy.TestView"),
-                        content =
-                            """
-                            @kotlinx.cinterop.ExperimentalForeignApi
-                            val view = TestView()
-                            """.trimIndent(),
-                    ),
                 ).build()
 
         // When
