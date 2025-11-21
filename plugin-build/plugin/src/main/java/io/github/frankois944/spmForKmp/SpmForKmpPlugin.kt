@@ -59,8 +59,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     return@afterEvaluate
                 }
                 entries.forEach { swiftPackageEntry ->
-                    logger.warn("NAME : ${swiftPackageEntry.name}")
-                    logger.warn("targetName : ${swiftPackageEntry.targetName}")
                     val spmWorkingDir =
                         resolveAndCreateDir(
                             File(swiftPackageEntry.spmWorkingPath),
@@ -153,11 +151,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     .getByType(KotlinMultiplatformExtension::class.java)
                     .targets
                     .findByName(targetName) as KotlinNativeTarget
-            logger.warn("targetName : $targetName")
             val mainCompilationTarget = ktTarget.compilations.getByName("main")
-            logger.warn("mainCompilationTarget : ${mainCompilationTarget.name}")
             if (!checkExistCInteropTask(mainCompilationTarget, "SpmForKmp")) {
-                logger.warn("Creating fake definition file for target: $targetName")
                 createCInteropTask(
                     mainCompilationTarget,
                     cinteropName = "SpmForKmp",

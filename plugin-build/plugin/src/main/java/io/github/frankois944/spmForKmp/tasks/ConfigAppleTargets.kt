@@ -54,9 +54,7 @@ internal fun Project.configAppleTargets(
             tasks
                 .withType(CInteropProcess::class.java)
                 .filter {
-                    logger.warn("Checking task name: ${it.name}")
-                    logger.warn("startsWith: cinteropSpmForKmp${swiftPackageEntry.targetName!!.capitalized()}")
-                    it.name.startsWith("cinteropSpmForKmp" + swiftPackageEntry.targetName!!.capitalized())
+                    it.name.startsWith("cinteropSpmForKmp" + swiftPackageEntry.targetName?.capitalized())
                 }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
         } else {
             tasks
