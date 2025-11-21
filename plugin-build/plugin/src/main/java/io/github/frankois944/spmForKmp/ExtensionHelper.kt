@@ -12,6 +12,13 @@ internal fun Project.swiftContainer(): NamedDomainObjectContainer<PackageRootDef
     @Suppress("UNCHECKED_CAST")
     extensions.getByName(CONTAINER_NAME) as NamedDomainObjectContainer<PackageRootDefinitionExtension>
 
+/**
+ * Configures a Swift package for the given Kotlin Native target. This allows seamless integration
+ * of Swift and Kotlin code in a multiplatform project by enabling the use of a Swift package.
+ *
+ * @param configure A lambda function to customize the package configuration
+ *                  using the provided `PackageRootDefinitionExtension`.
+ */
 public fun KotlinNativeTarget.swiftPackage(configure: PackageRootDefinitionExtension.() -> Unit) {
     val entry = project.swiftContainer().maybeCreate(this.name)
     entry.useExtension = true
@@ -19,11 +26,17 @@ public fun KotlinNativeTarget.swiftPackage(configure: PackageRootDefinitionExten
     entry.configure()
 }
 
+/**
+ * Configures a Swift Package for the specified Kotlin Native target.
+ *
+ * @param groupName The name of the group to associate with a group Of Target; useful when using a list of target
+ * @param configure A lambda used to configure the package using the provided `PackageRootDefinitionExtension`.
+ */
 public fun KotlinNativeTarget.swiftPackage(
-    name: String,
+    groupName: String,
     configure: PackageRootDefinitionExtension.() -> Unit,
 ) {
-    val entry = project.swiftContainer().maybeCreate(name)
+    val entry = project.swiftContainer().maybeCreate(groupName)
     entry.useExtension = true
     entry.targetName = this.name
     entry.configure()
