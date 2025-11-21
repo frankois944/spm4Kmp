@@ -164,7 +164,7 @@ internal fun Project.configAppleTargets(
             outputFiles.forEachIndexed { index, file ->
                 val cinteropName =
                     if (index > 0) {
-                        file.nameWithoutExtension + swiftPackageEntry.name.capitalized()
+                        file.nameWithoutExtension
                     } else {
                         file.nameWithoutExtension.split("_").first()
                     }
