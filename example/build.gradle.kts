@@ -10,8 +10,13 @@ val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plug
 
 kotlin {
 
+    iosSimulatorArm64 {
+        swiftPackage(groupName = "nativeIosShared") {
+        }
+    }
+
     listOf(
-        // iosArm64(),
+        iosArm64(),
         iosSimulatorArm64(),
     ).forEach { target ->
         target.binaries.getTest("debug").apply {
@@ -43,7 +48,10 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        target.swiftPackage(name = "nativeIosShared") {
+        /**
+         * groupName is only needed when using a list of target
+         */
+        target.swiftPackage(groupName = "nativeIosShared") {
             // optional parameters
             // the ios minimal version
             // minIos = "12.0"
@@ -132,21 +140,19 @@ kotlin {
         }
     }
 
-    listOf(
-        macosArm64(),
-    ).forEach { target ->
-        target.binaries.getTest("debug").apply {
+    macosArm64 {
+        binaries.getTest("debug").apply {
             linkerOpts +=
                 listOf(
                     "-rpath",
                     "${projectDir.path}/build/spmKmpPlugin/nativeMacosShared/scratch/arm64-apple-macosx/release/",
                 )
         }
-        target.binaries.framework {
+        binaries.framework {
             baseName = "shared"
             isStatic = true
         }
-        target.swiftPackage(name = "nativeMacosShared") {
+        swiftPackage(groupName = "nativeMacosShared") {
             dependency {
                 localPackage(
                     path = "$testResources/LocalSourceDummyFramework",
