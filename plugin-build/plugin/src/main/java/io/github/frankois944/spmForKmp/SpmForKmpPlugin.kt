@@ -15,7 +15,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
-import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
@@ -54,8 +53,14 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val taskGroup = mutableMapOf<AppleCompileTarget, Task>()
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
-                project.swiftContainer().forEach { swiftPackageEntry ->
-
+                val entries = swiftPackageEntries + project.swiftContainer()
+                if (entries.isEmpty()) {
+                    logger.error("No Configuration found, can't continue")
+                    return@afterEvaluate
+                }
+                entries.forEach { swiftPackageEntry ->
+                    logger.warn("NAME : ${swiftPackageEntry.name}")
+                    logger.warn("targetName : ${swiftPackageEntry.targetName}")
                     val spmWorkingDir =
                         resolveAndCreateDir(
                             File(swiftPackageEntry.spmWorkingPath),
@@ -139,19 +144,27 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
     }
 
     private fun Project.createMissingCinteropTask(swiftPackageEntry: PackageRootDefinitionExtension) {
-        val ktTarget =
-            extensions
-                .getByType(KotlinMultiplatformExtension::class.java)
-                .targets
-                .findByName(swiftPackageEntry.name) as KotlinNativeTarget
-        val mainCompilationTarget = ktTarget.compilations.getByName("main")
-        if (!checkExistCInteropTask(mainCompilationTarget, "SpmForKmp")) {
-            createCInteropTask(
-                mainCompilationTarget,
-                cinteropName = "SpmForKmp",
-                file = getAndCreateFakeDefinitionFile(),
-                packageName = "fake${swiftPackageEntry.name}",
-            )
+        if (!swiftPackageEntry.useExtension) {
+            return
+        }
+        swiftPackageEntry.targetName?.let { targetName ->
+            val ktTarget =
+                extensions
+                    .getByType(KotlinMultiplatformExtension::class.java)
+                    .targets
+                    .findByName(targetName) as KotlinNativeTarget
+            logger.warn("targetName : $targetName")
+            val mainCompilationTarget = ktTarget.compilations.getByName("main")
+            logger.warn("mainCompilationTarget : ${mainCompilationTarget.name}")
+            if (!checkExistCInteropTask(mainCompilationTarget, "SpmForKmp")) {
+                logger.warn("Creating fake definition file for target: $targetName")
+                createCInteropTask(
+                    mainCompilationTarget,
+                    cinteropName = "SpmForKmp",
+                    file = getAndCreateFakeDefinitionFile(),
+                    packageName = "fake$targetName",
+                )
+            }
         }
     }
 }

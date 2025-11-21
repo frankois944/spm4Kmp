@@ -12,9 +12,19 @@ internal fun Project.swiftContainer(): NamedDomainObjectContainer<PackageRootDef
     @Suppress("UNCHECKED_CAST")
     extensions.getByName(CONTAINER_NAME) as NamedDomainObjectContainer<PackageRootDefinitionExtension>
 
-// Per-target DSL: kotlin { iosArm64 { spm { ... } } }
 public fun KotlinNativeTarget.swiftPackage(configure: PackageRootDefinitionExtension.() -> Unit) {
     val entry = project.swiftContainer().maybeCreate(this.name)
     entry.useExtension = true
+    entry.targetName = this.name
+    entry.configure()
+}
+
+public fun KotlinNativeTarget.swiftPackage(
+    name: String,
+    configure: PackageRootDefinitionExtension.() -> Unit,
+) {
+    val entry = project.swiftContainer().maybeCreate(name)
+    entry.useExtension = true
+    entry.targetName = this.name
     entry.configure()
 }

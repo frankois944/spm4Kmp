@@ -37,6 +37,7 @@ public abstract class PackageRootDefinitionExtension
         project: Project,
     ) {
         internal var useExtension: Boolean = false
+        internal var targetName: String? = null
 
         /**
          * Specifies the custom source path for the Swift package in the Kotlin Multiplatform project.
