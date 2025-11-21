@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
+import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -36,6 +37,9 @@ public fun KotlinNativeTarget.swiftPackage(
     groupName: String,
     configure: PackageRootDefinitionExtension.() -> Unit,
 ) {
+    if (groupName.isEmpty()) {
+        throw GradleException("The groupName cannot be empty")
+    }
     val entry = project.swiftContainer().maybeCreate(groupName)
     entry.useExtension = true
     entry.targetName = this.name
