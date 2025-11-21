@@ -10,11 +10,6 @@ val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plug
 
 kotlin {
 
-    iosSimulatorArm64 {
-        swiftPackage(groupName = "nativeIosShared") {
-        }
-    }
-
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
