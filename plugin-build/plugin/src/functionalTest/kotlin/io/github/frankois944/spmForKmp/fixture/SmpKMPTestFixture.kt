@@ -41,6 +41,7 @@ abstract class SmpKMPTestFixture private constructor(
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginRootConfig: String? = null,
         val gradleCaching: Boolean = true,
+        val rawTargetBloc: KotlinSource? = null,
     )
 
     protected abstract fun createProject(): GradleProject
@@ -147,7 +148,7 @@ org.gradle.caching=${ if (extension.gradleCaching) "true" else "false" }
                         """.trimIndent(),
                     )
                 }
-            } else {
+            } else if (configuration.rawTargetBloc == null) {
                 buildString {
                     append(
                         """
@@ -206,9 +207,11 @@ swiftPackageConfig {
                     appendLine("}")
                     appendLine("}")
                 }
+            } else {
+                ""
             }
         val targets = configuration.targets.joinToString(separator = ",") { "$it()" }
-        val script =
+        var script =
             """
             // START enable code-coverage
 
@@ -233,13 +236,22 @@ swiftPackageConfig {
 
             kotlin {
                 listOf(
-                   $targets
+                    $targets
                 ).forEach {
-                    it.compilations {
-                        val main by getting {
-                            cinterops.create("${configuration.cinteropsName}")
-                        }
-                    }
+                    """
+        configuration.rawTargetBloc?.let { rawTargetBloc ->
+            script += rawTargetBloc.content
+        } ?: run {
+            script += """
+            it.compilations {
+                val main by getting {
+                    cinterops.create("${configuration.cinteropsName}")
+                }
+            }
+            """
+        }
+        script +=
+            """
                     it.binaries.framework {
                         baseName = "shared"
                         isStatic = true
@@ -288,6 +300,11 @@ swiftPackageConfig {
         fun withSecurity(path: String) =
             apply {
                 config = config.copy(sharedSecurityPath = path)
+            }
+
+        fun withRawTargetBlock(rawTargetBloc: KotlinSource) =
+            apply {
+                config = config.copy(rawTargetBloc = rawTargetBloc)
             }
 
         fun withSPMPath(path: String) =
