@@ -5,7 +5,9 @@ package io.github.frankois944.spmForKmp
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
+import io.github.frankois944.spmForKmp.tasks.checkExistCInteropTask
 import io.github.frankois944.spmForKmp.tasks.configAppleTargets
+import io.github.frankois944.spmForKmp.tasks.createCInteropTask
 import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
@@ -13,6 +15,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
+import org.gradle.internal.extensions.stdlib.capitalized
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
@@ -49,7 +54,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val taskGroup = mutableMapOf<AppleCompileTarget, Task>()
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
-                swiftPackageEntries.forEach { swiftPackageEntry ->
+                project.swiftContainer().forEach { swiftPackageEntry ->
 
                     val spmWorkingDir =
                         resolveAndCreateDir(
@@ -67,6 +72,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             File(swiftPackageEntry.customPackageSourcePath),
                             swiftPackageEntry.name,
                         )
+
+                    createMissingCinteropTask(swiftPackageEntry)
                     configAppleTargets(
                         taskGroup = taskGroup,
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
@@ -82,8 +89,10 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             ),
                     )
                 }
+
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
+                    logger.warn("cinterop ${cinterop.name} ${cinterop.konanTarget}")
                     if (HostManager.hostIsMac) {
                         val cinteropTarget =
                             AppleCompileTarget.fromKonanTarget(cinterop.konanTarget)
@@ -128,5 +137,22 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         nestedPath.forEach { resolved = resolved.resolve(it) }
         resolved.mkdirs()
         return resolved
+    }
+
+    private fun Project.createMissingCinteropTask(swiftPackageEntry: PackageRootDefinitionExtension) {
+        val ktTarget =
+            extensions
+                .getByType(KotlinMultiplatformExtension::class.java)
+                .targets
+                .findByName(swiftPackageEntry.name) as KotlinNativeTarget
+        val mainCompilationTarget = ktTarget.compilations.getByName("main")
+        if (checkExistCInteropTask(mainCompilationTarget, "SpmForKmp")) {
+            createCInteropTask(
+                mainCompilationTarget,
+                cinteropName = "SpmForKmp",
+                file = getAndCreateFakeDefinitionFile(),
+                packageName = "fake${swiftPackageEntry.name}",
+            )
+        }
     }
 }

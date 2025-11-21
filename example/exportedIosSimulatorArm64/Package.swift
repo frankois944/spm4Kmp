@@ -1,0 +1,27 @@
+// swift-tools-version: 5.9
+import PackageDescription
+
+let package = Package(
+  name: "exportedIosSimulatorArm64",
+  platforms: [.iOS("16.0"), .macOS("10.13"), .tvOS("12.0"), .watchOS("4.0")],
+  products: [
+    .library(
+      name: "exportedIosSimulatorArm64",
+      type: .static,
+      targets: ["exportedIosSimulatorArm64"])
+  ],
+  dependencies: [
+    .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "12.3.0")
+  ],
+  targets: [
+    .target(
+      name: "exportedIosSimulatorArm64",
+      dependencies: [
+        .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk")
+      ],
+      path: "Sources"
+
+    )
+
+  ]
+)

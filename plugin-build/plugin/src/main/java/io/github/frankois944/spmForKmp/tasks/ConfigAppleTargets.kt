@@ -14,6 +14,7 @@ import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.resources.getCurrentPackagesBuiltDir
+import io.github.frankois944.spmForKmp.swiftContainer
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.CopyPackageResourcesTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
@@ -26,16 +27,19 @@ import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
 import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import io.github.frankois944.spmForKmp.utils.Hashing
+import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
+import org.jetbrains.kotlin.gradle.plugin.mpp.DefaultCInteropSettings
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
+import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
 
 @Suppress("LongMethod")
@@ -49,8 +53,13 @@ internal fun Project.configAppleTargets(
         tasks
             .withType(CInteropProcess::class.java)
             .filter {
-                it.name.startsWith("cinterop" + swiftPackageEntry.name.capitalized())
+                it.name.startsWith("cinteropSpmForKmp" + swiftPackageEntry.name.capitalized())
             }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
+
+    if (allTargets.isEmpty()) {
+        logger.warn("No valid configuration found for ${swiftPackageEntry.name}")
+        return
+    }
 
     val packageDependencies = getCurrentDependencies(swiftPackageEntry)
 
@@ -145,8 +154,6 @@ internal fun Project.configAppleTargets(
         val outputFiles = definitionTask.get().outputFiles
 
         if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
-            extensions
-                .getByType(KotlinMultiplatformExtension::class.java)
             val ktTarget =
                 extensions
                     .getByType(KotlinMultiplatformExtension::class.java)
@@ -351,15 +358,25 @@ private fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     this.contentFolderPath.set(contentFolderPath)
 }
 
-private fun createCInteropTask(
+internal fun createCInteropTask(
     mainCompilation: KotlinNativeCompilation,
     cinteropName: String,
-    file: File,
-) {
+    file: File? = null,
+    packageName: String? = null,
+): DefaultCInteropSettings =
     mainCompilation.cinterops.create(cinteropName) { settings ->
-        settings.definitionFile.set(file)
+        file?.let {
+            settings.definitionFile.set(file)
+        }
+        packageName?.let {
+            settings.packageName = packageName
+        }
     }
-}
+
+internal fun checkExistCInteropTask(
+    mainCompilation: KotlinNativeCompilation,
+    cinteropName: String,
+): Boolean = mainCompilation.cinterops.findByName(cinteropName) != null
 
 private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> =
     swiftPackageEntry.packageDependenciesConfig.packageDependencies
