@@ -7,10 +7,12 @@ import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
 import org.junit.jupiter.api.Test
+import java.io.File
 
 class NewEntryPointTest : BaseTest() {
     @Test
     fun `build with new configuration entry point`() {
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
         // Given
         val fixture =
             SmpKMPTestFixture
@@ -22,14 +24,12 @@ class NewEntryPointTest : BaseTest() {
                             """
                             it.swiftPackage(groupName = "nativeIosShared") {
                                 minIos = "16.0"
-                                dependency {
-                                    remotePackageVersion(
-                                        url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
-                                        version = "12.3.0",
-                                        packageName = "firebase-ios-sdk",
-                                        products = { add("FirebaseAnalytics") },
-                                    )
-                                }
+                                localPackage(
+                                    path = "${localPackageDirectory.absolutePath}",
+                                    products = {
+                                        add("LocalSourceDummyFramework")
+                                    },
+                                )
                             }
                             """.trimIndent(),
                     ),
@@ -38,7 +38,7 @@ class NewEntryPointTest : BaseTest() {
                         content =
                             """
                             import UIKit
-                            import FirebaseAnalytics
+                            import LocalSourceDummyFramework
                             @objc public class TestView: UIView {}
                             """.trimIndent(),
                     ),
