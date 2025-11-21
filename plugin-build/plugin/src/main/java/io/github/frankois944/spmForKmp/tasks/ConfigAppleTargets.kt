@@ -50,14 +50,23 @@ internal fun Project.configAppleTargets(
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
     val allTargets =
-        tasks
-            .withType(CInteropProcess::class.java)
-            .filter {
-                it.name.startsWith("cinteropSpmForKmp" + swiftPackageEntry.name.capitalized())
-            }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
-
+        if (swiftPackageEntry.useExtension) {
+            tasks
+                .withType(CInteropProcess::class.java)
+                .filter {
+                    logger.warn("Checking task name: ${it.name}")
+                    logger.warn("startsWith: cinteropSpmForKmp${swiftPackageEntry.targetName!!.capitalized()}")
+                    it.name.startsWith("cinteropSpmForKmp" + swiftPackageEntry.targetName!!.capitalized())
+                }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
+        } else {
+            tasks
+                .withType(CInteropProcess::class.java)
+                .filter {
+                    it.name.startsWith("cinterop" + swiftPackageEntry.name.capitalized())
+                }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
+        }
     if (allTargets.isEmpty()) {
-        logger.warn("No valid configuration found for ${swiftPackageEntry.name}")
+        logger.error("No valid configuration found for ${swiftPackageEntry.name}")
         return
     }
 
@@ -162,9 +171,14 @@ internal fun Project.configAppleTargets(
             val mainCompilation = ktTarget.compilations.getByName("main")
 
             outputFiles.forEachIndexed { index, file ->
+
                 val cinteropName =
                     if (index > 0) {
-                        file.nameWithoutExtension
+                        if (swiftPackageEntry.useExtension) {
+                            file.nameWithoutExtension
+                        } else {
+                            file.nameWithoutExtension + swiftPackageEntry.name.capitalized()
+                        }
                     } else {
                         file.nameWithoutExtension.split("_").first()
                     }
