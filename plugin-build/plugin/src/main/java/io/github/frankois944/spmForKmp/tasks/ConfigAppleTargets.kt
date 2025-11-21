@@ -391,4 +391,4 @@ internal fun checkExistCInteropTask(
 ): Boolean = mainCompilation.cinterops.findByName(cinteropName) != null
 
 private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> =
-    swiftPackageEntry.packageDependenciesConfig.packageDependencies
+    swiftPackageEntry.packageDependenciesConfig.packageDependencies.distinctBy { it.packageName }
