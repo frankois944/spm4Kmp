@@ -24,12 +24,14 @@ class NewEntryPointTest : BaseTest() {
                             """
                             it.swiftPackage(groupName = "nativeIosShared") {
                                 minIos = "16.0"
-                                localPackage(
-                                    path = "${localPackageDirectory.absolutePath}",
-                                    products = {
-                                        add("LocalSourceDummyFramework")
-                                    },
-                                )
+                                dependency {
+                                    localPackage(
+                                        path = "${localPackageDirectory.absolutePath}",
+                                        products = {
+                                            add("LocalSourceDummyFramework")
+                                        },
+                                    )
+                                }
                             }
                             """.trimIndent(),
                     ),
