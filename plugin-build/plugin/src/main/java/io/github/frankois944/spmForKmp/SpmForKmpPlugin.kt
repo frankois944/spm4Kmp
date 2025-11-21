@@ -92,7 +92,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
-                    logger.warn("cinterop ${cinterop.name} ${cinterop.konanTarget}")
                     if (HostManager.hostIsMac) {
                         val cinteropTarget =
                             AppleCompileTarget.fromKonanTarget(cinterop.konanTarget)
@@ -146,7 +145,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 .targets
                 .findByName(swiftPackageEntry.name) as KotlinNativeTarget
         val mainCompilationTarget = ktTarget.compilations.getByName("main")
-        if (checkExistCInteropTask(mainCompilationTarget, "SpmForKmp")) {
+        if (!checkExistCInteropTask(mainCompilationTarget, "SpmForKmp")) {
             createCInteropTask(
                 mainCompilationTarget,
                 cinteropName = "SpmForKmp",
