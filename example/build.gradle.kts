@@ -1,4 +1,4 @@
-import io.github.frankois944.spmForKmp.definition.product.ProductName
+import io.github.frankois944.spmForKmp.swiftPackage
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,7 +8,7 @@ plugins {
 kotlin {
 
     listOf(
-        //  iosArm64(),
+        // iosArm64(),
         iosSimulatorArm64(),
     ).forEach { target ->
         target.binaries.getTest("debug").apply {
@@ -40,14 +40,24 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        target.compilations {
-            val main by getting {
-                cinterops.create("nativeIosShared")
+        target.swiftPackage {
+            minIos = "16.0"
+            spmWorkingPath =
+                project.layout.projectDirectory
+                    .dir("SPM")
+                    .asFile.path
+            dependency {
+                remotePackageVersion(
+                    url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
+                    version = "12.3.0",
+                    packageName = "firebase-ios-sdk",
+                    products = { add("FirebaseAnalytics", exportToKotlin = true) },
+                )
             }
         }
     }
 
-    listOf(
+    /*listOf(
         macosArm64(),
     ).forEach { target ->
         target.binaries.getTest("debug").apply {
@@ -61,12 +71,19 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        target.compilations {
-            val main by getting {
-                cinterops.create("nativeMacosShared")
+        target.swiftPackage {
+            dependency {
+                localPackage(
+                    path = "$testResources/LocalSourceDummyFramework",
+                    packageName = "LocalSourceDummyFramework",
+                    products = {
+                        // Export to Kotlin for use in shared Kotlin code, false by default
+                        add("LocalSourceDummyFramework", exportToKotlin = false)
+                    },
+                )
             }
         }
-    }
+    }*/
 
     sourceSets {
         commonMain.dependencies {
@@ -79,7 +96,7 @@ kotlin {
 }
 
 val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plugin/src/functionalTest/resources"
-swiftPackageConfig {
+/*swiftPackageConfig {
     create("nativeIosShared") {
         // optional parameters
         // the ios minimal version
@@ -99,72 +116,11 @@ swiftPackageConfig {
         //  - packageDependencyPrefix = "customName"
         //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
         // packageDependencyPrefix = null // default null
-        spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
+        // spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
         // swiftBinPath = "/path/to/.swiftly/bin/swift"
         // exportedPackageSettings {
         //     includeProduct = listOf("HevSocks5Tunnel")
         // }
-        minIos = "16.0"
-        dependency {
-            remotePackageVersion(
-                url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
-                // Libraries from the package
-                products = {
-                    // Export to Kotlin for use in shared Kotlin code
-                    add("FirebaseAnalytics", exportToKotlin = true)
-                    add(ProductName("FirebaseCore"), exportToKotlin = true)
-                    // add FirebaseDatabase to your own swift code but don't export it
-                    add(ProductName("FirebaseDatabase"))
-                },
-                // (Optional) Package name, can be required in some cases
-                packageName = "firebase-ios-sdk",
-                // Package version
-                version = "12.3.0",
-            )
-            localBinary(
-                path = "$testResources/DummyFrameworkV2.xcframework.zip",
-                packageName = "DummyFramework",
-                exportToKotlin = true,
-            )
-            localBinary(
-                path = "${layout.projectDirectory.asFile.path}/../example/xcframework/Sentry-Dynamic.xcframework.zip",
-                packageName = "Sentry",
-                exportToKotlin = false,
-            )
-            localPackage(
-                path = "$testResources/LocalSourceDummyFramework",
-                packageName = "LocalSourceDummyFramework",
-                products = {
-                    // Export to Kotlin for use in shared Kotlin code, false by default
-                    add(
-                        "LocalSourceDummyFramework",
-                        exportToKotlin = true,
-                    )
-                },
-            )
-            remotePackageVersion(
-                url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                version = "1.8.1",
-                products = {
-                    // Can be only used in your "src/swift" code.
-                    add("CryptoSwift")
-                },
-            )
-            remoteBinary(
-                url = uri("https://github.com/wanliyunyan/HevSocks5Tunnel/releases/download/2.10.0/HevSocks5Tunnel.xcframework.zip"),
-                packageName = "HevSocks5Tunnel",
-                exportToKotlin = true,
-                checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
-                isCLang = true,
-            )
-            remotePackageVersion(
-                url = uri("https://github.com/SDWebImage/SDWebImage.git"),
-                products = {
-                    add("SDWebImage")
-                },
-                version = "5.21.3",
-            )
-        }
     }
     create("nativeMacosShared") {
         dependency {
@@ -178,4 +134,4 @@ swiftPackageConfig {
             )
         }
     }
-}
+}*/
