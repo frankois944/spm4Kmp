@@ -32,7 +32,7 @@ public fun KotlinNativeTarget.swiftPackage(configure: PackageRootDefinitionExten
 /**
  * Configures a Swift Package for the specified Kotlin Native target.
  *
- * @param groupName The name of the group to associate with a group Of Target; useful when using a list of target
+ * @param groupName The name of the group to associate with a group of targets; useful when using a list of target
  * @param configure A lambda used to configure the package using the provided `PackageRootDefinitionExtension`.
  */
 @ExperimentalSpmForKmpFeature
