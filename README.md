@@ -43,21 +43,13 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64()
         // and more Apple targets...
-    ).forEach {
-        it.compilations {
-            val main by getting {
-                // Choose the cinterop name
-                cinterops.create("nativeBridge")
-            }
+    ).forEach { target ->
+        // `cinteropName` is recommended when using a list of native target
+        // Or when you want to keep the compatibility with the legacy way (cf: [cinteropName])
+        // If not set, It will take the name of the current Target
+        target.swiftPackageConfig(cinteropName = "[cinteropName]") {
+            // create a new directory at `src/swift/[cinteropName]`
         }
-    }
-}
-```
-
-``` kotlin title="build.gradle.kts"
-swiftPackageConfig {
-    create("nativeBridge") { // must match with cinterops.create name
-        // your bridge and native dependencies
     }
 }
 ```
