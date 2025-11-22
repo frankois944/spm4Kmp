@@ -4,6 +4,8 @@ site_author: François Dabonot
 site_description: An alternative to the dying CocoaPods with custom Kotlin/Swift bridge for KMP.
 site_url: https://spmforkmp.eu/
 extra:
+  annotate:
+    json: [.s2]
   social:
     - icon: material/coffee
       link: https://ko-fi.com/frankois944

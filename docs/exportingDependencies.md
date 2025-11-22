@@ -24,7 +24,34 @@ The following configuration exports to Kotlin the package [FirebaseAnalytics](ht
 
     Exporting an incompatible library is useless and will only increase build time.
 
-``` kotlin title="build.gradle.kts"
+```kotlin title="build.gradle.kts"
+kotlin {
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+        // and more Apple targets...
+    ).forEach { target ->
+        target.swiftPackageConfig(groupName = "[cinteropName]") {
+            dependency {
+                remotePackageVersion(
+                    url = uri("https://github.com/firebase/firebase-ios-sdk"),
+                    products = {
+                        add("FirebaseAnalytics", exportToKotlin = true), // exported
+                        add("FirebaseCore") // non-exported
+                    },
+                    version = "11.8.0",
+                )
+                // Another SwiftDependency
+                // ...
+            }
+        }
+    }
+}
+```
+
+<details>
+<summary>Legacy (< 1.1.0)</summary>
+```kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {
         dependency {
@@ -38,14 +65,15 @@ swiftPackageConfig {
             )
             // Another SwiftDependency
             // ...
-        )
+        }
     }
 }
 ```
+</details>
 
 ### Bridge
 
-``` kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
+```kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
 import FirebaseAnalytics.FIRConsentStatusGranted
 
 @ExperimentalForeignApi

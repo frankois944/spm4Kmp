@@ -21,7 +21,7 @@ It will fix issues with linking, missing resources, App Store compliance, and mo
 
 A Compose Multiplatform Component library using a native video player.
 
-``` Kotlin title="commonMain/kotlin/KmpPlayer.kt"
+```kotlin title="commonMain/kotlin/KmpPlayer.kt"
 @Composable
 public expect fun KmpPlayer(modifier: Modifier = Modifier, url: String)
 ```
@@ -31,7 +31,7 @@ For Android, it uses [Exoplayer](https://github.com/google/ExoPlayer).
 
 #### Gradle
 
-``` Kotlin title="library/build.gradle.kts"
+```kotlin title="library/build.gradle.kts"
 androidMain.dependencies {
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.exoplayer.dash)
@@ -41,7 +41,7 @@ androidMain.dependencies {
 
 #### AndroidMain
 
-``` Kotlin title="androidMain/kotlin/KmpPlayer.kt"
+```kotlin title="androidMain/kotlin/KmpPlayer.kt"
 @Composable
 public actual fun KmpPlayer(modifier: Modifier, url: String) {
 
@@ -85,21 +85,23 @@ For iOS, it uses [KSPlayer](https://github.com/kingslay/KSPlayer), it's a pure S
 
 #### Gradle
 
-``` Kotlin title="library/build.gradle.kts"
-swiftPackageConfig {
-    create("appleDeps") {
-        minIos = "13.0"
-        minMacos = "10.15"
-        minTvos = "13.0"
-        minWatchos = "2.0"
-        dependency {
-            remotePackageBranch(
-                url = URI("https://github.com/kingslay/KSPlayer"),
-                products = {
-                    add("KSPlayer")
-                },
-                branch = "main"
-            )
+```kotlin title="library/build.gradle.kts"
+kotlin {
+    iosArm64 {
+        swiftPackageConfig(cinteropName = "appleDeps") {
+            minIos = "13.0"
+            minMacos = "10.15"
+            minTvos = "13.0"
+            minWatchos = "2.0"
+            dependency {
+                remotePackageBranch(
+                    url = URI("https://github.com/kingslay/KSPlayer"),
+                    products = {
+                        add("KSPlayer")
+                    },
+                    branch = "main"
+                )
+            }
         }
     }
 }
@@ -109,7 +111,7 @@ swiftPackageConfig {
 
 Some tips [here](../section-help/tips.md#working-with-objcnamesclasses-types).
 
-``` Swift title="src/swift/appleDeps/MEPlayerController.swift"
+```swift title="src/swift/appleDeps/MEPlayerController.swift"
 import Foundation
 import KSPlayer
 
@@ -144,7 +146,7 @@ import KSPlayer
 
 #### IOSMain
 
-``` Kotlin title="iosMain/kotlin/KmpPlayer.kt"
+```kotlin title="iosMain/kotlin/KmpPlayer.kt"
 import appleDeps.MEPlayerController
 
 @Composable

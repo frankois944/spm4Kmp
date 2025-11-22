@@ -52,7 +52,34 @@ Set `spmforkmp.hideLocalPackageMessage=true` inside gradle.properties to hide th
 ### Gradle
 
 The following configuration imports the package [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) which is a pure Swift library, that can't be used directly in Kotlin.
-``` kotlin title="build.gradle.kts"
+
+```kotlin title="build.gradle.kts"
+kotlin {
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+        // and more Apple targets...
+    ).forEach { target ->
+        target.swiftPackageConfig(groupName = "[cinteropName]") {
+            dependency {
+                remotePackageVersion(
+                    url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                    products = {
+                        add("CryptoSwift")
+                    },
+                    version = "1.8.4",
+                )
+                // Another SwiftDependency
+                // ...
+            }
+        }
+    }
+}
+```
+
+<details>
+<summary>Legacy (< 1.1.0)</summary>
+```kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {
         dependency {
@@ -69,6 +96,7 @@ swiftPackageConfig {
     }
 }
 ```
+</details>
 
 ### Bridge
 
@@ -88,7 +116,7 @@ import CryptoSwift
 }
 ```
 
-``` kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
+```kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
 import [cinteropname].MySwiftBridge
 
 val contentFromSwift = MySwiftBridge().toMD5(value = "someString")
@@ -100,7 +128,7 @@ The plugin supports the following configurations :
 
 === "Version"
 
-    ``` kotlin
+    ```kotlin
     remotePackageVersion(
         url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
         version = "1.8.4",
@@ -112,7 +140,7 @@ The plugin supports the following configurations :
 
 === "Commit"
 
-    ``` kotlin
+    ```kotlin
     remotePackageCommit(
         url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
         revision = "729e01bc9b9dab466ac85f21fb9ee2bc1c61b258",
@@ -124,7 +152,7 @@ The plugin supports the following configurations :
 
 === "Branch"
 
-    ``` kotlin
+    ```kotlin
     remotePackageBranch(
         url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
         branch = "main",
@@ -135,7 +163,7 @@ The plugin supports the following configurations :
     ```
 === "Local"
 
-    ``` kotlin
+    ```kotlin
     localPackage(
         path = "Absolute path to the local package folder",
         packageName = "LocalSourceDummyFramework",
@@ -147,7 +175,7 @@ The plugin supports the following configurations :
 
 === "Local Binary"
 
-    ``` kotlin
+    ```kotlin
     localBinary(
         path = "/path/to/LocalFramework.xcframework",
         packageName = "LocalFramework"
@@ -156,7 +184,7 @@ The plugin supports the following configurations :
 
 === "Remote Binary"
 
-    ``` kotlin
+    ```kotlin
     remoteBinary(
         url = uri("https://.../RemoteBinaryFramework.xcframework.zip"),
         checksum = "[checksum]",
