@@ -2,9 +2,11 @@
 
 ## How It Works
 
-When syncing the project, the plugin creates a folder at `src/swift/[cinteropName]` or `src/swift/[targetName]` if `cinteropName` **is not defined**.
+When syncing the project, the plugin creates a folder at `src/swift/[cinteropName]` or `src/swift/[targetName]` if `cinteropName` **is not defined**, for example `src/swift/iosArm64`.
 
 The content of this folder is your bridge between Swift and Kotlin, **everything inside is copied to the build directory**.
+
+
 
 ## Example
 

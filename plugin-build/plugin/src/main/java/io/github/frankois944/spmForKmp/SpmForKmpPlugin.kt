@@ -55,10 +55,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
                 val entries = swiftPackageEntries + project.swiftContainer()
-                if (entries.isEmpty()) {
-                    logger.error("No Configuration found, can't continue")
-                    return@afterEvaluate
-                }
                 entries.forEach { swiftPackageEntry ->
                     val spmWorkingDir =
                         resolveAndCreateDir(
