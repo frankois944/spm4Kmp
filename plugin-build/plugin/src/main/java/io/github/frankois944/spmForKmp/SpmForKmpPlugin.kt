@@ -15,6 +15,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
+import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
@@ -152,12 +153,11 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     .targets
                     .findByName(targetName) as KotlinNativeTarget
             val mainCompilationTarget = ktTarget.compilations.getByName("main")
-            if (!checkExistCInteropTask(mainCompilationTarget, "SpmForKmp")) {
+            if (!checkExistCInteropTask(mainCompilationTarget, swiftPackageEntry.name.capitalized())) {
                 createCInteropTask(
                     mainCompilationTarget,
-                    cinteropName = "SpmForKmp",
+                    cinteropName = swiftPackageEntry.name.capitalized(),
                     file = getAndCreateFakeDefinitionFile(),
-                    packageName = "fake$targetName",
                 )
             }
         }
