@@ -11,7 +11,6 @@ private const val CONTAINER_NAME = PLUGIN_NAME // "swiftPackageConfig"
 
 @Suppress("UNCHECKED_CAST")
 internal fun Project.swiftContainer(): NamedDomainObjectContainer<PackageRootDefinitionExtension> =
-    @Suppress("UNCHECKED_CAST")
     extensions.getByName(CONTAINER_NAME) as NamedDomainObjectContainer<PackageRootDefinitionExtension>
 
 /**

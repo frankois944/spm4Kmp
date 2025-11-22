@@ -55,4 +55,50 @@ class NewEntryPointTest : BaseTest() {
         // Then
         assertThat(result).task(":library:build").succeeded()
     }
+
+    @Test
+    fun `build with new configuration entry point with no cinteropName`() {
+        val localPackageDirectory = File("src/functionalTest/resources/LocalSourceDummyFramework")
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withRawTargetBlock(
+                    KotlinSource.of(
+                        content =
+                            """
+                            it.swiftPackageConfig {
+                                minIos = "16.0"
+                                dependency {
+                                    localPackage(
+                                        path = "${localPackageDirectory.absolutePath}",
+                                        products = {
+                                            add("LocalSourceDummyFramework")
+                                        },
+                                    )
+                                }
+                            }
+                            """.trimIndent(),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import UIKit
+                            import LocalSourceDummyFramework
+                            @objc public class TestView: UIView {}
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        // When
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
 }
