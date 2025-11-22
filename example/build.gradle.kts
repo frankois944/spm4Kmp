@@ -1,5 +1,5 @@
 import io.github.frankois944.spmForKmp.definition.product.ProductName
-import io.github.frankois944.spmForKmp.swiftPackage
+import io.github.frankois944.spmForKmp.swiftPackageConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -148,7 +148,7 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        swiftPackageConfig(cinteropname = "nativeMacosShared") {
+        swiftPackageConfig(cinteropName = "nativeMacosShared") {
             dependency {
                 localPackage(
                     path = "$testResources/LocalSourceDummyFramework",
