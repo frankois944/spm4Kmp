@@ -8,7 +8,7 @@ import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.swiftPackage
+import io.github.frankois944.spmForKmp.swiftPackageConfig
 import org.gradle.internal.cc.base.logger
 import org.intellij.lang.annotations.Language
 
@@ -114,7 +114,7 @@ org.gradle.caching=${ if (extension.gradleCaching) "true" else "false" }
                     "java.lang.management.ManagementFactory",
                     "javax.management.ObjectName",
                     "io.github.frankois944.spmForKmp.definition.product.ProductName",
-                    "io.github.frankois944.spmForKmp.swiftPackage",
+                    "io.github.frankois944.spmForKmp.swiftPackageConfig",
                 )
             plugins(
                 Plugin(
