@@ -44,9 +44,10 @@ kotlin {
             isStatic = true
         }
         /**
-         * groupName is only needed when using a list of target
+         * cinteropName is only needed when using a list of target
+         * Or when you want to keep compatibility with older versions of the plugin
          */
-        target.swiftPackage(groupName = "nativeIosShared") {
+        target.swiftPackageConfig(cinteropName = "nativeIosShared") {
             // optional parameters
             // the ios minimal version
             // minIos = "12.0"
@@ -147,7 +148,7 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        swiftPackage(groupName = "nativeMacosShared") {
+        swiftPackageConfig(cinteropname = "nativeMacosShared") {
             dependency {
                 localPackage(
                     path = "$testResources/LocalSourceDummyFramework",

@@ -22,7 +22,7 @@ internal fun Project.swiftContainer(): NamedDomainObjectContainer<PackageRootDef
  *                  using the provided `PackageRootDefinitionExtension`.
  */
 @ExperimentalSpmForKmpFeature
-public fun KotlinNativeTarget.swiftPackage(configure: PackageRootDefinitionExtension.() -> Unit) {
+public fun KotlinNativeTarget.swiftPackageConfig(configure: PackageRootDefinitionExtension.() -> Unit) {
     val entry = project.swiftContainer().maybeCreate(this.name)
     entry.useExtension = true
     entry.targetName = this.name
@@ -32,18 +32,18 @@ public fun KotlinNativeTarget.swiftPackage(configure: PackageRootDefinitionExten
 /**
  * Configures a Swift Package for the specified Kotlin Native target.
  *
- * @param groupName The name of the group to associate with a group of targets; useful when using a list of target
+ * @param cinteropName The name of the group to associate with a group of targets; useful when using a list of target
  * @param configure A lambda used to configure the package using the provided `PackageRootDefinitionExtension`.
  */
 @ExperimentalSpmForKmpFeature
-public fun KotlinNativeTarget.swiftPackage(
-    groupName: String,
+public fun KotlinNativeTarget.swiftPackageConfig(
+    cinteropName: String,
     configure: PackageRootDefinitionExtension.() -> Unit,
 ) {
-    if (groupName.isEmpty()) {
-        throw GradleException("The groupName cannot be empty")
+    if (cinteropName.isEmpty()) {
+        throw GradleException("The cinteropName cannot be empty")
     }
-    val entry = project.swiftContainer().maybeCreate(groupName)
+    val entry = project.swiftContainer().maybeCreate(cinteropName)
     entry.useExtension = true
     entry.targetName = this.name
     entry.configure()

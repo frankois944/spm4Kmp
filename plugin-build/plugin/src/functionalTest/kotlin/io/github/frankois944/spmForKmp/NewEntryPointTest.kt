@@ -22,7 +22,7 @@ class NewEntryPointTest : BaseTest() {
                     KotlinSource.of(
                         content =
                             """
-                            it.swiftPackage(groupName = "nativeIosShared") {
+                            it.swiftPackageConfig(cinteropName = "nativeIosShared") {
                                 minIos = "16.0"
                                 dependency {
                                     localPackage(
