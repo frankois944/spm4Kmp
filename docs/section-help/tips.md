@@ -24,7 +24,7 @@ A [full example](https://github.com/frankois944/FirebaseKmpDemo) of how to imple
 
 when using a UIView (work with any ObjC Types, ex: UIViewController...).
 
-``` swift title="mySwiftBridge.swift"
+```swift title="mySwiftBridge.swift"
 
 // Force cinterop to include `platform.UIKit.UIView`
 @objcMembers public class MyDummyView: UIView {}
@@ -53,7 +53,7 @@ when using a UIView (work with any ObjC Types, ex: UIViewController...).
 
 }
 ```
-``` kotlin title="iosMain/myKotlinFile.kt"
+```kotlin title="iosMain/myKotlinFile.kt"
 fun getView(): UIView = TestClass().getView()
 fun setView(view: UIView) = TestClass().setViewWithView(view)
 

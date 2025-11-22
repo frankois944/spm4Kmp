@@ -39,7 +39,7 @@ plugins {
 }
 ```
 
-```kotlin linenums="1" hl_lines="3 4 11-26 28-37 40-60" title="myKMPApp/build.gradle.kts"
+``` kotlin linenums="1" hl_lines="3 4 11-26 28-50" title="myKMPApp/build.gradle.kts"
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     -- alias(libs.plugins.kotlinCocoapods)
@@ -55,7 +55,7 @@ kotlin {
     - cocoapods {
     -    summary = "Kotlin module with cocoapods dependencies"
     -    ios.deploymentTarget = "16.6"
-    -    pod("FirebaseCore") { 
+    -    pod("FirebaseCore") {
     -        version = libs.versions.firebaseIOS.get()
     -     }
     -     pod("FirebaseAnalytics") {
@@ -71,35 +71,26 @@ kotlin {
     +    iosArm64(),
     +    iosSimulatorArm64()
     + ).forEach {
-    +    it.compilations {
-    +        val main by getting {
-    +            cinterops.create("nativeBridge")
+    +    it.swiftPackageConfig(cinteropName = "nativeBridge") {
+    +        minIos = "16.6"
+    +        dependency {
+    +            remotePackageVersion(
+    +                url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
+    +                products = {
+    +                    add("FirebaseCore", "FirebaseAnalytics", exportToKotlin = true)
+    +                },
+    +                version = libs.versions.firebaseIOS.get(),
+    +            )
+    +            remotePackageVersion(
+    +                url = uri("https://github.com/krzyzanowskim/CryptoSwift"),
+    +                products = {
+    +                    add("CryptoSwift")
+    +                },
+    +                version = "1.2.3",
+    +            )
     +        }
     +    }
-    + }
 }
-
-+ swiftPackageConfig {
-+    create("nativeBridge") {
-+        minIos = "16.6"
-+        dependency {
-+            remotePackageVersion(
-+                url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
-+                products = {
-+                    add("FirebaseCore", "FirebaseAnalytics", exportToKotlin = true)
-+                },
-+                version = libs.versions.firebaseIOS.get(),
-+            )
-+            remotePackageVersion(
-+                url = uri("https://github.com/krzyzanowskim/CryptoSwift"),
-+                products = {
-+                    add("CryptoSwift")
-+                },
-+                version = "1.2.3",
-+            )
-+        }
-+    }
-+ }
 ```
 
 
@@ -116,7 +107,7 @@ pod deintegrate
 
 From the *Build Phases* tab of your project, create a `New Run Script Phase` and put it at the **top** of the list.
 
-Add inside the newly created script: 
+Add inside the newly created script:
 
 ``` title="Run script"
 cd "$SRCROOT/../../"
