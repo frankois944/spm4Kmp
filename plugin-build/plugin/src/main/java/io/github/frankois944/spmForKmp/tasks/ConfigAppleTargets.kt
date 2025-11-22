@@ -14,7 +14,6 @@ import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.resources.getCurrentPackagesBuiltDir
-import io.github.frankois944.spmForKmp.swiftContainer
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.CopyPackageResourcesTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
@@ -27,7 +26,6 @@ import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
 import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import io.github.frankois944.spmForKmp.utils.Hashing
-import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
@@ -39,7 +37,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
-import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
 
 @Suppress("LongMethod")
@@ -49,20 +46,7 @@ internal fun Project.configAppleTargets(
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
-    val allTargets =
-        if (swiftPackageEntry.useExtension) {
-            tasks
-                .withType(CInteropProcess::class.java)
-                .filter {
-                    it.name.startsWith("cinterop${swiftPackageEntry.name.capitalized()}${swiftPackageEntry.targetName?.capitalized()}")
-                }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
-        } else {
-            tasks
-                .withType(CInteropProcess::class.java)
-                .filter {
-                    it.name.startsWith("cinterop" + swiftPackageEntry.name.capitalized())
-                }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
-        }
+    val allTargets = getAllTargets(swiftPackageEntry)
     if (allTargets.isEmpty()) {
         logger.error("No valid configuration found for ${swiftPackageEntry.name}")
         return
@@ -392,3 +376,24 @@ internal fun checkExistCInteropTask(
 
 private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExtension): List<SwiftDependency> =
     swiftPackageEntry.packageDependenciesConfig.packageDependencies.distinctBy { it.packageName }
+
+private fun Project.getAllTargets(swiftPackageEntry: PackageRootDefinitionExtension): List<AppleCompileTarget> =
+    if (swiftPackageEntry.useExtension) {
+        tasks
+            .withType(CInteropProcess::class.java)
+            .filter {
+                val targetName =
+                    buildString {
+                        append("cinterop")
+                        append(swiftPackageEntry.name.capitalized())
+                        append(swiftPackageEntry.targetName?.capitalized())
+                    }
+                it.name.startsWith(targetName)
+            }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
+    } else {
+        tasks
+            .withType(CInteropProcess::class.java)
+            .filter {
+                it.name.startsWith("cinterop" + swiftPackageEntry.name.capitalized())
+            }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
+    }
