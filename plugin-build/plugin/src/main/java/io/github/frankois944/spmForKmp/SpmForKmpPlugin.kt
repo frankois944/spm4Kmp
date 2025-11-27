@@ -77,7 +77,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     tasks
                         .withType(CInteropProcess::class.java)
                         .forEach {
-                            logger.warn("CURRENT CInteropProcess task found: $it")
+                            logger.debug("CInteropProcess task found: {}", it)
                         }
 
                     configAppleTargets(
