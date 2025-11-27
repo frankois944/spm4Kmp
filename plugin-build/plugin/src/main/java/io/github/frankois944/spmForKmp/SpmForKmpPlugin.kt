@@ -55,12 +55,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
                 val entries = swiftPackageEntries + project.swiftContainer()
-                entries.forEach { swiftPackageEntry ->
+                createMissingCinteropTask(entries)
+                mergeEntries(entries).forEach { swiftPackageEntry ->
                     val spmWorkingDir =
                         resolveAndCreateDir(
                             File(swiftPackageEntry.spmWorkingPath),
                             "spmKmpPlugin",
-                            swiftPackageEntry.name,
+                            swiftPackageEntry.internalName,
                         )
 
                     val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
@@ -70,10 +71,15 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     val bridgeSourceDir =
                         resolveAndCreateDir(
                             File(swiftPackageEntry.customPackageSourcePath),
-                            swiftPackageEntry.name,
+                            swiftPackageEntry.internalName,
                         )
 
-                    createMissingCinteropTask(swiftPackageEntry)
+                    tasks
+                        .withType(CInteropProcess::class.java)
+                        .forEach {
+                            logger.warn("CURRENT CInteropProcess task found: $it")
+                        }
+
                     configAppleTargets(
                         taskGroup = taskGroup,
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
@@ -138,24 +144,41 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         return resolved
     }
 
-    private fun Project.createMissingCinteropTask(swiftPackageEntry: PackageRootDefinitionExtension) {
-        if (!swiftPackageEntry.useExtension) {
-            return
-        }
-        swiftPackageEntry.targetName?.let { targetName ->
-            val ktTarget =
-                extensions
-                    .getByType(KotlinMultiplatformExtension::class.java)
-                    .targets
-                    .findByName(targetName) as KotlinNativeTarget
-            val mainCompilationTarget = ktTarget.compilations.getByName("main")
-            if (!checkExistCInteropTask(mainCompilationTarget, swiftPackageEntry.name.capitalized())) {
-                createCInteropTask(
-                    mainCompilationTarget,
-                    cinteropName = swiftPackageEntry.name.capitalized(),
-                    file = getAndCreateFakeDefinitionFile(),
-                )
+    private fun Project.createMissingCinteropTask(swiftPackageEntry: Set<PackageRootDefinitionExtension>) {
+        swiftPackageEntry.forEach { swiftPackageEntry ->
+            if (!swiftPackageEntry.useExtension) {
+                return
+            }
+            swiftPackageEntry.targetName?.let { targetName ->
+                val ktTarget =
+                    extensions
+                        .getByType(KotlinMultiplatformExtension::class.java)
+                        .targets
+                        .findByName(targetName) as KotlinNativeTarget
+                val mainCompilationTarget = ktTarget.compilations.getByName("main")
+                if (!checkExistCInteropTask(mainCompilationTarget, swiftPackageEntry.internalName.capitalized())) {
+                    createCInteropTask(
+                        mainCompilationTarget,
+                        cinteropName = swiftPackageEntry.internalName.capitalized(),
+                        file = getAndCreateFakeDefinitionFile(),
+                    )
+                }
             }
         }
+    }
+
+    private fun mergeEntries(entries: Set<PackageRootDefinitionExtension>): Set<PackageRootDefinitionExtension> {
+        val mergedEntries = mutableSetOf<PackageRootDefinitionExtension>()
+        entries.forEach { entry ->
+            val foundEntry =
+                mergedEntries
+                    .firstOrNull { mergedEntry ->
+                        mergedEntry.internalName == entry.internalName
+                    }
+            if (foundEntry == null) {
+                mergedEntries.add(entry)
+            }
+        }
+        return mergedEntries
     }
 }
