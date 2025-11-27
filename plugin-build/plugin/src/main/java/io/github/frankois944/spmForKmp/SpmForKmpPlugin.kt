@@ -145,21 +145,21 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
     }
 
     private fun Project.createMissingCinteropTask(swiftPackageEntry: Set<PackageRootDefinitionExtension>) {
-        swiftPackageEntry.forEach { swiftPackageEntry ->
-            if (!swiftPackageEntry.useExtension) {
+        swiftPackageEntry.forEach { entry ->
+            if (!entry.useExtension) {
                 return
             }
-            swiftPackageEntry.targetName?.let { targetName ->
+            entry.targetName?.let { targetName ->
                 val ktTarget =
                     extensions
                         .getByType(KotlinMultiplatformExtension::class.java)
                         .targets
                         .findByName(targetName) as KotlinNativeTarget
                 val mainCompilationTarget = ktTarget.compilations.getByName("main")
-                if (!checkExistCInteropTask(mainCompilationTarget, swiftPackageEntry.internalName.capitalized())) {
+                if (!checkExistCInteropTask(mainCompilationTarget, entry.internalName.capitalized())) {
                     createCInteropTask(
                         mainCompilationTarget,
-                        cinteropName = swiftPackageEntry.internalName.capitalized(),
+                        cinteropName = entry.internalName.capitalized(),
                         file = getAndCreateFakeDefinitionFile(),
                     )
                 }
