@@ -5,6 +5,8 @@ import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.internal.cc.base.logger
+import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 private const val CONTAINER_NAME = PLUGIN_NAME // "swiftPackageConfig"
@@ -25,6 +27,7 @@ public fun KotlinNativeTarget.swiftPackageConfig(configure: PackageRootDefinitio
     val entry = project.swiftContainer().maybeCreate(this.name)
     entry.useExtension = true
     entry.targetName = this.name
+    entry.internalName = this.name
     entry.configure()
 }
 
@@ -42,8 +45,9 @@ public fun KotlinNativeTarget.swiftPackageConfig(
     if (cinteropName.isEmpty()) {
         throw GradleException("The cinteropName cannot be empty")
     }
-    val entry = project.swiftContainer().maybeCreate(cinteropName)
+    val entry = project.swiftContainer().maybeCreate("${cinteropName}_${name.capitalized()}")
     entry.useExtension = true
     entry.targetName = this.name
+    entry.internalName = cinteropName
     entry.configure()
 }

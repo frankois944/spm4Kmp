@@ -38,6 +38,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import kotlin.math.log
 
 @Suppress("LongMethod")
 internal fun Project.configAppleTargets(
@@ -48,7 +49,7 @@ internal fun Project.configAppleTargets(
 ) {
     val allTargets = getAllTargets(swiftPackageEntry)
     if (allTargets.isEmpty()) {
-        logger.error("No valid configuration found for ${swiftPackageEntry.name}")
+        logger.error("No valid configuration found for {}", swiftPackageEntry.internalName)
         return
     }
 
@@ -56,7 +57,7 @@ internal fun Project.configAppleTargets(
 
     val manifestTask =
         tasks.register(
-            getTaskName(TASK_GENERATE_MANIFEST, swiftPackageEntry.name),
+            getTaskName(TASK_GENERATE_MANIFEST, swiftPackageEntry.internalName),
             GenerateManifestTask::class.java,
         ) {
             it.configureManifestTask(
@@ -71,11 +72,12 @@ internal fun Project.configAppleTargets(
     val exportedManifestDirectory =
         layout.projectDirectory
             .asFile
-            .resolve("exported${swiftPackageEntry.name.capitalized()}")
+            .resolve("exported${swiftPackageEntry.internalName.capitalized()}")
 
+    logger.debug("NEW TASK exportedManifestTask {}", swiftPackageEntry.internalName)
     val exportedManifestTask: TaskProvider<GenerateExportableManifestTask> =
         tasks.register(
-            getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, swiftPackageEntry.name),
+            getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, swiftPackageEntry.internalName),
             GenerateExportableManifestTask::class.java,
         ) {
             it.configureExportableManifestTask(
@@ -92,6 +94,7 @@ internal fun Project.configAppleTargets(
         }
 
     allTargets.forEach { cinteropTarget ->
+        logger.debug("SETUP {}", cinteropTarget)
         val targetBuildDir =
             getTargetBuildDirectory(
                 packageScratchDir = packageDirectoriesConfig.packageScratchDir,
@@ -101,7 +104,7 @@ internal fun Project.configAppleTargets(
 
         val copyPackageResourcesTask =
             tasks.register(
-                getTaskName(TASK_COPY_PACKAGE_RESOURCES, swiftPackageEntry.name, cinteropTarget),
+                getTaskName(TASK_COPY_PACKAGE_RESOURCES, swiftPackageEntry.internalName, cinteropTarget),
                 CopyPackageResourcesTask::class.java,
             ) {
                 it.configureCopyPackageResourcesTask(
@@ -113,7 +116,7 @@ internal fun Project.configAppleTargets(
 
         val compileTask =
             tasks.register(
-                getTaskName(TASK_COMPILE_PACKAGE, swiftPackageEntry.name, cinteropTarget),
+                getTaskName(TASK_COMPILE_PACKAGE, swiftPackageEntry.internalName, cinteropTarget),
                 CompileSwiftPackageTask::class.java,
             ) {
                 it.configureCompileTask(
@@ -128,7 +131,7 @@ internal fun Project.configAppleTargets(
             tasks.register(
                 getTaskName(
                     TASK_GENERATE_CINTEROP_DEF,
-                    swiftPackageEntry.name,
+                    swiftPackageEntry.internalName,
                     cinteropTarget,
                 ),
                 GenerateCInteropDefinitionTask::class.java,
@@ -159,7 +162,7 @@ internal fun Project.configAppleTargets(
                         if (swiftPackageEntry.useExtension) {
                             file.nameWithoutExtension
                         } else {
-                            file.nameWithoutExtension + swiftPackageEntry.name.capitalized()
+                            file.nameWithoutExtension + swiftPackageEntry.internalName.capitalized()
                         }
                     } else {
                         file.nameWithoutExtension.split("_").first()
@@ -203,7 +206,7 @@ private fun GenerateManifestTask.configureManifestTask(
     packageDependencies: List<SwiftDependency>,
 ) {
     this.packageDependencies.set(packageDependencies)
-    this.packageName.set(swiftPackageEntry.name)
+    this.packageName.set(swiftPackageEntry.internalName)
     this.minIos.set(swiftPackageEntry.minIos)
     this.minTvos.set(swiftPackageEntry.minTvos)
     this.minMacos.set(swiftPackageEntry.minMacos)
@@ -273,9 +276,9 @@ private fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTa
     packageDirectoriesConfig: PackageDirectoriesConfig,
     packageDependencies: List<SwiftDependency>,
 ) {
-    this.compiledBinary.set(targetBuildDir.resolve("lib${swiftPackageEntry.name}.a"))
+    this.compiledBinary.set(targetBuildDir.resolve("lib${swiftPackageEntry.internalName}.a"))
     this.target.set(cinteropTarget)
-    this.productName.set(swiftPackageEntry.name)
+    this.productName.set(swiftPackageEntry.internalName)
     this.packages.set(packageDependencies)
     this.debugMode.set(swiftPackageEntry.debug)
     this.osVersion.set(
@@ -378,22 +381,8 @@ private fun getCurrentDependencies(swiftPackageEntry: PackageRootDefinitionExten
     swiftPackageEntry.packageDependenciesConfig.packageDependencies.distinctBy { it.packageName }
 
 private fun Project.getAllTargets(swiftPackageEntry: PackageRootDefinitionExtension): List<AppleCompileTarget> =
-    if (swiftPackageEntry.useExtension) {
-        tasks
-            .withType(CInteropProcess::class.java)
-            .filter {
-                val targetName =
-                    buildString {
-                        append("cinterop")
-                        append(swiftPackageEntry.name.capitalized())
-                        append(swiftPackageEntry.targetName?.capitalized())
-                    }
-                it.name.startsWith(targetName)
-            }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
-    } else {
-        tasks
-            .withType(CInteropProcess::class.java)
-            .filter {
-                it.name.startsWith("cinterop" + swiftPackageEntry.name.capitalized())
-            }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
-    }
+    tasks
+        .withType(CInteropProcess::class.java)
+        .filter {
+            it.name.startsWith("cinterop" + swiftPackageEntry.internalName.capitalized())
+        }.mapNotNull { AppleCompileTarget.fromKonanTarget(it.konanTarget) }
