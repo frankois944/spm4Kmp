@@ -77,7 +77,7 @@ kotlin {
             packageRegistry {
                 url = uri("http://google.fr")
                 auth =
-                    registryCredential(
+                    RegistryLogin.Credential(
                         username = "username",
                         password = "password",
                     )
