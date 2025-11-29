@@ -280,14 +280,17 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 }
             val baseDefinition =
                 when {
-                    moduleConfig.isFramework && moduleConfig.isCLang ->
+                    moduleConfig.isFramework && moduleConfig.isCLang -> {
                         generateCFrameworkDefinition(moduleConfig)
+                    }
 
-                    moduleConfig.isFramework ->
+                    moduleConfig.isFramework -> {
                         generateFrameworkDefinition(moduleName, moduleConfig)
+                    }
 
-                    else ->
+                    else -> {
                         generateNonFrameworkDefinition(moduleName, moduleConfig)
+                    }
                 }
 
             val definitionWithBridgeLib =
@@ -370,8 +373,9 @@ language = Objective-C
 modules = $moduleName
 package = $packageName
 libraryPaths = "${currentBuildDirectory()}"
-compilerOpts = -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+compilerOpts = -DSWIFT_TYPEDEFS -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
 linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+skipNonImportableModules = true
 ${getCustomizedDefinitionConfig()}
             """.trimIndent()
     }
@@ -432,8 +436,9 @@ language = Objective-C
 modules = $moduleName
 package = $packageName
 libraryPaths = "${currentBuildDirectory()}"
-compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"${currentBuildDirectory().path}"
+compilerOpts = -DSWIFT_TYPEDEFS $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"${currentBuildDirectory().path}"
 linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
+skipNonImportableModules = true
 ${getCustomizedDefinitionConfig()}
             """.trimIndent()
     }

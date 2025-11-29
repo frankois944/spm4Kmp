@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         google()
+        maven("https://packages.jetbrains.team/maven/p/kt/dev")
     }
 }
 
@@ -11,6 +12,7 @@ dependencyResolutionManagement {
         mavenCentral()
         google()
         mavenCentral()
+        maven("https://packages.jetbrains.team/maven/p/kt/dev")
     }
 
     versionCatalogs {
