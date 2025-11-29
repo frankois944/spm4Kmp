@@ -106,7 +106,15 @@ internal class Dependency :
         )
     }
 
+    override fun registry(
+        id: String,
+        version: String,
+        products: ProductPackageConfig.() -> Unit,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     private companion object {
-        private const val serialVersionUID: Long = 2
+        private const val serialVersionUID: Long = 3
     }
 }

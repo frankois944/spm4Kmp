@@ -82,6 +82,25 @@ internal sealed interface SwiftDependency : Serializable {
             Serializable {
             open val url: URI = URI("")
 
+            data class Registry(
+                val id: String,
+                override var packageName: String = "",
+                val version: String,
+                override val products: ProductPackageConfig.() -> Unit,
+            ) : Remote() {
+                init {
+                    productsConfig.apply(products)
+                    if (packageName.isEmpty()) {
+                        packageName =
+                            productsConfig.productPackages
+                                .first()
+                                .products
+                                .first()
+                                .name
+                    }
+                }
+            }
+
             data class Version(
                 override val url: URI,
                 override var packageName: String = "",
