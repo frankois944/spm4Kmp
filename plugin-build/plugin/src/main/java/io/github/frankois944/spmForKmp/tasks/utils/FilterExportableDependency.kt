@@ -31,13 +31,23 @@ private fun MutableList<SwiftDependency>.addFilteredRemotePackage(remotePackage:
     if (filteredProducts.isNotEmpty()) {
         val newConfig = ProductPackageConfigImpl(filteredProducts.toMutableList())
         when (remotePackage) {
-            is SwiftDependency.Package.Remote.Version ->
+            is SwiftDependency.Package.Remote.Version -> {
                 add(
                     remotePackage.copy().also { it.productsConfig = newConfig },
                 )
+            }
 
-            is SwiftDependency.Package.Remote.Branch -> add(remotePackage.copy().also { it.productsConfig = newConfig })
-            is SwiftDependency.Package.Remote.Commit -> add(remotePackage.copy().also { it.productsConfig = newConfig })
+            is SwiftDependency.Package.Remote.Branch -> {
+                add(remotePackage.copy().also { it.productsConfig = newConfig })
+            }
+
+            is SwiftDependency.Package.Remote.Commit -> {
+                add(remotePackage.copy().also { it.productsConfig = newConfig })
+            }
+
+            is SwiftDependency.Package.Remote.Registry -> {
+                add(remotePackage.copy().also { it.productsConfig = newConfig })
+            }
         }
     }
 }
