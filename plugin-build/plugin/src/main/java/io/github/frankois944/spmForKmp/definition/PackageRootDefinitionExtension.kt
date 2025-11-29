@@ -11,9 +11,12 @@ import io.github.frankois944.spmForKmp.definition.dependency.Dependency
 import io.github.frankois944.spmForKmp.definition.dependency.DependencyConfig
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackageConfig
+import io.github.frankois944.spmForKmp.definition.packageRegistry.PackageRegistry
+import io.github.frankois944.spmForKmp.definition.packageRegistry.PackageRegistryConfig
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettingsConfig
 import org.gradle.api.Project
+import java.net.URI
 import javax.inject.Inject
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
@@ -276,4 +279,15 @@ public abstract class PackageRootDefinitionExtension
          * [help-resolve-linker-errors](https://kotlinlang.org/docs/native-definition-file.html#help-resolve-linker-errors)
          */
         public var userSetupHint: String? = null
+
+        internal var packageRegistryConfig: PackageRegistryConfig? = null
+
+        /**
+         * Add a package registry configuration
+         */
+        public fun packageRegistry(packageRegistry: PackageRegistryConfig.() -> Unit = { }) {
+            packageRegistryConfig =
+                PackageRegistry(url = URI(""))
+                    .apply(packageRegistry)
+        }
     }
