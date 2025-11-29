@@ -1,4 +1,5 @@
 import io.github.frankois944.spmForKmp.definition.product.ProductName
+import io.github.frankois944.spmForKmp.definition.packageRegistry.auth.registryCredential
 import io.github.frankois944.spmForKmp.swiftPackageConfig
 
 plugins {
@@ -73,6 +74,14 @@ kotlin {
             //     includeProduct = listOf("HevSocks5Tunnel")
             // }
             minIos = "16.0"
+            packageRegistry {
+                url = uri("http://google.fr")
+                auth =
+                    registryCredential(
+                        username = "username",
+                        password = "password",
+                    )
+            }
             dependency {
                 remotePackageVersion(
                     url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
