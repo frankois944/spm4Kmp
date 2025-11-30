@@ -1,8 +1,13 @@
 package io.github.frankois944.spmForKmp.definition.packageRegistry.auth
 
-public open class PackageRegistryAuth(
-    public var username: String? = null,
-    public var token: String? = null,
-    public var password: String? = null,
-    public var tokenFile: String? = null,
-) : RegistryLogin()
+import java.io.File
+import java.io.Serializable
+import java.net.URI
+
+internal data class PackageRegistryAuth(
+    val url: URI,
+    val username: String? = null,
+    val token: String? = null,
+    val password: String? = null,
+    val tokenFile: File? = null,
+) : Serializable

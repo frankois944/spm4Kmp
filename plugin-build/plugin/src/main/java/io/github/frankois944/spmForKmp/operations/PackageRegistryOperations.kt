@@ -4,10 +4,11 @@ import org.gradle.api.logging.Logger
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.net.URI
 
 internal fun ExecOperations.packageRegistrySet(
     workingDir: File,
-    url: String,
+    url: URI,
     logger: Logger,
     swiftBinPath: String?,
 ) {
@@ -26,9 +27,11 @@ internal fun ExecOperations.packageRegistrySet(
             add("package-registry")
             add("set")
             add("--allow-insecure-http")
-            add(url)
+            add(url.toString())
         }
 
+    logger.warn("Executing package registry set command")
+    logger.debug("Package registry set command args: ${args.joinToString(" ")}")
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
     exec {
@@ -51,11 +54,11 @@ internal fun ExecOperations.packageRegistrySet(
 
 internal fun ExecOperations.packageRegistryAuth(
     workingDir: File,
-    url: String,
+    url: URI,
     username: String?,
     password: String?,
     token: String?,
-    tokenFile: String?,
+    tokenFile: File?,
     logger: Logger,
     swiftBinPath: String?,
 ) {
@@ -75,7 +78,7 @@ internal fun ExecOperations.packageRegistryAuth(
             }
             add("package-registry")
             add("login")
-            add(url)
+            add(url.toString())
             username?.let {
                 add("--username")
                 add(it)
@@ -90,11 +93,13 @@ internal fun ExecOperations.packageRegistryAuth(
             }
             tokenFile?.let {
                 add("--token-file")
-                add(it)
+                add(it.toString())
             }
             add("--no-confirm")
         }
 
+    logger.warn("Executing package registry login command")
+    logger.debug("Package registry login command args: ${args.joinToString(" ")}")
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
     exec {

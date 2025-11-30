@@ -8,6 +8,7 @@ import io.github.frankois944.spmForKmp.TASK_COPY_PACKAGE_RESOURCES
 import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
+import io.github.frankois944.spmForKmp.TASK_GENERATE_REGISTRY_FILE
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
@@ -15,6 +16,7 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.resources.getCurrentPackagesBuiltDir
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.ConfigRegistryPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.CopyPackageResourcesTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateExportableManifestTask
@@ -38,7 +40,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
-import kotlin.math.log
 
 @Suppress("LongMethod")
 internal fun Project.configAppleTargets(
@@ -91,6 +92,17 @@ internal fun Project.configAppleTargets(
                         buildMode = buildMode,
                     ),
             )
+        }
+
+    logger.warn(">>>> {}", swiftPackageEntry.packageRegistryConfigs)
+    val packageRegistryTask: TaskProvider<ConfigRegistryPackageTask> =
+        tasks.register(
+            getTaskName(TASK_GENERATE_REGISTRY_FILE, swiftPackageEntry.internalName),
+            ConfigRegistryPackageTask::class.java,
+        ) {
+            it.workingDir.set(packageDirectoriesConfig.spmWorkingDir)
+            it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
+            it.registries.set(swiftPackageEntry.packageRegistryConfigs)
         }
 
     allTargets.forEach { cinteropTarget ->
@@ -189,6 +201,7 @@ internal fun Project.configAppleTargets(
                                 .get()
                                 .dependsOn(
                                     manifestTask.get(),
+                                    packageRegistryTask.get(),
                                 ),
                         ),
                 )

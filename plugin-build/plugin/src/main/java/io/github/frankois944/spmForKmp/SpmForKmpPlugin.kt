@@ -30,6 +30,7 @@ internal const val TASK_GENERATE_MANIFEST: String = "generateSwiftPackage"
 internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
 internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
+internal const val TASK_GENERATE_REGISTRY_FILE: String = "generateRegistryFilePackage"
 internal const val TASK_COPY_PACKAGE_RESOURCES: String = "CopyPackageResources"
 
 @Suppress("UnnecessaryAbstractClass")
