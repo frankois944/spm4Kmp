@@ -90,14 +90,6 @@ internal sealed interface SwiftDependency : Serializable {
             ) : Remote() {
                 init {
                     productsConfig.apply(products)
-                    if (packageName.isEmpty()) {
-                        packageName =
-                            productsConfig.productPackages
-                                .first()
-                                .products
-                                .first()
-                                .name
-                    }
                 }
             }
 
@@ -144,7 +136,7 @@ internal sealed interface SwiftDependency : Serializable {
             }
 
             internal companion object {
-                private const val serialVersionUID: Long = 4
+                private const val serialVersionUID: Long = 5
             }
         }
 

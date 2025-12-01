@@ -111,7 +111,7 @@ public interface DependencyConfig : Serializable {
      * @property products A list of the product's package used during dependency configuration.
      *
      */
-    public fun registry(
+    public fun registryPackage(
         id: String,
         version: String,
         products: ProductPackageConfig.() -> Unit,

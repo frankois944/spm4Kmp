@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject
-import kotlin.math.log
 
 @CacheableTask
 internal abstract class ConfigRegistryPackageTask : DefaultTask() {
@@ -94,6 +93,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
             logger.warn("Create a new package registry file {}", registry.url)
             logger.warn("URL : {}", workingDir.get())
             registriesFile?.let { file ->
+                logger.warn("previous config file exist, delete it")
                 if (file.exists()) {
                     file.delete()
                 }
