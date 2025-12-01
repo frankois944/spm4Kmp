@@ -7,6 +7,7 @@ import FirebaseAnalytics.FIRConsentStatusGranted
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.runBlocking
 import nativeIosShared.TestClass
+import registrydummy.RegistryDummy
 import kotlin.coroutines.suspendCoroutine
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,6 +19,11 @@ class Test {
     @Test
     fun getDataFromBridgeTest() {
         assertEquals("HelloTest!", TestClass().getSomeValue())
+    }
+
+    @Test
+    fun registryPackageTest() {
+        assertEquals("test-string", RegistryDummy().testFunction())
     }
 
     @Test
