@@ -33,12 +33,11 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val tokenFile: ListProperty<File>
         get() {
-            logger.warn(">>><<<<Found token files {}", registries.get())
             val files =
                 registries.get().mapNotNull { registry ->
                     registry.tokenFile
                 }
-            logger.warn("Found token files {}", files)
+            logger.debug("Found token files {}", files)
             return project.objects.listProperty(File::class.java).apply {
                 addAll(files)
             }
@@ -54,7 +53,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
                     .get()
                     .resolve(".swiftpm")
             return if (registries.get().isEmpty()) {
-                logger.warn("registries is empty delete .swiftpm if exist")
+                logger.debug("registries is empty delete .swiftpm if exist")
                 if (manifest.exists()) {
                     manifest
                         .deleteRecursively()
@@ -65,7 +64,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
                     .resolve("configuration")
                     .resolve("registries.json")
                     .also {
-                        logger.warn("Create swiftpm config directory")
+                        logger.debug("Create swiftpm config directory")
                         it.ensureParentDirsCreated()
                     }
             }
@@ -84,16 +83,16 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
         onlyIf {
             HostManager.hostIsMac
         }
-        logger.warn("Found registries {}", registries.get())
+        logger.debug("Found registries {}", registries.get())
     }
 
     @TaskAction
     fun generateFile() {
         registries.get().forEach { registry ->
-            logger.warn("Create a new package registry file {}", registry.url)
-            logger.warn("URL : {}", workingDir.get())
+            logger.debug("Create a new package registry file {}", registry.url)
+            logger.debug("URL : {}", workingDir.get())
             registriesFile?.let { file ->
-                logger.warn("previous config file exist, delete it")
+                logger.debug("previous config file exist, delete it")
                 if (file.exists()) {
                     file.delete()
                 }
@@ -108,10 +107,10 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
                 registry.token != null ||
                 registry.tokenFile != null
             ) {
-                logger.warn("Authenticate with package registry {}", registry.url)
-                logger.warn("username: {} password: {}", registry.username, registry.password)
-                logger.warn("token: {}", tokenFile.orNull)
-                logger.warn("tokenFile: {}", tokenFile.orNull)
+                logger.debug("Authenticate with package registry {}", registry.url)
+                logger.debug("username: {} password: {}", registry.username, registry.password)
+                logger.debug("token: {}", tokenFile.orNull)
+                logger.debug("tokenFile: {}", tokenFile.orNull)
                 execOps.packageRegistryAuth(
                     workingDir = workingDir.get(),
                     url = registry.url,
