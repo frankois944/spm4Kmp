@@ -94,7 +94,6 @@ internal fun Project.configAppleTargets(
             )
         }
 
-    logger.warn(">>>> {}", swiftPackageEntry.packageRegistryConfigs)
     val packageRegistryTask: TaskProvider<ConfigRegistryPackageTask> =
         tasks.register(
             getTaskName(TASK_GENERATE_REGISTRY_FILE, swiftPackageEntry.internalName),

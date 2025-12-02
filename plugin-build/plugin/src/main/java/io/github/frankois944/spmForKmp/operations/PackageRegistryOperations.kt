@@ -30,7 +30,7 @@ internal fun ExecOperations.packageRegistrySet(
             add(url.toString())
         }
 
-    logger.warn("Executing package registry set command")
+    logger.debug("Executing package registry set command")
     logger.debug("Package registry set command args: ${args.joinToString(" ")}")
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
@@ -98,7 +98,7 @@ internal fun ExecOperations.packageRegistryAuth(
             add("--no-confirm")
         }
 
-    logger.warn("Executing package registry login command")
+    logger.debug("Executing package registry login command")
     logger.debug("Package registry login command args: ${args.joinToString(" ")}")
     val standardOutput = ByteArrayOutputStream()
     val errorOutput = ByteArrayOutputStream()
