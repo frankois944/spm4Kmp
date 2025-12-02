@@ -114,7 +114,6 @@ internal fun Project.configAppleTargets(
             it.configureResolveManifestTask(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
-                packageDependencies = packageDependencies,
             )
         }
 
