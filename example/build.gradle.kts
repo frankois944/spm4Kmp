@@ -1,3 +1,4 @@
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.swiftPackageConfig
 
 plugins {
@@ -72,19 +73,23 @@ kotlin {
             //     includeProduct = listOf("HevSocks5Tunnel")
             // }
             minIos = "16.0"
-            registry(
-                url = uri("https://spm.azodus.blog/api/packages/frankois944/swift"),
-                token = "4f9d8a367a339a38be7f8cb169f1e3d296e720bc",
-            )
-            dependency {
-                registryPackage(
-                    id = "spm.dummy",
-                    version = "1.0.1",
-                    products = {
-                        add("registrydummy", exportToKotlin = true)
-                    },
+            if (System.getenv("GITEA_TOKEN") != null) {
+                registry(
+                    url = uri("https://spm.azodus.blog/api/packages/frankois944/swift"),
+                    token = System.getenv("GITEA_TOKEN")!!,
                 )
-                /*remotePackageVersion(
+            }
+            dependency {
+                if (System.getenv("GITEA_TOKEN") != null) {
+                    registryPackage(
+                        id = "spm.dummy",
+                        version = "1.0.1",
+                        products = {
+                            add("registrydummy", exportToKotlin = true)
+                        },
+                    )
+                }
+                remotePackageVersion(
                     url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
                     // Libraries from the package
                     products = {
@@ -134,14 +139,14 @@ kotlin {
                     exportToKotlin = true,
                     checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
                     isCLang = true,
-                )*/
-                /*remotePackageVersion(
+                )
+                remotePackageVersion(
                     url = uri("https://github.com/SDWebImage/SDWebImage.git"),
                     products = {
                         add("SDWebImage")
                     },
                     version = "5.21.3",
-                )*/
+                )
             }
         }
     }
