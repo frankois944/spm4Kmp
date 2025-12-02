@@ -280,14 +280,17 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 }
             val baseDefinition =
                 when {
-                    moduleConfig.isFramework && moduleConfig.isCLang ->
+                    moduleConfig.isFramework && moduleConfig.isCLang -> {
                         generateCFrameworkDefinition(moduleConfig)
+                    }
 
-                    moduleConfig.isFramework ->
+                    moduleConfig.isFramework -> {
                         generateFrameworkDefinition(moduleName, moduleConfig)
+                    }
 
-                    else ->
+                    else -> {
                         generateNonFrameworkDefinition(moduleName, moduleConfig)
+                    }
                 }
 
             val definitionWithBridgeLib =
