@@ -4,7 +4,9 @@ import UIKit
 import CryptoSwift
 import FirebaseDatabase
 import HevSocks5Tunnel
+#if canImport(registrydummy)
 import registrydummy
+#endif
 
 // Force cinterop to include `platform.UIKit.UIView`
 @objcMembers public class MyDummyView: UIView {}

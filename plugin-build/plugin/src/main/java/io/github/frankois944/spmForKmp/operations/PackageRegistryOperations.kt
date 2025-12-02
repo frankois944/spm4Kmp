@@ -52,6 +52,7 @@ internal fun ExecOperations.packageRegistrySet(
     }
 }
 
+@Suppress("LongParameterList")
 internal fun ExecOperations.packageRegistryAuth(
     workingDir: File,
     url: URI,

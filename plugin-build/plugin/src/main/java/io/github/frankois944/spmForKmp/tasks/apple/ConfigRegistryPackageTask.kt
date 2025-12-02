@@ -81,7 +81,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
         description = "Generate Package Registry Manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.hostIsMac
+            HostManager.hostIsMac || registries.get().isEmpty()
         }
         logger.debug("Found registries {}", registries.get())
     }
@@ -103,10 +103,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
                 logger = logger,
                 swiftBinPath = swiftBinPath.orNull,
             )
-            if ((registry.username != null && registry.password != null) ||
-                registry.token != null ||
-                registry.tokenFile != null
-            ) {
+            if (registry.hasAuthCredentials()) {
                 logger.debug("Authenticate with package registry {}", registry.url)
                 logger.debug("username: {} password: {}", registry.username, registry.password)
                 logger.debug("token: {}", tokenFile.orNull)

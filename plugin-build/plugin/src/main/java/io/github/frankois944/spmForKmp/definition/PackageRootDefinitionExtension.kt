@@ -280,7 +280,7 @@ public abstract class PackageRootDefinitionExtension
          */
         public var userSetupHint: String? = null
 
-        internal var packageRegistryConfigs: MutableList<PackageRegistryAuth> = mutableListOf()
+        internal val packageRegistryConfigs: MutableList<PackageRegistryAuth> = mutableListOf()
 
         /**
          * Configures a package registry using the specified URL.
