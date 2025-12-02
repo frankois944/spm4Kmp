@@ -35,7 +35,7 @@ internal fun SwiftDependency.toDependencyDeclaration(): String? =
 
         is SwiftDependency.Package.Remote.Registry -> {
             """
-            .package(id: "$id", exact: "$version"),
+            .package(id: "$id", exact: "$version")
             """.trimIndent()
         }
 
