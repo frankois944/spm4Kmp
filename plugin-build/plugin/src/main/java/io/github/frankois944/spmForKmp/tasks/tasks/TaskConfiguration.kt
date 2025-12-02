@@ -70,7 +70,6 @@ internal fun GenerateExportableManifestTask.configureExportableManifestTask(
 internal fun ResolveManifestTask.configureResolveManifestTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
-    packageDependencies: List<SwiftDependency>,
 ) {
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
     this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
