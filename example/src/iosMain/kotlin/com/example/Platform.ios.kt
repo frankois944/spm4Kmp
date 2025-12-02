@@ -24,7 +24,6 @@ class IOSPlatform : Platform {
 
 fun test() {
     hev_socks5_tunnel_quit()
-    RegistryDummy().testFunction()
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()

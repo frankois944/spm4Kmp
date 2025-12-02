@@ -113,15 +113,6 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 manifestFile.get(),
                 logger,
             )
-            execOps.resolvePackage(
-                workingDir = manifestFile.get().parentFile,
-                scratchPath = packageScratchDir.get().asFile,
-                sharedCachePath = sharedCacheDir.orNull,
-                sharedConfigPath = sharedConfigDir.orNull,
-                sharedSecurityPath = sharedSecurityDir.orNull,
-                logger = logger,
-                swiftBinPath = swiftBinPath.orNull,
-            )
         } catch (ex: Exception) {
             logger.error(
                 "Manifest file generated :\n{}\n{}",

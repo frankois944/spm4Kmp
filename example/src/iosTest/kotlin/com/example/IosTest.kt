@@ -15,7 +15,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-class Test {
+class IosTest {
     @Test
     fun getDataFromBridgeTest() {
         assertEquals("HelloTest!", TestClass().getSomeValue())
@@ -23,6 +23,7 @@ class Test {
 
     @Test
     fun registryPackageTest() {
+        // run only in CI or when the GITEA_TOKEN is set
         assertEquals("test-string", RegistryDummy().testFunction())
     }
 

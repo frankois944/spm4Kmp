@@ -10,4 +10,13 @@ internal data class PackageRegistryAuth(
     val token: String? = null,
     val password: String? = null,
     val tokenFile: File? = null,
-) : Serializable
+) : Serializable {
+    fun hasAuthCredentials(): Boolean =
+        (username != null && password != null) ||
+            token != null ||
+            tokenFile != null
+
+    internal companion object {
+        private const val serialVersionUID: Long = 1
+    }
+}
