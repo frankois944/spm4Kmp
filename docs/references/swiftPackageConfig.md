@@ -223,7 +223,9 @@ Customize the local package used by Xcode
 fun exportedPackageSettings(setting: ExportedPackageConfig.() -> Unit)
 ```
 
-## strictEnums
+## Cinterop Behaviour
+
+### strictEnums
 
 A list of enums that should be generated as Kotlin enums.
 
@@ -233,7 +235,7 @@ A list of enums that should be generated as Kotlin enums.
 var strictEnums: List<String> = emptyList()
 ```
 
-## nonStrictEnums
+### nonStrictEnums
 
 A list of enums that should be generated as integral values.strict enums
 
@@ -243,7 +245,7 @@ A list of enums that should be generated as integral values.strict enums
 public var nonStrictEnums: List<String> = emptyList()
 ```
 
-## foreignExceptionMode
+### foreignExceptionMode
 
 Wraps exceptions from Objective-C code into Kotlin exceptions with the ForeignException type
 
@@ -253,7 +255,7 @@ Wraps exceptions from Objective-C code into Kotlin exceptions with the ForeignEx
 var foreignExceptionMode: String? = null
 ```
 
-## disableDesignatedInitializerChecks
+### disableDesignatedInitializerChecks
 
 Disables the compiler check that doesn't allow calling a non-designated Objective-C initializer as a super() constructor
 
@@ -263,7 +265,7 @@ Disables the compiler check that doesn't allow calling a non-designated Objectiv
 var disableDesignatedInitializerChecks: Boolean? = null
 ```
 
-## userSetupHint
+### userSetupHint
 
 Adds a custom message, for example, to help users resolve linker errors
 
@@ -271,4 +273,68 @@ Adds a custom message, for example, to help users resolve linker errors
 
 ```kotlin
 var userSetupHint: String? = null
+```
+
+## package Registry
+
+### registry
+
+Configures a package registry using the specified URL.
+This method adds a new registry configuration to the list of package registry settings.
+
+- url The URL of the package registry to be added.
+
+```kotlin
+fun registry(url: URI)
+```
+
+### registry with credential
+
+Configures authentication settings for a package registry by associating
+a URL with a username and password. These settings are used to authenticate
+access to the package registry during operations involving Swift package dependencies.
+
+- url The URL of the package registry.
+- username The username for authenticating with the registry.
+- password The password for authenticating with the registry.
+
+```kotlin
+fun registry(
+    url: URI,
+    username: String,
+    password: String,
+)
+```
+
+### registry with token
+
+Configures authentication settings for a package registry by associating
+a URL with a token. These settings are used to authenticate access
+to the package registry during operations involving Swift package dependencies.
+
+- url The URL of the package registry.
+- token The token used for authenticating with the registry.
+
+```kotlin
+fun registry(
+    url: URI,
+    token: String,
+)
+```
+
+
+### registry with token file
+
+Configures authentication settings for a package registry by associating
+a URL with a token file. These settings are used to authenticate access
+to the package registry during operations involving Swift package dependencies.
+
+- url The URL of the package registry.
+- tokenFile The file containing the token for authenticating with the registry.
+
+```kotlin
+fun registry(
+    url: URI,
+    tokenFile: File,
+)
 ```

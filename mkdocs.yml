@@ -51,6 +51,7 @@ nav:
     - usages/distribution.md
     - usages/largebridge.md
     - usages/importCLangFramework.md
+    - usages/packageRegistry.md
   - References:
       - references/swiftPackageConfig.md
       - Dependencies:

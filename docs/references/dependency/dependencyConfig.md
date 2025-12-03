@@ -131,6 +131,23 @@ fun remotePackageCommit(
 )
 ```
 
+### registryPackage
+    
+Represents a registry-based dependency.
+
+- id The unique identifier of the registry.
+- version The version of the dependency.
+- products A list of the product's package used during dependency configuration.
+
+
+```kotlin
+public fun registryPackage(
+    id: String,
+    version: String,
+    products: ProductPackageConfig.() -> Unit,
+)
+```
+
 
 
 
