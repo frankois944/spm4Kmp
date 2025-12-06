@@ -7,6 +7,7 @@ import FirebaseAnalytics.FIRConsentStatusGranted
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.runBlocking
 import nativeIosShared.TestClass
+import registrydummy.RegistryDummy
 import kotlin.coroutines.suspendCoroutine
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,10 +15,16 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-class Test {
+class IosTest {
     @Test
     fun getDataFromBridgeTest() {
         assertEquals("HelloTest!", TestClass().getSomeValue())
+    }
+
+    @Test
+    fun registryPackageTest() {
+        // run only in CI or when the GITEA_TOKEN is set
+        assertEquals("test-string", RegistryDummy().testFunction())
     }
 
     @Test

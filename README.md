@@ -8,11 +8,11 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=frankois944_spm4Kmp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=frankois944_spm4Kmp)
 [![GitHub License](https://img.shields.io/github/license/frankois944/spm4kmp)](https://github.com/frankois944/spm4Kmp/blob/main/LICENSE)
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A51MG1Y9)
-
 The Swift Package Manager for Kotlin Multiplatform Plugin, aka `spmForKmp` Gradle Plugin, is an **alternative of the [dying](https://blog.cocoapods.org/CocoaPods-Specs-Repo/) CocoaPods Plugin** used by [KMP cocoapods plugin](https://kotlinlang.org/docs/native-cocoapods.html#set-up-an-environment-to-work-with-cocoapods).
 
 It will help you to integrate Swift Package and simplify communication between Swift/Kotlin Multiplatform projects targeting the **Apple platform**.
+
+You can also easily **use your own Swift code** to your Kotlin's Apple sourceSet!
 
 The plugin uses the embedded Swift Package Manager, so **no third-party dependency is needed**, and it's less intrusive.
 
@@ -43,21 +43,13 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64()
         // and more Apple targets...
-    ).forEach {
-        it.compilations {
-            val main by getting {
-                // Choose the cinterop name
-                cinterops.create("nativeBridge")
-            }
+    ).forEach { target ->
+        // `cinteropName` is recommended when using a list of native target
+        // Or when you want to keep the compatibility with the legacy way (cf: [cinteropName])
+        // If not set, It will take the name of the current Target
+        target.swiftPackageConfig(cinteropName = "[cinteropName]") {
+            // create a new directory at `src/swift/[cinteropName]`
         }
-    }
-}
-```
-
-``` kotlin title="build.gradle.kts"
-swiftPackageConfig {
-    create("nativeBridge") { // must match with cinterops.create name
-        // your bridge and native dependencies
     }
 }
 ```
@@ -69,6 +61,10 @@ If you find this project useful, please consider giving it a star!
 [![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A51MG1Y9)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=frankois944/spm4Kmp&type=date&legend=top-left)](https://www.star-history.com/#frankois944/spm4Kmp&type=date&legend=top-left)
 
 ---
 

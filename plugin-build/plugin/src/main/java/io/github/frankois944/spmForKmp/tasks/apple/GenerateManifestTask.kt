@@ -4,7 +4,6 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
-import io.github.frankois944.spmForKmp.operations.resolvePackage
 import io.github.frankois944.spmForKmp.operations.swiftFormat
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -112,15 +111,6 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             execOps.swiftFormat(
                 manifestFile.get(),
                 logger,
-            )
-            execOps.resolvePackage(
-                workingDir = manifestFile.get().parentFile,
-                scratchPath = packageScratchDir.get().asFile,
-                sharedCachePath = sharedCacheDir.orNull,
-                sharedConfigPath = sharedConfigDir.orNull,
-                sharedSecurityPath = sharedSecurityDir.orNull,
-                logger = logger,
-                swiftBinPath = swiftBinPath.orNull,
             )
         } catch (ex: Exception) {
             logger.error(

@@ -23,30 +23,32 @@ var includeProduct: List<String> = emptyList()
     ```
 
 ```kotlin
-swiftPackageConfig {
-    create("dummy") {
-        // Manually include the KeychainAccess library
-        exportedPackageSettings { includeProduct = listOf("KeychainAccess") }
-        dependency {
-            remotePackageBranch(
-                url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
-                branch = "main",
-                products = {
-                    add(
-                        ProductName(
-                            "CryptoSwift"
-                        ), // will not be included inside the exported package
-                    )
-                },
-            )
-            remotePackageBranch(
-                url =
-                    URI(
-                        "https://github.com/kishikawakatsumi/KeychainAccess.git"
-                    ), // will be included inside the exported package
-                products = { add("KeychainAccess") },
-                branch = "master",
-            )
+kotlin {
+    iosArm64 {
+        swiftPackageConfig {
+            // Manually include the KeychainAccess library
+            exportedPackageSettings { includeProduct = listOf("KeychainAccess") }
+            dependency {
+                remotePackageBranch(
+                    url = URI("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                    branch = "main",
+                    products = {
+                        add(
+                            ProductName(
+                                "CryptoSwift"
+                            ), // will not be included inside the exported package
+                        )
+                    },
+                )
+                remotePackageBranch(
+                    url =
+                        URI(
+                            "https://github.com/kishikawakatsumi/KeychainAccess.git"
+                        ), // will be included inside the exported package
+                    products = { add("KeychainAccess") },
+                    branch = "master",
+                )
+            }
         }
     }
 }

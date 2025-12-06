@@ -9,15 +9,17 @@ internal val SwiftDependency.isBinaryDependency: Boolean
 
 internal fun SwiftDependency.toDependencyDeclaration(): String? =
     when (this) {
-        is SwiftDependency.Package.Local ->
+        is SwiftDependency.Package.Local -> {
             """
             .package(path: "$path")
             """.trimIndent()
+        }
 
-        is SwiftDependency.Package.Remote.Version ->
+        is SwiftDependency.Package.Remote.Version -> {
             """
             .package(url: "$url", exact: "$version")
             """.trimIndent()
+        }
 
         is SwiftDependency.Package.Remote.Commit -> {
             """
@@ -25,10 +27,19 @@ internal fun SwiftDependency.toDependencyDeclaration(): String? =
             """.trimIndent()
         }
 
-        is SwiftDependency.Package.Remote.Branch ->
+        is SwiftDependency.Package.Remote.Branch -> {
             """
             .package(url: "$url", branch: "$branch")
             """.trimIndent()
+        }
 
-        else -> null
+        is SwiftDependency.Package.Remote.Registry -> {
+            """
+            .package(id: "$id", exact: "$version")
+            """.trimIndent()
+        }
+
+        else -> {
+            null
+        }
     }

@@ -5,7 +5,33 @@
 
 You can set a different configuration for each target you manage.
 
-``` kotlin title="build.gradle.kts"
+```kotlin title="build.gradle.kts"
+kotlin {
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { target ->
+        target.swiftPackageConfig(cinteropName = "nativeIosShared") {
+            // your embedded swift is inside the folder src/swift/nativeIosShared
+            // your config for iOS
+        }
+    }
+}
+
+kotlin {
+    macosArm64 {
+        swiftPackageConfig {
+            // your embedded swift is inside the folder src/swift/macosArm64
+            // your config for macOS
+        }
+    }
+}
+```
+
+
+<details>
+<summary>Legacy (< 1.1.0)</summary>
+```kotlin title="build.gradle.kts"
 listOf(
     iosX64(),
     iosSimulatorArm64(),
@@ -38,3 +64,4 @@ swiftPackageConfig {
     }
 }
 ```
+</details>

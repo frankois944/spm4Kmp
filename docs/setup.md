@@ -13,7 +13,7 @@
 
 [![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.frankois944.spmForKmp)](https://plugins.gradle.org/plugin/io.github.frankois944.spmForKmp)
 
-``` kotlin title="build.gradle.kts"
+```kotlin title="build.gradle.kts"
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("io.github.frankois944.spmForKmp") version "[version]"
@@ -26,10 +26,39 @@ plugins {
 kotlin.mpp.enableCInteropCommonization=true
 ```
 
-
 ## Initial Configuration
 
-``` kotlin title="build.gradle.kts"
+```kotlin title="build.gradle.kts"
+// List of targets
+kotlin {
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+        // and more Apple targets...
+    ).forEach { target ->
+        // `cinteropName` is recommended when using a list of native target
+        // Or when you want to keep the compatibility with the legacy way (cf: [cinteropName])
+        // If not set, It will take the name of the current Target
+        target.swiftPackageConfig(cinteropName = "[cinteropName]") {
+            // create a new directory at `src/swift/[cinteropName]`
+        }
+    }
+}
+
+// For a single target
+
+kotlin {
+    iosArm64 {
+        swiftPackageConfig {
+            // create a new directory at `src/swift/iosArm64`
+        }
+    }
+}
+```
+
+<details>
+<summary>Legacy (< 1.1.0)</summary>
+```kotlin title="build.gradle.kts"
 kotlin {
     listOf(
         iosArm64(),
@@ -46,10 +75,14 @@ kotlin {
 }
 ```
 
-[swiftPackageConfig reference](references/swiftPackageConfig.md)
-``` kotlin title="build.gradle.kts"
+```kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") { // must match with cinterops.create name
     }
 }
 ```
+</details>
+
+[swiftPackageConfig reference](references/swiftPackageConfig.md)
+
+

@@ -5,7 +5,9 @@ package io.github.frankois944.spmForKmp
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
+import io.github.frankois944.spmForKmp.tasks.checkExistCInteropTask
 import io.github.frankois944.spmForKmp.tasks.configAppleTargets
+import io.github.frankois944.spmForKmp.tasks.createCInteropTask
 import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
@@ -13,6 +15,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
+import org.gradle.internal.extensions.stdlib.capitalized
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
@@ -25,7 +30,9 @@ internal const val TASK_GENERATE_MANIFEST: String = "generateSwiftPackage"
 internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
 internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
+internal const val TASK_GENERATE_REGISTRY_FILE: String = "generateRegistryFilePackage"
 internal const val TASK_COPY_PACKAGE_RESOURCES: String = "CopyPackageResources"
+internal const val TASK_RESOLVE_MANIFEST: String = "resolveSwiftPackage"
 
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
@@ -49,13 +56,14 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val taskGroup = mutableMapOf<AppleCompileTarget, Task>()
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
-                swiftPackageEntries.forEach { swiftPackageEntry ->
-
+                val entries = swiftPackageEntries + project.swiftContainer()
+                createMissingCinteropTask(entries)
+                mergeEntries(entries).forEach { swiftPackageEntry ->
                     val spmWorkingDir =
                         resolveAndCreateDir(
                             File(swiftPackageEntry.spmWorkingPath),
                             "spmKmpPlugin",
-                            swiftPackageEntry.name,
+                            swiftPackageEntry.internalName,
                         )
 
                     val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
@@ -65,8 +73,15 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     val bridgeSourceDir =
                         resolveAndCreateDir(
                             File(swiftPackageEntry.customPackageSourcePath),
-                            swiftPackageEntry.name,
+                            swiftPackageEntry.internalName,
                         )
+
+                    tasks
+                        .withType(CInteropProcess::class.java)
+                        .forEach {
+                            logger.debug("CInteropProcess task found: {}", it)
+                        }
+
                     configAppleTargets(
                         taskGroup = taskGroup,
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
@@ -82,6 +97,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             ),
                     )
                 }
+
                 // link the main definition File
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
                     if (HostManager.hostIsMac) {
@@ -128,5 +144,43 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         nestedPath.forEach { resolved = resolved.resolve(it) }
         resolved.mkdirs()
         return resolved
+    }
+
+    private fun Project.createMissingCinteropTask(swiftPackageEntry: Set<PackageRootDefinitionExtension>) {
+        swiftPackageEntry.forEach { entry ->
+            if (!entry.useExtension) {
+                return
+            }
+            entry.targetName?.let { targetName ->
+                val ktTarget =
+                    extensions
+                        .getByType(KotlinMultiplatformExtension::class.java)
+                        .targets
+                        .findByName(targetName) as KotlinNativeTarget
+                val mainCompilationTarget = ktTarget.compilations.getByName("main")
+                if (!checkExistCInteropTask(mainCompilationTarget, entry.internalName.capitalized())) {
+                    createCInteropTask(
+                        mainCompilationTarget,
+                        cinteropName = entry.internalName.capitalized(),
+                        file = getAndCreateFakeDefinitionFile(),
+                    )
+                }
+            }
+        }
+    }
+
+    private fun mergeEntries(entries: Set<PackageRootDefinitionExtension>): Set<PackageRootDefinitionExtension> {
+        val mergedEntries = mutableSetOf<PackageRootDefinitionExtension>()
+        entries.forEach { entry ->
+            val foundEntry =
+                mergedEntries
+                    .firstOrNull { mergedEntry ->
+                        mergedEntry.internalName == entry.internalName
+                    }
+            if (foundEntry == null) {
+                mergedEntries.add(entry)
+            }
+        }
+        return mergedEntries
     }
 }

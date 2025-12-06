@@ -21,7 +21,7 @@ A Swift Package is based on a Manifest, the Package.swift ([official documentati
 
 ### Example
 
-``` Swift title="Package.swift"
+```swift title="Package.swift"
 // swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
@@ -69,7 +69,7 @@ Usually located at `Sources/[packageName]`, it has the same requirement as the p
 
 ### Example
 
-``` Swift title="Sources/MyStripeSDK/Package.swift"
+```swift title="Sources/MyStripeSDK/Package.swift"
 
 import StripePaymentSheet
 
@@ -98,11 +98,11 @@ Add your local package to your plugin configuration, follow the [guide](../expor
 
 ### Example
 
-``` Kotlin title="build.gradle.kts"
+```kotlin title="build.gradle.kts"
 
-swiftPackageConfig {
-    create("MyStripeSDKLibs") {
-        dependency {
+kotlin {
+    iosArm64 {
+        swiftPackageConfig {
             localPackage(
                 // absolute path to your Local Package
                 path = "$projectDir/../MyStripeSDK",

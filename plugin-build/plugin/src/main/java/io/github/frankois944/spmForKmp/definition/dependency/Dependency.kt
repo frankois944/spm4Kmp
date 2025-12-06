@@ -106,7 +106,22 @@ internal class Dependency :
         )
     }
 
+    override fun registryPackage(
+        id: String,
+        version: String,
+        products: ProductPackageConfig.() -> Unit,
+    ) {
+        packageDependencies.add(
+            SwiftDependency.Package.Remote.Registry(
+                id = id,
+                version = version,
+                packageName = id,
+                products = products,
+            ),
+        )
+    }
+
     private companion object {
-        private const val serialVersionUID: Long = 2
+        private const val serialVersionUID: Long = 4
     }
 }

@@ -22,7 +22,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject

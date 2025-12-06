@@ -102,4 +102,18 @@ public interface DependencyConfig : Serializable {
         revision: String,
         products: ProductPackageConfig.() -> Unit,
     )
+
+    /**
+     * Represents a registry-based dependency.
+     *
+     * @property id The unique identifier of the registry.
+     * @property version The version of the dependency.
+     * @property products A list of the product's package used during dependency configuration.
+     *
+     */
+    public fun registryPackage(
+        id: String,
+        version: String,
+        products: ProductPackageConfig.() -> Unit,
+    )
 }
