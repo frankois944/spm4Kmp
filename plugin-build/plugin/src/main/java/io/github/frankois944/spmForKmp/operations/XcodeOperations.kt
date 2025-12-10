@@ -311,7 +311,7 @@ ERROR $errorOutput
 OUTPUT $standardOutput
 ###
             """.trimMargin()
-        if (!errorOutput.toString().contains("unexpected binary framework")) {
+        if (!errorOutput.toString().contains("unexpected binary")) {
             throw GradleException(
                 "spmForKmp failed when running $action",
                 Exception(errorString),
