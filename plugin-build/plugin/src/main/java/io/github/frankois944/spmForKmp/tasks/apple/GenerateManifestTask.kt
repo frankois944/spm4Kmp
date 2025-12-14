@@ -84,6 +84,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
             outputFile =
                 project.projectDir
                     .resolve("spmForKmpTrace")
+                    .resolve(manifestFile.get().parentFile.name)
                     .resolve("GenerateManifestTask.html"),
         )
     }

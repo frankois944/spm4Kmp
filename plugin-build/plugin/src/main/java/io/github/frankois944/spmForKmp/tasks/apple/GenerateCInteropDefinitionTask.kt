@@ -133,6 +133,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             outputFile =
                 project.projectDir
                     .resolve("spmForKmpTrace")
+                    .resolve(scratchDir.get().parentFile.name)
                     .resolve(target.get().toString())
                     .resolve("GenerateCInteropDefinitionTask.html"),
         )

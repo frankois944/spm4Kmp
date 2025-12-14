@@ -48,7 +48,11 @@ internal abstract class ResolveManifestTask : DefaultTask() {
             outputFile =
                 project.projectDir
                     .resolve("spmForKmpTrace")
-                    .resolve("ResolveManifestTask.html"),
+                    .resolve(
+                        manifestFile
+                            .get()
+                            .asFile.parentFile.name,
+                    ).resolve("ResolveManifestTask.html"),
         )
     }
 

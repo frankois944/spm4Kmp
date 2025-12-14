@@ -74,6 +74,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             outputFile =
                 project.projectDir
                     .resolve("spmForKmpTrace")
+                    .resolve(manifestFile.get().parentFile.name)
                     .resolve(target.get().toString())
                     .resolve("CompileSwiftPackageTask.html"),
         )
