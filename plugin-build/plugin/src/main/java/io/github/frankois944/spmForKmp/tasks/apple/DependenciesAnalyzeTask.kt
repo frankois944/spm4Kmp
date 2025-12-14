@@ -64,6 +64,9 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
     @TaskAction
     fun compilePackage() {
         tracer.trace("DependenciesAnalyzeTask") {
+            tracer.trace("prepare source dir") {
+                prepareSourceDir()
+            }
             tracer.trace("getPackageImplicitDependencies") {
                 logger.debug("Start check dependencies")
                 val content =
@@ -77,5 +80,17 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
             }
         }
         tracer.writeHtmlReport()
+    }
+
+    private fun prepareSourceDir() {
+        val sourceDir =
+            manifestFile
+                .get()
+                .parentFile
+                .resolve("Sources")
+        sourceDir.mkdirs()
+        sourceDir
+            .resolve("Dummy.swift")
+            .writeText("import Foundation")
     }
 }
