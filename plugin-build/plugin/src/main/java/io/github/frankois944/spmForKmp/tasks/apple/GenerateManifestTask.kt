@@ -5,6 +5,7 @@ import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.swiftFormat
+import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
@@ -72,6 +73,21 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @Internal
     val packageScratchDir: DirectoryProperty = project.objects.directoryProperty()
 
+    @get:Input
+    abstract val traceEnabled: Property<Boolean>
+
+    @get:Internal
+    val tracer: TaskTracer by lazy {
+        TaskTracer(
+            "GenerateManifestTask",
+            traceEnabled.get(),
+            outputFile =
+                project.projectDir
+                    .resolve("spmForKmpTrace")
+                    .resolve("GenerateManifestTask.html"),
+        )
+    }
+
     @get:Inject
     abstract val execOps: ExecOperations
 
@@ -85,40 +101,47 @@ internal abstract class GenerateManifestTask : DefaultTask() {
 
     @TaskAction
     fun generateFile() {
-        val manifest =
-            generateManifest(
-                parameters =
-                    TemplateParameters(
-                        forExportedPackage = false,
-                        dependencies = packageDependencies.get(),
-                        generatedPackageDirectory =
-                            manifestFile
-                                .get()
-                                .parentFile
-                                .toPath(),
-                        productName = packageName.get(),
-                        minIos = minIos.orNull.orEmpty(),
-                        minMacos = minMacos.orNull.orEmpty(),
-                        minTvos = minTvos.orNull.orEmpty(),
-                        minWatchos = minWatchos.orNull.orEmpty(),
-                        toolsVersion = toolsVersion.get(),
-                        targetSettings = targetSettings.get(),
-                        exportedPackage = null,
-                    ),
-            )
-        manifestFile.get().writeText(manifest)
-        try {
-            execOps.swiftFormat(
-                manifestFile.get(),
-                logger,
-            )
-        } catch (ex: Exception) {
-            logger.error(
-                "Manifest file generated :\n{}\n{}",
-                manifestFile.get(),
-                manifestFile.get().readText(),
-            )
-            throw ex
+        tracer.trace("GenerateManifestTask") {
+            tracer.trace("generateManifest") {
+                val manifest =
+                    generateManifest(
+                        parameters =
+                            TemplateParameters(
+                                forExportedPackage = false,
+                                dependencies = packageDependencies.get(),
+                                generatedPackageDirectory =
+                                    manifestFile
+                                        .get()
+                                        .parentFile
+                                        .toPath(),
+                                productName = packageName.get(),
+                                minIos = minIos.orNull.orEmpty(),
+                                minMacos = minMacos.orNull.orEmpty(),
+                                minTvos = minTvos.orNull.orEmpty(),
+                                minWatchos = minWatchos.orNull.orEmpty(),
+                                toolsVersion = toolsVersion.get(),
+                                targetSettings = targetSettings.get(),
+                                exportedPackage = null,
+                            ),
+                    )
+                manifestFile.get().writeText(manifest)
+            }
+            tracer.trace("swiftFormat") {
+                try {
+                    execOps.swiftFormat(
+                        manifestFile.get(),
+                        logger,
+                    )
+                } catch (ex: Exception) {
+                    logger.error(
+                        "Manifest file generated :\n{}\n{}",
+                        manifestFile.get(),
+                        manifestFile.get().readText(),
+                    )
+                    throw ex
+                }
+            }
         }
+        tracer.writeHtmlReport()
     }
 }

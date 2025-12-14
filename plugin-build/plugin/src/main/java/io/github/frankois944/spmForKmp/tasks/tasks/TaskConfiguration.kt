@@ -15,8 +15,16 @@ import io.github.frankois944.spmForKmp.tasks.apple.GenerateManifestTask
 import io.github.frankois944.spmForKmp.tasks.apple.ResolveManifestTask
 import io.github.frankois944.spmForKmp.tasks.utils.computeOsVersion
 import io.github.frankois944.spmForKmp.utils.Hashing
+import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import java.io.File
+
+internal val Project.isTraceEnabled: Boolean
+    get() =
+        project.extraProperties.properties
+            .getOrDefault("spmforkmp.hideLocalPackageMessage", false)
+            .toString()
+            .toBoolean()
 
 @Suppress("LongParameterList")
 internal fun GenerateManifestTask.configureManifestTask(
@@ -38,6 +46,7 @@ internal fun GenerateManifestTask.configureManifestTask(
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.targetSettings.set(swiftPackageEntry.bridgeSettings as BridgeSettings)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
+    this.traceEnabled.set(this.project.isTraceEnabled)
 }
 
 internal fun GenerateExportableManifestTask.configureExportableManifestTask(
@@ -64,6 +73,7 @@ internal fun GenerateExportableManifestTask.configureExportableManifestTask(
             .toString()
             .toBoolean(),
     )
+    this.traceEnabled.set(this.project.isTraceEnabled)
 }
 
 @Suppress("LongParameterList")
@@ -77,6 +87,7 @@ internal fun ResolveManifestTask.configureResolveManifestTask(
     this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
+    this.traceEnabled.set(this.project.isTraceEnabled)
 }
 
 @Suppress("LongParameterList")
@@ -99,6 +110,7 @@ internal fun CompileSwiftPackageTask.configureCompileTask(
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
     this.bridgeSourceBuiltDir.set(manifestFile.parentFile.resolve("Sources"))
+    this.traceEnabled.set(this.project.isTraceEnabled)
 }
 
 internal fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTask(
@@ -128,6 +140,7 @@ internal fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionT
     this.foreignExceptionMode.set(swiftPackageEntry.foreignExceptionMode)
     this.disableDesignatedInitializerChecks.set(swiftPackageEntry.disableDesignatedInitializerChecks)
     this.userSetupHint.set(swiftPackageEntry.userSetupHint)
+    this.traceEnabled.set(this.project.isTraceEnabled)
 }
 
 @Suppress("LongParameterList")
@@ -187,4 +200,5 @@ internal fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     this.codeSignIdentityName.set(System.getenv("EXPANDED_CODE_SIGN_IDENTITY_NAME"))
     this.buildProductDir.set(buildProductDir)
     this.contentFolderPath.set(contentFolderPath)
+    this.traceEnabled.set(this.project.isTraceEnabled)
 }

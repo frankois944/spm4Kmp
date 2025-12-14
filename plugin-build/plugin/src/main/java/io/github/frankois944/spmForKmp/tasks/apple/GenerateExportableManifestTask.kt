@@ -7,6 +7,7 @@ import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.isDynamicLibrary
 import io.github.frankois944.spmForKmp.operations.swiftFormat
+import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import io.github.frankois944.spmForKmp.utils.getPlistValue
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -16,6 +17,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
@@ -65,6 +67,21 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
 
     @get:Input
     abstract val includeProduct: ListProperty<String>
+
+    @get:Input
+    abstract val traceEnabled: Property<Boolean>
+
+    @get:Internal
+    val tracer: TaskTracer by lazy {
+        TaskTracer(
+            "GenerateExportableManifestTask",
+            traceEnabled.get(),
+            outputFile =
+                project.projectDir
+                    .resolve("spmForKmpTrace")
+                    .resolve("GenerateExportableManifestTask.html"),
+        )
+    }
 
     @get:Input
     abstract val hideLocalPackageMessage: Property<Boolean>
@@ -134,69 +151,77 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateFile() {
-        val requiredDependencies =
-            getRequireProductsDependencies()
-
-        if (requiredDependencies.isNotEmpty()) {
-            val manifest =
-                generateManifest(
-                    parameters =
-                        TemplateParameters(
-                            forExportedPackage = true,
-                            dependencies = packageDependencies.get(),
-                            generatedPackageDirectory =
-                                manifestFile
-                                    .get()
-                                    .asFile.parentFile
-                                    .toPath(),
-                            productName = packageName.get(),
-                            minIos = minIos.orNull.orEmpty(),
-                            minMacos = minMacos.orNull.orEmpty(),
-                            minTvos = minTvos.orNull.orEmpty(),
-                            minWatchos = minWatchos.orNull.orEmpty(),
-                            toolsVersion = toolsVersion.get(),
-                            targetSettings = null,
-                            exportedPackage = exportedPackage.get(),
-                            onlyDeps = requiredDependencies,
-                        ),
-                )
-            manifestFile.asFile.get().writeText(manifest)
-            try {
-                execOps.swiftFormat(
-                    manifestFile.asFile.get(),
-                    logger,
-                )
-                if (!hideLocalPackageMessage.get()) {
-                    val namesToExport = requiredDependencies.joinToString(",") { it.name }
-                    logger.error(
-                        """
-                        Spm4Kmp: The following dependencies [$namesToExport] need to be added to your xcode project
-                        A local Swift package has been generated at
-                        ${manifestFile.get().asFile.parentFile.path}
-                        Please add it to your xcode project as a local package dependency
-                        Check https://spmforkmp.eu/bridgeWithDependencies/#automatic-dependency-build-inclusion for more details
-                        Set "spmforkmp.hideLocalPackageMessage=true" inside gradle.properties to hide this message
-                        """.trimIndent(),
-                    )
+        tracer.trace("GenerateManifestTask") {
+            val requiredDependencies =
+                tracer.trace("getRequireProductsDependencies") {
+                    getRequireProductsDependencies()
                 }
-            } catch (ex: Exception) {
-                logger.error(
-                    "Manifest file generated : \n{}\n{}",
-                    manifestFile.get().asFile,
-                    manifestFile.get().asFile.readText(),
+            if (requiredDependencies.isNotEmpty()) {
+                tracer.trace("generateManifest") {
+                    val manifest =
+                        generateManifest(
+                            parameters =
+                                TemplateParameters(
+                                    forExportedPackage = true,
+                                    dependencies = packageDependencies.get(),
+                                    generatedPackageDirectory =
+                                        manifestFile
+                                            .get()
+                                            .asFile.parentFile
+                                            .toPath(),
+                                    productName = packageName.get(),
+                                    minIos = minIos.orNull.orEmpty(),
+                                    minMacos = minMacos.orNull.orEmpty(),
+                                    minTvos = minTvos.orNull.orEmpty(),
+                                    minWatchos = minWatchos.orNull.orEmpty(),
+                                    toolsVersion = toolsVersion.get(),
+                                    targetSettings = null,
+                                    exportedPackage = exportedPackage.get(),
+                                    onlyDeps = requiredDependencies,
+                                ),
+                        )
+                    manifestFile.asFile.get().writeText(manifest)
+                }
+                tracer.trace("swiftFormat") {
+                    try {
+                        execOps.swiftFormat(
+                            manifestFile.asFile.get(),
+                            logger,
+                        )
+                        if (!hideLocalPackageMessage.get()) {
+                            val namesToExport = requiredDependencies.joinToString(",") { it.name }
+                            logger.error(
+                                """
+                                Spm4Kmp: The following dependencies [$namesToExport] need to be added to your xcode project
+                                A local Swift package has been generated at
+                                ${manifestFile.get().asFile.parentFile.path}
+                                Please add it to your xcode project as a local package dependency
+                                Check https://spmforkmp.eu/bridgeWithDependencies/#automatic-dependency-build-inclusion for more details
+                                Set "spmforkmp.hideLocalPackageMessage=true" inside gradle.properties to hide this message
+                                """.trimIndent(),
+                            )
+                        }
+                    } catch (ex: Exception) {
+                        logger.error(
+                            "Manifest file generated : \n{}\n{}",
+                            manifestFile.get().asFile,
+                            manifestFile.get().asFile.readText(),
+                        )
+                        throw ex
+                    }
+                }
+            } else {
+                logger.debug(
+                    "No dependencies to export found; delete the old one {}",
+                    manifestFile.asFile.get().absolutePath,
                 )
-                throw ex
+                manifestFile.asFile
+                    .get()
+                    .parentFile
+                    .deleteRecursively()
             }
-        } else {
-            logger.debug(
-                "No dependencies to export found; delete the old one {}",
-                manifestFile.asFile.get().absolutePath,
-            )
-            manifestFile.asFile
-                .get()
-                .parentFile
-                .deleteRecursively()
         }
+        tracer.writeHtmlReport()
     }
 
     // the static framework must be included inside the xcode project

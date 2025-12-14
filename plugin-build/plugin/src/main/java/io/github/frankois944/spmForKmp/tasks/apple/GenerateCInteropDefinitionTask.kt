@@ -5,6 +5,7 @@ import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
+import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
 import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
@@ -21,6 +22,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
@@ -117,8 +119,24 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 }
             }
 
+    @get:Input
+    abstract val traceEnabled: Property<Boolean>
+
     @get:Inject
     abstract val execOps: ExecOperations
+
+    @get:Internal
+    val tracer: TaskTracer by lazy {
+        TaskTracer(
+            "GenerateCInteropDefinitionTask-${target.get()}",
+            traceEnabled.get(),
+            outputFile =
+                project.projectDir
+                    .resolve("spmForKmpTrace")
+                    .resolve(target.get().toString())
+                    .resolve("GenerateCInteropDefinitionTask.html"),
+        )
+    }
 
     init {
         description = "Generate the cinterop definitions files"
@@ -192,32 +210,42 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
-        removeOldDefinition()
+        tracer.trace("GenerateCInteropDefinitionTask") {
+            tracer.trace("cleanup old definitions") {
+                removeOldDefinition()
+            }
 
-        val currentBuildDir = currentBuildDirectory()
-        val bridgeHash = currentBridgeHash.get()
-        val compiledBinaryFile = compiledBinary.asFile.get()
+            val currentBuildDir = currentBuildDirectory()
+            val compiledBinaryFile = compiledBinary.asFile.get()
 
-        val moduleConfigs = getModuleConfigs()
-        val builtModules = getModulesInBuildDirectory(currentBuildDir)
+            val moduleConfigs = tracer.trace("collect module configs") { getModuleConfigs() }
+            val builtModules = tracer.trace("scan built modules") { getModulesInBuildDirectory(currentBuildDir) }
 
-        // Configure les répertoires et fichiers de définition pour chaque module
-        configureModules(moduleConfigs, builtModules, currentBuildDir)
+            tracer.trace("configure modules") {
+                // Configure les répertoires et fichiers de définition pour chaque module
+                configureModules(moduleConfigs, builtModules, currentBuildDir)
+            }
 
-        logger.debug(
-            "Modules configured\n{}",
-            moduleConfigs.joinToString("\n"),
-        )
+            logger.debug(
+                "Modules configured\n{}",
+                moduleConfigs.joinToString("\n"),
+            )
 
-        // Génère les fichiers de définition
-        moduleConfigs.forEachIndexed { index, moduleConfig ->
-            buildDefinitionFile(index, moduleConfig, compiledBinaryFile)?.let { definition ->
-                moduleConfig.definitionFile.writeText(definition.trimIndent())
-                logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
-                logger.debug("At Path: {}", moduleConfig.definitionFile.path)
-                logger.debug("{}", moduleConfig.definitionFile.readText())
+            // Génère les fichiers de définition
+            tracer.trace("generate definition files") {
+                moduleConfigs.forEachIndexed { index, moduleConfig ->
+                    tracer.trace("build ${moduleConfig.name} definition") {
+                        buildDefinitionFile(index, moduleConfig, compiledBinaryFile)?.let { definition ->
+                            moduleConfig.definitionFile.writeText(definition.trimIndent())
+                            logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
+                            logger.debug("At Path: {}", moduleConfig.definitionFile.path)
+                            logger.debug("{}", moduleConfig.definitionFile.readText())
+                        }
+                    }
+                }
             }
         }
+        tracer.writeHtmlReport()
     }
 
     private fun configureModules(
@@ -267,52 +295,65 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         index: Int,
         moduleConfig: ModuleConfig,
         compiledBinaryFile: File,
-    ): String? {
+    ): String {
         logger.debug("Building definition file for: {}", moduleConfig)
-        return try {
-            val moduleName =
-                if (moduleConfig.isCLang) {
-                    moduleConfig.name
-                } else {
-                    val mapFile = getModuleMap(moduleConfig)
-                    extractModuleNameFromModuleMap(mapFile.readText())
-                        ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
-                }
-            val baseDefinition =
-                when {
-                    moduleConfig.isFramework && moduleConfig.isCLang -> {
-                        generateCFrameworkDefinition(moduleConfig)
+        return tracer.trace("buildDefinitionFile") {
+            try {
+                val moduleName =
+                    tracer.trace("resolve module name") {
+                        if (moduleConfig.isCLang) {
+                            moduleConfig.name
+                        } else {
+                            val mapFile = tracer.trace("read modulemap") { getModuleMap(moduleConfig) }
+                            extractModuleNameFromModuleMap(mapFile.readText())
+                                ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
+                        }
                     }
 
-                    moduleConfig.isFramework -> {
-                        generateFrameworkDefinition(moduleName, moduleConfig)
+                val baseDefinition =
+                    tracer.trace("generate base definition") {
+                        when {
+                            moduleConfig.isFramework && moduleConfig.isCLang -> {
+                                tracer.trace("C framework definition") { generateCFrameworkDefinition(moduleConfig) }
+                            }
+
+                            moduleConfig.isFramework -> {
+                                tracer.trace("Swift framework definition") {
+                                    generateFrameworkDefinition(moduleName, moduleConfig)
+                                }
+                            }
+
+                            else -> {
+                                tracer.trace("non-framework definition") {
+                                    generateNonFrameworkDefinition(moduleName, moduleConfig)
+                                }
+                            }
+                        }
                     }
 
-                    else -> {
-                        generateNonFrameworkDefinition(moduleName, moduleConfig)
+                val definitionWithBridgeLib =
+                    tracer.trace("append bridge lib and checksum (if needed)") {
+                        if (index == 0) {
+                            val libName = compiledBinaryFile.name
+                            val checksum = tracer.trace("compute checksum") { compiledBinaryFile.checkSum() }
+                            val md5 = "#checksums: $checksum ${currentBridgeHash.get()}"
+                            "$baseDefinition\n$md5\nstaticLibraries = $libName"
+                        } else {
+                            baseDefinition
+                        }
                     }
-                }
 
-            val definitionWithBridgeLib =
-                if (index == 0) {
-                    val libName = compiledBinaryFile.name
-                    val checksum = compiledBinaryFile.checkSum()
-                    val md5 = "#checksums: $checksum ${currentBridgeHash.get()}"
-                    "$baseDefinition\n$md5\nstaticLibraries = $libName"
-                } else {
-                    baseDefinition
-                }
-
-            definitionWithBridgeLib
-        } catch (ex: Exception) {
-            logger.error("Can't generate definition for  {}", moduleConfig.name)
-            logger.error("Expected file: {}", moduleConfig.definitionFile.path)
-            logger.error("Config: {}", moduleConfig)
-            logger.error("Exception: $ex")
-            throw GradleException(
-                "spmForKmp failed when generating definition file for ${moduleConfig.name} module",
-                ex,
-            )
+                definitionWithBridgeLib
+            } catch (ex: Exception) {
+                logger.error("Can't generate definition for  {}", moduleConfig.name)
+                logger.error("Expected file: {}", moduleConfig.definitionFile.path)
+                logger.error("Config: {}", moduleConfig)
+                logger.error("Exception: $ex")
+                throw GradleException(
+                    "spmForKmp failed when generating definition file for ${moduleConfig.name} module",
+                    ex,
+                )
+            }
         }
     }
 
@@ -362,84 +403,124 @@ headerFilter = "$libraryPaths/Headers/**"
     private fun generateFrameworkDefinition(
         moduleName: String,
         moduleConfig: ModuleConfig,
-    ): String {
-        val frameworkName = moduleConfig.buildDir.nameWithoutExtension
-        val packageName =
-            packageDependencyPrefix.orNull?.let {
-                "$it.${moduleConfig.name}"
-            } ?: moduleConfig.name
-        return """
+    ): String =
+        tracer.trace("generateFrameworkDefinition") {
+            val frameworkName =
+                tracer.trace("resolve framework name") { moduleConfig.buildDir.nameWithoutExtension }
+
+            val packageName =
+                tracer.trace("resolve package name") {
+                    packageDependencyPrefix.orNull?.let {
+                        "$it.${moduleConfig.name}"
+                    } ?: moduleConfig.name
+                }
+
+            val buildDirPath =
+                tracer.trace("resolve build dir path") { currentBuildDirectory().path }
+
+            tracer.trace("render definition") {
+                """
 language = Objective-C
 modules = $moduleName
 package = $packageName
 libraryPaths = "${currentBuildDirectory()}"
-compilerOpts = -fmodules -framework "$frameworkName" -F"${currentBuildDirectory().path}"
-linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"${currentBuildDirectory().path}"
+compilerOpts = -fmodules -framework "$frameworkName" -F"$buildDirPath"
+linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"$buildDirPath"
 ${getCustomizedDefinitionConfig()}
-            """.trimIndent()
-    }
+                """.trimIndent()
+            }
+        }
 
     private fun generateNonFrameworkDefinition(
         moduleName: String,
         moduleConfig: ModuleConfig,
-    ): String {
-        // There are some dirty hacks for getting the headers paths needed by cinterop
-        // Because, It's really difficult to extract the correct headers path from each dependency.
-        // Some manifests are heavily customized and use dynamic values.
-        val headerSearchPaths =
-            buildList {
-                logger.debug("SEARCH IN {}", scratchDir.get())
-                logger.debug("spmPackageName IN {}", moduleConfig.spmPackageName)
-                moduleConfig.spmPackageName?.let {
-                    val folderToSearch =
-                        scratchDir
-                            .get()
-                            .resolve("checkouts")
-                            .resolve(it)
-                    logger.debug("SEARCH IN {}", folderToSearch)
-                    // extract all folder names "include" in checkout package directory
-                    addAll(
-                        findIncludeFolders(folderToSearch),
-                    )
+    ): String =
+        tracer.trace("generateNonFrameworkDefinition") {
+            // There are some dirty hacks for getting the headers paths needed by cinterop
+            // Because, It's really difficult to extract the correct headers path from each dependency.
+            // Some manifests are heavily customized and use dynamic values.
+            val headerSearchPaths =
+                tracer.trace("build header search paths") {
+                    buildList {
+                        logger.debug("SEARCH IN {}", scratchDir.get())
+                        logger.debug("spmPackageName IN {}", moduleConfig.spmPackageName)
+
+                        tracer.trace("include folders from checkout") {
+                            moduleConfig.spmPackageName?.let {
+                                val folderToSearch =
+                                    scratchDir
+                                        .get()
+                                        .resolve("checkouts")
+                                        .resolve(it)
+                                logger.debug("SEARCH IN {}", folderToSearch)
+                                // extract all folder names "include" in checkout package directory
+                                addAll(findIncludeFolders(folderToSearch))
+                            }
+                        }
+
+                        tracer.trace("publicHeadersPath from manifest") {
+                            logger.debug("SEARCH IN extractPublicHeaderFromCheckout")
+                            // extract from the current module manifest the `publicHeadersPath` values
+                            addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
+                        }
+
+                        tracer.trace("public folders from implicit deps") {
+                            logger.debug("getPackageImplicitDependencies")
+                            // extract the Public third-party dependencies' for all the modules
+                            tracer.trace("getPackageImplicitDependencies") {
+                                val dependencies =
+                                    execOps
+                                        .getPackageImplicitDependencies(
+                                            workingDir = manifestFile.asFile.get().parentFile,
+                                            scratchPath = scratchDir.get(),
+                                            logger = logger,
+                                            swiftBinPath = swiftBinPath.orNull,
+                                        )
+                                tracer.trace("getPublicFolders") {
+                                    addAll(
+                                        dependencies.getPublicFolders(),
+                                    )
+                                }
+                            }
+                        }
+
+                        tracer.trace("headers from artifacts (xcframework)") {
+                            // extract the header from the SPM artifacts, which there are xcframework
+                            addAll(findHeadersModule(scratchDir.get().resolve("artifacts"), target.get()))
+                        }
+
+                        // add the current build dir of the package where there are every built module
+                        add(currentBuildDirectory().path)
+                    }.joinToString(" ") { "-I\"$it\"" }
                 }
-                logger.debug("SEARCH IN extractPublicHeaderFromCheckout")
-                // extract from the current module manifest the `publicHeadersPath` values
-                addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
-                // extract the Public third-party dependencies' for all the modules
-                logger.debug("getPackageImplicitDependencies")
-                addAll(
-                    execOps
-                        .getPackageImplicitDependencies(
-                            workingDir = manifestFile.asFile.get().parentFile,
-                            scratchPath = scratchDir.get(),
-                            logger = logger,
-                            swiftBinPath = swiftBinPath.orNull,
-                        ).getPublicFolders(),
-                )
-                // extract the header from the SPM artifacts, which there are xcframework
-                addAll(findHeadersModule(scratchDir.get().resolve("artifacts"), target.get()))
-                // add the current build dir of the package where there are every built module
-                add(currentBuildDirectory().path)
-            }.joinToString(" ") { "-I\"$it\"" }
 
-        val packageName =
-            packageDependencyPrefix.orNull?.let {
-                "$it.${moduleConfig.name}"
-            } ?: moduleConfig.name
-        val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
-        val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
-        val includeModulePath = "${moduleConfig.buildDir.resolve("include")}"
+            val packageName =
+                tracer.trace("resolve package name") {
+                    packageDependencyPrefix.orNull?.let {
+                        "$it.${moduleConfig.name}"
+                    } ?: moduleConfig.name
+                }
 
-        return """
+            val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
+
+            val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
+
+            val includeModulePath = "${moduleConfig.buildDir.resolve("include")}"
+
+            val buildDirPath = currentBuildDirectory().path
+
+            tracer.trace("render definition") {
+                """
 language = Objective-C
 modules = $moduleName
 package = $packageName
 libraryPaths = "${currentBuildDirectory()}"
-compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"${currentBuildDirectory().path}"
-linkerOpts = $linkerOps ${getExtraLinkers()} -F"${currentBuildDirectory().path}"
+compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"$buildDirPath"
+linkerOpts = $linkerOps ${getExtraLinkers()} -F"$buildDirPath"
 ${getCustomizedDefinitionConfig()}
-            """.trimIndent()
-    }
+                """.trimIndent()
+            }
+        }
 
     private fun removeOldDefinition() {
         currentBuildDirectory().listFiles()?.forEach { file ->
