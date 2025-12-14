@@ -34,6 +34,11 @@ internal data class PackageImplicitDependencies(
             )
     }
 
+    fun toJsonString(): String =
+        objectMapper.writeValueAsString(
+            this,
+        )
+
     fun getPublicFolders(): Set<File> =
         searchInFolder(
             dependencies = this.dependencies,
