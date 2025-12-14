@@ -25,9 +25,17 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: Property<File>
 
-    @get:InputDirectory
+    @get:Input
+    abstract val packageScratchDir: Property<File>
+
+    @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val packageScratchDir: DirectoryProperty
+    val scratchLockFile: File
+        get() {
+            return packageScratchDir
+                .get()
+                .resolve(".lock")
+        }
 
     @get:OutputFile
     val dependencyData: File
@@ -72,7 +80,7 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
                 val content =
                     execOps.getPackageImplicitDependencies(
                         workingDir = manifestFile.get().parentFile,
-                        scratchPath = packageScratchDir.get().asFile,
+                        scratchPath = packageScratchDir.get(),
                         logger = logger,
                         swiftBinPath = swiftBinPath.orNull,
                     )
