@@ -26,6 +26,7 @@ import io.github.frankois944.spmForKmp.tasks.tasks.configureExportableManifestTa
 import io.github.frankois944.spmForKmp.tasks.tasks.configureGenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.tasks.configureManifestTask
 import io.github.frankois944.spmForKmp.tasks.tasks.configureResolveManifestTask
+import io.github.frankois944.spmForKmp.tasks.tasks.isTraceEnabled
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
@@ -104,6 +105,7 @@ internal fun Project.configAppleTargets(
             it.workingDir.set(packageDirectoriesConfig.spmWorkingDir)
             it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
             it.registries.set(swiftPackageEntry.packageRegistryConfigs)
+            it.traceEnabled.set(this.project.isTraceEnabled)
         }
 
     val resolveManifestTask =

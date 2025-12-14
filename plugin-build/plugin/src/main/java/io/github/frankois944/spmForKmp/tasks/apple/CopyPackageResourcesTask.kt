@@ -4,12 +4,14 @@ import io.github.frankois944.spmForKmp.operations.isDynamicLibrary
 import io.github.frankois944.spmForKmp.operations.signFramework
 import io.github.frankois944.spmForKmp.resources.CopiedResourcesFactory
 import io.github.frankois944.spmForKmp.resources.FrameworkResource
+import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -41,6 +43,21 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @get:Input
     abstract val contentFolderPath: Property<String>
 
+    @get:Input
+    abstract val traceEnabled: Property<Boolean>
+
+    @get:Internal
+    val tracer: TaskTracer by lazy {
+        TaskTracer(
+            "CopyPackageResourcesTask",
+            traceEnabled.get(),
+            outputFile =
+                project.projectDir
+                    .resolve("spmForKmpTrace")
+                    .resolve("CopyPackageResourcesTask.html"),
+        )
+    }
+
     @get:Inject
     abstract val execOps: ExecOperations
 
@@ -59,10 +76,18 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @TaskAction
     fun copyResources() {
         logger.debug("preparing resources")
-        val copiedResources = createCopiedResources()
-
-        copyBundleResources(copiedResources)
-        copyFrameworkResources(copiedResources)
+        tracer.trace("CopyPackageResourcesTask") {
+            tracer.trace("createCopiedResources") {
+                val copiedResources = createCopiedResources()
+                tracer.trace("copyBundleResources") {
+                    copyBundleResources(copiedResources)
+                }
+                tracer.trace("copyFrameworkResources") {
+                    copyFrameworkResources(copiedResources)
+                }
+            }
+        }
+        tracer.writeHtmlReport()
     }
 
     private fun createCopiedResources(): CopiedResourcesFactory =
