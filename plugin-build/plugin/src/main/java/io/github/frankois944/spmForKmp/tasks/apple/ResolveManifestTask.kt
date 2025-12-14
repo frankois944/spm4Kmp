@@ -15,6 +15,7 @@ import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.cc.base.logger
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
@@ -52,16 +53,16 @@ internal abstract class ResolveManifestTask : DefaultTask() {
                 val scratchDir = packageScratchDir.get()
                 val manifestParentDir = manifestFile.get().asFile.parentFile
 
-                putIfExists(
+                put(
                     "Package.resolved",
                     manifestParentDir.resolve("Package.resolved"),
                 )
 
                 val lockFile = scratchDir.resolve(".lock")
-                putIfExists("lock", lockFile)
+                put("lock", lockFile)
 
                 val workspaceStateDir = scratchDir.resolve("workspace-state")
-                putIfExists("workspace-state", workspaceStateDir)
+                put("workspace-state", workspaceStateDir)
             }
         }
 
@@ -79,7 +80,7 @@ internal abstract class ResolveManifestTask : DefaultTask() {
                     )
 
                 for ((key, dirName) in scratchEntries) {
-                    putIfExists(key, scratchDir.resolve(dirName))
+                    put(key, scratchDir.resolve(dirName))
                 }
             }
         }
@@ -139,14 +140,5 @@ internal abstract class ResolveManifestTask : DefaultTask() {
             }
         }
         tracer.writeHtmlReport()
-    }
-}
-
-private fun MutableMap<String, File>.putIfExists(
-    key: String,
-    file: File,
-) {
-    if (file.exists()) {
-        this[key] = file
     }
 }
