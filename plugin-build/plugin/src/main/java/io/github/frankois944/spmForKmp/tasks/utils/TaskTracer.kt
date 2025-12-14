@@ -3,6 +3,7 @@ package io.github.frankois944.spmForKmp.tasks.utils
 import java.io.File
 import java.time.Duration
 import java.time.Instant
+import java.util.Locale
 import java.util.concurrent.ConcurrentLinkedDeque
 
 /**
@@ -48,6 +49,7 @@ internal class TaskTracer(
         }
     }
 
+    @Suppress("LongMethod")
     private fun renderHtml(): String {
         val totalMs = root.durationMillis()
 
@@ -269,6 +271,7 @@ internal class TaskTracer(
             """.trimIndent()
     }
 
+    @Suppress("MagicNumber")
     private fun renderRow(
         span: Span,
         totalMs: Long,
@@ -277,7 +280,7 @@ internal class TaskTracer(
         val ms = span.durationMillis()
         val selfMs = span.selfDurationMillis()
         val pct = if (totalMs > 0) (ms.toDouble() / totalMs * 100).coerceIn(0.0, 100.0) else 0.0
-        val pctLabel = String.format("%.1f", pct)
+        val pctLabel = String.format(locale = Locale.US, "%.1f", pct)
 
         val row =
             """
@@ -305,6 +308,7 @@ internal class TaskTracer(
         return row + children
     }
 
+    @Suppress("MagicNumber")
     private fun renderSpan(
         span: Span,
         totalMs: Long,
@@ -319,16 +323,23 @@ internal class TaskTracer(
                 ""
             }
         return """
-                                    <li>
-                                      <div><strong>${esc(span.name)}</strong> — $ms ms <span class=\"pct\">(${
+                                                                                                            <li>
+                                                                                                              <div><strong>${esc(
+            span.name,
+        )}</strong> — $ms ms <span class=\"pct\">(${
             String.format(
+                locale = Locale.US,
                 "%.1f",
                 pct,
             )
         }%)</span></div>
-                                      <div class=\"bar\" style=\"width:${String.format("%.1f", barWidth)}%\"></div>
-                                      $childrenHtml
-                                    </li>
+                                                                                                              <div class=\"bar\" style=\"width:${String.format(
+            locale = Locale.US,
+            "%.1f",
+            barWidth,
+        )}%\"></div>
+                                                                                                              $childrenHtml
+                                                                                                            </li>
             """.trimIndent()
     }
 
