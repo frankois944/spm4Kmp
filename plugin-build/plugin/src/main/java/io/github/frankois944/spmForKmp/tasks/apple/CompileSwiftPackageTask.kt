@@ -100,6 +100,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         }
     }
 
+    @Suppress("LongMethod")
     @TaskAction
     fun compilePackage() {
         tracer.trace("CompileSwiftPackageTask") {

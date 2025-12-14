@@ -236,7 +236,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             tracer.trace("generate definition files") {
                 moduleConfigs.forEachIndexed { index, moduleConfig ->
                     tracer.trace("build ${moduleConfig.name} definition") {
-                        buildDefinitionFile(index, moduleConfig, compiledBinaryFile)?.let { definition ->
+                        buildDefinitionFile(index, moduleConfig, compiledBinaryFile).let { definition ->
                             moduleConfig.definitionFile.writeText(definition.trimIndent())
                             logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
                             logger.debug("At Path: {}", moduleConfig.definitionFile.path)
@@ -432,6 +432,7 @@ ${getCustomizedDefinitionConfig()}
             }
         }
 
+    @Suppress("LongMethod")
     private fun generateNonFrameworkDefinition(
         moduleName: String,
         moduleConfig: ModuleConfig,
