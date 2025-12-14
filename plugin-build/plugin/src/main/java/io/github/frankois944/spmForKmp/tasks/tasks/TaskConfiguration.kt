@@ -22,7 +22,7 @@ import java.io.File
 internal val Project.isTraceEnabled: Boolean
     get() =
         project.extraProperties.properties
-            .getOrDefault("spmforkmp.hideLocalPackageMessage", false)
+            .getOrDefault("spmforkmp.enableTracing", false)
             .toString()
             .toBoolean()
 
