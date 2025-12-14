@@ -34,6 +34,8 @@ internal const val TASK_GENERATE_REGISTRY_FILE: String = "generateRegistryFilePa
 internal const val TASK_COPY_PACKAGE_RESOURCES: String = "CopyPackageResources"
 internal const val TASK_RESOLVE_MANIFEST: String = "resolveSwiftPackage"
 
+internal const val TASK_DEPENDENCIES_ANALYZE: String = "DependenciesAnalyze"
+
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
     @Suppress("LongMethod")

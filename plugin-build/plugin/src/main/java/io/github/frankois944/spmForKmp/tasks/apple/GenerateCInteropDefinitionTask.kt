@@ -3,6 +3,7 @@ package io.github.frankois944.spmForKmp.tasks.apple
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
@@ -24,6 +25,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -119,11 +121,19 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 }
             }
 
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val dependencyData: File
+        get() {
+            return manifestFile
+                .get()
+                .asFile
+                .parentFile
+                .resolve(".dependencies_data.json")
+        }
+
     @get:Input
     abstract val traceEnabled: Property<Boolean>
-
-    @get:Inject
-    abstract val execOps: ExecOperations
 
     @get:Internal
     val tracer: TaskTracer by lazy {
@@ -138,6 +148,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     .resolve("GenerateCInteropDefinitionTask.html"),
         )
     }
+
+    @get:Inject
+    abstract val execOps: ExecOperations
+
+    private lateinit var packageImplicitDependencies: PackageImplicitDependencies
 
     init {
         description = "Generate the cinterop definitions files"
@@ -470,18 +485,16 @@ ${getCustomizedDefinitionConfig()}
                             logger.debug("getPackageImplicitDependencies")
                             // extract the Public third-party dependencies' for all the modules
                             tracer.trace("getPackageImplicitDependencies") {
-                                val dependencies =
-                                    execOps
-                                        .getPackageImplicitDependencies(
-                                            workingDir = manifestFile.asFile.get().parentFile,
-                                            scratchPath = scratchDir.get(),
-                                            logger = logger,
-                                            swiftBinPath = swiftBinPath.orNull,
+                                try {
+                                    val string = dependencyData.readText()
+                                    val dependencies = PackageImplicitDependencies.fromString(string)
+                                    tracer.trace("getPublicFolders") {
+                                        addAll(
+                                            dependencies.getPublicFolders(),
                                         )
-                                tracer.trace("getPublicFolders") {
-                                    addAll(
-                                        dependencies.getPublicFolders(),
-                                    )
+                                    }
+                                } catch (ex: Exception) {
+                                    logger.debug("Failed to get implicit dependencies from ${dependencyData.absolutePath}", ex)
                                 }
                             }
                         }

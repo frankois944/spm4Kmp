@@ -2,8 +2,10 @@
 
 package io.github.frankois944.spmForKmp.tasks
 
+import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_COPY_PACKAGE_RESOURCES
+import io.github.frankois944.spmForKmp.TASK_DEPENDENCIES_ANALYZE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
@@ -16,6 +18,7 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.ConfigRegistryPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.CopyPackageResourcesTask
+import io.github.frankois944.spmForKmp.tasks.apple.DependenciesAnalyzeTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateExportableManifestTask
 import io.github.frankois944.spmForKmp.tasks.apple.GenerateManifestTask
@@ -43,6 +46,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import kotlin.jvm.java
 
 @Suppress("LongMethod")
 internal fun Project.configAppleTargets(
@@ -117,6 +121,17 @@ internal fun Project.configAppleTargets(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
             )
+        }
+
+    val dependenciesAnalyzeTask =
+        tasks.register(
+            getTaskName(TASK_DEPENDENCIES_ANALYZE, swiftPackageEntry.internalName),
+            DependenciesAnalyzeTask::class.java,
+        ) {
+            it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
+            it.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
+            it.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
+            it.traceEnabled.set(this.project.isTraceEnabled)
         }
 
     allTargets.forEach { cinteropTarget ->
@@ -214,13 +229,17 @@ internal fun Project.configAppleTargets(
                             compileTask
                                 .get()
                                 .dependsOn(
-                                    resolveManifestTask
+                                    dependenciesAnalyzeTask
                                         .get()
                                         .dependsOn(
-                                            packageRegistryTask
+                                            resolveManifestTask
                                                 .get()
                                                 .dependsOn(
-                                                    manifestTask.get(),
+                                                    packageRegistryTask
+                                                        .get()
+                                                        .dependsOn(
+                                                            manifestTask.get(),
+                                                        ),
                                                 ),
                                         ),
                                 ),
