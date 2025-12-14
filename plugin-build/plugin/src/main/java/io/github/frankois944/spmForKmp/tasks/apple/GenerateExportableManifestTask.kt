@@ -79,7 +79,11 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             outputFile =
                 project.projectDir
                     .resolve("spmForKmpTrace")
-                    .resolve("GenerateExportableManifestTask.html"),
+                    .resolve(
+                        manifestFile
+                            .get()
+                            .asFile.parentFile.name,
+                    ).resolve("GenerateExportableManifestTask.html"),
         )
     }
 

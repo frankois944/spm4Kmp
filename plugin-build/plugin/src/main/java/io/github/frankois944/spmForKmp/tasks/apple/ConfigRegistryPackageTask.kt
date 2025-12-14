@@ -86,6 +86,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
             outputFile =
                 project.projectDir
                     .resolve("spmForKmpTrace")
+                    .resolve(workingDir.get().name)
                     .resolve("ConfigRegistryPackageTask.html"),
         )
     }
