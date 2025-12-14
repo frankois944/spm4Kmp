@@ -49,16 +49,19 @@ internal abstract class ResolveManifestTask : DefaultTask() {
     val packageScratchFiles: Map<String, File>
         get() {
             return buildMap {
-                put(
+                val scratchDir = packageScratchDir.get()
+                val manifestParentDir = manifestFile.get().asFile.parentFile
+
+                putIfExists(
                     "Package.resolved",
-                    manifestFile
-                        .get()
-                        .asFile
-                        .parentFile
-                        .resolve("Package.resolved"),
+                    manifestParentDir.resolve("Package.resolved"),
                 )
-                put("lock", packageScratchDir.get().resolve(".lock"))
-                put("workspace-state", packageScratchDir.get().resolve("workspace-state"))
+
+                val lockFile = scratchDir.resolve(".lock")
+                putIfExists("lock", lockFile)
+
+                val workspaceStateDir = scratchDir.resolve("workspace-state")
+                putIfExists("workspace-state", workspaceStateDir)
             }
         }
 
@@ -66,10 +69,18 @@ internal abstract class ResolveManifestTask : DefaultTask() {
     val packageScratchDirectories: Map<String, File>
         get() {
             return buildMap {
-                put("artifacts", packageScratchDir.get().resolve("artifacts"))
-                put("checkouts", packageScratchDir.get().resolve("checkouts"))
-                put("registry", packageScratchDir.get().resolve("registry"))
-                put("repositories", packageScratchDir.get().resolve("repositories"))
+                val scratchDir = packageScratchDir.get()
+                val scratchEntries =
+                    listOf(
+                        "artifacts" to "artifacts",
+                        "checkouts" to "checkouts",
+                        "registry" to "registry",
+                        "repositories" to "repositories",
+                    )
+
+                for ((key, dirName) in scratchEntries) {
+                    putIfExists(key, scratchDir.resolve(dirName))
+                }
             }
         }
 
@@ -128,5 +139,14 @@ internal abstract class ResolveManifestTask : DefaultTask() {
             }
         }
         tracer.writeHtmlReport()
+    }
+}
+
+private fun MutableMap<String, File>.putIfExists(
+    key: String,
+    file: File,
+) {
+    if (file.exists()) {
+        this[key] = file
     }
 }
