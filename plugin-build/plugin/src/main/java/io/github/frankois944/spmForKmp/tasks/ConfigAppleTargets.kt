@@ -218,34 +218,31 @@ internal fun Project.configAppleTargets(
             }
         }
 
-        // Explicitly create the dependency tree for the target
-        taskGroup[cinteropTarget] =
-            definitionTask
-                .get()
-                .dependsOn(
-                    copyPackageResourcesTask
-                        .get()
-                        .dependsOn(
-                            compileTask
-                                .get()
-                                .dependsOn(
-                                    dependenciesAnalyzeTask
-                                        .get()
-                                        .dependsOn(
-                                            resolveManifestTask
-                                                .get()
-                                                .dependsOn(
-                                                    packageRegistryTask
-                                                        .get()
-                                                        .dependsOn(
-                                                            manifestTask.get(),
-                                                        ),
-                                                ),
-                                        ),
-                                ),
-                        ),
-                )
+        // Clean, lazy dependency wiring (no nested dependsOn, minimal .get()).
+        dependenciesAnalyzeTask.configure {
+            it.dependsOn(resolveManifestTask)
+        }
+        resolveManifestTask.configure {
+            it.dependsOn(packageRegistryTask)
+        }
+        packageRegistryTask.configure {
+            it.dependsOn(manifestTask)
+        }
+
+        compileTask.configure {
+            it.dependsOn(dependenciesAnalyzeTask)
+        }
+        copyPackageResourcesTask.configure {
+            it.dependsOn(compileTask)
+        }
+        definitionTask.configure {
+            it.dependsOn(copyPackageResourcesTask)
+        }
+
+        // Keep a handle to the "root" for this target
+        taskGroup[cinteropTarget] = definitionTask.get()
     }
+
     taskGroup[allTargets.first()] =
         exportedManifestTask
             .get()

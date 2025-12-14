@@ -76,5 +76,6 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
                 dependencyData.writeText(content.toJsonString())
             }
         }
+        tracer.writeHtmlReport()
     }
 }
