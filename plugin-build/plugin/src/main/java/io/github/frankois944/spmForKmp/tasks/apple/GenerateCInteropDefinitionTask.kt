@@ -152,8 +152,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Inject
     abstract val execOps: ExecOperations
 
-    private lateinit var packageImplicitDependencies: PackageImplicitDependencies
-
     init {
         description = "Generate the cinterop definitions files"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -494,7 +492,11 @@ ${getCustomizedDefinitionConfig()}
                                         )
                                     }
                                 } catch (ex: Exception) {
-                                    logger.debug("Failed to get implicit dependencies from ${dependencyData.absolutePath}", ex)
+                                    logger.debug(
+                                        "Failed to get implicit " +
+                                            "dependencies from ${dependencyData.absolutePath}",
+                                        ex,
+                                    )
                                 }
                             }
                         }
