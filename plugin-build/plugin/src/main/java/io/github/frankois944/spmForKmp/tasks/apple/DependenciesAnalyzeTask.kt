@@ -32,9 +32,17 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val scratchLockFile: File
         get() {
-            return packageScratchDir
-                .get()
-                .resolve("workspace-state.json")
+            val lockFile =
+                packageScratchDir
+                    .get()
+                    .resolve(".lock")
+            return if (lockFile.exists()) {
+                lockFile
+            } else {
+                packageScratchDir
+                    .get()
+                    .resolve("workspace-state.json")
+            }
         }
 
     @get:OutputFile
