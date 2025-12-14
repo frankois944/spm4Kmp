@@ -34,7 +34,7 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
         get() {
             return packageScratchDir
                 .get()
-                .resolve(".lock")
+                .resolve("workspace-state.json")
         }
 
     @get:OutputFile
