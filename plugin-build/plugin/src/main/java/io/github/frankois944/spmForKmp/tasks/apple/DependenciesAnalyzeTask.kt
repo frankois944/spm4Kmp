@@ -3,19 +3,20 @@ package io.github.frankois944.spmForKmp.tasks.apple
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.enterprise.test.FileProperty
 import org.gradle.process.ExecOperations
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.inject.Inject
 
@@ -23,49 +24,38 @@ import javax.inject.Inject
 internal abstract class DependenciesAnalyzeTask : DefaultTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val manifestFile: Property<File>
+    abstract val manifestFile: RegularFileProperty
 
     @get:Input
-    abstract val packageScratchDir: Property<File>
+    abstract val packageScratchDir: Property<String>
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val scratchLockFile: File
-        get() {
-            val lockFile =
-                packageScratchDir
-                    .get()
-                    .resolve(".my.lock")
-            return if (lockFile.exists()) {
-                lockFile
-            } else {
-                packageScratchDir
-                    .get()
-                    .resolve("my.workspace-state.json")
-            }
-        }
+    abstract val scratchLockFile: RegularFileProperty
 
     @get:OutputFile
-    val dependencyData: File
-        get() {
-            return manifestFile
-                .get()
-                .parentFile
-                .resolve(".dependencies_data.json")
-        }
+    abstract val dependencyDataFile: RegularFileProperty
 
     @get:Input
     @get:Optional
-    abstract val swiftBinPath: Property<String?>
+    abstract val swiftBinPath: Property<String>
 
     @get:Inject
     abstract val execOps: ExecOperations
 
-    @get:Input
-    abstract val storedTracePath: Property<File>
+    @get:OutputFile
+    abstract val storedTraceFile: RegularFileProperty
 
     @get:Input
     abstract val traceEnabled: Property<Boolean>
+
+    init {
+        description = "Analyze a Swift Package manifest dependency"
+        group = "io.github.frankois944.spmForKmp.tasks"
+        onlyIf {
+            HostManager.hostIsMac
+        }
+    }
 
     @TaskAction
     fun compilePackage() {
@@ -74,11 +64,9 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
                 "DependenciesAnalyzeTask",
                 traceEnabled.get(),
                 outputFile =
-                    storedTracePath
+                    storedTraceFile
                         .get()
-                        .resolve("spmForKmpTrace")
-                        .resolve(manifestFile.get().parentFile.name)
-                        .resolve("DependenciesAnalyzeTask.html"),
+                        .asFile,
             )
         tracer.trace("DependenciesAnalyzeTask") {
             tracer.trace("prepare source dir") {
@@ -88,21 +76,23 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
                 logger.debug("Start check dependencies")
                 val content =
                     execOps.getPackageImplicitDependencies(
-                        workingDir = manifestFile.get().parentFile,
-                        scratchPath = packageScratchDir.get(),
+                        workingDir = manifestFile.get().asFile.parentFile,
+                        scratchPath = File(packageScratchDir.get()),
                         logger = logger,
                         swiftBinPath = swiftBinPath.orNull,
                     )
-                dependencyData.writeText(content.toJsonString())
+                dependencyDataFile.get().asFile.writeText(content.toJsonString())
             }
         }
         tracer.writeHtmlReport()
     }
 
     private fun prepareSourceDir() {
+        // TODO: remove this file
         val sourceDir =
             manifestFile
                 .get()
+                .asFile
                 .parentFile
                 .resolve("Sources")
         sourceDir.mkdirs()

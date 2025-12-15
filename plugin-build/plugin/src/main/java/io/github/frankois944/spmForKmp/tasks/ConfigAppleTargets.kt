@@ -46,6 +46,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import kotlin.io.resolve
 import kotlin.jvm.java
 
 @Suppress("LongMethod")
@@ -106,11 +107,16 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_GENERATE_REGISTRY_FILE, swiftPackageEntry.internalName),
             ConfigRegistryPackageTask::class.java,
         ) {
-            it.workingDir.set(packageDirectoriesConfig.spmWorkingDir)
+            it.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
             it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
             it.registries.set(swiftPackageEntry.packageRegistryConfigs)
-            it.traceEnabled.set(this.project.isTraceEnabled)
-            it.storedTracePath.set(project.projectDir)
+            it.traceEnabled.set(project.isTraceEnabled)
+            it.storedTraceFile.set(
+                project.projectDir
+                    .resolve("spmForKmpTrace")
+                    .resolve(packageDirectoriesConfig.spmWorkingDir.name)
+                    .resolve("ConfigRegistryPackageTask.html"),
+            )
         }
 
     val resolveManifestTask =
@@ -131,9 +137,29 @@ internal fun Project.configAppleTargets(
         ) {
             it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
             it.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-            it.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
-            it.traceEnabled.set(this.project.isTraceEnabled)
-            it.storedTracePath.set(project.projectDir)
+            it.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
+            it.traceEnabled.set(project.isTraceEnabled)
+            it.storedTraceFile.set(
+                project.projectDir
+                    .resolve("spmForKmpTrace")
+                    .resolve(packageDirectoriesConfig.spmWorkingDir.name)
+                    .resolve("DependenciesAnalyzeTask.html"),
+            )
+            it.dependencyDataFile.set(
+                packageDirectoriesConfig.spmWorkingDir
+                    .resolve(".dependencies_data.json"),
+            )
+            val lockFile =
+                packageDirectoriesConfig.packageScratchDir
+                    .resolve(".my.lock")
+            it.scratchLockFile.set(
+                if (lockFile.exists()) {
+                    lockFile
+                } else {
+                    packageDirectoriesConfig.packageScratchDir
+                        .resolve("my.workspace-state.json")
+                },
+            )
         }
 
     allTargets.forEach { cinteropTarget ->

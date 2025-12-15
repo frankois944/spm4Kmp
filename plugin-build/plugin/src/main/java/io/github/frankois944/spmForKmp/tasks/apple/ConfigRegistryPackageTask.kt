@@ -6,6 +6,7 @@ import io.github.frankois944.spmForKmp.operations.packageRegistrySet
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
@@ -26,7 +27,7 @@ import javax.inject.Inject
 @CacheableTask
 internal abstract class ConfigRegistryPackageTask : DefaultTask() {
     @get:Internal
-    abstract val workingDir: Property<File>
+    abstract val workingDir: Property<String>
 
     @get:Input
     abstract val registries: ListProperty<PackageRegistryAuth>
@@ -48,10 +49,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
     val registriesFile: File?
         get() {
             // .swiftpm/configuration/registries.json.
-            val manifest =
-                workingDir
-                    .get()
-                    .resolve(".swiftpm")
+            val manifest = File(workingDir.get()).resolve(".swiftpm")
             return if (registries.get().isEmpty()) {
                 logger.debug("registries is empty delete .swiftpm if exist")
                 if (manifest.exists()) {
@@ -72,13 +70,13 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val swiftBinPath: Property<String?>
+    abstract val swiftBinPath: Property<String>
 
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Input
-    abstract val storedTracePath: Property<File>
+    @get:OutputFile
+    abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -89,7 +87,6 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
         onlyIf {
             HostManager.hostIsMac && registries.get().isNotEmpty()
         }
-        logger.debug("Found registries {}", registries.get())
     }
 
     @TaskAction
@@ -98,12 +95,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
             TaskTracer(
                 "ConfigRegistryPackageTask",
                 traceEnabled.get(),
-                outputFile =
-                    storedTracePath
-                        .get()
-                        .resolve("spmForKmpTrace")
-                        .resolve(workingDir.get().name)
-                        .resolve("ConfigRegistryPackageTask.html"),
+                outputFile = storedTraceFile.get().asFile,
             )
         tracer.trace("ConfigRegistryPackageTask") {
             registries.get().forEach { registry ->
@@ -118,7 +110,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
                     }
                     tracer.trace("packageRegistrySet") {
                         execOps.packageRegistrySet(
-                            workingDir = workingDir.get(),
+                            workingDir = File(workingDir.get()),
                             url = registry.url,
                             logger = logger,
                             swiftBinPath = swiftBinPath.orNull,
@@ -128,7 +120,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
                         logger.debug("Authenticate with package registry {}", registry.url)
                         tracer.trace("packageRegistryAuth") {
                             execOps.packageRegistryAuth(
-                                workingDir = workingDir.get(),
+                                workingDir = File(workingDir.get()),
                                 url = registry.url,
                                 username = registry.username,
                                 password = registry.password,

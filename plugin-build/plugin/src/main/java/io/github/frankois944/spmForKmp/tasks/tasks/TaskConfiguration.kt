@@ -18,6 +18,7 @@ import io.github.frankois944.spmForKmp.utils.Hashing
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import java.io.File
+import java.nio.file.Path
 
 internal val Project.isTraceEnabled: Boolean
     get() =
@@ -40,13 +41,16 @@ internal fun GenerateManifestTask.configureManifestTask(
     this.minWatchos.set(swiftPackageEntry.minWatchos)
     this.toolsVersion.set(swiftPackageEntry.toolsVersion)
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-    this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir)
-    this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
-    this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.targetSettings.set(swiftPackageEntry.bridgeSettings as BridgeSettings)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-    this.traceEnabled.set(this.project.isTraceEnabled)
-    this.storedTracePath.set(project.projectDir)
+    this.traceEnabled.set(project.isTraceEnabled)
+    this.storedTraceFile.set(
+        project.projectDir
+            .resolve("spmForKmpTrace")
+            .resolve(
+                packageDirectoriesConfig.spmWorkingDir.name,
+            ).resolve("GenerateManifestTask.html"),
+    )
 }
 
 internal fun GenerateExportableManifestTask.configureExportableManifestTask(
@@ -83,13 +87,45 @@ internal fun ResolveManifestTask.configureResolveManifestTask(
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
+    this.storedTraceFile.set(
+        project.projectDir
+            .resolve("spmForKmpTrace")
+            .resolve(
+                packageDirectoriesConfig.spmWorkingDir.name,
+            ).resolve("ResolveManifestTask.html"),
+    )
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir)
     this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-    this.traceEnabled.set(this.project.isTraceEnabled)
-    this.storedTracePath.set(project.projectDir)
+    this.traceEnabled.set(project.isTraceEnabled)
+    this.packageScratchPath.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
+    this.packageScratchFiles.set(
+        buildList {
+            add(packageDirectoriesConfig.spmWorkingDir.resolve("Package.resolved"))
+
+            val lockFile = packageDirectoriesConfig.packageScratchDir.resolve(".my.lock")
+            add(lockFile)
+
+            val workspaceStateDir = packageDirectoriesConfig.packageScratchDir.resolve("my.workspace-state.json")
+            add(workspaceStateDir)
+        },
+    )
+    this.packageScratchDirectories.set(
+        buildList {
+            val scratchEntries =
+                listOf(
+                    "artifacts" to "artifacts",
+                    "checkouts" to "checkouts",
+                    "registry" to "registry",
+                    "repositories" to "repositories",
+                )
+
+            for ((_, dirName) in scratchEntries) {
+                add(packageDirectoriesConfig.packageScratchDir.resolve(dirName))
+            }
+        },
+    )
 }
 
 @Suppress("LongParameterList")

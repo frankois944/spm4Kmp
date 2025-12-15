@@ -4,7 +4,11 @@ import io.github.frankois944.spmForKmp.operations.resolvePackage
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -12,6 +16,8 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectories
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -19,77 +25,45 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import java.nio.file.Path
 import javax.inject.Inject
 
 @CacheableTask
 internal abstract class ResolveManifestTask : DefaultTask() {
-    @get:Input
+    @get:OutputDirectory
     @get:Optional
-    abstract val sharedCacheDir: Property<File?>
+    abstract val sharedCacheDir: DirectoryProperty
+
+    @get:OutputDirectory
+    @get:Optional
+    abstract val sharedConfigDir: DirectoryProperty
+
+    @get:OutputDirectory
+    @get:Optional
+    abstract val sharedSecurityDir: DirectoryProperty
 
     @get:Input
     @get:Optional
-    abstract val sharedConfigDir: Property<File?>
-
-    @get:Input
-    @get:Optional
-    abstract val sharedSecurityDir: Property<File?>
-
-    @get:Input
-    @get:Optional
-    abstract val swiftBinPath: Property<String?>
+    abstract val swiftBinPath: Property<String>
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val manifestFile: RegularFileProperty
 
     @get:Input
-    abstract val packageScratchDir: Property<File>
+    abstract val packageScratchPath: Property<String>
 
     @get:OutputFiles
-    val packageScratchFiles: Map<String, File>
-        get() {
-            return buildMap {
-                val scratchDir = packageScratchDir.get()
-                val manifestParentDir = manifestFile.get().asFile.parentFile
-
-                put(
-                    "Package.resolved",
-                    manifestParentDir.resolve("Package.resolved"),
-                )
-
-                val lockFile = scratchDir.resolve(".my.lock")
-                put("lock", lockFile)
-
-                val workspaceStateDir = scratchDir.resolve("my.workspace-state.json")
-                put("workspace-state", workspaceStateDir)
-            }
-        }
+    abstract val packageScratchFiles: ListProperty<File>
 
     @get:OutputDirectories
-    val packageScratchDirectories: Map<String, File>
-        get() {
-            return buildMap {
-                val scratchDir = packageScratchDir.get()
-                val scratchEntries =
-                    listOf(
-                        "artifacts" to "artifacts",
-                        "checkouts" to "checkouts",
-                        "registry" to "registry",
-                        "repositories" to "repositories",
-                    )
-
-                for ((key, dirName) in scratchEntries) {
-                    put(key, scratchDir.resolve(dirName))
-                }
-            }
-        }
+    abstract val packageScratchDirectories: ListProperty<File>
 
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Input
-    abstract val storedTracePath: Property<File>
+    @get:OutputFile
+    abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -109,25 +83,20 @@ internal abstract class ResolveManifestTask : DefaultTask() {
                 "ResolveManifestTask",
                 traceEnabled.get(),
                 outputFile =
-                    storedTracePath
+                    storedTraceFile
                         .get()
-                        .resolve("spmForKmpTrace")
-                        .resolve(
-                            manifestFile
-                                .get()
-                                .asFile
-                                .parentFile.name,
-                        ).resolve("ResolveManifestTask.html"),
+                        .asFile,
             )
         tracer.trace("ResolveManifestTask") {
             tracer.trace("resolvePackage") {
                 try {
+                    val packageScratchDir = File(packageScratchPath.get())
                     execOps.resolvePackage(
                         workingDir = manifestFile.get().asFile.parentFile,
-                        scratchPath = packageScratchDir.get(),
-                        sharedCachePath = sharedCacheDir.orNull,
-                        sharedConfigPath = sharedConfigDir.orNull,
-                        sharedSecurityPath = sharedSecurityDir.orNull,
+                        scratchPath = packageScratchDir,
+                        sharedCachePath = sharedCacheDir.orNull?.asFile,
+                        sharedConfigPath = sharedConfigDir.orNull?.asFile,
+                        sharedSecurityPath = sharedSecurityDir.orNull?.asFile,
                         logger = logger,
                         swiftBinPath = swiftBinPath.orNull,
                     )
@@ -148,19 +117,20 @@ internal abstract class ResolveManifestTask : DefaultTask() {
     }
 
     private fun copyLocalFiles() {
-        val lockFile = packageScratchDir.get().resolve(".lock")
+        val packageScratchDir = File(packageScratchPath.get())
+        val lockFile = packageScratchDir.resolve(".lock")
         if (lockFile.exists()) {
             lockFile
                 .copyTo(
-                    packageScratchDir.get().resolve(".my.lock"),
+                    packageScratchDir.resolve(".my.lock"),
                     true,
                 )
         }
-        val statFile = packageScratchDir.get().resolve("workspace-state.json")
+        val statFile = packageScratchDir.resolve("workspace-state.json")
         if (statFile.exists()) {
             statFile
                 .copyTo(
-                    packageScratchDir.get().resolve("my.workspace-state.json"),
+                    packageScratchDir.resolve("my.workspace-state.json"),
                     true,
                 )
         }

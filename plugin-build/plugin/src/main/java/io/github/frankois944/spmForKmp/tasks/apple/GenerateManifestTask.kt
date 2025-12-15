@@ -7,11 +7,14 @@ import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.swiftFormat
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
@@ -47,18 +50,6 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     abstract val toolsVersion: Property<String>
 
     @get:Input
-    @get:Optional
-    abstract val sharedCacheDir: Property<File?>
-
-    @get:Input
-    @get:Optional
-    abstract val sharedConfigDir: Property<File?>
-
-    @get:Input
-    @get:Optional
-    abstract val sharedSecurityDir: Property<File?>
-
-    @get:Input
     abstract val targetSettings: Property<BridgeSettings>
 
     @get:Input
@@ -66,13 +57,13 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     abstract val swiftBinPath: Property<String?>
 
     @get:OutputFile
-    abstract val manifestFile: Property<File>
+    abstract val manifestFile: RegularFileProperty
 
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Input
-    abstract val storedTracePath: Property<File>
+    @get:OutputFile
+    abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -92,11 +83,9 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                 "GenerateManifestTask",
                 traceEnabled.get(),
                 outputFile =
-                    storedTracePath
+                    storedTraceFile
                         .get()
-                        .resolve("spmForKmpTrace")
-                        .resolve(manifestFile.get().parentFile.name)
-                        .resolve("GenerateManifestTask.html"),
+                        .asFile,
             )
         tracer.trace("GenerateManifestTask") {
             tracer.trace("generateManifest") {
@@ -109,6 +98,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                                 generatedPackageDirectory =
                                     manifestFile
                                         .get()
+                                        .asFile
                                         .parentFile
                                         .toPath(),
                                 productName = packageName.get(),
@@ -121,23 +111,25 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                                 exportedPackage = null,
                             ),
                     )
-                manifestFile.get().writeText(manifest)
+                manifestFile.get().asFile.writeText(manifest)
             }
-            tracer.trace("swiftFormat") {
-                try {
-                    execOps.swiftFormat(
-                        manifestFile.get(),
-                        logger,
-                    )
-                } catch (ex: Exception) {
-                    logger.error(
-                        "Manifest file generated :\n{}\n{}",
-                        manifestFile.get(),
-                        manifestFile.get().readText(),
-                    )
-                    throw ex
+           /* if (HostManager.hostIsMac) {
+                tracer.trace("swiftFormat") {
+                    try {
+                        execOps.swiftFormat(
+                            manifestFile.get().asFile,
+                            logger,
+                        )
+                    } catch (ex: Exception) {
+                        logger.error(
+                            "Manifest file generated :\n{}\n{}",
+                            manifestFile.get(),
+                            manifestFile.get().asFile.readText(),
+                        )
+                        throw ex
+                    }
                 }
-            }
+            }*/
         }
         tracer.writeHtmlReport()
     }
