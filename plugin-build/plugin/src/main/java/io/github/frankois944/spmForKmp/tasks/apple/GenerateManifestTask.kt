@@ -7,12 +7,10 @@ import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.operations.swiftFormat
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -70,24 +68,11 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:OutputFile
     abstract val manifestFile: Property<File>
 
-    @Internal
-    val packageScratchDir: DirectoryProperty = project.objects.directoryProperty()
-
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Internal
-    val tracer: TaskTracer by lazy {
-        TaskTracer(
-            "GenerateManifestTask",
-            traceEnabled.get(),
-            outputFile =
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve(manifestFile.get().parentFile.name)
-                    .resolve("GenerateManifestTask.html"),
-        )
-    }
+    @get:Input
+    abstract val storedTracePath: Property<File>
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -102,6 +87,17 @@ internal abstract class GenerateManifestTask : DefaultTask() {
 
     @TaskAction
     fun generateFile() {
+        val tracer =
+            TaskTracer(
+                "GenerateManifestTask",
+                traceEnabled.get(),
+                outputFile =
+                    storedTracePath
+                        .get()
+                        .resolve("spmForKmpTrace")
+                        .resolve(manifestFile.get().parentFile.name)
+                        .resolve("GenerateManifestTask.html"),
+            )
         tracer.trace("GenerateManifestTask") {
             tracer.trace("generateManifest") {
                 val manifest =

@@ -17,7 +17,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
@@ -71,21 +70,8 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Internal
-    val tracer: TaskTracer by lazy {
-        TaskTracer(
-            "GenerateExportableManifestTask",
-            traceEnabled.get(),
-            outputFile =
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve(
-                        manifestFile
-                            .get()
-                            .asFile.parentFile.name,
-                    ).resolve("GenerateExportableManifestTask.html"),
-        )
-    }
+    @get:Input
+    abstract val storedTracePath: Property<File>
 
     @get:Input
     abstract val hideLocalPackageMessage: Property<Boolean>
@@ -155,6 +141,20 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateFile() {
+        val tracer =
+            TaskTracer(
+                "GenerateExportableManifestTask",
+                traceEnabled.get(),
+                outputFile =
+                    storedTracePath
+                        .get()
+                        .resolve("spmForKmpTrace")
+                        .resolve(
+                            manifestFile
+                                .get()
+                                .asFile.parentFile.name,
+                        ).resolve("GenerateExportableManifestTask.html"),
+            )
         tracer.trace("GenerateManifestTask") {
             val requiredDependencies =
                 tracer.trace("getRequireProductsDependencies") {

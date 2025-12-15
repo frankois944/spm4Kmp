@@ -5,6 +5,7 @@ import io.github.frankois944.spmForKmp.operations.packageRegistryAuth
 import io.github.frankois944.spmForKmp.operations.packageRegistrySet
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
@@ -32,16 +33,14 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val tokenFile: ListProperty<File>
+    val tokenFile: List<File>
         get() {
             val files =
                 registries.get().mapNotNull { registry ->
                     registry.tokenFile
                 }
             logger.debug("Found token files {}", files)
-            return project.objects.listProperty(File::class.java).apply {
-                addAll(files)
-            }
+            return files
         }
 
     @get:OutputFile
@@ -78,18 +77,8 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Internal
-    val tracer: TaskTracer by lazy {
-        TaskTracer(
-            "ConfigRegistryPackageTask",
-            traceEnabled.get(),
-            outputFile =
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve(workingDir.get().name)
-                    .resolve("ConfigRegistryPackageTask.html"),
-        )
-    }
+    @get:Input
+    abstract val storedTracePath: Property<File>
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -105,6 +94,17 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
 
     @TaskAction
     fun generateFile() {
+        val tracer =
+            TaskTracer(
+                "ConfigRegistryPackageTask",
+                traceEnabled.get(),
+                outputFile =
+                    storedTracePath
+                        .get()
+                        .resolve("spmForKmpTrace")
+                        .resolve(workingDir.get().name)
+                        .resolve("ConfigRegistryPackageTask.html"),
+            )
         tracer.trace("ConfigRegistryPackageTask") {
             registries.get().forEach { registry ->
                 tracer.trace("new package registry ${registry.url}") {
@@ -126,9 +126,6 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
                     }
                     if (registry.hasAuthCredentials()) {
                         logger.debug("Authenticate with package registry {}", registry.url)
-                        logger.debug("username: {} password: {}", registry.username, registry.password)
-                        logger.debug("token: {}", tokenFile.orNull)
-                        logger.debug("tokenFile: {}", tokenFile.orNull)
                         tracer.trace("packageRegistryAuth") {
                             execOps.packageRegistryAuth(
                                 workingDir = workingDir.get(),
