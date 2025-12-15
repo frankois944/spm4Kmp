@@ -36,6 +36,7 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
+import kotlin.lazy
 
 @CacheableTask
 @Suppress("TooManyFunctions")
@@ -135,19 +136,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Internal
-    val tracer: TaskTracer by lazy {
-        TaskTracer(
-            "GenerateCInteropDefinitionTask-${target.get()}",
-            traceEnabled.get(),
-            outputFile =
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve(scratchDir.get().parentFile.name)
-                    .resolve(target.get().toString())
-                    .resolve("GenerateCInteropDefinitionTask.html"),
-        )
-    }
+    private lateinit var tracer: TaskTracer
+
+    @get:Input
+    abstract val storedTracePath: Property<File>
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -224,6 +216,18 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
+        tracer =
+            TaskTracer(
+                "GenerateCInteropDefinitionTask-${target.get()}",
+                traceEnabled.get(),
+                outputFile =
+                    storedTracePath
+                        .get()
+                        .resolve("spmForKmpTrace")
+                        .resolve(scratchDir.get().parentFile.name)
+                        .resolve(target.get().toString())
+                        .resolve("GenerateCInteropDefinitionTask.html"),
+            )
         tracer.trace("GenerateCInteropDefinitionTask") {
             tracer.trace("cleanup old definitions") {
                 removeOldDefinition()

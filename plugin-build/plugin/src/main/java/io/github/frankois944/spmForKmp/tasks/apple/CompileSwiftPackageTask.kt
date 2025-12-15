@@ -12,7 +12,6 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -75,19 +74,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Internal
-    val tracer: TaskTracer by lazy {
-        TaskTracer(
-            "CompileSwiftPackageTask-${target.get()}",
-            traceEnabled.get(),
-            outputFile =
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve(manifestFile.get().parentFile.name)
-                    .resolve(target.get().toString())
-                    .resolve("CompileSwiftPackageTask.html"),
-        )
-    }
+    @get:Input
+    abstract val storedTracePath: Property<File>
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -103,6 +91,18 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun compilePackage() {
+        val tracer =
+            TaskTracer(
+                "CompileSwiftPackageTask-${target.get()}",
+                traceEnabled.get(),
+                outputFile =
+                    storedTracePath
+                        .get()
+                        .resolve("spmForKmpTrace")
+                        .resolve(manifestFile.get().parentFile.name)
+                        .resolve(target.get().toString())
+                        .resolve("CompileSwiftPackageTask.html"),
+            )
         tracer.trace("CompileSwiftPackageTask") {
             logger.debug("Compile the manifest {}", manifestFile.get().path)
             tracer.trace("prepareWorkingDir") {

@@ -46,17 +46,8 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Internal
-    val tracer: TaskTracer by lazy {
-        TaskTracer(
-            "CopyPackageResourcesTask",
-            traceEnabled.get(),
-            outputFile =
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve("CopyPackageResourcesTask.html"),
-        )
-    }
+    @get:Input
+    abstract val storedTracePath: Property<File>
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -75,6 +66,17 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
 
     @TaskAction
     fun copyResources() {
+        val tracer =
+            TaskTracer(
+                "CopyPackageResourcesTask",
+                traceEnabled.get(),
+                outputFile =
+                    storedTracePath
+                        .get()
+                        .resolve("spmForKmpTrace")
+                        .resolve("CopyPackageResourcesTask.html"),
+            )
+
         logger.debug("preparing resources")
         tracer.trace("CopyPackageResourcesTask") {
             tracer.trace("createCopiedResources") {

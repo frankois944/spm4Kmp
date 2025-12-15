@@ -1,7 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.utils
 
 import java.io.File
-import java.time.Duration
 import java.time.Instant
 import java.util.Locale
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -14,7 +13,7 @@ internal class TaskTracer(
     private val isEnabled: Boolean = true,
     private val outputFile: File,
 ) {
-    private val root = Span(name = title, start = Instant.now())
+    private val root = Span(name = title, start = Instant.now().toEpochMilli())
     private val stack = ConcurrentLinkedDeque<Span>().apply { push(root) }
 
     fun <T> trace(
@@ -23,13 +22,13 @@ internal class TaskTracer(
     ): T {
         if (isEnabled) {
             val parent = stack.peek() ?: root
-            val span = Span(name = name, start = Instant.now())
+            val span = Span(name = name, start = Instant.now().toEpochMilli())
             parent.children.add(span)
             stack.push(span)
             return try {
                 block()
             } finally {
-                span.end = Instant.now()
+                span.end = Instant.now().toEpochMilli()
                 stack.pop()
             }
         } else {
@@ -38,7 +37,7 @@ internal class TaskTracer(
     }
 
     fun finish() {
-        if (isEnabled && root.end == null) root.end = Instant.now()
+        if (isEnabled && root.end == null) root.end = Instant.now().toEpochMilli()
     }
 
     fun writeHtmlReport() {
@@ -323,8 +322,8 @@ internal class TaskTracer(
                 ""
             }
         return """
-                                                                                                            <li>
-                                                                                                              <div><strong>${esc(
+                                                                                                                                                            <li>
+                                                                                                                                                              <div><strong>${esc(
             span.name,
         )}</strong> — $ms ms <span class=\"pct\">(${
             String.format(
@@ -333,19 +332,19 @@ internal class TaskTracer(
                 pct,
             )
         }%)</span></div>
-                                                                                                              <div class=\"bar\" style=\"width:${String.format(
+                                                                                                                                                              <div class=\"bar\" style=\"width:${String.format(
             locale = Locale.US,
             "%.1f",
             barWidth,
         )}%\"></div>
-                                                                                                              $childrenHtml
-                                                                                                            </li>
+                                                                                                                                                              $childrenHtml
+                                                                                                                                                            </li>
             """.trimIndent()
     }
 
     private fun Span.durationMillis(): Long {
-        val endInstant = end ?: Instant.now()
-        return Duration.between(start, endInstant).toMillis()
+        val endInstant = end ?: Instant.now().toEpochMilli()
+        return endInstant - start
     }
 
     private fun Span.selfDurationMillis(): Long {
@@ -363,8 +362,8 @@ internal class TaskTracer(
 
     private data class Span(
         val name: String,
-        val start: Instant,
-        var end: Instant? = null,
+        val start: Long,
+        var end: Long? = null,
         val children: MutableList<Span> = mutableListOf(),
     )
 }

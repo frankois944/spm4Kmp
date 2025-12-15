@@ -110,6 +110,7 @@ internal fun Project.configAppleTargets(
             it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
             it.registries.set(swiftPackageEntry.packageRegistryConfigs)
             it.traceEnabled.set(this.project.isTraceEnabled)
+            it.storedTracePath.set(project.projectDir)
         }
 
     val resolveManifestTask =
@@ -132,6 +133,7 @@ internal fun Project.configAppleTargets(
             it.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
             it.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
             it.traceEnabled.set(this.project.isTraceEnabled)
+            it.storedTracePath.set(project.projectDir)
         }
 
     allTargets.forEach { cinteropTarget ->

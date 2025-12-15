@@ -40,13 +40,13 @@ internal fun GenerateManifestTask.configureManifestTask(
     this.minWatchos.set(swiftPackageEntry.minWatchos)
     this.toolsVersion.set(swiftPackageEntry.toolsVersion)
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir)
     this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.targetSettings.set(swiftPackageEntry.bridgeSettings as BridgeSettings)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
     this.traceEnabled.set(this.project.isTraceEnabled)
+    this.storedTracePath.set(project.projectDir)
 }
 
 internal fun GenerateExportableManifestTask.configureExportableManifestTask(
@@ -74,6 +74,7 @@ internal fun GenerateExportableManifestTask.configureExportableManifestTask(
             .toBoolean(),
     )
     this.traceEnabled.set(this.project.isTraceEnabled)
+    this.storedTracePath.set(project.projectDir)
 }
 
 @Suppress("LongParameterList")
@@ -88,6 +89,7 @@ internal fun ResolveManifestTask.configureResolveManifestTask(
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
     this.traceEnabled.set(this.project.isTraceEnabled)
+    this.storedTracePath.set(project.projectDir)
 }
 
 @Suppress("LongParameterList")
@@ -111,6 +113,7 @@ internal fun CompileSwiftPackageTask.configureCompileTask(
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
     this.bridgeSourceBuiltDir.set(manifestFile.parentFile.resolve("Sources"))
     this.traceEnabled.set(this.project.isTraceEnabled)
+    this.storedTracePath.set(project.projectDir)
 }
 
 internal fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionTask(
@@ -141,6 +144,7 @@ internal fun GenerateCInteropDefinitionTask.configureGenerateCInteropDefinitionT
     this.disableDesignatedInitializerChecks.set(swiftPackageEntry.disableDesignatedInitializerChecks)
     this.userSetupHint.set(swiftPackageEntry.userSetupHint)
     this.traceEnabled.set(this.project.isTraceEnabled)
+    this.storedTracePath.set(project.projectDir)
 }
 
 @Suppress("LongParameterList")
@@ -201,4 +205,5 @@ internal fun CopyPackageResourcesTask.configureCopyPackageResourcesTask(
     this.buildProductDir.set(buildProductDir)
     this.contentFolderPath.set(contentFolderPath)
     this.traceEnabled.set(this.project.isTraceEnabled)
+    this.storedTracePath.set(project.projectDir)
 }

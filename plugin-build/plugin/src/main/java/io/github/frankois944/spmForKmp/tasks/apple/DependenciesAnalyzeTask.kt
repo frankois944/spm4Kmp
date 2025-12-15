@@ -35,13 +35,13 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
             val lockFile =
                 packageScratchDir
                     .get()
-                    .resolve(".lock")
+                    .resolve(".my.lock")
             return if (lockFile.exists()) {
                 lockFile
             } else {
                 packageScratchDir
                     .get()
-                    .resolve("workspace-state.json")
+                    .resolve("my.workspace-state.json")
             }
         }
 
@@ -62,23 +62,24 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
     abstract val execOps: ExecOperations
 
     @get:Input
-    abstract val traceEnabled: Property<Boolean>
+    abstract val storedTracePath: Property<File>
 
-    @get:Internal
-    val tracer: TaskTracer by lazy {
-        TaskTracer(
-            "DependenciesAnalyzeTask",
-            traceEnabled.get(),
-            outputFile =
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve(manifestFile.get().parentFile.name)
-                    .resolve("DependenciesAnalyzeTask.html"),
-        )
-    }
+    @get:Input
+    abstract val traceEnabled: Property<Boolean>
 
     @TaskAction
     fun compilePackage() {
+        val tracer =
+            TaskTracer(
+                "DependenciesAnalyzeTask",
+                traceEnabled.get(),
+                outputFile =
+                    storedTracePath
+                        .get()
+                        .resolve("spmForKmpTrace")
+                        .resolve(manifestFile.get().parentFile.name)
+                        .resolve("DependenciesAnalyzeTask.html"),
+            )
         tracer.trace("DependenciesAnalyzeTask") {
             tracer.trace("prepare source dir") {
                 prepareSourceDir()
