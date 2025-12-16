@@ -50,7 +50,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val swiftBinPath: Property<String?>
+    abstract val swiftBinPath: Property<String>
 
     @get:OutputFile
     abstract val manifestFile: RegularFileProperty

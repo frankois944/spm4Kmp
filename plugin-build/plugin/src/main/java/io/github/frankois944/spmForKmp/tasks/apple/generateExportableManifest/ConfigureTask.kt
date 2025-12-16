@@ -1,6 +1,5 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest
 
-import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
@@ -10,7 +9,6 @@ import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
-import java.io.File
 
 internal fun GenerateExportableManifestTask.configureTask(
     swiftPackageEntry: PackageRootDefinitionExtension,

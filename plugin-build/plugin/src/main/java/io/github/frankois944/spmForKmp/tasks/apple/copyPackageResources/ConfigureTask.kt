@@ -62,5 +62,10 @@ internal fun CopyPackageResourcesTask.configureTask(
     this.buildProductDir.set(buildProductDir)
     this.contentFolderPath.set(contentFolderPath)
     this.traceEnabled.set(project.isTraceEnabled)
-    this.storedTracePath.set(project.projectDir)
+    this.storedTraceFile.set(
+        project.projectDir
+            .resolve("spmForKmpTrace")
+            .resolve(packageDirectoriesConfig.spmWorkingDir.name)
+            .resolve("CopyPackageResourcesTask.html"),
+    )
 }

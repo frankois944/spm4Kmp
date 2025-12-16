@@ -1,6 +1,5 @@
 package io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage
 
-import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
@@ -11,22 +10,33 @@ import java.io.File
 internal fun CompileSwiftPackageTask.configureTask(
     target: AppleCompileTarget,
     swiftPackageEntry: PackageRootDefinitionExtension,
-    targetBuildDir: File,
     packageDirectoriesConfig: PackageDirectoriesConfig,
+    targetBuildDir: File,
 ) {
-    val manifestFile = packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME)
-    this.manifestFile.set(manifestFile)
     this.target.set(target)
     this.debugMode.set(swiftPackageEntry.debug)
-    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
-    this.compiledTargetDir.set(targetBuildDir)
+    this.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
+    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
     this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
     this.osVersion.set(computeOsVersion(target, swiftPackageEntry))
-    this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir)
-    this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir)
-    this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir)
+    this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir?.absolutePath)
+    this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir?.absolutePath)
+    this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir?.absolutePath)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-    this.bridgeSourceBuiltDir.set(manifestFile.parentFile.resolve("Sources"))
+    this.bridgeSourceBuiltDir.set(packageDirectoriesConfig.spmWorkingDir.resolve("Sources"))
     this.traceEnabled.set(project.isTraceEnabled)
-    this.storedTracePath.set(project.projectDir)
+    this.storedTraceFile.set(
+        project.projectDir
+            .resolve("spmForKmpTrace")
+            .resolve(packageDirectoriesConfig.spmWorkingDir.name)
+            .resolve(target.toString())
+            .resolve("CompileSwiftPackageTask.html"),
+    )
+    this.compiledBinaryLocation.set(
+        targetBuildDir.resolve("lib${swiftPackageEntry.internalName}.a"),
+    )
+    this.compiledBinaryDestination.set(
+        packageDirectoriesConfig.spmWorkingDir
+            .resolve("lib${swiftPackageEntry.internalName}.a"),
+    )
 }

@@ -16,13 +16,17 @@ import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.checkSum
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -30,6 +34,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
+import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
@@ -37,6 +42,9 @@ import kotlin.io.path.nameWithoutExtension
 @CacheableTask
 @Suppress("TooManyFunctions")
 internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
+    @get:OutputDirectory
+    abstract val definitionFolder: DirectoryProperty
+
     @get:Input
     abstract val target: Property<AppleCompileTarget>
 
@@ -57,18 +65,18 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val osVersion: Property<String?>
+    abstract val osVersion: Property<String>
 
     @get:Input
-    abstract val scratchDir: Property<File>
-
-    @get:Input
-    @get:Optional
-    abstract val packageDependencyPrefix: Property<String?>
+    abstract val scratchDir: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val swiftBinPath: Property<String?>
+    abstract val packageDependencyPrefix: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val swiftBinPath: Property<String>
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -89,15 +97,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val foreignExceptionMode: Property<String?>
+    abstract val foreignExceptionMode: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val disableDesignatedInitializerChecks: Property<Boolean?>
+    abstract val disableDesignatedInitializerChecks: Property<Boolean>
 
     @get:Input
     @get:Optional
-    abstract val userSetupHint: Property<String?>
+    abstract val userSetupHint: Property<String>
 
     @get:OutputFiles
     val outputFiles: List<File>
@@ -106,12 +114,16 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 getModuleConfigs().forEachIndexed { index, moduleName ->
                     if (index == 0) {
                         add(
-                            currentBuildDirectory()
+                            definitionFolder
+                                .get()
+                                .asFile
                                 .resolve("${moduleName.name}_bridge.def"),
                         )
                     } else {
                         add(
-                            currentBuildDirectory()
+                            definitionFolder
+                                .get()
+                                .asFile
                                 .resolve("${moduleName.name}.def"),
                         )
                     }
@@ -134,25 +146,22 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     private lateinit var tracer: TaskTracer
 
-    @get:Input
-    abstract val storedTracePath: Property<File>
+    @get:OutputFile
+    abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject
     abstract val execOps: ExecOperations
+
+    @get:Internal
+    abstract val currentBuildDirectory: DirectoryProperty
 
     init {
         description = "Generate the cinterop definitions files"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.Companion.hostIsMac
+            HostManager.hostIsMac
         }
     }
-
-    private fun currentBuildDirectory(): File =
-        compiledBinary
-            .asFile
-            .get()
-            .parentFile
 
     private fun getModuleConfigs(): List<ModuleConfig> =
         buildList {
@@ -216,28 +225,24 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             TaskTracer(
                 "GenerateCInteropDefinitionTask-${target.get()}",
                 traceEnabled.get(),
-                outputFile =
-                    storedTracePath
-                        .get()
-                        .resolve("spmForKmpTrace")
-                        .resolve(scratchDir.get().parentFile.name)
-                        .resolve(target.get().toString())
-                        .resolve("GenerateCInteropDefinitionTask.html"),
+                outputFile = storedTraceFile.get().asFile,
             )
         tracer.trace("GenerateCInteropDefinitionTask") {
             tracer.trace("cleanup old definitions") {
                 removeOldDefinition()
             }
 
-            val currentBuildDir = currentBuildDirectory()
             val compiledBinaryFile = compiledBinary.asFile.get()
 
             val moduleConfigs = tracer.trace("collect module configs") { getModuleConfigs() }
-            val builtModules = tracer.trace("scan built modules") { getModulesInBuildDirectory(currentBuildDir) }
+            val builtModules =
+                tracer.trace("scan built modules") {
+                    getModulesInBuildDirectory(currentBuildDirectory.get().asFile)
+                }
 
             tracer.trace("configure modules") {
                 // Configure les répertoires et fichiers de définition pour chaque module
-                configureModules(moduleConfigs, builtModules, currentBuildDir)
+                configureModules(moduleConfigs, builtModules)
             }
 
             logger.debug(
@@ -265,7 +270,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     private fun configureModules(
         moduleConfigs: List<ModuleConfig>,
         builtModules: List<File>,
-        currentBuildDir: File,
     ) {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("LOOKING for module dir {}", moduleConfig.name)
@@ -279,12 +283,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 moduleConfig.isFramework = true
                 moduleConfig.buildDir =
                     getModuleArtifactsPath(
-                        fromPath = scratchDir.get().toPath(),
+                        fromPath = Path.of(scratchDir.get()),
                         productName = productName.get(),
                         moduleConfig = moduleConfig,
                         target = target.get(),
                     )
-                moduleConfig.definitionFile = currentBuildDir.resolve("${moduleConfig.name}.def")
+                moduleConfig.definitionFile = definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
             } else {
                 builtModules
                     .find {
@@ -295,9 +299,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         moduleConfig.buildDir = buildDir.toPath()
                         val definitionFilePath =
                             if (index == 0) {
-                                currentBuildDir.resolve("${moduleConfig.name}_bridge.def")
+                                definitionFolder.get().asFile.resolve("${moduleConfig.name}_bridge.def")
                             } else {
-                                currentBuildDir.resolve("${moduleConfig.name}.def")
+                                definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
                             }
                         moduleConfig.definitionFile = definitionFilePath
                     }
@@ -393,7 +397,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     private fun generateCFrameworkDefinition(moduleConfig: ModuleConfig): String {
         val libraryPaths =
             getModuleArtifactsPath(
-                fromPath = scratchDir.get().toPath(),
+                fromPath = Path.of(scratchDir.get()),
                 productName = productName.get(),
                 moduleConfig = moduleConfig,
                 target = target.get(),
@@ -430,14 +434,14 @@ headerFilter = "$libraryPaths/Headers/**"
                 }
 
             val buildDirPath =
-                tracer.trace("resolve build dir path") { currentBuildDirectory().path }
+                tracer.trace("resolve build dir path") { currentBuildDirectory.get().asFile.path }
 
             tracer.trace("render definition") {
                 """
 language = Objective-C
 modules = $moduleName
 package = $packageName
-libraryPaths = "${currentBuildDirectory()}"
+libraryPaths = "${currentBuildDirectory.get().asFile}"
 compilerOpts = -fmodules -framework "$frameworkName" -F"$buildDirPath"
 linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"$buildDirPath"
 ${getCustomizedDefinitionConfig()}
@@ -463,8 +467,7 @@ ${getCustomizedDefinitionConfig()}
                         tracer.trace("include folders from checkout") {
                             moduleConfig.spmPackageName?.let {
                                 val folderToSearch =
-                                    scratchDir
-                                        .get()
+                                    File(scratchDir.get())
                                         .resolve("checkouts")
                                         .resolve(it)
                                 logger.debug("SEARCH IN {}", folderToSearch)
@@ -476,7 +479,7 @@ ${getCustomizedDefinitionConfig()}
                         tracer.trace("publicHeadersPath from manifest") {
                             logger.debug("SEARCH IN extractPublicHeaderFromCheckout")
                             // extract from the current module manifest the `publicHeadersPath` values
-                            addAll(extractPublicHeaderFromCheckout(scratchDir.get(), moduleConfig))
+                            addAll(extractPublicHeaderFromCheckout(File(scratchDir.get()), moduleConfig))
                         }
 
                         tracer.trace("public folders from implicit deps") {
@@ -484,13 +487,13 @@ ${getCustomizedDefinitionConfig()}
                             // extract the Public third-party dependencies' for all the modules
                             tracer.trace("getPackageImplicitDependencies") {
                                 try {
-                                    val string = dependencyData.readText()
+                                   /* val string = dependencyData.readText()
                                     val dependencies = PackageImplicitDependencies.Companion.fromString(string)
                                     tracer.trace("getPublicFolders") {
                                         addAll(
                                             dependencies.getPublicFolders(),
                                         )
-                                    }
+                                    }*/
                                 } catch (ex: Exception) {
                                     logger.debug(
                                         "Failed to get implicit " +
@@ -503,11 +506,17 @@ ${getCustomizedDefinitionConfig()}
 
                         tracer.trace("headers from artifacts (xcframework)") {
                             // extract the header from the SPM artifacts, which there are xcframework
-                            addAll(findHeadersModule(scratchDir.get().resolve("artifacts"), target.get()))
+                            addAll(
+                                findHeadersModule(
+                                    File(scratchDir.get())
+                                        .resolve("artifacts"),
+                                    target.get(),
+                                ),
+                            )
                         }
 
                         // add the current build dir of the package where there are every built module
-                        add(currentBuildDirectory().path)
+                        add(currentBuildDirectory.get().asFile.path)
                     }.joinToString(" ") { "-I\"$it\"" }
                 }
 
@@ -524,14 +533,14 @@ ${getCustomizedDefinitionConfig()}
 
             val includeModulePath = "${moduleConfig.buildDir.resolve("include")}"
 
-            val buildDirPath = currentBuildDirectory().path
+            val buildDirPath = currentBuildDirectory.get().asFile.path
 
             tracer.trace("render definition") {
                 """
 language = Objective-C
 modules = $moduleName
 package = $packageName
-libraryPaths = "${currentBuildDirectory()}"
+libraryPaths = "${currentBuildDirectory.get().asFile}"
 compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"$buildDirPath"
 linkerOpts = $linkerOps ${getExtraLinkers()} -F"$buildDirPath"
 ${getCustomizedDefinitionConfig()}
@@ -540,7 +549,7 @@ ${getCustomizedDefinitionConfig()}
         }
 
     private fun removeOldDefinition() {
-        currentBuildDirectory().listFiles()?.forEach { file ->
+        definitionFolder.get().asFileTree.forEach { file ->
             if (file.name.endsWith("_default.def") && file.exists() && file.delete()) {
                 logger.debug("Removing old definition {}", file)
             }

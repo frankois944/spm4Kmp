@@ -9,8 +9,11 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.OutputDirectory
@@ -68,7 +71,7 @@ internal abstract class ResolveManifestTask : DefaultTask() {
         description = "Resolve a Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.Companion.hostIsMac
+            HostManager.hostIsMac
         }
     }
 
@@ -126,7 +129,7 @@ internal abstract class ResolveManifestTask : DefaultTask() {
         if (statFile.exists()) {
             statFile
                 .copyTo(
-                    packageScratchDir.resolve("my.workspace-state.json"),
+                    packageScratchDir.resolve(".my.workspace-state.json"),
                     true,
                 )
         }

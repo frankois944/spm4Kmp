@@ -151,8 +151,8 @@ internal fun Project.configAppleTargets(
                 it.configureTask(
                     target = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
-                    targetBuildDir = targetBuildDir,
                     packageDirectoriesConfig = packageDirectoriesConfig,
+                    targetBuildDir = targetBuildDir,
                 )
             }
 

@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.dependenciesAnalyze
 
+import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
@@ -8,6 +9,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
@@ -20,9 +22,8 @@ import javax.inject.Inject
 
 @CacheableTask
 internal abstract class DependenciesAnalyzeTask : DefaultTask() {
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val manifestFile: RegularFileProperty
+    @get:Internal
+    abstract val workingDir: RegularFileProperty
 
     @get:Input
     abstract val packageScratchDir: Property<String>
@@ -51,7 +52,7 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
         description = "Analyze a Swift Package manifest dependency"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.Companion.hostIsMac
+            HostManager.hostIsMac
         }
     }
 
@@ -72,14 +73,23 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
             }
             tracer.trace("getPackageImplicitDependencies") {
                 logger.debug("Start check dependencies")
-                val content =
+                /*val content =
                     execOps.getPackageImplicitDependencies(
-                        workingDir = manifestFile.get().asFile.parentFile,
+                        workingDir = workingDir.get().asFile,
                         scratchPath = File(packageScratchDir.get()),
                         logger = logger,
                         swiftBinPath = swiftBinPath.orNull,
-                    )
-                dependencyDataFile.get().asFile.writeText(content.toJsonString())
+                    )*/
+                dependencyDataFile.get().asFile.writeText(
+                    PackageImplicitDependencies(
+                        dependencies = emptyList(),
+                        identity = null,
+                        name = null,
+                        path = null,
+                        url = null,
+                        version = null,
+                    ).toJsonString(),
+                )
             }
         }
         tracer.writeHtmlReport()
@@ -88,10 +98,9 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
     private fun prepareSourceDir() {
         // TODO: remove this file
         val sourceDir =
-            manifestFile
+            workingDir
                 .get()
                 .asFile
-                .parentFile
                 .resolve("Sources")
         sourceDir.mkdirs()
         sourceDir

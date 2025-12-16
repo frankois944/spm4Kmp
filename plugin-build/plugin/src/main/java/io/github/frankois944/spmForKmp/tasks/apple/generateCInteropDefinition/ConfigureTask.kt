@@ -17,7 +17,10 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     packageDirectoriesConfig: PackageDirectoriesConfig,
     packageDependencies: List<SwiftDependency>,
 ) {
-    this.compiledBinary.set(targetBuildDir.resolve("lib${swiftPackageEntry.internalName}.a"))
+    this.compiledBinary.set(
+        packageDirectoriesConfig.spmWorkingDir.resolve("lib${swiftPackageEntry.internalName}.a"),
+    )
+    this.currentBuildDirectory.set(targetBuildDir)
     this.target.set(cinteropTarget)
     this.productName.set(swiftPackageEntry.internalName)
     this.packages.set(packageDependencies)
@@ -26,7 +29,7 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
         computeOsVersion(cinteropTarget, swiftPackageEntry),
     )
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-    this.scratchDir.set(packageDirectoriesConfig.packageScratchDir)
+    this.scratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
     this.packageDependencyPrefix.set(swiftPackageEntry.packageDependencyPrefix)
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)
@@ -38,5 +41,16 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     this.disableDesignatedInitializerChecks.set(swiftPackageEntry.disableDesignatedInitializerChecks)
     this.userSetupHint.set(swiftPackageEntry.userSetupHint)
     this.traceEnabled.set(project.isTraceEnabled)
-    this.storedTracePath.set(project.projectDir)
+    this.storedTraceFile.set(
+        project.projectDir
+            .resolve("spmForKmpTrace")
+            .resolve(packageDirectoriesConfig.spmWorkingDir.name)
+            .resolve(cinteropTarget.toString())
+            .resolve("GenerateCInteropDefinitionTask.html"),
+    )
+    this.definitionFolder.set(
+        packageDirectoriesConfig
+            .spmWorkingDir
+            .resolve("defFiles"),
+    )
 }

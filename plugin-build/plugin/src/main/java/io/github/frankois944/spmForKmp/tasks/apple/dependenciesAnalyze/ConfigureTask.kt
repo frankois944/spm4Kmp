@@ -10,7 +10,7 @@ internal fun DependenciesAnalyzeTask.configureTask(
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-    this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
+    this.workingDir.set(packageDirectoriesConfig.spmWorkingDir)
     this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
     this.traceEnabled.set(project.isTraceEnabled)
     this.storedTraceFile.set(
@@ -23,15 +23,18 @@ internal fun DependenciesAnalyzeTask.configureTask(
         packageDirectoriesConfig.spmWorkingDir
             .resolve(".dependencies_data.json"),
     )
+    val resolveFile =
+        packageDirectoriesConfig.spmWorkingDir
+            .resolve("Package.resolved")
     val lockFile =
         packageDirectoriesConfig.packageScratchDir
             .resolve(".my.lock")
+    val workspaceStateFile =
+        packageDirectoriesConfig.packageScratchDir
+            .resolve(".my.workspace-state.json")
     this.scratchLockFile.set(
-        if (lockFile.exists()) {
-            lockFile
-        } else {
-            packageDirectoriesConfig.packageScratchDir
-                .resolve("my.workspace-state.json")
-        },
+        listOf(resolveFile, lockFile, workspaceStateFile)
+            .firstOrNull { it.exists() }
+            ?: workspaceStateFile,
     )
 }

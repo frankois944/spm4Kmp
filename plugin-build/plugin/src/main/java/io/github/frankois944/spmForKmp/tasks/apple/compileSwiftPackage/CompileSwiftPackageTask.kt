@@ -6,14 +6,17 @@ import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -26,8 +29,10 @@ import javax.inject.Inject
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 
-@CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
+    @get:Internal
+    abstract val workingDir: Property<String>
+
     @get:Input
     abstract val target: Property<AppleCompileTarget>
 
@@ -35,47 +40,46 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     abstract val debugMode: Property<Boolean>
 
     @get:Input
-    abstract val packageScratchDir: Property<File>
+    abstract val packageScratchDir: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val osVersion: Property<String?>
+    abstract val osVersion: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val sharedCacheDir: Property<File?>
+    abstract val sharedCacheDir: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val sharedConfigDir: Property<File?>
+    abstract val sharedConfigDir: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val sharedSecurityDir: Property<File?>
+    abstract val sharedSecurityDir: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val swiftBinPath: Property<String?>
-
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val manifestFile: Property<File>
+    abstract val swiftBinPath: Property<String>
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val bridgeSourceDir: DirectoryProperty
 
     @get:OutputDirectory
-    abstract val bridgeSourceBuiltDir: Property<File>
-
-    @get:OutputDirectory
-    abstract val compiledTargetDir: Property<File>
+    abstract val bridgeSourceBuiltDir: DirectoryProperty
 
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Input
-    abstract val storedTracePath: Property<File>
+    @get:OutputFile
+    abstract val storedTraceFile: RegularFileProperty
+
+    @get:Internal
+    abstract val compiledBinaryLocation: RegularFileProperty
+
+    @get:OutputFile
+    abstract val compiledBinaryDestination: RegularFileProperty
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -84,7 +88,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         description = "Compile the Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.Companion.hostIsMac
+            HostManager.hostIsMac
         }
     }
 
@@ -96,15 +100,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 "CompileSwiftPackageTask-${target.get()}",
                 traceEnabled.get(),
                 outputFile =
-                    storedTracePath
+                    storedTraceFile
                         .get()
-                        .resolve("spmForKmpTrace")
-                        .resolve(manifestFile.get().parentFile.name)
-                        .resolve(target.get().toString())
-                        .resolve("CompileSwiftPackageTask.html"),
+                        .asFile,
             )
         tracer.trace("CompileSwiftPackageTask") {
-            logger.debug("Compile the manifest {}", manifestFile.get().path)
             tracer.trace("prepareWorkingDir") {
                 prepareWorkingDir()
             }
@@ -123,7 +123,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add("--triple")
                     add(target.get().triple(osVersion.orNull.orEmpty()))
                     add("--scratch-path")
-                    add(packageScratchDir.get().path)
+                    add(packageScratchDir.get())
                     add("-c")
                     add(if (debugMode.get()) "debug" else "release")
                     add("--jobs")
@@ -131,15 +131,15 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add("--disable-automatic-resolution")
                     sharedCacheDir.orNull?.let {
                         add("--cache-path")
-                        add(it.path)
+                        add(it)
                     }
                     sharedConfigDir.orNull?.let {
                         add("--config-path")
-                        add(it.path)
+                        add(it)
                     }
                     sharedSecurityDir.orNull?.let {
                         add("--security-path")
-                        add(it.path)
+                        add(it)
                     }
                 }
 
@@ -149,7 +149,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 execOps
                     .exec {
                         it.executable = swiftBinPath.orNull ?: "xcrun"
-                        it.workingDir = manifestFile.get().parentFile
+                        it.workingDir = File(workingDir.get())
                         it.args = args
                         it.standardOutput = standardOutput
                         it.errorOutput = errorOutput
@@ -163,38 +163,59 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                             errorOutput,
                         )
                     }
+                copyBinaryToLocation()
             }
         }
         tracer.writeHtmlReport()
     }
 
+    private fun copyBinaryToLocation() {
+        if (!compiledBinaryLocation.get().asFile.exists()) {
+            throw GradleException("No Binary found at ${compiledBinaryLocation.get()}")
+        }
+        logger.debug("Copying binary to destination: {}", compiledBinaryDestination)
+        compiledBinaryLocation.get().asFile.copyTo(
+            compiledBinaryDestination.get().asFile,
+            true,
+        )
+    }
+
     private fun prepareWorkingDir() {
-        if (Files.isSymbolicLink(bridgeSourceBuiltDir.get().toPath())) {
-            bridgeSourceBuiltDir.get().toPath().deleteIfExists()
+        if (Files.isSymbolicLink(bridgeSourceBuiltDir.get().asFile.toPath())) {
+            bridgeSourceBuiltDir
+                .get()
+                .asFile
+                .toPath()
+                .deleteIfExists()
         }
         if (bridgeSourceDir.get().asFileTree.isEmpty) {
-            val dummyFile = bridgeSourceBuiltDir.get().resolve("DummySPMFile.swift")
+            val dummyFile = bridgeSourceBuiltDir.get().asFile.resolve("DummySPMFile.swift")
             if (!dummyFile.exists()) {
                 logger.debug("Copy Dummy swift file to directory {}", bridgeSourceBuiltDir)
-                bridgeSourceBuiltDir.get().mkdirs()
+                bridgeSourceBuiltDir.get().asFile.mkdirs()
                 dummyFile.writeText("import Foundation")
             }
         } else {
-            if (bridgeSourceBuiltDir.get().toPath().exists()) {
+            if (bridgeSourceBuiltDir
+                    .get()
+                    .asFile
+                    .toPath()
+                    .exists()
+            ) {
                 logger.debug("bridgeSourceBuiltDir exist")
-                if (!Files.isSymbolicLink(bridgeSourceBuiltDir.get().toPath())) {
+                if (!Files.isSymbolicLink(bridgeSourceBuiltDir.get().asFile.toPath())) {
                     logger.debug("bridgeSourceBuiltDir is not a symbolic link")
                     logger.debug("it must be deleted and be a symbolic link")
-                    bridgeSourceBuiltDir.get().deleteRecursively()
+                    bridgeSourceBuiltDir.get().asFile.deleteRecursively()
                     Files.createSymbolicLink(
-                        bridgeSourceBuiltDir.get().toPath(),
+                        bridgeSourceBuiltDir.get().asFile.toPath(),
                         bridgeSourceDir.get().asFile.toPath(),
                     )
                 }
             } else {
                 logger.debug("bridgeSourceBuiltDir doesn't exist, create a symbolic Link")
                 Files.createSymbolicLink(
-                    bridgeSourceBuiltDir.get().toPath(),
+                    bridgeSourceBuiltDir.get().asFile.toPath(),
                     bridgeSourceDir.get().asFile.toPath(),
                 )
             }

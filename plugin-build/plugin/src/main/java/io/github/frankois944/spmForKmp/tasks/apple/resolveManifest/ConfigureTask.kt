@@ -27,7 +27,7 @@ internal fun ResolveManifestTask.configureTask(
         buildList {
             add(packageDirectoriesConfig.spmWorkingDir.resolve("Package.resolved"))
             add(packageDirectoriesConfig.packageScratchDir.resolve(".my.lock"))
-            add(packageDirectoriesConfig.packageScratchDir.resolve("my.workspace-state.json"))
+            add(packageDirectoriesConfig.packageScratchDir.resolve(".my.workspace-state.json"))
         },
     )
     this.packageScratchDirectories.set(
