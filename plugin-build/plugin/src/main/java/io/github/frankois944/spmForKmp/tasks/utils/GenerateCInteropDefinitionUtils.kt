@@ -12,11 +12,11 @@ internal fun findFolders(
     path: File,
     vararg names: String,
 ): List<File> {
-    val names = names.map { it.lowercase() }
+    val namesLowercases = names.map { it.lowercase() }
     return findFilesRecursively(
         directory = path,
         criteria = { file ->
-            file.isDirectory && names.contains(file.name.lowercase())
+            file.isDirectory && namesLowercases.contains(file.name.lowercase())
         },
         withDirectory = true,
     )

@@ -96,7 +96,7 @@ internal abstract class DependenciesAnalyzeTask : DefaultTask() {
     }
 
     private fun prepareSourceDir() {
-        // TODO: remove this file
+        // remove this file
         val sourceDir =
             workingDir
                 .get()

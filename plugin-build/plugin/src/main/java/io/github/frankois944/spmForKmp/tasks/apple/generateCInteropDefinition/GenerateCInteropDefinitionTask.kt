@@ -307,6 +307,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         }
     }
 
+    @Suppress("LongMethod")
     private fun buildDefinitionFile(
         index: Int,
         moduleConfig: ModuleConfig,
@@ -323,7 +324,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                             tracer.trace("read modulemap") {
                                 val mapFile = getModuleMap(moduleConfig)
                                 extractModuleNameFromModuleMap(mapFile.readText())
-                                    ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
+                                    ?: throw Exception(
+                                        "No module name for ${moduleConfig.name}" +
+                                            " in mapFile ${mapFile.path}",
+                                    )
                             }
                         }
                     }
