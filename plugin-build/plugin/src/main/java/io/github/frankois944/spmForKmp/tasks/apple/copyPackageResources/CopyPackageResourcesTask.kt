@@ -1,4 +1,6 @@
-package io.github.frankois944.spmForKmp.tasks.apple
+@file:OptIn(ExperimentalPathApi::class)
+
+package io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources
 
 import io.github.frankois944.spmForKmp.operations.isDynamicLibrary
 import io.github.frankois944.spmForKmp.operations.signFramework
@@ -11,7 +13,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -26,7 +27,6 @@ import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.name
 
-@OptIn(ExperimentalPathApi::class)
 @CacheableTask
 internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @get:InputDirectory
@@ -56,7 +56,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
         description = "Copy package resource to application"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.hostIsMac
+            HostManager.Companion.hostIsMac
         }
     }
 

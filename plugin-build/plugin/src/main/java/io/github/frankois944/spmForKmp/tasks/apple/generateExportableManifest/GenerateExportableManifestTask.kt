@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.tasks.apple
+package io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest
 
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
@@ -134,7 +134,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
         description = "Generate a Swift Package manifest with exported product"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.hostIsMac
+            HostManager.Companion.hostIsMac
         }
     }
 

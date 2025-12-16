@@ -1,4 +1,4 @@
-package io.github.frankois944.spmForKmp.tasks.apple
+package io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.operations.getNbJobs
@@ -84,7 +84,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         description = "Compile the Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.hostIsMac
+            HostManager.Companion.hostIsMac
         }
     }
 
@@ -128,6 +128,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add(if (debugMode.get()) "debug" else "release")
                     add("--jobs")
                     add(execOps.getNbJobs(logger))
+                    add("--disable-automatic-resolution")
                     sharedCacheDir.orNull?.let {
                         add("--cache-path")
                         add(it.path)

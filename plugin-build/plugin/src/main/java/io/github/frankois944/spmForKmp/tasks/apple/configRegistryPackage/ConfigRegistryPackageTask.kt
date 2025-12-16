@@ -1,11 +1,10 @@
-package io.github.frankois944.spmForKmp.tasks.apple
+package io.github.frankois944.spmForKmp.tasks.apple.configRegistryPackage
 
 import io.github.frankois944.spmForKmp.definition.packageRegistry.auth.PackageRegistryAuth
 import io.github.frankois944.spmForKmp.operations.packageRegistryAuth
 import io.github.frankois944.spmForKmp.operations.packageRegistrySet
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -85,7 +84,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
         description = "Generate Package Registry Manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.hostIsMac && registries.get().isNotEmpty()
+            HostManager.Companion.hostIsMac && registries.get().isNotEmpty()
         }
     }
 

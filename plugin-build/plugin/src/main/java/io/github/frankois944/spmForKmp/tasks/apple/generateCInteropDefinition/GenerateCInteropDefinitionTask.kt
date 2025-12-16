@@ -1,10 +1,9 @@
-package io.github.frankois944.spmForKmp.tasks.apple
+package io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
-import io.github.frankois944.spmForKmp.operations.getPackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
@@ -23,9 +22,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -36,7 +33,6 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
-import kotlin.lazy
 
 @CacheableTask
 @Suppress("TooManyFunctions")
@@ -148,7 +144,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         description = "Generate the cinterop definitions files"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.hostIsMac
+            HostManager.Companion.hostIsMac
         }
     }
 
@@ -489,7 +485,7 @@ ${getCustomizedDefinitionConfig()}
                             tracer.trace("getPackageImplicitDependencies") {
                                 try {
                                     val string = dependencyData.readText()
-                                    val dependencies = PackageImplicitDependencies.fromString(string)
+                                    val dependencies = PackageImplicitDependencies.Companion.fromString(string)
                                     tracer.trace("getPublicFolders") {
                                         addAll(
                                             dependencies.getPublicFolders(),

@@ -2,7 +2,6 @@
 
 package io.github.frankois944.spmForKmp.tasks
 
-import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_COPY_PACKAGE_RESOURCES
 import io.github.frankois944.spmForKmp.TASK_DEPENDENCIES_ANALYZE
@@ -15,21 +14,22 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
-import io.github.frankois944.spmForKmp.tasks.apple.ConfigRegistryPackageTask
-import io.github.frankois944.spmForKmp.tasks.apple.CopyPackageResourcesTask
-import io.github.frankois944.spmForKmp.tasks.apple.DependenciesAnalyzeTask
-import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
-import io.github.frankois944.spmForKmp.tasks.apple.GenerateExportableManifestTask
-import io.github.frankois944.spmForKmp.tasks.apple.GenerateManifestTask
-import io.github.frankois944.spmForKmp.tasks.apple.ResolveManifestTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureCompileTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureCopyPackageResourcesTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureExportableManifestTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureGenerateCInteropDefinitionTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureManifestTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureResolveManifestTask
-import io.github.frankois944.spmForKmp.tasks.tasks.isTraceEnabled
+import io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage.CompileSwiftPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.configRegistryPackage.ConfigRegistryPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.configRegistryPackage.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources.CopyPackageResourcesTask
+import io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.dependenciesAnalyze.DependenciesAnalyzeTask
+import io.github.frankois944.spmForKmp.tasks.apple.dependenciesAnalyze.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.GenerateCInteropDefinitionTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.GenerateExportableManifestTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.GenerateManifestTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.resolveManifest.ResolveManifestTask
+import io.github.frankois944.spmForKmp.tasks.apple.resolveManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
@@ -46,8 +46,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
-import kotlin.io.resolve
-import kotlin.jvm.java
 
 @Suppress("LongMethod")
 internal fun Project.configAppleTargets(
@@ -69,7 +67,7 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_GENERATE_MANIFEST, swiftPackageEntry.internalName),
             GenerateManifestTask::class.java,
         ) {
-            it.configureManifestTask(
+            it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
                 packageDependencies = packageDependencies,
@@ -89,7 +87,7 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, swiftPackageEntry.internalName),
             GenerateExportableManifestTask::class.java,
         ) {
-            it.configureExportableManifestTask(
+            it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
                 manifestDir = exportedManifestDirectory,
                 packageDependencies = packageDependencies,
@@ -107,15 +105,9 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_GENERATE_REGISTRY_FILE, swiftPackageEntry.internalName),
             ConfigRegistryPackageTask::class.java,
         ) {
-            it.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
-            it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-            it.registries.set(swiftPackageEntry.packageRegistryConfigs)
-            it.traceEnabled.set(project.isTraceEnabled)
-            it.storedTraceFile.set(
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve(packageDirectoriesConfig.spmWorkingDir.name)
-                    .resolve("ConfigRegistryPackageTask.html"),
+            it.configureTask(
+                swiftPackageEntry = swiftPackageEntry,
+                packageDirectoriesConfig = packageDirectoriesConfig,
             )
         }
 
@@ -124,7 +116,7 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_RESOLVE_MANIFEST, swiftPackageEntry.internalName),
             ResolveManifestTask::class.java,
         ) {
-            it.configureResolveManifestTask(
+            it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
             )
@@ -135,30 +127,9 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_DEPENDENCIES_ANALYZE, swiftPackageEntry.internalName),
             DependenciesAnalyzeTask::class.java,
         ) {
-            it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-            it.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-            it.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
-            it.traceEnabled.set(project.isTraceEnabled)
-            it.storedTraceFile.set(
-                project.projectDir
-                    .resolve("spmForKmpTrace")
-                    .resolve(packageDirectoriesConfig.spmWorkingDir.name)
-                    .resolve("DependenciesAnalyzeTask.html"),
-            )
-            it.dependencyDataFile.set(
-                packageDirectoriesConfig.spmWorkingDir
-                    .resolve(".dependencies_data.json"),
-            )
-            val lockFile =
-                packageDirectoriesConfig.packageScratchDir
-                    .resolve(".my.lock")
-            it.scratchLockFile.set(
-                if (lockFile.exists()) {
-                    lockFile
-                } else {
-                    packageDirectoriesConfig.packageScratchDir
-                        .resolve("my.workspace-state.json")
-                },
+            it.configureTask(
+                swiftPackageEntry = swiftPackageEntry,
+                packageDirectoriesConfig = packageDirectoriesConfig,
             )
         }
 
@@ -176,7 +147,7 @@ internal fun Project.configAppleTargets(
                 getTaskName(TASK_COPY_PACKAGE_RESOURCES, swiftPackageEntry.internalName, cinteropTarget),
                 CopyPackageResourcesTask::class.java,
             ) {
-                it.configureCopyPackageResourcesTask(
+                it.configureTask(
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     buildMode = buildMode,
                     cinteropTarget = cinteropTarget,
@@ -188,7 +159,7 @@ internal fun Project.configAppleTargets(
                 getTaskName(TASK_COMPILE_PACKAGE, swiftPackageEntry.internalName, cinteropTarget),
                 CompileSwiftPackageTask::class.java,
             ) {
-                it.configureCompileTask(
+                it.configureTask(
                     target = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
                     targetBuildDir = targetBuildDir,
@@ -205,7 +176,7 @@ internal fun Project.configAppleTargets(
                 ),
                 GenerateCInteropDefinitionTask::class.java,
             ) {
-                it.configureGenerateCInteropDefinitionTask(
+                it.configureTask(
                     targetBuildDir = targetBuildDir,
                     cinteropTarget = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
