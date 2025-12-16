@@ -28,19 +28,19 @@ internal abstract class GenerateManifestTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val minIos: Property<String?>
+    abstract val minIos: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val minMacos: Property<String?>
+    abstract val minMacos: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val minTvos: Property<String?>
+    abstract val minTvos: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val minWatchos: Property<String?>
+    abstract val minWatchos: Property<String>
 
     @get:Input
     abstract val toolsVersion: Property<String>
@@ -68,7 +68,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
         description = "Generate a Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.Companion.hostIsMac
+            HostManager.hostIsMac
         }
     }
 
@@ -109,23 +109,6 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                     )
                 manifestFile.get().asFile.writeText(manifest)
             }
-           /* if (HostManager.hostIsMac) {
-                tracer.trace("swiftFormat") {
-                    try {
-                        execOps.swiftFormat(
-                            manifestFile.get().asFile,
-                            logger,
-                        )
-                    } catch (ex: Exception) {
-                        logger.error(
-                            "Manifest file generated :\n{}\n{}",
-                            manifestFile.get(),
-                            manifestFile.get().asFile.readText(),
-                        )
-                        throw ex
-                    }
-                }
-            }*/
         }
         tracer.writeHtmlReport()
     }

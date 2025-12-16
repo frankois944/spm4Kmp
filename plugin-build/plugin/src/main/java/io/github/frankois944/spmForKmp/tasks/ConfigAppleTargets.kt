@@ -74,13 +74,6 @@ internal fun Project.configAppleTargets(
             )
         }
 
-    val buildMode = getBuildMode(swiftPackageEntry)
-
-    val exportedManifestDirectory =
-        layout.projectDirectory
-            .asFile
-            .resolve("exported${swiftPackageEntry.internalName.capitalized()}")
-
     logger.debug("NEW TASK exportedManifestTask {}", swiftPackageEntry.internalName)
     val exportedManifestTask: TaskProvider<GenerateExportableManifestTask> =
         tasks.register(
@@ -89,14 +82,9 @@ internal fun Project.configAppleTargets(
         ) {
             it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
-                manifestDir = exportedManifestDirectory,
+                packageDirectoriesConfig = packageDirectoriesConfig,
                 packageDependencies = packageDependencies,
-                targetBuildDir =
-                    getTargetBuildDirectory(
-                        packageScratchDir = packageDirectoriesConfig.packageScratchDir,
-                        cinteropTarget = allTargets.first(),
-                        buildMode = buildMode,
-                    ),
+                targets = allTargets,
             )
         }
 
@@ -133,6 +121,7 @@ internal fun Project.configAppleTargets(
             )
         }
 
+    val buildMode = getBuildMode(swiftPackageEntry)
     allTargets.forEach { cinteropTarget ->
         logger.debug("SETUP {}", cinteropTarget)
         val targetBuildDir =

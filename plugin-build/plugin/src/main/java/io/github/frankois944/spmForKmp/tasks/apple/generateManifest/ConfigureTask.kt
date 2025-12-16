@@ -7,7 +7,6 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
 
-@Suppress("LongParameterList")
 internal fun GenerateManifestTask.configureTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,

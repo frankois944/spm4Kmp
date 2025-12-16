@@ -1,29 +1,43 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest
 
 import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
+import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
+import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import java.io.File
 
 internal fun GenerateExportableManifestTask.configureTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
-    manifestDir: File,
     packageDependencies: List<SwiftDependency>,
-    targetBuildDir: File,
+    packageDirectoriesConfig: PackageDirectoriesConfig,
+    targets: List<AppleCompileTarget>,
 ) {
     this.packageDependencies.set(packageDependencies)
-    this.packageName.set(manifestDir.name)
+    this.packageName.set(packageDirectoriesConfig.spmWorkingDir.name)
     this.minIos.set(swiftPackageEntry.minIos)
     this.minTvos.set(swiftPackageEntry.minTvos)
     this.minMacos.set(swiftPackageEntry.minMacos)
     this.minWatchos.set(swiftPackageEntry.minWatchos)
     this.toolsVersion.set(swiftPackageEntry.toolsVersion)
-    manifestDir.mkdirs()
-    this.manifestFile.set(manifestDir.resolve(SWIFT_PACKAGE_NAME))
     this.exportedPackage.set(swiftPackageEntry.exportedPackageSettings)
-    this.compiledTargetDir.set(targetBuildDir)
+    val exportedManifestDirectory =
+        project.layout.projectDirectory
+            .asFile
+            .resolve("exported${swiftPackageEntry.internalName.capitalized()}")
+    this.exportedDirectory.set(exportedManifestDirectory)
+    this.compiledTargetDir.set(
+        getTargetBuildDirectory(
+            packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+            cinteropTarget = targets.first(),
+            buildMode = getBuildMode(swiftPackageEntry),
+        ).absolutePath,
+    )
     this.includeProduct.set(swiftPackageEntry.exportedPackageSettings.includeProduct)
     this.hideLocalPackageMessage.set(
         project.extraProperties.properties
@@ -32,5 +46,11 @@ internal fun GenerateExportableManifestTask.configureTask(
             .toBoolean(),
     )
     this.traceEnabled.set(project.isTraceEnabled)
-    this.storedTracePath.set(project.projectDir)
+    this.storedTraceFile.set(
+        project.projectDir
+            .resolve("spmForKmpTrace")
+            .resolve(
+                packageDirectoriesConfig.spmWorkingDir.name,
+            ).resolve("GenerateExportableManifestTask.html"),
+    )
 }
