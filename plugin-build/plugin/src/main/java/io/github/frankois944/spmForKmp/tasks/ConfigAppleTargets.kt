@@ -149,7 +149,7 @@ internal fun Project.configAppleTargets(
                 CompileSwiftPackageTask::class.java,
             ) {
                 it.configureTask(
-                    target = cinteropTarget,
+                    cinteropTarget = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     targetBuildDir = targetBuildDir,

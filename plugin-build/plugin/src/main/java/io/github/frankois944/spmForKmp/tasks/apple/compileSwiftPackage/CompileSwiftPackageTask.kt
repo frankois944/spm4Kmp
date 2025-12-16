@@ -34,7 +34,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     abstract val workingDir: Property<String>
 
     @get:Input
-    abstract val target: Property<AppleCompileTarget>
+    abstract val cinteropTarget: Property<AppleCompileTarget>
 
     @get:Input
     abstract val debugMode: Property<Boolean>
@@ -97,7 +97,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     fun compilePackage() {
         val tracer =
             TaskTracer(
-                "CompileSwiftPackageTask-${target.get()}",
+                "CompileSwiftPackageTask-${cinteropTarget.get()}",
                 traceEnabled.get(),
                 outputFile =
                     storedTraceFile
@@ -119,9 +119,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add("build")
                     add("-q")
                     add("--sdk")
-                    add(execOps.getSDKPath(target.get(), logger))
+                    add(execOps.getSDKPath(cinteropTarget.get(), logger))
                     add("--triple")
-                    add(target.get().triple(osVersion.orNull.orEmpty()))
+                    add(cinteropTarget.get().triple(osVersion.orNull.orEmpty()))
                     add("--scratch-path")
                     add(packageScratchDir.get())
                     add("-c")

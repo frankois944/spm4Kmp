@@ -8,17 +8,17 @@ import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
 import java.io.File
 
 internal fun CompileSwiftPackageTask.configureTask(
-    target: AppleCompileTarget,
+    cinteropTarget: AppleCompileTarget,
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
     targetBuildDir: File,
 ) {
-    this.target.set(target)
+    this.cinteropTarget.set(cinteropTarget)
     this.debugMode.set(swiftPackageEntry.debug)
     this.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
     this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
     this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
-    this.osVersion.set(computeOsVersion(target, swiftPackageEntry))
+    this.osVersion.set(computeOsVersion(cinteropTarget, swiftPackageEntry))
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir?.absolutePath)
     this.sharedConfigDir.set(packageDirectoriesConfig.sharedConfigDir?.absolutePath)
     this.sharedSecurityDir.set(packageDirectoriesConfig.sharedSecurityDir?.absolutePath)
@@ -29,14 +29,17 @@ internal fun CompileSwiftPackageTask.configureTask(
         project.projectDir
             .resolve("spmForKmpTrace")
             .resolve(packageDirectoriesConfig.spmWorkingDir.name)
-            .resolve(target.toString())
+            .resolve(cinteropTarget.toString())
             .resolve("CompileSwiftPackageTask.html"),
     )
     this.compiledBinaryLocation.set(
-        targetBuildDir.resolve("lib${swiftPackageEntry.internalName}.a"),
+        targetBuildDir
+            .resolve("lib${swiftPackageEntry.internalName}.a"),
     )
     this.compiledBinaryDestination.set(
         packageDirectoriesConfig.spmWorkingDir
+            .resolve("output")
+            .resolve(cinteropTarget.toString())
             .resolve("lib${swiftPackageEntry.internalName}.a"),
     )
 }
