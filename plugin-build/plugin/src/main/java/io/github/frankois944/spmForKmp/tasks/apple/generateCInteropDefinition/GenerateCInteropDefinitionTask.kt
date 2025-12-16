@@ -9,8 +9,8 @@ import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
 import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
+import io.github.frankois944.spmForKmp.tasks.utils.findFolders
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
-import io.github.frankois944.spmForKmp.tasks.utils.findIncludeFolders
 import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.checkSum
@@ -130,17 +130,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 }
             }
 
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    val dependencyData: File
-        get() {
-            return manifestFile
-                .get()
-                .asFile
-                .parentFile
-                .resolve(".dependencies_data.json")
-        }
-
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
@@ -154,6 +143,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:Internal
     abstract val currentBuildDirectory: DirectoryProperty
+
+    private val checkoutFolder: File
+        get() =
+            File(scratchDir.get())
+                .resolve("checkouts")
+
+    private val checkoutPublicFolder: List<File> by lazy {
+        findFolders(checkoutFolder, "public")
+    }
 
     init {
         description = "Generate the cinterop definitions files"
@@ -322,9 +320,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                         if (moduleConfig.isCLang) {
                             moduleConfig.name
                         } else {
-                            val mapFile = tracer.trace("read modulemap") { getModuleMap(moduleConfig) }
-                            extractModuleNameFromModuleMap(mapFile.readText())
-                                ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
+                            tracer.trace("read modulemap") {
+                                val mapFile = getModuleMap(moduleConfig)
+                                extractModuleNameFromModuleMap(mapFile.readText())
+                                    ?: throw Exception("No module name for ${moduleConfig.name} in mapFile ${mapFile.path}")
+                            }
                         }
                     }
 
@@ -464,45 +464,30 @@ ${getCustomizedDefinitionConfig()}
                         logger.debug("SEARCH IN {}", scratchDir.get())
                         logger.debug("spmPackageName IN {}", moduleConfig.spmPackageName)
 
-                        tracer.trace("include folders from checkout") {
-                            moduleConfig.spmPackageName?.let {
-                                val folderToSearch =
-                                    File(scratchDir.get())
-                                        .resolve("checkouts")
-                                        .resolve(it)
-                                logger.debug("SEARCH IN {}", folderToSearch)
-                                // extract all folder names "include" in checkout package directory
-                                addAll(findIncludeFolders(folderToSearch))
-                            }
-                        }
-
-                        tracer.trace("publicHeadersPath from manifest") {
-                            logger.debug("SEARCH IN extractPublicHeaderFromCheckout")
-                            // extract from the current module manifest the `publicHeadersPath` values
-                            addAll(extractPublicHeaderFromCheckout(File(scratchDir.get()), moduleConfig))
-                        }
-
-                        tracer.trace("public folders from implicit deps") {
-                            logger.debug("getPackageImplicitDependencies")
-                            // extract the Public third-party dependencies' for all the modules
-                            tracer.trace("getPackageImplicitDependencies") {
-                                try {
-                                   /* val string = dependencyData.readText()
-                                    val dependencies = PackageImplicitDependencies.Companion.fromString(string)
-                                    tracer.trace("getPublicFolders") {
-                                        addAll(
-                                            dependencies.getPublicFolders(),
-                                        )
-                                    }*/
-                                } catch (ex: Exception) {
-                                    logger.debug(
-                                        "Failed to get implicit " +
-                                            "dependencies from ${dependencyData.absolutePath}",
-                                        ex,
+                        tracer.trace("looking for headers from checkout") {
+                            moduleConfig.spmPackageName?.let { packageName ->
+                                tracer.trace("Looking include folder") {
+                                    logger.debug("SEARCH INCLUDE IN {}", checkoutFolder.resolve(packageName))
+                                    // extract all folder names "include" in checkout package directory
+                                    addAll(
+                                        findFolders(
+                                            checkoutFolder.resolve(packageName),
+                                            "include",
+                                        ),
                                     )
+                                }
+                                tracer.trace("looking for public folder") {
+                                    logger.debug("SEARCH PUBLIC IN {}", checkoutFolder.resolve(packageName))
+                                    addAll(checkoutPublicFolder)
                                 }
                             }
                         }
+
+                        /*tracer.trace("publicHeadersPath from manifest") {
+                            logger.debug("SEARCH IN extractPublicHeaderFromCheckout")
+                            // extract from the current module manifest the `publicHeadersPath` values
+                            addAll(extractPublicHeaderFromCheckout(File(scratchDir.get()), moduleConfig))
+                        }*/
 
                         tracer.trace("headers from artifacts (xcframework)") {
                             // extract the header from the SPM artifacts, which there are xcframework

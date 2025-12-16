@@ -60,6 +60,7 @@ abstract class SmpKMPTestFixture private constructor(
         var content = """
 kotlin.mpp.enableCInteropCommonization=true
 org.gradle.caching=${ if (extension.gradleCaching) "true" else "false" }
+spmforkmp.enableTracing=true
 """
         // code coverage
         if (jacocoDestfile != null) {

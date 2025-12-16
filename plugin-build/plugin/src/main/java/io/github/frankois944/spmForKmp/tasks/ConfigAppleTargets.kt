@@ -110,7 +110,7 @@ internal fun Project.configAppleTargets(
             )
         }
 
-    val dependenciesAnalyzeTask =
+    /*val dependenciesAnalyzeTask =
         tasks.register(
             getTaskName(TASK_DEPENDENCIES_ANALYZE, swiftPackageEntry.internalName),
             DependenciesAnalyzeTask::class.java,
@@ -119,7 +119,7 @@ internal fun Project.configAppleTargets(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
             )
-        }
+        }*/
 
     val buildMode = getBuildMode(swiftPackageEntry)
     allTargets.forEach { cinteropTarget ->
@@ -207,18 +207,14 @@ internal fun Project.configAppleTargets(
         }
 
         // Clean, lazy dependency wiring (no nested dependsOn, minimal .get()).
-        dependenciesAnalyzeTask.configure {
-            it.dependsOn(resolveManifestTask)
-        }
         resolveManifestTask.configure {
             it.dependsOn(packageRegistryTask)
         }
         packageRegistryTask.configure {
             it.dependsOn(manifestTask)
         }
-
         compileTask.configure {
-            it.dependsOn(dependenciesAnalyzeTask)
+            it.dependsOn(resolveManifestTask)
         }
         copyPackageResourcesTask.configure {
             it.dependsOn(compileTask)

@@ -8,14 +8,19 @@ import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import java.io.File
 import java.nio.file.Path
 
-internal fun findIncludeFolders(path: File): List<File> =
-    findFilesRecursively(
+internal fun findFolders(
+    path: File,
+    vararg names: String,
+): List<File> {
+    val names = names.map { it.lowercase() }
+    return findFilesRecursively(
         directory = path,
         criteria = { file ->
-            file.isDirectory && file.name == "include"
+            file.isDirectory && names.contains(file.name.lowercase())
         },
         withDirectory = true,
     )
+}
 
 internal fun findHeadersModule(
     path: File,
