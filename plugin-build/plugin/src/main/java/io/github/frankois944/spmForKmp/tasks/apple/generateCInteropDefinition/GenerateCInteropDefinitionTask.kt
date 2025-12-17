@@ -147,8 +147,20 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             File(scratchDir.get())
                 .resolve("checkouts")
 
+    private val artifactFolder: File
+        get() =
+            File(scratchDir.get())
+                .resolve("artifacts")
+
     private val checkoutPublicFolder: List<File> by lazy {
         findFolders(checkoutFolder, "public")
+    }
+
+    private val artifactPublicFolder: List<File> by lazy {
+        findHeadersModule(
+            artifactFolder,
+            target.get(),
+        )
     }
 
     init {
@@ -487,13 +499,7 @@ ${getCustomizedDefinitionConfig()}
 
                         tracer.trace("headers from artifacts (xcframework)") {
                             // extract the header from the SPM artifacts, which there are xcframework
-                            addAll(
-                                findHeadersModule(
-                                    File(scratchDir.get())
-                                        .resolve("artifacts"),
-                                    target.get(),
-                                ),
-                            )
+                            addAll(artifactPublicFolder)
                         }
 
                         // add the current build dir of the package where there are every built module
