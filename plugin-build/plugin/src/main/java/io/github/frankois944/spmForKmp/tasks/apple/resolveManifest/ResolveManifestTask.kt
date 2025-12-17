@@ -9,11 +9,8 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.OutputDirectory
@@ -99,9 +96,6 @@ internal abstract class ResolveManifestTask : DefaultTask() {
                         logger = logger,
                         swiftBinPath = swiftBinPath.orNull,
                     )
-                    tracer.trace("copyLocalFiles") {
-                        copyLocalFiles()
-                    }
                 } catch (ex: Exception) {
                     logger.error(
                         "Manifest file resolver :\n{}\n{}",
@@ -113,25 +107,5 @@ internal abstract class ResolveManifestTask : DefaultTask() {
             }
         }
         tracer.writeHtmlReport()
-    }
-
-    private fun copyLocalFiles() {
-        val packageScratchDir = File(packageScratchPath.get())
-        val lockFile = packageScratchDir.resolve(".lock")
-        if (lockFile.exists()) {
-            lockFile
-                .copyTo(
-                    packageScratchDir.resolve(".my.lock"),
-                    true,
-                )
-        }
-        val statFile = packageScratchDir.resolve("workspace-state.json")
-        if (statFile.exists()) {
-            statFile
-                .copyTo(
-                    packageScratchDir.resolve(".my.workspace-state.json"),
-                    true,
-                )
-        }
     }
 }

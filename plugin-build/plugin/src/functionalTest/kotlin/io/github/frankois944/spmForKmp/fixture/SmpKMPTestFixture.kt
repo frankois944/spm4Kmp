@@ -8,7 +8,6 @@ import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.swiftPackageConfig
 import org.gradle.internal.cc.base.logger
 import org.intellij.lang.annotations.Language
 

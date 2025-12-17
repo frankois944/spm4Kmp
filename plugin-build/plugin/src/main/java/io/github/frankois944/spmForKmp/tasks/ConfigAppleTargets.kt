@@ -4,7 +4,6 @@ package io.github.frankois944.spmForKmp.tasks
 
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_COPY_PACKAGE_RESOURCES
-import io.github.frankois944.spmForKmp.TASK_DEPENDENCIES_ANALYZE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
