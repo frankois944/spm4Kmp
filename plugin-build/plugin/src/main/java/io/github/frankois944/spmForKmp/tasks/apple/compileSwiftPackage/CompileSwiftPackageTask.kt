@@ -6,16 +6,13 @@ import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
@@ -81,12 +78,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Internal
     abstract val storedTraceFile: RegularFileProperty
 
-    /*@get:Internal
-    abstract val compiledBinaryLocation: RegularFileProperty
-
-    @get:OutputFile
-    abstract val compiledBinaryDestination: RegularFileProperty*/
-
     @get:Inject
     abstract val execOps: ExecOperations
 
@@ -110,7 +101,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                         .get()
                         .asFile,
             )
-        logger.warn(">>> CompileSwiftPackageTask <<<")
         tracer.trace("CompileSwiftPackageTask") {
             tracer.trace("prepareWorkingDir") {
                 prepareWorkingDir()
@@ -169,22 +159,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                             errorOutput,
                         )
                     }
-                //   copyBinaryToLocation()
             }
         }
         tracer.writeHtmlReport()
     }
-
-    /*private fun copyBinaryToLocation() {
-        if (!compiledBinaryLocation.get().asFile.exists()) {
-            throw GradleException("No Binary found at ${compiledBinaryLocation.get()}")
-        }
-        logger.debug("Copying binary to destination: {}", compiledBinaryDestination)
-        compiledBinaryLocation.get().asFile.copyTo(
-            compiledBinaryDestination.get().asFile,
-            true,
-        )
-    }*/
 
     private fun prepareWorkingDir() {
         if (Files.isSymbolicLink(bridgeSourceBuiltDir.get().asFile.toPath())) {
