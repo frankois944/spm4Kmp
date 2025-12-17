@@ -16,7 +16,7 @@ internal fun CompileSwiftPackageTask.configureTask(
     this.cinteropTarget.set(cinteropTarget)
     this.debugMode.set(swiftPackageEntry.debug)
     this.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
-    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
+    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
     this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
     this.osVersion.set(computeOsVersion(cinteropTarget, swiftPackageEntry))
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir?.absolutePath)
@@ -32,14 +32,5 @@ internal fun CompileSwiftPackageTask.configureTask(
             .resolve(cinteropTarget.toString())
             .resolve("CompileSwiftPackageTask.html"),
     )
-    this.compiledBinaryLocation.set(
-        targetBuildDir
-            .resolve("lib${swiftPackageEntry.internalName}.a"),
-    )
-    this.compiledBinaryDestination.set(
-        packageDirectoriesConfig.spmWorkingDir
-            .resolve("output")
-            .resolve(cinteropTarget.toString())
-            .resolve("lib${swiftPackageEntry.internalName}.a"),
-    )
+    this.packageResolveFile.set(packageDirectoriesConfig.spmWorkingDir.resolve("Package.resolved"))
 }

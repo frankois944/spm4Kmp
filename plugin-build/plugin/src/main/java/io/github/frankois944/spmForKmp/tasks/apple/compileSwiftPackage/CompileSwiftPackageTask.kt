@@ -10,9 +10,12 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
@@ -28,9 +31,13 @@ import javax.inject.Inject
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 
+@CacheableTask
 internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Internal
     abstract val workingDir: Property<String>
+
+    @get:OutputFile
+    abstract val packageResolveFile: RegularFileProperty
 
     @get:Input
     abstract val cinteropTarget: Property<AppleCompileTarget>
@@ -38,8 +45,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Input
     abstract val debugMode: Property<Boolean>
 
-    @get:Input
-    abstract val packageScratchDir: Property<String>
+    @get:OutputDirectory
+    abstract val packageScratchDir: DirectoryProperty
 
     @get:Input
     @get:Optional
@@ -65,20 +72,20 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val bridgeSourceDir: DirectoryProperty
 
-    @get:OutputDirectory
+    @get:Internal
     abstract val bridgeSourceBuiltDir: DirectoryProperty
 
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:OutputFile
+    @get:Internal
     abstract val storedTraceFile: RegularFileProperty
 
-    @get:Internal
+    /*@get:Internal
     abstract val compiledBinaryLocation: RegularFileProperty
 
     @get:OutputFile
-    abstract val compiledBinaryDestination: RegularFileProperty
+    abstract val compiledBinaryDestination: RegularFileProperty*/
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -103,6 +110,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                         .get()
                         .asFile,
             )
+        logger.warn(">>> CompileSwiftPackageTask <<<")
         tracer.trace("CompileSwiftPackageTask") {
             tracer.trace("prepareWorkingDir") {
                 prepareWorkingDir()
@@ -122,12 +130,11 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add("--triple")
                     add(cinteropTarget.get().triple(osVersion.orNull.orEmpty()))
                     add("--scratch-path")
-                    add(packageScratchDir.get())
+                    add(packageScratchDir.get().asFile.absolutePath)
                     add("-c")
                     add(if (debugMode.get()) "debug" else "release")
                     add("--jobs")
                     add(execOps.getNbJobs(logger))
-                    add("--disable-automatic-resolution")
                     sharedCacheDir.orNull?.let {
                         add("--cache-path")
                         add(it)
@@ -162,13 +169,13 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                             errorOutput,
                         )
                     }
-                copyBinaryToLocation()
+                //   copyBinaryToLocation()
             }
         }
         tracer.writeHtmlReport()
     }
 
-    private fun copyBinaryToLocation() {
+    /*private fun copyBinaryToLocation() {
         if (!compiledBinaryLocation.get().asFile.exists()) {
             throw GradleException("No Binary found at ${compiledBinaryLocation.get()}")
         }
@@ -177,7 +184,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             compiledBinaryDestination.get().asFile,
             true,
         )
-    }
+    }*/
 
     private fun prepareWorkingDir() {
         if (Files.isSymbolicLink(bridgeSourceBuiltDir.get().asFile.toPath())) {

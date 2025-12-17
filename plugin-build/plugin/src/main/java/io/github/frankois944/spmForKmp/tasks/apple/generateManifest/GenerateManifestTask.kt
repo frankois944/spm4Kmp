@@ -11,6 +11,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -58,7 +59,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:OutputFile
+    @get:Internal
     abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject

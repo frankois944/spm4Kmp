@@ -74,7 +74,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:OutputFile
+    @get:Internal
     abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject

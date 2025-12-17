@@ -8,7 +8,6 @@ import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.TASK_GENERATE_REGISTRY_FILE
-import io.github.frankois944.spmForKmp.TASK_RESOLVE_MANIFEST
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
@@ -25,8 +24,6 @@ import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.Ge
 import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.GenerateManifestTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.configureTask
-import io.github.frankois944.spmForKmp.tasks.apple.resolveManifest.ResolveManifestTask
-import io.github.frankois944.spmForKmp.tasks.apple.resolveManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
@@ -89,17 +86,6 @@ internal fun Project.configAppleTargets(
         tasks.register(
             getTaskName(TASK_GENERATE_REGISTRY_FILE, swiftPackageEntry.internalName),
             ConfigRegistryPackageTask::class.java,
-        ) {
-            it.configureTask(
-                swiftPackageEntry = swiftPackageEntry,
-                packageDirectoriesConfig = packageDirectoriesConfig,
-            )
-        }
-
-    val resolveManifestTask =
-        tasks.register(
-            getTaskName(TASK_RESOLVE_MANIFEST, swiftPackageEntry.internalName),
-            ResolveManifestTask::class.java,
         ) {
             it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
@@ -193,14 +179,11 @@ internal fun Project.configAppleTargets(
         }
 
         // Clean, lazy dependency wiring (no nested dependsOn, minimal .get()).
-        resolveManifestTask.configure {
-            it.dependsOn(packageRegistryTask)
-        }
         packageRegistryTask.configure {
             it.dependsOn(manifestTask)
         }
         compileTask.configure {
-            it.dependsOn(resolveManifestTask)
+            it.dependsOn(packageRegistryTask)
         }
         copyPackageResourcesTask.configure {
             it.dependsOn(compileTask)

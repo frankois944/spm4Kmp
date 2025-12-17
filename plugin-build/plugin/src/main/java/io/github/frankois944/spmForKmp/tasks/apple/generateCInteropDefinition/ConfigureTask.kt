@@ -18,9 +18,7 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     packageDependencies: List<SwiftDependency>,
 ) {
     this.compiledBinary.set(
-        packageDirectoriesConfig.spmWorkingDir
-            .resolve("output")
-            .resolve(cinteropTarget.toString())
+        targetBuildDir
             .resolve("lib${swiftPackageEntry.internalName}.a"),
     )
     this.currentBuildDirectory.set(targetBuildDir)
