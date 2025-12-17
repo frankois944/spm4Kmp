@@ -20,8 +20,6 @@ import io.github.frankois944.spmForKmp.tasks.apple.configRegistryPackage.ConfigR
 import io.github.frankois944.spmForKmp.tasks.apple.configRegistryPackage.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources.CopyPackageResourcesTask
 import io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources.configureTask
-import io.github.frankois944.spmForKmp.tasks.apple.dependenciesAnalyze.DependenciesAnalyzeTask
-import io.github.frankois944.spmForKmp.tasks.apple.dependenciesAnalyze.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.GenerateExportableManifestTask
@@ -109,17 +107,6 @@ internal fun Project.configAppleTargets(
                 packageDirectoriesConfig = packageDirectoriesConfig,
             )
         }
-
-    /*val dependenciesAnalyzeTask =
-        tasks.register(
-            getTaskName(TASK_DEPENDENCIES_ANALYZE, swiftPackageEntry.internalName),
-            DependenciesAnalyzeTask::class.java,
-        ) {
-            it.configureTask(
-                swiftPackageEntry = swiftPackageEntry,
-                packageDirectoriesConfig = packageDirectoriesConfig,
-            )
-        }*/
 
     val buildMode = getBuildMode(swiftPackageEntry)
     allTargets.forEach { cinteropTarget ->

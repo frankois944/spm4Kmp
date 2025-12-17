@@ -3,11 +3,9 @@ package io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
-import io.github.frankois944.spmForKmp.tasks.utils.extractPublicHeaderFromCheckout
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findFolders
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
@@ -487,12 +485,6 @@ ${getCustomizedDefinitionConfig()}
                             }
                         }
 
-                        /*tracer.trace("publicHeadersPath from manifest") {
-                            logger.debug("SEARCH IN extractPublicHeaderFromCheckout")
-                            // extract from the current module manifest the `publicHeadersPath` values
-                            addAll(extractPublicHeaderFromCheckout(File(scratchDir.get()), moduleConfig))
-                        }*/
-
                         tracer.trace("headers from artifacts (xcframework)") {
                             // extract the header from the SPM artifacts, which there are xcframework
                             addAll(
@@ -506,7 +498,8 @@ ${getCustomizedDefinitionConfig()}
 
                         // add the current build dir of the package where there are every built module
                         add(currentBuildDirectory.get().asFile.path)
-                    }.joinToString(" ") { "-I\"$it\"" }
+                    }.distinct()
+                        .joinToString(" ") { "-I\"$it\"" }
                 }
 
             val packageName =

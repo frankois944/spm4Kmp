@@ -3,20 +3,20 @@
         import PackageDescription
 
         let package = Package(
-            name: "nativeIosShared",
+            name: "exportedNativeIosShared",
             platforms: [.iOS("16.0"),.macOS("10.13"),.tvOS("12.0"),.watchOS("4.0")],
             products: [
                 .library(
-                    name: "nativeIosShared",
+                    name: "exportedNativeIosShared",
                     type: .static,
-                    targets: ["nativeIosShared","HevSocks5Tunnel"])
+                    targets: ["exportedNativeIosShared","HevSocks5Tunnel"])
             ],
             dependencies: [
                 .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "12.3.0")
             ],
             targets: [
                 .target(
-                    name: "nativeIosShared",
+                    name: "exportedNativeIosShared",
                     dependencies: [
                         .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),"HevSocks5Tunnel"
                     ],

@@ -16,8 +16,9 @@ internal fun GenerateExportableManifestTask.configureTask(
     packageDirectoriesConfig: PackageDirectoriesConfig,
     targets: List<AppleCompileTarget>,
 ) {
+    val productName = "exported${swiftPackageEntry.internalName.capitalized()}"
     this.packageDependencies.set(packageDependencies)
-    this.packageName.set(packageDirectoriesConfig.spmWorkingDir.name)
+    this.packageName.set(productName)
     this.minIos.set(swiftPackageEntry.minIos)
     this.minTvos.set(swiftPackageEntry.minTvos)
     this.minMacos.set(swiftPackageEntry.minMacos)
@@ -27,7 +28,7 @@ internal fun GenerateExportableManifestTask.configureTask(
     val exportedManifestDirectory =
         project.layout.projectDirectory
             .asFile
-            .resolve("exported${swiftPackageEntry.internalName.capitalized()}")
+            .resolve(productName)
     this.exportedDirectory.set(exportedManifestDirectory)
     this.compiledTargetDir.set(
         getTargetBuildDirectory(
@@ -48,7 +49,7 @@ internal fun GenerateExportableManifestTask.configureTask(
         project.projectDir
             .resolve("spmForKmpTrace")
             .resolve(
-                packageDirectoriesConfig.spmWorkingDir.name,
+                productName,
             ).resolve("GenerateExportableManifestTask.html"),
     )
 }
