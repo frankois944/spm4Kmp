@@ -47,17 +47,17 @@ internal fun generateManifest(parameters: TemplateParameters): String {
         }
 
     return """
-        // swift-tools-version: ${parameters.toolsVersion}
-        import PackageDescription
+// swift-tools-version: ${parameters.toolsVersion}
+import PackageDescription
 
-        let package = Package(
+let package = Package(
+    name: "$name",
+    $platforms
+    products: [
+        .library(
             name: "$name",
-            $platforms
-            products: [
-                .library(
-                    name: "$name",
-                    type: $type,
-                    targets: [${
+            type: $type,
+            targets: [${
         getProductsTargets(
             name,
             parameters.dependencies,
@@ -65,28 +65,28 @@ internal fun generateManifest(parameters: TemplateParameters): String {
             parameters.onlyDeps,
         )
     }])
-            ],
+    ],
+    dependencies: [
+        ${getDependencies(parameters.dependencies, parameters.forExportedPackage, parameters.onlyDeps)}
+    ],
+    targets: [
+        .target(
+            name: "$name",
             dependencies: [
-                ${getDependencies(parameters.dependencies, parameters.forExportedPackage, parameters.onlyDeps)}
-            ],
-            targets: [
-                .target(
-                    name: "$name",
-                    dependencies: [
-                        ${
+                ${
         getDependenciesTargets(
             parameters.dependencies,
             parameters.forExportedPackage,
             parameters.onlyDeps,
         )
     }
-                    ],
-                    path: "Sources"
-                    ${getTargetSetting?.let { ",$it" }.orEmpty()}
-                )
-                $binaryDependencies
-            ]
+            ],
+            path: "Sources"
+            ${getTargetSetting?.let { ",$it" }.orEmpty()}
         )
+        $binaryDependencies
+    ]
+)
         """
 }
 
