@@ -94,7 +94,7 @@ internal fun Project.configAppleTargets(
         }
 
     val buildMode = getBuildMode(swiftPackageEntry)
-    allTargets.forEach { cinteropTarget ->
+    allTargets.forEachIndexed { index, cinteropTarget ->
         logger.debug("SETUP {}", cinteropTarget)
         val targetBuildDir =
             getTargetBuildDirectory(
@@ -124,6 +124,8 @@ internal fun Project.configAppleTargets(
                     cinteropTarget = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
+                    targetBuildDir = targetBuildDir,
+                    isFirstTarget = index == 0,
                 )
             }
 

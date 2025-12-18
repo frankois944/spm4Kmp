@@ -5,11 +5,14 @@ import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.utils.computeOsVersion
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+import java.io.File
 
 internal fun CompileSwiftPackageTask.configureTask(
     cinteropTarget: AppleCompileTarget,
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
+    targetBuildDir: File,
+    isFirstTarget: Boolean,
 ) {
     this.cinteropTarget.set(cinteropTarget)
     this.debugMode.set(swiftPackageEntry.debug)
@@ -31,4 +34,15 @@ internal fun CompileSwiftPackageTask.configureTask(
             .resolve("CompileSwiftPackageTask.html"),
     )
     this.packageResolveFile.set(packageDirectoriesConfig.spmWorkingDir.resolve("Package.resolved"))
+    this.generatedDirs.set(
+        buildList {
+            if (isFirstTarget) {
+                add(packageDirectoriesConfig.packageScratchDir.resolve("artifacts"))
+                add(packageDirectoriesConfig.packageScratchDir.resolve("plugins"))
+                add(packageDirectoriesConfig.packageScratchDir.resolve("registry"))
+                add(packageDirectoriesConfig.packageScratchDir.resolve("checkouts"))
+            }
+            add(targetBuildDir)
+        },
+    )
 }
