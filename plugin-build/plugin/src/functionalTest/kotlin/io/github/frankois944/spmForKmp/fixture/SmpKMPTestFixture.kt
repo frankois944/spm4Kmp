@@ -40,7 +40,7 @@ abstract class SmpKMPTestFixture private constructor(
         val rawDependencyConfiguration: KotlinSource? = null,
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginRootConfig: String? = null,
-        val gradleCaching: Boolean = true,
+        val gradleCaching: Boolean = false,
         val rawTargetBloc: KotlinSource? = null,
     )
 
