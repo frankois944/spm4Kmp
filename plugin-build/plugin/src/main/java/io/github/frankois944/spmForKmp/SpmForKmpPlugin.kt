@@ -32,9 +32,6 @@ internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinit
 internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
 internal const val TASK_GENERATE_REGISTRY_FILE: String = "generateRegistryFilePackage"
 internal const val TASK_COPY_PACKAGE_RESOURCES: String = "CopyPackageResources"
-internal const val TASK_RESOLVE_MANIFEST: String = "resolveSwiftPackage"
-
-internal const val TASK_DEPENDENCIES_ANALYZE: String = "DependenciesAnalyze"
 
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {

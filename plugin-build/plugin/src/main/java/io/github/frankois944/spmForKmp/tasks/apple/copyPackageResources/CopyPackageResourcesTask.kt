@@ -1,4 +1,6 @@
-package io.github.frankois944.spmForKmp.tasks.apple
+@file:OptIn(ExperimentalPathApi::class)
+
+package io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources
 
 import io.github.frankois944.spmForKmp.operations.isDynamicLibrary
 import io.github.frankois944.spmForKmp.operations.signFramework
@@ -7,12 +9,12 @@ import io.github.frankois944.spmForKmp.resources.FrameworkResource
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -26,8 +28,6 @@ import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.name
 
-@OptIn(ExperimentalPathApi::class)
-@CacheableTask
 internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -35,7 +35,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val codeSignIdentityName: Property<String?>
+    abstract val codeSignIdentityName: Property<String>
 
     @get:Input
     abstract val buildProductDir: Property<String>
@@ -46,8 +46,8 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:Input
-    abstract val storedTracePath: Property<File>
+    @get:OutputFile
+    abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject
     abstract val execOps: ExecOperations
@@ -71,10 +71,9 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
                 "CopyPackageResourcesTask",
                 traceEnabled.get(),
                 outputFile =
-                    storedTracePath
+                    storedTraceFile
                         .get()
-                        .resolve("spmForKmpTrace")
-                        .resolve("CopyPackageResourcesTask.html"),
+                        .asFile,
             )
 
         logger.debug("preparing resources")

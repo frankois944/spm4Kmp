@@ -2,20 +2,25 @@ package io.github.frankois944.spmForKmp.tasks.utils
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
-import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.utils.extractTargetBlocks
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import java.io.File
 import java.nio.file.Path
 
-internal fun findIncludeFolders(path: File): List<File> =
-    findFilesRecursively(
+internal fun findFolders(
+    path: File,
+    vararg names: String,
+): List<File> {
+    val namesLowercases = names.map { it.lowercase() }
+    return findFilesRecursively(
         directory = path,
         criteria = { file ->
-            file.isDirectory && file.name == "include"
+            file.isDirectory && namesLowercases.contains(file.name.lowercase())
         },
         withDirectory = true,
     )
+}
 
 internal fun findHeadersModule(
     path: File,

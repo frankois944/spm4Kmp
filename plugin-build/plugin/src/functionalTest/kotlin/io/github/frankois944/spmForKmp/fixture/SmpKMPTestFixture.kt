@@ -8,7 +8,6 @@ import com.autonomousapps.kit.Subproject
 import com.autonomousapps.kit.gradle.Imports
 import com.autonomousapps.kit.gradle.Plugin
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.swiftPackageConfig
 import org.gradle.internal.cc.base.logger
 import org.intellij.lang.annotations.Language
 
@@ -41,7 +40,7 @@ abstract class SmpKMPTestFixture private constructor(
         val rawDependencyConfiguration: KotlinSource? = null,
         val rawPluginConfiguration: List<KotlinSource> = emptyList(),
         val rawPluginRootConfig: String? = null,
-        val gradleCaching: Boolean = true,
+        val gradleCaching: Boolean = false,
         val rawTargetBloc: KotlinSource? = null,
     )
 
@@ -60,6 +59,7 @@ abstract class SmpKMPTestFixture private constructor(
         var content = """
 kotlin.mpp.enableCInteropCommonization=true
 org.gradle.caching=${ if (extension.gradleCaching) "true" else "false" }
+spmforkmp.enableTracing=true
 """
         // code coverage
         if (jacocoDestfile != null) {

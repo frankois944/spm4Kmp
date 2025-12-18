@@ -2,34 +2,28 @@
 
 package io.github.frankois944.spmForKmp.tasks
 
-import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_COPY_PACKAGE_RESOURCES
-import io.github.frankois944.spmForKmp.TASK_DEPENDENCIES_ANALYZE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.TASK_GENERATE_REGISTRY_FILE
-import io.github.frankois944.spmForKmp.TASK_RESOLVE_MANIFEST
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.tasks.apple.CompileSwiftPackageTask
-import io.github.frankois944.spmForKmp.tasks.apple.ConfigRegistryPackageTask
-import io.github.frankois944.spmForKmp.tasks.apple.CopyPackageResourcesTask
-import io.github.frankois944.spmForKmp.tasks.apple.DependenciesAnalyzeTask
-import io.github.frankois944.spmForKmp.tasks.apple.GenerateCInteropDefinitionTask
-import io.github.frankois944.spmForKmp.tasks.apple.GenerateExportableManifestTask
-import io.github.frankois944.spmForKmp.tasks.apple.GenerateManifestTask
-import io.github.frankois944.spmForKmp.tasks.apple.ResolveManifestTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureCompileTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureCopyPackageResourcesTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureExportableManifestTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureGenerateCInteropDefinitionTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureManifestTask
-import io.github.frankois944.spmForKmp.tasks.tasks.configureResolveManifestTask
-import io.github.frankois944.spmForKmp.tasks.tasks.isTraceEnabled
+import io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage.CompileSwiftPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.configRegistryPackage.ConfigRegistryPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.configRegistryPackage.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources.CopyPackageResourcesTask
+import io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.GenerateCInteropDefinitionTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.GenerateExportableManifestTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.GenerateManifestTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
@@ -46,7 +40,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
-import kotlin.jvm.java
 
 @Suppress("LongMethod")
 internal fun Project.configAppleTargets(
@@ -68,19 +61,12 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_GENERATE_MANIFEST, swiftPackageEntry.internalName),
             GenerateManifestTask::class.java,
         ) {
-            it.configureManifestTask(
+            it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
                 packageDependencies = packageDependencies,
             )
         }
-
-    val buildMode = getBuildMode(swiftPackageEntry)
-
-    val exportedManifestDirectory =
-        layout.projectDirectory
-            .asFile
-            .resolve("exported${swiftPackageEntry.internalName.capitalized()}")
 
     logger.debug("NEW TASK exportedManifestTask {}", swiftPackageEntry.internalName)
     val exportedManifestTask: TaskProvider<GenerateExportableManifestTask> =
@@ -88,16 +74,11 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_GENERATE_EXPORTABLE_PACKAGE, swiftPackageEntry.internalName),
             GenerateExportableManifestTask::class.java,
         ) {
-            it.configureExportableManifestTask(
+            it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
-                manifestDir = exportedManifestDirectory,
+                packageDirectoriesConfig = packageDirectoriesConfig,
                 packageDependencies = packageDependencies,
-                targetBuildDir =
-                    getTargetBuildDirectory(
-                        packageScratchDir = packageDirectoriesConfig.packageScratchDir,
-                        cinteropTarget = allTargets.first(),
-                        buildMode = buildMode,
-                    ),
+                targets = allTargets,
             )
         }
 
@@ -106,37 +87,14 @@ internal fun Project.configAppleTargets(
             getTaskName(TASK_GENERATE_REGISTRY_FILE, swiftPackageEntry.internalName),
             ConfigRegistryPackageTask::class.java,
         ) {
-            it.workingDir.set(packageDirectoriesConfig.spmWorkingDir)
-            it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-            it.registries.set(swiftPackageEntry.packageRegistryConfigs)
-            it.traceEnabled.set(this.project.isTraceEnabled)
-            it.storedTracePath.set(project.projectDir)
-        }
-
-    val resolveManifestTask =
-        tasks.register(
-            getTaskName(TASK_RESOLVE_MANIFEST, swiftPackageEntry.internalName),
-            ResolveManifestTask::class.java,
-        ) {
-            it.configureResolveManifestTask(
+            it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
             )
         }
 
-    val dependenciesAnalyzeTask =
-        tasks.register(
-            getTaskName(TASK_DEPENDENCIES_ANALYZE, swiftPackageEntry.internalName),
-            DependenciesAnalyzeTask::class.java,
-        ) {
-            it.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-            it.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-            it.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
-            it.traceEnabled.set(this.project.isTraceEnabled)
-            it.storedTracePath.set(project.projectDir)
-        }
-
-    allTargets.forEach { cinteropTarget ->
+    val buildMode = getBuildMode(swiftPackageEntry)
+    allTargets.forEachIndexed { index, cinteropTarget ->
         logger.debug("SETUP {}", cinteropTarget)
         val targetBuildDir =
             getTargetBuildDirectory(
@@ -150,7 +108,7 @@ internal fun Project.configAppleTargets(
                 getTaskName(TASK_COPY_PACKAGE_RESOURCES, swiftPackageEntry.internalName, cinteropTarget),
                 CopyPackageResourcesTask::class.java,
             ) {
-                it.configureCopyPackageResourcesTask(
+                it.configureTask(
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     buildMode = buildMode,
                     cinteropTarget = cinteropTarget,
@@ -162,11 +120,12 @@ internal fun Project.configAppleTargets(
                 getTaskName(TASK_COMPILE_PACKAGE, swiftPackageEntry.internalName, cinteropTarget),
                 CompileSwiftPackageTask::class.java,
             ) {
-                it.configureCompileTask(
-                    target = cinteropTarget,
+                it.configureTask(
+                    cinteropTarget = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
-                    targetBuildDir = targetBuildDir,
                     packageDirectoriesConfig = packageDirectoriesConfig,
+                    targetBuildDir = targetBuildDir,
+                    isFirstTarget = index == 0,
                 )
             }
 
@@ -179,7 +138,7 @@ internal fun Project.configAppleTargets(
                 ),
                 GenerateCInteropDefinitionTask::class.java,
             ) {
-                it.configureGenerateCInteropDefinitionTask(
+                it.configureTask(
                     targetBuildDir = targetBuildDir,
                     cinteropTarget = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
@@ -198,10 +157,10 @@ internal fun Project.configAppleTargets(
                     .findByName(cinteropTarget.name) as KotlinNativeTarget
             val mainCompilation = ktTarget.compilations.getByName("main")
 
-            outputFiles.forEachIndexed { index, file ->
+            outputFiles.forEachIndexed { cindex, file ->
 
                 val cinteropName =
-                    if (index > 0) {
+                    if (cindex > 0) {
                         if (swiftPackageEntry.useExtension) {
                             file.nameWithoutExtension
                         } else {
@@ -211,7 +170,7 @@ internal fun Project.configAppleTargets(
                         file.nameWithoutExtension.split("_").first()
                     }
 
-                if (index > 0) {
+                if (cindex > 0) {
                     createCInteropTask(mainCompilation, cinteropName, file)
                 }
 
@@ -221,18 +180,11 @@ internal fun Project.configAppleTargets(
         }
 
         // Clean, lazy dependency wiring (no nested dependsOn, minimal .get()).
-        dependenciesAnalyzeTask.configure {
-            it.dependsOn(resolveManifestTask)
-        }
-        resolveManifestTask.configure {
-            it.dependsOn(packageRegistryTask)
-        }
         packageRegistryTask.configure {
             it.dependsOn(manifestTask)
         }
-
         compileTask.configure {
-            it.dependsOn(dependenciesAnalyzeTask)
+            it.dependsOn(packageRegistryTask)
         }
         copyPackageResourcesTask.configure {
             it.dependsOn(compileTask)
