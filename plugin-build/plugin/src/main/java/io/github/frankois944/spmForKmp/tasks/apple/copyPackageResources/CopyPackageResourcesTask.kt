@@ -13,11 +13,15 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.UntrackedTask
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
@@ -28,6 +32,7 @@ import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.name
 
+@UntrackedTask(because = "To be fixed later")
 internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -46,7 +51,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:OutputFile
+    @get:Internal
     abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject
