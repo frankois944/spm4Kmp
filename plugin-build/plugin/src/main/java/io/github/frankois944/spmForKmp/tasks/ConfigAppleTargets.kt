@@ -157,10 +157,10 @@ internal fun Project.configAppleTargets(
                     .findByName(cinteropTarget.name) as KotlinNativeTarget
             val mainCompilation = ktTarget.compilations.getByName("main")
 
-            outputFiles.forEachIndexed { index, file ->
+            outputFiles.forEachIndexed { cindex, file ->
 
                 val cinteropName =
-                    if (index > 0) {
+                    if (cindex > 0) {
                         if (swiftPackageEntry.useExtension) {
                             file.nameWithoutExtension
                         } else {
@@ -170,7 +170,7 @@ internal fun Project.configAppleTargets(
                         file.nameWithoutExtension.split("_").first()
                     }
 
-                if (index > 0) {
+                if (cindex > 0) {
                     createCInteropTask(mainCompilation, cinteropName, file)
                 }
 
