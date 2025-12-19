@@ -140,13 +140,6 @@ kotlin {
                     checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
                     isCLang = true,
                 )
-                remotePackageVersion(
-                    url = uri("https://github.com/googlemaps/ios-maps-sdk"),
-                    products = {
-                        add("GoogleMaps", exportToKotlin = true)
-                    },
-                    version = "10.6.0",
-                )
             }
         }
     }
