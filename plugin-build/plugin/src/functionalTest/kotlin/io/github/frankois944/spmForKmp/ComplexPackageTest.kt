@@ -123,4 +123,48 @@ class ComplexPackageTest : BaseTest() {
         // Then
         assertThat(result).task(":library:build").succeeded()
     }
+
+    @Test
+    fun `build and export with GoogleMap`() {
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withTargets(AppleCompileTarget.iosSimulatorArm64)
+                .withMinIos("17.0")
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+                            remotePackageVersion(
+                                url = uri("https://github.com/googlemaps/ios-maps-sdk"),
+                                products = {
+                                    add("GoogleMaps", exportToKotlin = true)
+                                },
+                            version = "10.6.0",
+                            )
+                            """.trimIndent(),
+                    ),
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        imports = listOf("GoogleMaps.GMSFeatureType"),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import GoogleMaps
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
 }
