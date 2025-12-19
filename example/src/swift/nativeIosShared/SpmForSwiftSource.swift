@@ -1,5 +1,7 @@
 import Foundation
 import UIKit
+import GoogleMaps
+
 import CryptoSwift
 import FirebaseDatabase
 import HevSocks5Tunnel
