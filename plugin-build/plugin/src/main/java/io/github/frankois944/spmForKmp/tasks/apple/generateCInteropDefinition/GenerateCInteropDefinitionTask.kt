@@ -302,7 +302,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("LOOKING for module dir {}", moduleConfig.name)
             if (moduleConfig.isCLang) {
-                logger.debug(
+                logger.warn(
                     """
                     CLang is experimental and not fully tested; please create an issue if you encounter a bug.
                     Only C language-based xcFramework is currently supported.
