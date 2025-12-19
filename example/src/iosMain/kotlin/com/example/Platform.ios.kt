@@ -5,7 +5,6 @@ package com.example
 import DummyFramework.MyDummyFramework
 import FirebaseAnalytics.FIRConsentStatusGranted
 import FirebaseCore.FIRApp
-import GoogleMaps.GMSFeatureType
 import HevSocks5Tunnel.hev_socks5_tunnel_quit
 import kotlinx.cinterop.ExperimentalForeignApi
 import nativeIosShared.MySwiftDummyClass
@@ -32,8 +31,6 @@ actual fun getPlatform(): Platform = IOSPlatform()
 val myNativeClass = MySwiftDummyClass().mySwiftDummyFunction()
 
 val getSwiftValue = TestClass().getSomeValue()
-
-val testGmap: Comparator<String> = GMSFeatureType.CASE_INSENSITIVE_ORDER
 
 fun getView() = TestClass().getView()
 
