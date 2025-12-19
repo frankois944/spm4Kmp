@@ -219,6 +219,15 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 logger.debug("Product names to export: {}", it)
             }
 
+    private fun lookingForArtifactFramework(moduleConfig: ModuleConfig): File =
+        artifactFolder
+            .resolve(moduleConfig.packageName)
+            .resolve(moduleConfig.name)
+            .resolve("${moduleConfig.name}.xcframework")
+            .resolve(target.get().xcFrameworkArchName())
+            .resolve("Headers")
+            .resolve(moduleConfig.name)
+
     private fun getExtraLinkers(): String {
         val xcodeDevPath = execOps.getXcodeDevPath(logger)
         return buildList {
@@ -263,10 +272,17 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 moduleConfigs.forEachIndexed { index, moduleConfig ->
                     tracer.trace("build ${moduleConfig.name} definition") {
                         buildDefinitionFile(index, moduleConfig, compiledBinaryFile).let { definition ->
-                            moduleConfig.definitionFile.writeText(definition.trimIndent())
-                            logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
-                            logger.debug("At Path: {}", moduleConfig.definitionFile.path)
-                            logger.debug("{}", moduleConfig.definitionFile.readText())
+                            try {
+                                moduleConfig.definitionFile.writeText(definition.trimIndent())
+                                logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
+                                logger.debug("At Path: {}", moduleConfig.definitionFile.path)
+                                logger.debug("{}", moduleConfig.definitionFile.readText())
+                            } catch (e: Exception) {
+                                throw GradleException(
+                                    "Error writing definition file for module ${moduleConfig.name}",
+                                    e,
+                                )
+                            }
                         }
                     }
                 }
@@ -282,7 +298,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("LOOKING for module dir {}", moduleConfig.name)
             if (moduleConfig.isCLang) {
-                logger.warn(
+                logger.debug(
                     """
                     CLang is experimental and not fully tested; please create an issue if you encounter a bug.
                     Only C language-based xcFramework is currently supported.
@@ -312,7 +328,18 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                 definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
                             }
                         moduleConfig.definitionFile = definitionFilePath
+                    } ?: let {
+                    lookingForArtifactFramework(moduleConfig).let { location ->
+                        logger.debug("FOUND ARTIFACT MODULE ${location.name}")
+                        if (location.exists()) {
+                            moduleConfig.isFramework = false
+                            moduleConfig.buildDir = location.toPath()
+                            moduleConfig.definitionFile =
+                                definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
+                            moduleConfig.customSearchHeaderPath.add(location)
+                        }
                     }
+                }
             }
         }
     }
@@ -405,6 +432,12 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 return file.toFile()
             }
         }
+        val moduleMapFromArtifacts = lookingForArtifactFramework(moduleConfig)
+        if (moduleMapFromArtifacts.resolve("module.modulemap").exists()) {
+            logger.debug("modulemap found from artifact {}", moduleMapFromArtifacts)
+            moduleConfig.customSearchHeaderPath.add(moduleMapFromArtifacts)
+            return moduleMapFromArtifacts.resolve("module.modulemap")
+        }
         error("Module map file not found for module: ${moduleConfig.name}")
     }
 
@@ -475,6 +508,7 @@ ${getCustomizedDefinitionConfig()}
             val headerSearchPaths =
                 tracer.trace("build header search paths") {
                     buildList {
+                        addAll(moduleConfig.customSearchHeaderPath)
                         logger.debug("SEARCH IN {}", scratchDir.get())
                         logger.debug("spmPackageName IN {}", moduleConfig.spmPackageName)
 

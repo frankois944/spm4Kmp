@@ -15,6 +15,7 @@ internal data class ModuleConfig(
     var compilerOpts: List<String> = emptyList(),
     var swiftDependency: SwiftDependency? = null,
     var isCLang: Boolean = false,
+    var customSearchHeaderPath: MutableList<File> = mutableListOf(),
 )
 
 internal fun List<ModuleConfig>.containsPackage(name: String): Boolean =

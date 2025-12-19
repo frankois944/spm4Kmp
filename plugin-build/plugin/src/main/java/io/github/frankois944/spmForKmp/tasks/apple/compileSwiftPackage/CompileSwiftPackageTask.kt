@@ -141,6 +141,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                         add("--security-path")
                         add(it)
                     }
+                    add("--disable-index-store")
+                    add("-debug-info-format")
+                    add("none")
                 }
 
             val standardOutput = ByteArrayOutputStream()
