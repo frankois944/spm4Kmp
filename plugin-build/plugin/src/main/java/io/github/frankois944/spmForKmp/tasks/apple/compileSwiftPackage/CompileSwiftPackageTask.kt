@@ -13,6 +13,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectories
@@ -39,6 +40,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     @get:Input
     abstract val cinteropTarget: Property<AppleCompileTarget>
+
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val packageSwift: RegularFileProperty
 
     @get:Input
     abstract val debugMode: Property<Boolean>
