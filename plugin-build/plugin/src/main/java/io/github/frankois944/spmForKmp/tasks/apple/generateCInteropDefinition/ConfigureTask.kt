@@ -42,6 +42,7 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     this.disableDesignatedInitializerChecks.set(swiftPackageEntry.disableDesignatedInitializerChecks)
     this.userSetupHint.set(swiftPackageEntry.userSetupHint)
     this.traceEnabled.set(project.isTraceEnabled)
+    this.packageSwift.set(packageDirectoriesConfig.spmWorkingDir.resolve("Package.swift"))
     this.storedTraceFile.set(
         project.projectDir
             .resolve("spmForKmpTrace")

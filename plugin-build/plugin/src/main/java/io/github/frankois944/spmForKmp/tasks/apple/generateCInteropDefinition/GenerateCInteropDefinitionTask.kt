@@ -43,6 +43,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:OutputDirectory
     abstract val definitionFolder: DirectoryProperty
 
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val packageSwift: RegularFileProperty
+
     @get:Input
     abstract val target: Property<AppleCompileTarget>
 
