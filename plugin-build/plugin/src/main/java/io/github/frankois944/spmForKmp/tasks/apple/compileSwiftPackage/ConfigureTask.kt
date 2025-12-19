@@ -16,6 +16,7 @@ internal fun CompileSwiftPackageTask.configureTask(
 ) {
     this.cinteropTarget.set(cinteropTarget)
     this.debugMode.set(swiftPackageEntry.debug)
+    this.packageSwift.set(packageDirectoriesConfig.spmWorkingDir.resolve("Package.swift"))
     this.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
     this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
     this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)

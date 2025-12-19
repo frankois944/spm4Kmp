@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import GoogleMaps
 
 import CryptoSwift
 import FirebaseDatabase
