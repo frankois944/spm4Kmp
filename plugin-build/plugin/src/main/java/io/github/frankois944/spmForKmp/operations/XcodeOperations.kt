@@ -1,69 +1,11 @@
 package io.github.frankois944.spmForKmp.operations
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.dump.PackageImplicitDependencies
 import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
-
-@Suppress("LongParameterList")
-internal fun ExecOperations.resolvePackage(
-    workingDir: File,
-    scratchPath: File,
-    sharedCachePath: File?,
-    sharedConfigPath: File?,
-    sharedSecurityPath: File?,
-    logger: Logger,
-    swiftBinPath: String?,
-) {
-    val args =
-        buildList {
-            if (swiftBinPath == null) {
-                add("--sdk")
-                add("macosx")
-                add("swift")
-            }
-            add("package")
-            add("resolve")
-            add("--scratch-path")
-            add(scratchPath.path)
-            add("--jobs")
-            add(getNbJobs(logger))
-            sharedCachePath?.let {
-                add("--cache-path")
-                add(it.path)
-            }
-            sharedConfigPath?.let {
-                add("--config-path")
-                add(it.path)
-            }
-            sharedSecurityPath?.let {
-                add("--security-path")
-                add(it.path)
-            }
-        }
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = swiftBinPath ?: "xcrun"
-        it.args = args
-        it.workingDir = workingDir
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        logger.printExecLogs(
-            "resolvePackage",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
-}
 
 internal fun ExecOperations.getXcodeDevPath(logger: Logger): String {
     val args =
@@ -125,80 +67,6 @@ internal fun ExecOperations.getSDKPath(
         )
     }
     return standardOutput.toString().trim()
-}
-
-internal fun ExecOperations.getPackageImplicitDependencies(
-    workingDir: File,
-    scratchPath: File,
-    logger: Logger,
-    swiftBinPath: String?,
-): PackageImplicitDependencies {
-    val args =
-        buildList {
-            if (swiftBinPath == null) {
-                add("--sdk")
-                add("macosx")
-                add("swift")
-            }
-            add("package")
-            add("show-dependencies")
-            add("--scratch-path")
-            add(scratchPath.path)
-            add("--format")
-            add("json")
-        }
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = swiftBinPath ?: "xcrun"
-        it.workingDir = workingDir
-        it.args = args
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        logger.printExecLogs(
-            "show-dependencies",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
-    return PackageImplicitDependencies.fromString(standardOutput.toString())
-}
-
-internal fun ExecOperations.swiftFormat(
-    file: File,
-    logger: Logger,
-) {
-    val args =
-        listOf(
-            "--sdk",
-            "macosx",
-            "swift-format",
-            "-i",
-            file.path,
-        )
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = "xcrun"
-        it.args = args
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        logger.printExecLogs(
-            "swift-format",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
 }
 
 internal fun ExecOperations.getNbJobs(logger: Logger): String {
