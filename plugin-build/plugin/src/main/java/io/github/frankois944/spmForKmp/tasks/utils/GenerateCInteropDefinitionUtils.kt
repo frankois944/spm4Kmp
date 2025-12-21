@@ -55,55 +55,6 @@ internal fun getModulesInBuildDirectory(buildDir: File): List<File> {
         ?.toList() ?: throw RuntimeException("No Module/Framework found in ${buildDir.path}")
 }
 
-internal fun GenerateCInteropDefinitionTask.extractPublicHeaderFromCheckout(
-    fromDir: File,
-    module: ModuleConfig,
-): Set<File> {
-    logger.debug("Looking for public header for {}", module.name)
-
-    val checkoutsDir = "checkouts"
-    val packageSwift = "Package.swift"
-    val sourcesDir = "Sources"
-
-    val packageDir = fromDir.resolve(checkoutsDir).resolve(module.packageName)
-    val manifestFile = packageDir.resolve(packageSwift)
-    val result = mutableSetOf<File>()
-
-    if (!manifestFile.exists()) {
-        logger.debug("No manifest found at {}", manifestFile.path)
-        return result
-    }
-
-    val content = manifestFile.readText()
-    val targets = extractTargetBlocks(content)
-
-    targets.forEach { target ->
-        val name = extractFirstMatch(target, """name:\s*"([^"]+)"""")
-        val targetPath = extractFirstMatch(target, """path:\s*"([^"]+)"""")
-        logger.debug("targetPath {}", targetPath)
-        val publicHeadersPath = extractFirstMatch(target, """publicHeadersPath:\s*"([^"]+)"""")
-        logger.debug("publicHeadersPath: {}", publicHeadersPath)
-        var resolvedIncludeDir =
-            if (targetPath != null) {
-                packageDir.resolve(targetPath)
-            } else {
-                packageDir.resolve(sourcesDir).resolve(name ?: module.name)
-            }
-
-        if (publicHeadersPath != null) {
-            resolvedIncludeDir = resolvedIncludeDir.resolve(publicHeadersPath)
-        }
-
-        logger.debug("resolvedIncludeDir: {}", resolvedIncludeDir)
-        if (resolvedIncludeDir.exists()) {
-            result.add(resolvedIncludeDir)
-        } else {
-            logger.debug("PUBLIC HEADER NOT FOUND AT: {} FOR : {}", resolvedIncludeDir, module.name)
-        }
-    }
-    return result
-}
-
 internal fun extractFirstMatch(
     input: String,
     pattern: String,
