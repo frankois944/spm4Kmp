@@ -55,11 +55,6 @@ internal fun getModulesInBuildDirectory(buildDir: File): List<File> {
         ?.toList() ?: throw RuntimeException("No Module/Framework found in ${buildDir.path}")
 }
 
-internal fun extractFirstMatch(
-    input: String,
-    pattern: String,
-): String? = Regex(pattern).find(input)?.groupValues?.getOrNull(1)
-
 internal fun GenerateCInteropDefinitionTask.extractModuleNameFromModuleMap(module: String): String? {
     val regex = """module\s+\S+\s+""".toRegex()
     return regex

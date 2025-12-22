@@ -48,8 +48,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Input
     abstract val debugMode: Property<Boolean>
 
-    @get:Internal
-    abstract val packageScratchDir: DirectoryProperty
+    @get:Input
+    abstract val packageScratchDir: Property<String>
 
     @get:OutputDirectories
     abstract val generatedDirs: ListProperty<File>
@@ -129,7 +129,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add("--triple")
                     add(cinteropTarget.get().triple(osVersion.orNull.orEmpty()))
                     add("--scratch-path")
-                    add(packageScratchDir.get().asFile.absolutePath)
+                    add(packageScratchDir.get())
                     add("-c")
                     add(if (debugMode.get()) "debug" else "release")
                     add("--jobs")
