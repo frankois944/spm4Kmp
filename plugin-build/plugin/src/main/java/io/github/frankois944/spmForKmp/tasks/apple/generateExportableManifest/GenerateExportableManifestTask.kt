@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest
 
+import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
@@ -123,7 +124,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 traceEnabled.get(),
                 outputFile = storedTraceFile.get(),
             )
-        val manifestFile = exportedDirectory.get().asFile.resolve("Package.swift")
+        val manifestFile = exportedDirectory.get().asFile.resolve(SWIFT_PACKAGE_NAME)
         tracer.trace("GenerateManifestTask") {
             prepareExportedPackage()
             val requiredDependencies =
