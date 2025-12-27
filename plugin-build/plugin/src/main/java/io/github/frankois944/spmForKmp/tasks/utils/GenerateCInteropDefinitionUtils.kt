@@ -12,11 +12,13 @@ internal fun findFolders(
     path: File,
     vararg names: String,
 ): List<File> {
-    val namesLowercases = names.map { it.lowercase() }
+    if (names.isEmpty()) return emptyList()
+    val namesLowercaseSet = names.mapTo(HashSet(names.size)) { it.lowercase() }
     return findFilesRecursively(
         directory = path,
         criteria = { file ->
-            file.isDirectory && namesLowercases.contains(file.name.lowercase())
+            // Early exit on non-directory to avoid string operations
+            file.isDirectory && namesLowercaseSet.contains(file.name.lowercase())
         },
         withDirectory = true,
     )
@@ -25,15 +27,17 @@ internal fun findFolders(
 internal fun findHeadersModule(
     path: File,
     forTarget: AppleCompileTarget,
-): List<File> =
-    findFilesRecursively(
+): List<File> {
+    val targetArchName = "/${forTarget.xcFrameworkArchName()}/"
+    return findFilesRecursively(
         directory = path,
         criteria = { filename ->
             filename.name == "Headers" &&
-                filename.path.contains("/${forTarget.xcFrameworkArchName()}/")
+                filename.path.contains(targetArchName)
         },
         withDirectory = true,
     )
+}
 
 internal fun getModuleArtifactsPath(
     fromPath: Path,
@@ -48,22 +52,20 @@ internal fun getModuleArtifactsPath(
         .resolve("${moduleConfig.name}.xcframework")
         .resolve(target.xcFrameworkArchName())
 
-internal fun getModulesInBuildDirectory(buildDir: File): List<File> {
-    val extensions = listOf("build", "framework")
-    return buildDir // get folders with headers for internal dependencies
-        .listFiles { file -> extensions.contains(file.extension) || file.name == "Modules" }
-        ?.toList() ?: throw RuntimeException("No Module/Framework found in ${buildDir.path}")
-}
+internal fun getModulesInBuildDirectory(buildDir: File): List<File> =
+    buildDir
+        .listFiles { file ->
+            val ext = file.extension
+            ext == "build" || ext == "framework" || file.name == "Modules"
+        }?.toList() ?: throw RuntimeException("No Module/Framework found in ${buildDir.path}")
 
-internal fun GenerateCInteropDefinitionTask.extractModuleNameFromModuleMap(module: String): String? {
-    val regex = """module\s+\S+\s+""".toRegex()
-    return regex
+private val moduleNameRegex = """module\s+(\S+)\s+""".toRegex()
+
+internal fun GenerateCInteropDefinitionTask.extractModuleNameFromModuleMap(module: String): String? =
+    moduleNameRegex
         .find(module)
         ?.groupValues
-        ?.firstOrNull()
-        ?.replace("module", "")
-        ?.trim()
+        ?.getOrNull(1)
         ?.also {
             logger.debug("MODULE FOUND {}", it)
         }
-}
