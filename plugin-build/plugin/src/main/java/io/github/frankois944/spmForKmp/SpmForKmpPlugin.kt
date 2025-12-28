@@ -8,6 +8,7 @@ import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.checkExistCInteropTask
 import io.github.frankois944.spmForKmp.tasks.configAppleTargets
 import io.github.frankois944.spmForKmp.tasks.createCInteropTask
+import io.github.frankois944.spmForKmp.utils.StartingFile
 import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
@@ -76,6 +77,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             File(swiftPackageEntry.customPackageSourcePath),
                             swiftPackageEntry.internalName,
                         )
+
+                    StartingFile.createStartingFileIfNeeded(bridgeSourceDir)
 
                     tasks
                         .withType(CInteropProcess::class.java)
