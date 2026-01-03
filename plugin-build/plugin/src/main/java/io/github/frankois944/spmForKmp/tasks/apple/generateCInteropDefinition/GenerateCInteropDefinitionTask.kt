@@ -157,18 +157,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 .resolve("artifacts")
 
     private val checkoutPublicFolder: List<File> by lazy {
-        tracer.trace("checkoutPublicFolder") {
-            findFolders(checkoutFolder, "public")
-        }
+        findFolders(checkoutFolder, "public")
     }
 
     private val artifactPublicFolder: List<File> by lazy {
-        tracer.trace("artifactPublicFolder") {
-            findHeadersModule(
-                artifactFolder,
-                target.get(),
-            )
-        }
+        findHeadersModule(
+            artifactFolder,
+            target.get(),
+        )
     }
 
     init {
