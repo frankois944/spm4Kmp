@@ -12,31 +12,38 @@ internal fun findFolders(
     vararg names: String,
 ): List<File> {
     if (names.isEmpty()) return emptyList()
-    val namesLowercaseSet = names.mapTo(HashSet(names.size)) { it.lowercase() }
-    return findFilesRecursively(
-        directory = path,
-        criteria = { file ->
-            // Early exit on non-directory to avoid string operations
-            file.isDirectory && namesLowercaseSet.contains(file.name.lowercase())
-        },
-        withDirectory = true,
-    )
+    return try {
+        val namesLowercaseSet = names.mapTo(HashSet(names.size)) { it.lowercase() }
+        findFilesRecursively(
+            directory = path,
+            criteria = { file ->
+                // Early exit on non-directory to avoid string operations
+                file.isDirectory && namesLowercaseSet.contains(file.name.lowercase())
+            },
+            withDirectory = true,
+        )
+    } catch (_: Throwable) {
+        emptyList()
+    }
 }
 
 internal fun findHeadersModule(
     path: File,
     forTarget: AppleCompileTarget,
-): List<File> {
-    val targetArchName = "/${forTarget.xcFrameworkArchName()}/"
-    return findFilesRecursively(
-        directory = path,
-        criteria = { filename ->
-            filename.name == "Headers" &&
-                filename.path.contains(targetArchName)
-        },
-        withDirectory = true,
-    )
-}
+): List<File> =
+    try {
+        val targetArchName = "/${forTarget.xcFrameworkArchName()}/"
+        findFilesRecursively(
+            directory = path,
+            criteria = { filename ->
+                filename.name == "Headers" &&
+                    filename.path.contains(targetArchName)
+            },
+            withDirectory = true,
+        )
+    } catch (_: Exception) {
+        emptyList()
+    }
 
 internal fun getModuleArtifactsPath(
     fromPath: Path,
