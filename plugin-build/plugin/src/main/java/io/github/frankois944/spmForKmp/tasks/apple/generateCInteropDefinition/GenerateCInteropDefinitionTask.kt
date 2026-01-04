@@ -137,7 +137,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     private lateinit var tracer: TaskTracer
 
-    @get:OutputFile
+    @get:Internal
     abstract val storedTraceFile: RegularFileProperty
 
     @get:Inject

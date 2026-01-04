@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest
 
+import io.github.frankois944.spmForKmp.SPM_TRACE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
@@ -47,7 +48,7 @@ internal fun GenerateExportableManifestTask.configureTask(
     this.traceEnabled.set(project.isTraceEnabled)
     this.storedTraceFile.set(
         project.projectDir
-            .resolve("spmForKmpTrace")
+            .resolve(SPM_TRACE_NAME)
             .resolve(
                 productName,
             ).resolve("GenerateExportableManifestTask.html"),

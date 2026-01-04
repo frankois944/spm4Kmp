@@ -207,14 +207,10 @@ internal fun createCInteropTask(
     mainCompilation: KotlinNativeCompilation,
     cinteropName: String,
     file: File? = null,
-    packageName: String? = null,
 ): DefaultCInteropSettings =
     mainCompilation.cinterops.create(cinteropName) { settings ->
         file?.let {
             settings.definitionFile.set(file)
-        }
-        packageName?.let {
-            settings.packageName = packageName
         }
     }
 

@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition
 
+import io.github.frankois944.spmForKmp.SPM_TRACE_NAME
 import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
@@ -42,10 +43,10 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     this.disableDesignatedInitializerChecks.set(swiftPackageEntry.disableDesignatedInitializerChecks)
     this.userSetupHint.set(swiftPackageEntry.userSetupHint)
     this.traceEnabled.set(project.isTraceEnabled)
-    this.packageSwift.set(packageDirectoriesConfig.spmWorkingDir.resolve("Package.swift"))
+    this.packageSwift.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
     this.storedTraceFile.set(
         project.projectDir
-            .resolve("spmForKmpTrace")
+            .resolve(SPM_TRACE_NAME)
             .resolve(packageDirectoriesConfig.spmWorkingDir.name)
             .resolve(cinteropTarget.toString())
             .resolve("GenerateCInteropDefinitionTask.html"),

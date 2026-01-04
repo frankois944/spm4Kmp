@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.configRegistryPackage
 
+import io.github.frankois944.spmForKmp.SPM_TRACE_NAME
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
@@ -14,7 +15,7 @@ internal fun ConfigRegistryPackageTask.configureTask(
     this.traceEnabled.set(project.isTraceEnabled)
     this.storedTraceFile.set(
         project.projectDir
-            .resolve("spmForKmpTrace")
+            .resolve(SPM_TRACE_NAME)
             .resolve(packageDirectoriesConfig.spmWorkingDir.name)
             .resolve("ConfigRegistryPackageTask.html"),
     )

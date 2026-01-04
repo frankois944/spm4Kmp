@@ -1,5 +1,8 @@
 package io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage
 
+import io.github.frankois944.spmForKmp.SPM_TRACE_NAME
+import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
+import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_RESOLVE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
@@ -16,9 +19,9 @@ internal fun CompileSwiftPackageTask.configureTask(
 ) {
     this.cinteropTarget.set(cinteropTarget)
     this.debugMode.set(swiftPackageEntry.debug)
-    this.packageSwift.set(packageDirectoriesConfig.spmWorkingDir.resolve("Package.swift"))
+    this.packageSwift.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
     this.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
-    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir)
+    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
     this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
     this.osVersion.set(computeOsVersion(cinteropTarget, swiftPackageEntry))
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir?.absolutePath)
@@ -29,12 +32,12 @@ internal fun CompileSwiftPackageTask.configureTask(
     this.traceEnabled.set(project.isTraceEnabled)
     this.storedTraceFile.set(
         project.projectDir
-            .resolve("spmForKmpTrace")
+            .resolve(SPM_TRACE_NAME)
             .resolve(packageDirectoriesConfig.spmWorkingDir.name)
             .resolve(cinteropTarget.toString())
             .resolve("CompileSwiftPackageTask.html"),
     )
-    this.packageResolveFile.set(packageDirectoriesConfig.spmWorkingDir.resolve("Package.resolved"))
+    this.packageResolveFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_RESOLVE_NAME))
     this.generatedDirs.set(
         buildList {
             if (isFirstTarget) {

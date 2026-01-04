@@ -1,7 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
-import io.github.frankois944.spmForKmp.operations.getNbJobs
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
@@ -48,8 +47,8 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Input
     abstract val debugMode: Property<Boolean>
 
-    @get:Internal
-    abstract val packageScratchDir: DirectoryProperty
+    @get:Input
+    abstract val packageScratchDir: Property<String>
 
     @get:OutputDirectories
     abstract val generatedDirs: ListProperty<File>
@@ -125,15 +124,18 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add("build")
                     add("-q")
                     add("--sdk")
-                    add(execOps.getSDKPath(cinteropTarget.get(), logger))
+                    tracer.trace("getSDKPath") {
+                        add(execOps.getSDKPath(cinteropTarget.get(), logger))
+                    }
                     add("--triple")
                     add(cinteropTarget.get().triple(osVersion.orNull.orEmpty()))
                     add("--scratch-path")
-                    add(packageScratchDir.get().asFile.absolutePath)
+                    add(packageScratchDir.get())
+                    add("--disable-sandbox")
                     add("-c")
                     add(if (debugMode.get()) "debug" else "release")
                     add("--jobs")
-                    add(execOps.getNbJobs(logger))
+                    add(Runtime.getRuntime().availableProcessors().toString())
                     sharedCacheDir.orNull?.let {
                         add("--cache-path")
                         add(it)

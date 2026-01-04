@@ -6,8 +6,11 @@
       <module name="com.ncorti.kotlin.gradle.template.plugin.main" target="1.8" />
       <module name="com.ncorti.kotlin.gradle.template.plugin.test" target="1.8" />
       <module name="plugin-build.io.github.frankois944.spmForKmp.plugin.functionalTest" target="17" />
+      <module name="plugin-build.io.github.frankois944.spmForKmp.plugin.functionalTest~3" target="17" />
       <module name="plugin-build.io.github.frankois944.spmForKmp.plugin.main" target="17" />
+      <module name="plugin-build.io.github.frankois944.spmForKmp.plugin.main~3" target="17" />
       <module name="plugin-build.io.github.frankois944.spmForKmp.plugin.test" target="17" />
+      <module name="plugin-build.io.github.frankois944.spmForKmp.plugin.test~3" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

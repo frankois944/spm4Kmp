@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest
 
+import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.exported.ExportedPackage
@@ -14,6 +15,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
@@ -62,7 +64,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     @get:Input
     abstract val traceEnabled: Property<Boolean>
 
-    @get:OutputFile
+    @get:Internal
     abstract val storedTraceFile: Property<File>
 
     @get:Input
@@ -122,7 +124,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 traceEnabled.get(),
                 outputFile = storedTraceFile.get(),
             )
-        val manifestFile = exportedDirectory.get().asFile.resolve("Package.swift")
+        val manifestFile = exportedDirectory.get().asFile.resolve(SWIFT_PACKAGE_NAME)
         tracer.trace("GenerateManifestTask") {
             prepareExportedPackage()
             val requiredDependencies =

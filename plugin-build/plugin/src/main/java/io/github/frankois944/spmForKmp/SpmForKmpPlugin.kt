@@ -8,6 +8,7 @@ import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.checkExistCInteropTask
 import io.github.frankois944.spmForKmp.tasks.configAppleTargets
 import io.github.frankois944.spmForKmp.tasks.createCInteropTask
+import io.github.frankois944.spmForKmp.utils.StartingFile
 import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
@@ -26,12 +27,14 @@ import kotlin.reflect.typeOf
 
 internal const val PLUGIN_NAME: String = "swiftPackageConfig"
 internal const val SWIFT_PACKAGE_NAME = "Package.swift"
+internal const val SWIFT_PACKAGE_RESOLVE_NAME = "Package.resolved"
 internal const val TASK_GENERATE_MANIFEST: String = "generateSwiftPackage"
 internal const val TASK_COMPILE_PACKAGE: String = "compileSwiftPackage"
 internal const val TASK_GENERATE_CINTEROP_DEF: String = "generateCInteropDefinition"
 internal const val TASK_GENERATE_EXPORTABLE_PACKAGE: String = "generateExportableSwiftPackage"
 internal const val TASK_GENERATE_REGISTRY_FILE: String = "generateRegistryFilePackage"
 internal const val TASK_COPY_PACKAGE_RESOURCES: String = "CopyPackageResources"
+internal const val SPM_TRACE_NAME: String = "spmForKmpTrace"
 
 @Suppress("UnnecessaryAbstractClass")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
@@ -74,6 +77,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             File(swiftPackageEntry.customPackageSourcePath),
                             swiftPackageEntry.internalName,
                         )
+
+                    StartingFile.createStartingFileIfNeeded(bridgeSourceDir)
 
                     tasks
                         .withType(CInteropProcess::class.java)

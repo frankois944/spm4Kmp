@@ -69,33 +69,6 @@ internal fun ExecOperations.getSDKPath(
     return standardOutput.toString().trim()
 }
 
-internal fun ExecOperations.getNbJobs(logger: Logger): String {
-    val args =
-        listOf(
-            "-n",
-            "hw.ncpu",
-        )
-
-    val standardOutput = ByteArrayOutputStream()
-    val errorOutput = ByteArrayOutputStream()
-    exec {
-        it.executable = "sysctl"
-        it.args = args
-        it.standardOutput = standardOutput
-        it.errorOutput = errorOutput
-        it.isIgnoreExitValue = true
-    }.also {
-        logger.printExecLogs(
-            "getNbJobs",
-            args,
-            it.exitValue != 0,
-            standardOutput,
-            errorOutput,
-        )
-    }
-    return standardOutput.toString().trim()
-}
-
 internal fun ExecOperations.isDynamicLibrary(
     file: File,
     logger: Logger,
