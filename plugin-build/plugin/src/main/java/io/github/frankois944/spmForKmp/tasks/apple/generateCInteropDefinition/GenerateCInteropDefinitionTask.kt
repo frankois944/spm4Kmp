@@ -156,16 +156,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             File(scratchDir.get())
                 .resolve("artifacts")
 
-    private val checkoutPublicFolder: List<File> by lazy {
-        findFolders(checkoutFolder, "public")
-    }
+    private lateinit var checkoutPublicFolder: List<File>
 
-    private val artifactPublicFolder: List<File> by lazy {
-        findHeadersModule(
-            artifactFolder,
-            target.get(),
-        )
-    }
+    private lateinit var artifactPublicFolder: List<File>
 
     init {
         description = "Generate the cinterop definitions files"
@@ -242,6 +235,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
+        checkoutPublicFolder = findFolders(checkoutFolder, "public")
+        artifactPublicFolder = findHeadersModule(artifactFolder, target.get())
         tracer =
             TaskTracer(
                 "GenerateCInteropDefinitionTask-${target.get()}",
