@@ -28,6 +28,13 @@ class RemotePackageTest : BaseTest() {
                                     add("CryptoSwift")
                                 },
                             )
+                            remotePackageVersion(
+                                url = uri("https://github.com/DataDog/dd-sdk-ios.git"),
+                                products = {
+                                    add("DatadogCore", exportToKotlin = true)
+                                },
+                                version = "3.4.0",
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
