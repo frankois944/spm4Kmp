@@ -12,6 +12,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
 import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.checkSum
+import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
@@ -24,7 +25,6 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -160,6 +160,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     private lateinit var artifactPublicFolder: List<File>
 
+    private lateinit var builtModulesFolder: List<File>
+
     init {
         description = "Generate the cinterop definitions files"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -235,8 +237,6 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
-        checkoutPublicFolder = findFolders(checkoutFolder, "public")
-        artifactPublicFolder = findHeadersModule(artifactFolder, target.get())
         tracer =
             TaskTracer(
                 "GenerateCInteropDefinitionTask-${target.get()}",
@@ -246,6 +246,25 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         tracer.trace("GenerateCInteropDefinitionTask") {
             tracer.trace("cleanup old definitions") {
                 removeOldDefinition()
+            }
+
+            tracer.trace("checkoutPublicFolder") {
+                checkoutPublicFolder = findFolders(checkoutFolder, "public")
+            }
+            tracer.trace("artifactPublicFolder") {
+                artifactPublicFolder = findHeadersModule(artifactFolder, target.get())
+            }
+            tracer.trace("builtModulesFolder") {
+                builtModulesFolder =
+                    findFilesRecursively(
+                        directory = currentBuildDirectory.get().asFile,
+                        criteria = { file ->
+                            // Early exit on non-directory to avoid string operations
+                            file.isDirectory &&
+                                file.extension == "build"
+                        },
+                        withDirectory = true,
+                    )
             }
 
             val compiledBinaryFile = compiledBinary.asFile.get()
@@ -522,6 +541,7 @@ ${getCustomizedDefinitionConfig()}
                                             "include",
                                         ),
                                     )
+                                    addAll(builtModulesFolder)
                                 }
                                 tracer.trace("looking for public folder") {
                                     logger.debug("SEARCH PUBLIC IN {}", checkoutFolder.resolve(packageName))
