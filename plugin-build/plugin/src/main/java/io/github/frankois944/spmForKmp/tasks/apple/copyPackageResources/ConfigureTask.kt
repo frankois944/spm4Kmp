@@ -59,7 +59,9 @@ internal fun CopyPackageResourcesTask.configureTask(
             logger = logger,
         ),
     )
-    this.codeSignIdentityName.set(System.getenv("EXPANDED_CODE_SIGN_IDENTITY_NAME"))
+    this.codeSignIdentityName.set(
+        System.getenv("EXPANDED_CODE_SIGN_IDENTITY") ?: System.getenv("EXPANDED_CODE_SIGN_IDENTITY_NAME"),
+    )
     this.buildProductDir.set(buildProductDir)
     this.contentFolderPath.set(contentFolderPath)
     this.traceEnabled.set(project.isTraceEnabled)
