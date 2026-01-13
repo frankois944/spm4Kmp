@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition
 
+import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
@@ -11,6 +12,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.findFolders
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
 import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
+import io.github.frankois944.spmForKmp.utils.SwiftManifestParser
 import io.github.frankois944.spmForKmp.utils.checkSum
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import org.gradle.api.DefaultTask
@@ -36,6 +38,7 @@ import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
+import kotlin.math.log
 
 @CacheableTask
 @Suppress("TooManyFunctions")
@@ -532,7 +535,7 @@ ${getCustomizedDefinitionConfig()}
 
                         tracer.trace("looking for headers from checkout") {
                             moduleConfig.spmPackageName?.let { packageName ->
-                                tracer.trace("Looking include folder") {
+                                /*tracer.trace("Looking include folder") {
                                     logger.debug("SEARCH INCLUDE IN {}", checkoutFolder.resolve(packageName))
                                     // extract all folder names "include" in checkout package directory
                                     addAll(
@@ -541,12 +544,32 @@ ${getCustomizedDefinitionConfig()}
                                             "include",
                                         ),
                                     )
+                                }*/
+                                tracer.trace("Looking for includes") {
+                                    val productCheckoutPackage =
+                                        checkoutFolder
+                                            .resolve(packageName)
+                                            .resolve(SWIFT_PACKAGE_NAME)
+                                    if (productCheckoutPackage.exists()) {
+                                        logger.warn("look at $productCheckoutPackage")
+                                        val swiftManifestParser =
+                                            SwiftManifestParser(productCheckoutPackage)
+                                        swiftManifestParser.extractHeaderSearchPaths(moduleConfig.name).also {
+                                            logger.warn("extractHeaderSearchPaths ${moduleConfig.name}")
+                                            it.forEach { file ->
+                                                logger.warn(file)
+                                            }
+                                            if (it.isNotEmpty()) {
+                                                addAll(it)
+                                            }
+                                        }
+                                    }
                                     addAll(builtModulesFolder)
                                 }
-                                tracer.trace("looking for public folder") {
+                                /*tracer.trace("looking for public folder") {
                                     logger.debug("SEARCH PUBLIC IN {}", checkoutFolder.resolve(packageName))
                                     addAll(checkoutPublicFolder)
-                                }
+                                }*/
                             }
                         }
 
