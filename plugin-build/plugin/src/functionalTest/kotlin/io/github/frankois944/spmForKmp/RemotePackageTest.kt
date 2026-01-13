@@ -35,6 +35,15 @@ class RemotePackageTest : BaseTest() {
                                 },
                                 version = "3.4.0",
                             )
+                            remotePackageVersion(
+                                url = uri("https://github.com/openid/AppAuth-iOS.git"),
+                                products = {
+                                    add("AppAuth", exportToKotlin = true)
+                                    add("AppAuthCore", exportToKotlin = true)
+                                },
+                                version = "2.0.0",
+                                packageName = "AppAuth-iOS",
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
