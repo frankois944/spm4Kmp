@@ -535,41 +535,31 @@ ${getCustomizedDefinitionConfig()}
 
                         tracer.trace("looking for headers from checkout") {
                             moduleConfig.spmPackageName?.let { packageName ->
-                                /*tracer.trace("Looking include folder") {
-                                    logger.debug("SEARCH INCLUDE IN {}", checkoutFolder.resolve(packageName))
-                                    // extract all folder names "include" in checkout package directory
-                                    addAll(
-                                        findFolders(
-                                            checkoutFolder.resolve(packageName),
-                                            "include",
-                                        ),
-                                    )
-                                }*/
                                 tracer.trace("Looking for includes") {
                                     val productCheckoutPackage =
                                         checkoutFolder
                                             .resolve(packageName)
                                             .resolve(SWIFT_PACKAGE_NAME)
+                                    logger.debug(
+                                        "SEARCH include from product manifest name : {} manifest : {}",
+                                        moduleConfig.name,
+                                        productCheckoutPackage,
+                                    )
                                     if (productCheckoutPackage.exists()) {
-                                        logger.warn("look at $productCheckoutPackage")
                                         val swiftManifestParser =
                                             SwiftManifestParser(productCheckoutPackage)
                                         swiftManifestParser.extractHeaderSearchPaths(moduleConfig.name).also {
-                                            logger.warn("extractHeaderSearchPaths ${moduleConfig.name}")
-                                            it.forEach { file ->
-                                                logger.warn(file)
-                                            }
                                             if (it.isNotEmpty()) {
+                                                logger.debug("found header")
+                                                it.forEach { file ->
+                                                    logger.debug(file)
+                                                }
                                                 addAll(it)
                                             }
                                         }
                                     }
                                     addAll(builtModulesFolder)
                                 }
-                                /*tracer.trace("looking for public folder") {
-                                    logger.debug("SEARCH PUBLIC IN {}", checkoutFolder.resolve(packageName))
-                                    addAll(checkoutPublicFolder)
-                                }*/
                             }
                         }
 
