@@ -38,7 +38,6 @@ import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
-import kotlin.math.log
 
 @CacheableTask
 @Suppress("TooManyFunctions")
@@ -532,9 +531,13 @@ ${getCustomizedDefinitionConfig()}
                         addAll(moduleConfig.customSearchHeaderPath)
                         logger.debug("SEARCH IN {}", scratchDir.get())
                         logger.debug("spmPackageName IN {}", moduleConfig.spmPackageName)
-
                         tracer.trace("looking for headers from checkout") {
                             moduleConfig.spmPackageName?.let { packageName ->
+                                tracer.trace("looking for public folder") {
+                                    logger.debug("SEARCH PUBLIC IN {}", checkoutFolder.resolve(packageName))
+                                    addAll(checkoutPublicFolder)
+                                }
+
                                 tracer.trace("Looking for includes") {
                                     val productCheckoutPackage =
                                         checkoutFolder
