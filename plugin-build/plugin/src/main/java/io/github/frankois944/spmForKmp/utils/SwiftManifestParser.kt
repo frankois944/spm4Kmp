@@ -38,7 +38,8 @@ internal class SwiftManifestParser(
                 }
 
             // 2. Extract publicHeadersPath
-            val publicHeadersRegex = Regex("""publicHeadersPath\s*:\s*"([^"]*)"""") // Note the * for empty string support
+            // Note the * for empty string support
+            val publicHeadersRegex = Regex("""publicHeadersPath\s*:\s*"([^"]*)"""")
             val publicHeadersMatch = publicHeadersRegex.find(targetBlock)
 
             val publicPath =
@@ -95,6 +96,7 @@ internal class SwiftManifestParser(
             .toList()
     }
 
+    @Suppress("ReturnCount")
     private fun findTargetBlock(
         content: String,
         targetName: String,
