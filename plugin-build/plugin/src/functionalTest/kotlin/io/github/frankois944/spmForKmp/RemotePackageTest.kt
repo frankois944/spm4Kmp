@@ -101,7 +101,7 @@ class RemotePackageTest : BaseTest() {
                     ),
                 ).withKotlinSources(
                     KotlinSource.of(
-                        imports = listOf("FirebaseFirestore.*"),
+                        imports = listOf("FirebaseFirestore.FIRFirestoreErrorCodeDeadlineExceeded"),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(
