@@ -18,7 +18,7 @@ let package = Package(
         .target(
             name: "exportedNativeIosShared",
             dependencies: [
-                .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),"HevSocks5Tunnel"
+                .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),.product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),"HevSocks5Tunnel"
             ],
             path: "Sources"
             

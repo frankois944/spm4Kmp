@@ -88,6 +88,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                             }.map { product ->
                                 ModuleConfig(
                                     name = product.name,
+                                    alias = product.alias,
                                     packageName = dependency.packageName,
                                     spmPackageName = dependency.packageName,
                                 )
@@ -156,7 +157,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                 tracer.trace("swiftFormat") {
                     try {
                         if (!hideLocalPackageMessage.get()) {
-                            val namesToExport = requiredDependencies.joinToString(",") { it.name }
+                            val namesToExport = requiredDependencies.joinToString(",") { it.alias ?: it.name }
                             logger.error(
                                 """
                                 Spm4Kmp: The following dependencies [$namesToExport] need to be added to your xcode project
