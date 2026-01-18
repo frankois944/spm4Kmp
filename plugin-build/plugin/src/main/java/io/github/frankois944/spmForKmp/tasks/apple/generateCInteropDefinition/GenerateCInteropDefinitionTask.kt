@@ -578,12 +578,11 @@ ${getCustomizedDefinitionConfig()}
                         .joinToString(" ") { "-I\"$it\"" }
                 }
 
-            val initialPackageName = moduleConfig.alias ?: moduleConfig.name
             val packageName =
                 tracer.trace("resolve package name") {
                     packageDependencyPrefix.orNull?.let {
-                        "$it.$initialPackageName"
-                    } ?: initialPackageName
+                        "$it.${moduleConfig.name}"
+                    } ?: moduleConfig.name
                 }
 
             val compilerOpts = moduleConfig.compilerOpts.joinToString(" ")
