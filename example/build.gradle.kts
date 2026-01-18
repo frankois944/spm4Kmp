@@ -1,5 +1,6 @@
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.swiftPackageConfig
+import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -95,6 +96,7 @@ kotlin {
                     products = {
                         // Export to Kotlin for use in shared Kotlin code
                         add("FirebaseAnalytics", exportToKotlin = true)
+                        add(ProductName("FirebaseFirestoreInternal", alias = "FirebaseFirestore"), exportToKotlin = true)
                         add(ProductName("FirebaseCore"), exportToKotlin = true)
                         // add FirebaseDatabase to your own swift code but don't export it
                         add(ProductName("FirebaseDatabase"))

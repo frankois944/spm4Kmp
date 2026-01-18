@@ -75,6 +75,54 @@ class RemotePackageTest : BaseTest() {
     }
 
     @Test
+    fun `build with remote packages using alias`() {
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withMinIos("16.0")
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+                            remotePackageVersion(
+                                url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
+                                // Libraries from the package
+                                products = {
+                                    add(ProductName("FirebaseFirestoreInternal", alias = "FirebaseFirestore"), exportToKotlin = true)
+                                },
+                                // (Optional) Package name, can be required in some cases
+                                packageName = "firebase-ios-sdk",
+                                // Package version
+                                version = "12.3.0",
+                            )
+                            """.trimIndent(),
+                    ),
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        imports = listOf("FirebaseFirestore.*"),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import FirebaseFirestore
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
+
+    @Test
     fun `build with remote packages by branch`() {
         // Given
         val fixture =

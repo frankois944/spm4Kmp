@@ -7,6 +7,7 @@ import java.nio.file.Path
 internal data class ModuleConfig(
     var isFramework: Boolean = false,
     var name: String = "",
+    var alias: String? = null,
     var spmPackageName: String? = null,
     var packageName: String = "",
     var buildDir: Path = Path.of(""),
@@ -24,4 +25,8 @@ internal fun List<ModuleConfig>.containsPackage(name: String): Boolean =
             it.spmPackageName ?: it.packageName
         }.contains(name)
 
-internal fun List<ModuleConfig>.containsProduct(name: String) = this.map { it.name }.contains(name)
+internal fun List<ModuleConfig>.containsProduct(name: String) =
+    this
+        .map {
+            it.alias ?: it.name
+        }.contains(name)

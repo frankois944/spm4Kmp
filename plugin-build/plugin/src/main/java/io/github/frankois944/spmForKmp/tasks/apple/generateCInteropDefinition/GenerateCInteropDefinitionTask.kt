@@ -197,6 +197,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                                     }.map { product ->
                                         ModuleConfig(
                                             name = product.name,
+                                            alias = product.alias,
                                             packageName = dependency.packageName,
                                             spmPackageName = dependency.packageName,
                                         )
@@ -492,12 +493,12 @@ headerFilter = "$libraryPaths/Headers/**"
         tracer.trace("generateFrameworkDefinition") {
             val frameworkName =
                 tracer.trace("resolve framework name") { moduleConfig.buildDir.nameWithoutExtension }
-
+            val initialPackageName = moduleConfig.alias ?: moduleConfig.name
             val packageName =
                 tracer.trace("resolve package name") {
                     packageDependencyPrefix.orNull?.let {
-                        "$it.${moduleConfig.name}"
-                    } ?: moduleConfig.name
+                        "$it.$initialPackageName"
+                    } ?: initialPackageName
                 }
 
             val buildDirPath =
