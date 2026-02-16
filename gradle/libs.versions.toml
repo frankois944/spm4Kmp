@@ -1,7 +1,7 @@
 [versions]
 detekt = "1.23.8"
 # increase > 2.2.20 for xcode > 26
-kotlin = "2.1.21"
+kotlin = "2.3.10"
 ktlintGradle = "14.0.1"
 pluginPublish = "2.0.0"
 versionCheck = "0.53.0"
