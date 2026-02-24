@@ -9,7 +9,6 @@ autonomousapps-testkit = "0.17"
 junit = "6.0.1"
 publish="0.35.0"
 agp = "8.7.3"
-jackson = "2.20.1"
 plist-reader = "1.28"
 
 [plugins]
@@ -28,6 +27,4 @@ junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.r
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine" }
 junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 plist-reader = { module = "com.googlecode.plist:dd-plist", version.ref = "plist-reader"}
