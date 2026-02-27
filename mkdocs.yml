@@ -67,6 +67,7 @@ nav:
           - references/targetSettingsConfigs/LinkerSettingConfig.md
           - references/targetSettingsConfigs/SwiftSettingConfig.md
 markdown_extensions:
+  - md_in_html
   - admonition
   - footnotes
   - pymdownx.details
@@ -93,6 +94,7 @@ plugins:
   - search
   - social
   - tags
+  - glightbox
 validation:
   omitted_files: warn
   absolute_links: warn
