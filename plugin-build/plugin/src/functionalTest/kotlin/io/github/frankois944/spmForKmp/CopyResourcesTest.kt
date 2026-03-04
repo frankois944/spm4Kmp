@@ -168,4 +168,70 @@ class CopyResourcesTest : BaseTest() {
             destination.deleteRecursively()
         }
     }
+
+    @Test
+    fun `copy resources task works when simulator ARCHS has multiple values`() {
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withTargets(AppleCompileTarget.iosSimulatorArm64)
+                .build()
+
+        val appBuiltProductDir = "/tmp/resource-test-multi-arch/"
+        val appContentFolderPath = "iphone-sim-test"
+        val destination = Path(appBuiltProductDir, appContentFolderPath)
+        destination.createDirectories()
+
+        val parameters =
+            buildList {
+                add("SwiftPackageConfigAppleDummyCopyPackageResourcesIosSimulatorArm64")
+                add("-Pio.github.frankois944.spmForKmp.PLATFORM_NAME=iphonesimulator")
+                add("-Pio.github.frankois944.spmForKmp.ARCHS=arm64 x86_64")
+                add("-Pio.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR=$appBuiltProductDir")
+                add("-Pio.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH=$appContentFolderPath")
+            }
+
+        // When
+        val buildTask =
+            GradleBuilder
+                .runner(
+                    fixture.gradleProject.rootDir,
+                    "build",
+                ).build()
+
+        assertThat(buildTask).task(":library:build").succeeded()
+
+        val copyResourceTask =
+            GradleBuilder
+                .runner(
+                    fixture.gradleProject.rootDir,
+                    *parameters.toTypedArray(),
+                ).build()
+
+        // Then
+        assertThat(copyResourceTask)
+            .task(":library:SwiftPackageConfigAppleDummyCopyPackageResourcesIosSimulatorArm64")
+            .succeeded()
+        val scratchDir =
+            fixture.gradleProject.rootDir
+                .resolve("library")
+                .resolve("build")
+                .resolve("spmKmpPlugin")
+                .resolve("dummy")
+                .resolve("scratch")
+        val expectedBuildDir = scratchDir.resolve("arm64-apple-ios-simulator").resolve("release")
+        val incorrectBuildDir = scratchDir.resolve("arm64 x86_64-apple-ios-simulator").resolve("release")
+        assert(expectedBuildDir.exists()) {
+            "Expected target build directory to exist at ${expectedBuildDir.absolutePath}"
+        }
+        assert(!incorrectBuildDir.exists()) {
+            "Unexpected multi-arch build directory should not exist at ${incorrectBuildDir.absolutePath}"
+        }
+
+        if (destination.exists()) {
+            destination.deleteRecursively()
+        }
+    }
 }
