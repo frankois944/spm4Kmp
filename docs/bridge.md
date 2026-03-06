@@ -6,7 +6,12 @@ When syncing the project, the plugin creates a folder at `src/swift/[cinteropNam
 
 The content of this folder is your bridge between Swift and Kotlin, **everything inside is copied to the build directory**.
 
+!!! note "StartYourBridgeHere.swift"
 
+    A template file named `StartYourBridgeHere.swift` is added when the bridge is empty; it contains some example and
+    this is your starting point to create your bridge.
+
+    This behavior can be disable by adding inside your gradle.prodperties `spmforkmp.disableStartupFile=true`
 
 ## Example
 
