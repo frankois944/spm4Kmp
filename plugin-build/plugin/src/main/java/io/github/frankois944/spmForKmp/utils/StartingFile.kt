@@ -18,6 +18,10 @@ internal object StartingFile {
             public override init() {
                 super.init()
             }
+            static fun staticMethod() {
+            }
+            fun instanceMethod() {
+            }
         }
         **/
         """.trimIndent()
