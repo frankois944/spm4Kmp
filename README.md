@@ -18,6 +18,8 @@ The plugin uses the embedded Swift Package Manager, so **no third-party dependen
 
 # [READ THE DOCUMENTATION](https://spmforkmp.eu/)
 
+# 💙 [Vote for me on the Golden Kodee Community Awards 2026](https://golden-kodee.awardsplatform.com/entry/vote/mNKjQxkX/qyMdRblZ?search=b619a0e328bb6c6b-19) ❤️
+
 # QuickStart
 
 ## Gradle Plugin
