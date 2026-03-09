@@ -115,4 +115,17 @@ freeCompilerArgs +=
 }
 ```
 
+## Disable Swift Package Automatic IDE Resolution
 
+If your project has a Swift package manifest, the IDE automatically resolves the package but for nothing.
+
+It makes the project **run slower** and can use a **lot of disk space** (never used and deleted).
+
+I recommend disabling it in the IDE settings [Sync Project after changes in the build script](jetbrains://idea/settings?name=Build%2C+Execution%2C+Deployment--Build+Tools).
+
+Also, after disabling this settings, you can delete the folder "/Users/[you]/Library/Caches/JetBrains/IntelliJIdea[Version]/DerivedData"
+
+<figure markdown="span">
+  ![Image title](../assets/project-setting-desactivation.png){ width="500" }
+<figcaption>Sync Project after changes in the build script</figcaption>
+</figure>

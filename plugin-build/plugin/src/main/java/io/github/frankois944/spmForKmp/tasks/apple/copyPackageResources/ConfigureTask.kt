@@ -3,8 +3,8 @@ package io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources
 import io.github.frankois944.spmForKmp.SPM_TRACE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
-import io.github.frankois944.spmForKmp.resources.getCurrentPackagesBuiltDir
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+import org.gradle.api.Project
 
 internal fun CopyPackageResourcesTask.configureTask(
     packageDirectoriesConfig: PackageDirectoriesConfig,
@@ -12,26 +12,21 @@ internal fun CopyPackageResourcesTask.configureTask(
     cinteropTarget: AppleCompileTarget,
 ) {
     val buildProductDir: String? =
-        project.findProperty("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String
+        project.propertyOrNull("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String
             ?: System.getenv("BUILT_PRODUCTS_DIR")
     val contentFolderPath: String? =
-        project.findProperty("io.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH") as? String
+        project.propertyOrNull("io.github.frankois944.spmForKmp.CONTENTS_FOLDER_PATH") as? String
             ?: System.getenv("CONTENTS_FOLDER_PATH")
-    val archs: String? =
-        project.findProperty("io.github.frankois944.spmForKmp.ARCHS") as? String
-            ?: System.getenv("ARCHS")
     val platformName: String? =
-        project.findProperty("io.github.frankois944.spmForKmp.PLATFORM_NAME") as? String
+        project.propertyOrNull("io.github.frankois944.spmForKmp.PLATFORM_NAME") as? String
             ?: System.getenv("PLATFORM_NAME")
 
     logger.debug("buildProductDir $buildProductDir")
     logger.debug("contentFolderPath $contentFolderPath")
-    logger.debug("archs $archs")
     logger.debug("platformName $platformName")
 
     @Suppress("ComplexCondition")
-    if (archs.isNullOrEmpty() ||
-        platformName.isNullOrEmpty() ||
+    if (platformName.isNullOrEmpty() ||
         buildProductDir.isNullOrEmpty() ||
         contentFolderPath.isNullOrEmpty()
     ) {
@@ -51,13 +46,9 @@ internal fun CopyPackageResourcesTask.configureTask(
     }
 
     this.builtDirectory.set(
-        getCurrentPackagesBuiltDir(
-            packageScratchDir = packageDirectoriesConfig.packageScratchDir,
-            platformName = platformName,
-            archs = archs,
-            buildPackageMode = buildMode,
-            logger = logger,
-        ),
+        packageDirectoriesConfig.packageScratchDir
+            .resolve(cinteropTarget.packageBuildDirName())
+            .resolve(buildMode),
     )
     this.codeSignIdentityName.set(
         System.getenv("EXPANDED_CODE_SIGN_IDENTITY") ?: System.getenv("EXPANDED_CODE_SIGN_IDENTITY_NAME"),
@@ -71,4 +62,13 @@ internal fun CopyPackageResourcesTask.configureTask(
             .resolve(packageDirectoriesConfig.spmWorkingDir.name)
             .resolve("CopyPackageResourcesTask.html"),
     )
+}
+
+private fun Project.propertyOrNull(key: String): Any? {
+    val container = project.extensions.extraProperties
+    var result: Any? = null
+    if (container.has(key)) {
+        result = container.get(key)
+    }
+    return result
 }

@@ -13,5 +13,6 @@ mkdocs-pymdownx-material-extras = "==2.8"
 yamllint = "==1.37.0"
 mkdocs-material = {extras = ["imaging"], version = "*"}
 zensical = "==0.0.10"
+mkdocs-glightbox = "*"
 
 [dev-packages]

@@ -7,9 +7,9 @@ import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
+import io.github.frankois944.spmForKmp.tasks.utils.hideLocalPackageMessage
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
 import org.gradle.internal.extensions.stdlib.capitalized
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 internal fun GenerateExportableManifestTask.configureTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
@@ -39,12 +39,7 @@ internal fun GenerateExportableManifestTask.configureTask(
         ).absolutePath,
     )
     this.includeProduct.set(swiftPackageEntry.exportedPackageSettings.includeProduct)
-    this.hideLocalPackageMessage.set(
-        project.extraProperties.properties
-            .getOrDefault("spmforkmp.hideLocalPackageMessage", false)
-            .toString()
-            .toBoolean(),
-    )
+    this.hideLocalPackageMessage.set(project.hideLocalPackageMessage())
     this.traceEnabled.set(project.isTraceEnabled)
     this.storedTraceFile.set(
         project.projectDir
