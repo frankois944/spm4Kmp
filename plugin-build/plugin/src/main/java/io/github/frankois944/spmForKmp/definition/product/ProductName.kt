@@ -7,8 +7,10 @@ import java.io.Serializable
  *
  * @property name The name of the product within the Swift package ecosystem. This is required for proper
  * identification and resolution of the dependency.
- * @property alias An optional alias that can be used as an alternate reference to the product.
- * Some Package use indirect name for a product.
+ * @property alias An optional alias that can be used as an alternate name to the product.
+ * Import Clang modules where the name doesn’t match the product name inside the manifest.
+ *
+ * Ex: `ProductName("FirebaseFirestoreInternal", alias = "FirebaseFirestore")`
  *
  */
 public data class ProductName(

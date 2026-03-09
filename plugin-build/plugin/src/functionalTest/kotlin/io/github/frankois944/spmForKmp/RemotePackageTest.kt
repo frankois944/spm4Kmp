@@ -28,6 +28,22 @@ class RemotePackageTest : BaseTest() {
                                     add("CryptoSwift")
                                 },
                             )
+                            remotePackageVersion(
+                                url = uri("https://github.com/DataDog/dd-sdk-ios.git"),
+                                products = {
+                                    add("DatadogCore", exportToKotlin = true)
+                                },
+                                version = "3.4.0",
+                            )
+                            remotePackageVersion(
+                                url = uri("https://github.com/openid/AppAuth-iOS.git"),
+                                products = {
+                                    add("AppAuth", exportToKotlin = true)
+                                    add("AppAuthCore", exportToKotlin = true)
+                                },
+                                version = "2.0.0",
+                                packageName = "AppAuth-iOS",
+                            )
                             """.trimIndent(),
                     ),
                 ).withKotlinSources(
@@ -45,6 +61,54 @@ class RemotePackageTest : BaseTest() {
                                     return value.md5()
                                 }
                             }
+                            """.trimIndent(),
+                    ),
+                ).build()
+
+        val result =
+            GradleBuilder
+                .runner(fixture.gradleProject.rootDir, "build")
+                .build()
+
+        // Then
+        assertThat(result).task(":library:build").succeeded()
+    }
+
+    @Test
+    fun `build with remote packages using alias`() {
+        // Given
+        val fixture =
+            SmpKMPTestFixture
+                .builder()
+                .withBuildPath(testProjectDir.root.absolutePath)
+                .withMinIos("16.0")
+                .withRawDependencies(
+                    KotlinSource.of(
+                        content =
+                            """
+                            remotePackageVersion(
+                                url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
+                                // Libraries from the package
+                                products = {
+                                    add(ProductName("FirebaseFirestoreInternal", alias = "FirebaseFirestore"), exportToKotlin = true)
+                                },
+                                // (Optional) Package name, can be required in some cases
+                                packageName = "firebase-ios-sdk",
+                                // Package version
+                                version = "12.3.0",
+                            )
+                            """.trimIndent(),
+                    ),
+                ).withKotlinSources(
+                    KotlinSource.of(
+                        imports = listOf("FirebaseFirestore.FIRFirestoreErrorCodeDeadlineExceeded"),
+                    ),
+                ).withSwiftSources(
+                    SwiftSource.of(
+                        content =
+                            """
+                            import Foundation
+                            import FirebaseFirestore
                             """.trimIndent(),
                     ),
                 ).build()

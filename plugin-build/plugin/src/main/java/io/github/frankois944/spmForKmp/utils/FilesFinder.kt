@@ -1,38 +1,25 @@
 package io.github.frankois944.spmForKmp.utils
 
 import java.io.File
+import java.nio.file.Files
+import kotlin.streams.toList
 
-private val visited = mutableSetOf<String>()
-
-// Method to find files with the specified name in a directory recursively
-@Suppress("NestedBlockDepth")
 internal fun findFilesRecursively(
     directory: File,
     criteria: (File) -> Boolean,
     withDirectory: Boolean = false,
-    withFirstTime: Boolean = true,
+    @Suppress("UNUSED_PARAMETER") withFirstTime: Boolean = true,
 ): List<File> {
-    val result = mutableListOf<File>()
+    if (!directory.exists() || !directory.isDirectory) return emptyList()
 
-    if (withFirstTime) {
-        visited.clear()
-    }
-
-    val canonicalPath = directory.canonicalPath
-    if (canonicalPath !in visited && directory.exists() && directory.isDirectory()) {
-        visited.add(canonicalPath)
-        directory.listFiles()?.let { files ->
-            if (withDirectory && criteria(directory)) {
-                result.add(directory)
+    return Files
+        .walk(directory.toPath())
+        .map { it.toFile() }
+        .filter { file ->
+            if (file.isDirectory) {
+                withDirectory && criteria(file)
+            } else {
+                criteria(file)
             }
-            for (file in files) {
-                if (file.isDirectory) {
-                    result.addAll(findFilesRecursively(file, criteria, withDirectory, false))
-                } else if (criteria(file)) {
-                    result.add(file)
-                }
-            }
-        }
-    }
-    return result
+        }.toList()
 }

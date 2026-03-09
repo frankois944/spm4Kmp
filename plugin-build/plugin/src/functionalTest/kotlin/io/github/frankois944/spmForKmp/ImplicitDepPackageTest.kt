@@ -25,7 +25,7 @@ class ImplicitDepPackageTest : BaseTest() {
                                products = {
                                    add("GoogleSignIn", exportToKotlin = true)
                                },
-                               version = "8.0.0",
+                               version = "9.0.0",
                             )
                             """.trimIndent(),
                     ),

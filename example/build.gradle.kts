@@ -1,5 +1,6 @@
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.swiftPackageConfig
+import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -95,6 +96,7 @@ kotlin {
                     products = {
                         // Export to Kotlin for use in shared Kotlin code
                         add("FirebaseAnalytics", exportToKotlin = true)
+                        add(ProductName("FirebaseFirestoreInternal", alias = "FirebaseFirestore"), exportToKotlin = true)
                         add(ProductName("FirebaseCore"), exportToKotlin = true)
                         // add FirebaseDatabase to your own swift code but don't export it
                         add(ProductName("FirebaseDatabase"))
@@ -139,13 +141,6 @@ kotlin {
                     exportToKotlin = true,
                     checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
                     isCLang = true,
-                )
-                remotePackageVersion(
-                    url = uri("https://github.com/SDWebImage/SDWebImage.git"),
-                    products = {
-                        add("SDWebImage")
-                    },
-                    version = "5.21.3",
                 )
             }
         }

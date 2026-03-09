@@ -322,23 +322,27 @@ internal class TaskTracer(
                 ""
             }
         return """
-                                                                                                                                                            <li>
-                                                                                                                                                              <div><strong>${esc(
-            span.name,
-        )}</strong> — $ms ms <span class=\"pct\">(${
+                                                                                                                                                                                    <li>
+                                                                                                                                                                                      <div><strong>${
+            esc(
+                span.name,
+            )
+        }</strong> — $ms ms <span class=\"pct\">(${
             String.format(
                 locale = Locale.US,
                 "%.1f",
                 pct,
             )
         }%)</span></div>
-                                                                                                                                                              <div class=\"bar\" style=\"width:${String.format(
-            locale = Locale.US,
-            "%.1f",
-            barWidth,
-        )}%\"></div>
-                                                                                                                                                              $childrenHtml
-                                                                                                                                                            </li>
+                                                                                                                                                                                      <div class=\"bar\" style=\"width:${
+            String.format(
+                locale = Locale.US,
+                "%.1f",
+                barWidth,
+            )
+        }%\"></div>
+                                                                                                                                                                                      $childrenHtml
+                                                                                                                                                                                    </li>
             """.trimIndent()
     }
 

@@ -26,7 +26,7 @@ class ErrorPackageTest : BaseTest() {
                                 version = "9.3.0",
                                 products = {
                                     add(
-                                        ProductName(name = "GoogleMapsTarget", alias = "GoogleMaps"),
+                                        ProductName("GoogleMaps"),
                                         exportToKotlin = true,
                                     )
                                 },
@@ -35,7 +35,11 @@ class ErrorPackageTest : BaseTest() {
                     ),
                 ).withKotlinSources(
                     KotlinSource.of(
-                        imports = listOf("GoogleMapsTarget.*"),
+                        imports =
+                            listOf(
+                                "GoogleMaps.kGMSTypeHybrid",
+                                "GoogleMaps.GMSMapPoint",
+                            ),
                     ),
                 ).withSwiftSources(
                     SwiftSource.of(

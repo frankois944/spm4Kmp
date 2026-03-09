@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "spmForKmp-plugin"
+rootProject.name = "spm4Kmp"
 
 include(":example")
 includeBuild("plugin-build")
