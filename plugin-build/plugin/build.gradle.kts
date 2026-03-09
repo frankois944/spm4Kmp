@@ -23,8 +23,6 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(gradleApi())
     implementation(libs.kotlin.gradle)
-    implementation(libs.jackson.databind)
-    implementation(libs.jackson.module.kotlin)
     implementation(libs.plist.reader)
 
     testImplementation(kotlin("test"))
