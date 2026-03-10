@@ -9,7 +9,7 @@ autonomousapps-testkit = "0.17"
 junit = "6.0.3"
 publish="0.36.0"
 agp = "8.7.3"
-plist-reader = "1.28"
+plist-reader = "1.29"
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
