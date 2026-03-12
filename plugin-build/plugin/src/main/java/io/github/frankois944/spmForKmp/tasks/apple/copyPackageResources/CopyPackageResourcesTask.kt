@@ -163,8 +163,8 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
 
     private fun signFrameworkResources(file: File) {
         codeSignIdentityName.orNull?.let { identity ->
-            if (identity == "Sign to Run Locally" || identity.isEmpty()) {
-                logger.debug("Ignore framework signing because of local run")
+            if (identity == "Sign to Run Locally" || identity.isEmpty() || identity == "-") {
+                logger.debug("Ignore framework signing because of local run : \"$identity\"")
                 return@let
             }
             logger.debug("Found sign identity {}", identity)
