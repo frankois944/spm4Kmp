@@ -3,6 +3,7 @@
 package io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources
 
 import io.github.frankois944.spmForKmp.operations.isDynamicLibrary
+import io.github.frankois944.spmForKmp.operations.makeDirectoryWritable
 import io.github.frankois944.spmForKmp.operations.signFramework
 import io.github.frankois944.spmForKmp.resources.CopiedResourcesFactory
 import io.github.frankois944.spmForKmp.resources.FrameworkResource
@@ -168,6 +169,11 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
                 return@let
             }
             logger.debug("Found sign identity {}", identity)
+            logger.debug("Ensure that Framework Writable {}", file)
+            execOps.makeDirectoryWritable(
+                file = file,
+                logger = logger,
+            )
             logger.debug("Signing framework at {}", file)
             execOps.signFramework(
                 file = file,

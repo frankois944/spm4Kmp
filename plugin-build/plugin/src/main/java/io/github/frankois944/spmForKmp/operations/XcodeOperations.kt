@@ -98,6 +98,35 @@ internal fun ExecOperations.isDynamicLibrary(
     return standardOutput.toString().contains("dynamically linked shared library")
 }
 
+internal fun ExecOperations.makeDirectoryWritable(
+    file: File,
+    logger: Logger,
+) {
+    val args =
+        listOf(
+            "-R",
+            "+x",
+            file.path,
+        )
+    val standardOutput = ByteArrayOutputStream()
+    val errorOutput = ByteArrayOutputStream()
+    exec {
+        it.executable = "chmod"
+        it.args = args
+        it.standardOutput = standardOutput
+        it.errorOutput = errorOutput
+        it.isIgnoreExitValue = true
+    }.also {
+        logger.printExecLogs(
+            "makeDirectoryWritable",
+            args,
+            it.exitValue != 0,
+            standardOutput,
+            errorOutput,
+        )
+    }
+}
+
 internal fun ExecOperations.signFramework(
     file: File,
     signIdentityName: String,
