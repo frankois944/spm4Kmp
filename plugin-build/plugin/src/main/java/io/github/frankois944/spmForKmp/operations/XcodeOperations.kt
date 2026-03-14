@@ -105,7 +105,7 @@ internal fun ExecOperations.makeDirectoryWritable(
     val args =
         listOf(
             "-R",
-            "+x",
+            "+w",
             file.path,
         )
     val standardOutput = ByteArrayOutputStream()
