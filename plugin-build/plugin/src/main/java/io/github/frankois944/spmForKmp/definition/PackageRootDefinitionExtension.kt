@@ -281,6 +281,25 @@ public abstract class PackageRootDefinitionExtension
         public var userSetupHint: String? = null
 
         internal val packageRegistryConfigs: MutableList<PackageRegistryAuth> = mutableListOf()
+        internal var newPublicationInteroperabilityFeature: Boolean = false
+
+        /**
+         * New experimental interoperability mode for C or Objective-C libraries (for kotlin >= 2.3.20)
+         *
+         * In general, Kotlin/Native enables importing C and Objective-C libraries into Kotlin. However,
+         * for KMP libraries, this functionality is currently affected by the KMP compatibility issues
+         * with older compiler versions.
+         *
+         * Apply on your bridge and exported products
+         *
+         * [Link](https://kotlinlang.org/docs/whatsnew2320.html#new-interoperability-mode-for-c-or-objective-c-libraries)
+         */
+        @ExperimentalMultiplatform
+        public var newPublicationInteroperability: Boolean
+            get() = newPublicationInteroperabilityFeature
+            set(value) {
+                newPublicationInteroperabilityFeature = value
+            }
 
         /**
          * Configures a package registry using the specified URL.

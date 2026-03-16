@@ -9,6 +9,7 @@ import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.TASK_GENERATE_REGISTRY_FILE
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.config.NewPublicationInteroperabilityFeature
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
@@ -171,9 +172,12 @@ internal fun Project.configAppleTargets(
                     }
 
                 if (cindex > 0) {
-                    createCInteropTask(mainCompilation, cinteropName, file)
+                    val extraOpts = mutableListOf<String>()
+                    if (swiftPackageEntry.newPublicationInteroperabilityFeature) {
+                        extraOpts.addAll(NewPublicationInteroperabilityFeature.extraOpts())
+                    }
+                    createCInteropTask(mainCompilation, cinteropName, extraOpts, file)
                 }
-
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
                 cInteropTaskNamesWithDefFile[cinteropTaskName] = file
             }
@@ -206,9 +210,11 @@ internal fun Project.configAppleTargets(
 internal fun createCInteropTask(
     mainCompilation: KotlinNativeCompilation,
     cinteropName: String,
+    extraOpts: List<String>,
     file: File? = null,
 ): DefaultCInteropSettings =
     mainCompilation.cinterops.create(cinteropName) { settings ->
+        settings.extraOpts = extraOpts
         file?.let {
             settings.definitionFile.set(file)
         }
