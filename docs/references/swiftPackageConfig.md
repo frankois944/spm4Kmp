@@ -352,5 +352,5 @@ Apply on your bridge and exported products
 [More Info](https://kotlinlang.org/docs/whatsnew2320.html#new-interoperability-mode-for-c-or-objective-c-libraries)
 
 ```kotlin
-public var newPublicationInteroperability: Boolean
+var newPublicationInteroperability: Boolean
 ```
