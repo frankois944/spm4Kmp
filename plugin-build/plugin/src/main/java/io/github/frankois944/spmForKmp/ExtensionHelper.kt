@@ -1,7 +1,6 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
-import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -21,7 +20,6 @@ internal fun Project.swiftContainer(): NamedDomainObjectContainer<PackageRootDef
  * @param configure A lambda function to customize the package configuration
  *                  using the provided `PackageRootDefinitionExtension`.
  */
-@ExperimentalSpmForKmpFeature
 public fun KotlinNativeTarget.swiftPackageConfig(configure: PackageRootDefinitionExtension.() -> Unit) {
     val entry = project.swiftContainer().maybeCreate(this.name)
     entry.useExtension = true
@@ -36,7 +34,6 @@ public fun KotlinNativeTarget.swiftPackageConfig(configure: PackageRootDefinitio
  * @param cinteropName The name of the group to associate with a group of targets; useful when using a list of target
  * @param configure A lambda used to configure the package using the provided `PackageRootDefinitionExtension`.
  */
-@ExperimentalSpmForKmpFeature
 public fun KotlinNativeTarget.swiftPackageConfig(
     cinteropName: String,
     configure: PackageRootDefinitionExtension.() -> Unit,

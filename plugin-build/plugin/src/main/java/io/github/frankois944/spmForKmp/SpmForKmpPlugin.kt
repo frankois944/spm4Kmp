@@ -70,13 +70,21 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     )
                 }
                 mergeEntries(entries).forEach { swiftPackageEntry ->
+                    if (!swiftPackageEntry.useExtension) {
+                        logger.warn(
+                            """
+                            Please migrate your configuration to use the extension way (https://spmforkmp.eu/usages/multiTarget/)
+                            This will be a error in the future
+                            """.trimIndent(),
+                        )
+                    }
+
                     val spmWorkingDir =
                         resolveAndCreateDir(
                             File(swiftPackageEntry.spmWorkingPath),
                             "spmKmpPlugin",
                             swiftPackageEntry.internalName,
                         )
-
                     val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
                     val sharedCacheDir = swiftPackageEntry.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
                     val sharedConfigDir = swiftPackageEntry.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
