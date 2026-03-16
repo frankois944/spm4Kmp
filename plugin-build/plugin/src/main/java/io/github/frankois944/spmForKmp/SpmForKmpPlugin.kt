@@ -11,6 +11,7 @@ import io.github.frankois944.spmForKmp.tasks.configAppleTargets
 import io.github.frankois944.spmForKmp.tasks.createCInteropTask
 import io.github.frankois944.spmForKmp.tasks.utils.disableStartupFile
 import io.github.frankois944.spmForKmp.utils.StartingFile
+import io.github.frankois944.spmForKmp.utils.compareVersions
 import io.github.frankois944.spmForKmp.utils.getAndCreateFakeDefinitionFile
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
@@ -20,6 +21,7 @@ import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.kotlinToolingVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -184,7 +186,12 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val mainCompilationTarget = ktTarget.compilations.getByName("main")
                 if (!checkExistCInteropTask(mainCompilationTarget, entry.internalName.capitalized())) {
                     val extraOpts = mutableListOf<String>()
-                    if (entry.newPublicationInteroperabilityFeature) {
+                    if (entry.newPublicationInteroperabilityFeature &&
+                        compareVersions(
+                            kotlinToolingVersion.toString(),
+                            NewPublicationInteroperabilityFeature.minKotlinVersion(),
+                        ) >= 0
+                    ) {
                         extraOpts.addAll(NewPublicationInteroperabilityFeature.extraOpts())
                     }
                     createCInteropTask(

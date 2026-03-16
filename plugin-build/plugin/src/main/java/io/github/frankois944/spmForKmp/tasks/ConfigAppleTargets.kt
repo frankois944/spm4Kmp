@@ -30,11 +30,13 @@ import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
 import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
+import io.github.frankois944.spmForKmp.utils.compareVersions
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.kotlinToolingVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.DefaultCInteropSettings
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -173,7 +175,12 @@ internal fun Project.configAppleTargets(
 
                 if (cindex > 0) {
                     val extraOpts = mutableListOf<String>()
-                    if (swiftPackageEntry.newPublicationInteroperabilityFeature) {
+                    if (swiftPackageEntry.newPublicationInteroperabilityFeature &&
+                        compareVersions(
+                            kotlinToolingVersion.toString(),
+                            NewPublicationInteroperabilityFeature.minKotlinVersion(),
+                        ) >= 0
+                    ) {
                         extraOpts.addAll(NewPublicationInteroperabilityFeature.extraOpts())
                     }
                     createCInteropTask(mainCompilation, cinteropName, extraOpts, file)
