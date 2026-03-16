@@ -15,7 +15,7 @@ internal fun compareVersions(
         val result =
             when {
                 l != null && r != null -> l.compareTo(r)
-                else -> (leftParts.getOrNull(i) ?: "").compareTo(rightParts.getOrNull(i) ?: "")
+                else -> (leftParts.getOrNull(i).orEmpty()).compareTo(rightParts.getOrNull(i).orEmpty())
             }
 
         if (result != 0) return result
