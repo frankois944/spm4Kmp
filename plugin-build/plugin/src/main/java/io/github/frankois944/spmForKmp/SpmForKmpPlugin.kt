@@ -38,7 +38,7 @@ internal const val TASK_GENERATE_REGISTRY_FILE: String = "generateRegistryFilePa
 internal const val TASK_COPY_PACKAGE_RESOURCES: String = "CopyPackageResources"
 internal const val SPM_TRACE_NAME: String = "spmForKmpTrace"
 
-@Suppress("UnnecessaryAbstractClass")
+@Suppress("UnnecessaryAbstractClass", "CyclomaticComplexMethod")
 public abstract class SpmForKmpPlugin : Plugin<Project> {
     @Suppress("LongMethod")
     override fun apply(target: Project): Unit =
@@ -169,6 +169,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         return resolved
     }
 
+    @Suppress("NestedBlockDepth")
     private fun Project.createMissingCinteropTask(swiftPackageEntry: Set<PackageRootDefinitionExtension>) {
         swiftPackageEntry.forEach { entry ->
             if (!entry.useExtension) {
