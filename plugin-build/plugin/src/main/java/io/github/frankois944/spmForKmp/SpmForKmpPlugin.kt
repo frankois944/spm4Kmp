@@ -3,6 +3,7 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.config.NewPublicationInteroperabilityFeature
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.tasks.checkExistCInteropTask
@@ -61,6 +62,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
                 val entries = swiftPackageEntries + project.swiftContainer()
                 createMissingCinteropTask(entries)
+                if (entries.firstOrNull()?.newPublicationInteroperabilityFeature == true) {
+                    logger.warn(
+                        "Caution: experimental interoperability mode is enabled " +
+                            "(https://kotlinlang.org/docs/whatsnew2320.html#new-interoperability-" +
+                            "mode-for-c-or-objective-c-libraries)",
+                    )
+                }
                 mergeEntries(entries).forEach { swiftPackageEntry ->
                     val spmWorkingDir =
                         resolveAndCreateDir(
@@ -166,10 +174,15 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         .findByName(targetName) as KotlinNativeTarget
                 val mainCompilationTarget = ktTarget.compilations.getByName("main")
                 if (!checkExistCInteropTask(mainCompilationTarget, entry.internalName.capitalized())) {
+                    val extraOpts = mutableListOf<String>()
+                    if (entry.newPublicationInteroperabilityFeature) {
+                        extraOpts.addAll(NewPublicationInteroperabilityFeature.extraOpts())
+                    }
                     createCInteropTask(
                         mainCompilationTarget,
                         cinteropName = entry.internalName.capitalized(),
                         file = getAndCreateFakeDefinitionFile(),
+                        extraOpts = extraOpts,
                     )
                 }
             }

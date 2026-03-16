@@ -80,6 +80,7 @@ kotlin {
                     token = System.getenv("GITEA_TOKEN")!!,
                 )
             }
+            newPublicationInteroperability = true
             dependency {
                 if (System.getenv("GITEA_TOKEN") != null) {
                     registryPackage(
