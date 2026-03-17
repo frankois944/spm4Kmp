@@ -83,12 +83,24 @@ let package = Package(
             ],
             path: "Sources"
             ${getTargetSetting?.let { ",$it" }.orEmpty()}
+            ${getResourceSettings(parameters.resourcesPaths)}
         )
         $binaryDependencies
     ]
 )
         """
 }
+
+private fun getResourceSettings(paths: List<String>?): String =
+    if (paths.isNullOrEmpty()) {
+        ""
+    } else {
+        buildString {
+            append(", resources: [")
+            append(paths.joinToString(",") { ".process(\"$it\")" })
+            append("],")
+        }
+    }
 
 private fun getPlatformBlock(
     minIos: String,

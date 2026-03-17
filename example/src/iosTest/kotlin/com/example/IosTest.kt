@@ -53,6 +53,11 @@ class IosTest {
     }
 
     @Test
+    fun getFileContentFromBridgeTest() {
+        assertEquals("My content\n", TestClass().localFile())
+    }
+
+    @Test
     fun testAsync() =
         runBlocking {
             val isDone =

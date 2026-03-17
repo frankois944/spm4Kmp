@@ -2,7 +2,6 @@ package io.github.frankois944.spmForKmp.utils
 
 import java.io.File
 import java.nio.file.Files
-import kotlin.streams.toList
 
 internal fun findFilesRecursively(
     directory: File,

@@ -17,7 +17,9 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
+import java.nio.file.Path
 import javax.inject.Inject
+import kotlin.io.path.exists
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
@@ -106,6 +108,13 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                                 toolsVersion = toolsVersion.get(),
                                 targetSettings = targetSettings.get(),
                                 exportedPackage = null,
+                                resourcesPaths =
+                                    getResourcePaths(
+                                        manifestFile
+                                            .get()
+                                            .asFile.parentFile
+                                            .toPath(),
+                                    ),
                             ),
                     )
                 manifestFile.get().asFile.writeText(manifest)
@@ -113,4 +122,13 @@ internal abstract class GenerateManifestTask : DefaultTask() {
         }
         tracer.writeHtmlReport()
     }
+
+    private fun getResourcePaths(packagePath: Path): List<String>? =
+        listOf("Resources")
+            .takeIf {
+                packagePath
+                    .resolve("Sources")
+                    .resolve("Resources")
+                    .exists()
+            }
 }

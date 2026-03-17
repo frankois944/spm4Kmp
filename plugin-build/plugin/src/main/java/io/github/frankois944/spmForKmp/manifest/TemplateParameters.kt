@@ -19,4 +19,5 @@ internal data class TemplateParameters(
     val targetSettings: BridgeSettings?,
     val exportedPackage: ExportedPackage?,
     val onlyDeps: List<ModuleConfig> = emptyList(),
+    val resourcesPaths: List<String>? = null,
 )
