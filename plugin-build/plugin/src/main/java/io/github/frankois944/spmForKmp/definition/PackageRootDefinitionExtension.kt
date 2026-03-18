@@ -302,6 +302,11 @@ public abstract class PackageRootDefinitionExtension
             }
 
         /**
+         *  use a custom toolchain to build the package
+         */
+        public var toolchain: String? = null
+
+        /**
          * Configures a package registry using the specified URL.
          * This method adds a new registry configuration to the list of package registry settings.
          *

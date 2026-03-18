@@ -339,7 +339,7 @@ fun registry(
 )
 ```
 
-### newPublicationInteroperability
+## newPublicationInteroperability
 
 New experimental interoperability mode for C or Objective-C libraries (for kotlin >= 2.3.20)
 
@@ -349,8 +349,21 @@ with older compiler versions.
 
 Apply on your bridge and exported products
 
+!!! warning
+
+    Do not publish libraries compiled with the new interoperability mode yet, as it's still Experimental.
+
+
 [More Info](https://kotlinlang.org/docs/whatsnew2320.html#new-interoperability-mode-for-c-or-objective-c-libraries)
 
 ```kotlin
 var newPublicationInteroperability: Boolean
+```
+
+## toolchain
+
+Use a custom toolchain to build the package
+
+```kotlin
+var toolchain: String? = null
 ```
