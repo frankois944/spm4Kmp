@@ -161,7 +161,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add("none")
                 }
 
-            println(args.joinToString(" "))
             val standardOutput = ByteArrayOutputStream()
             val errorOutput = ByteArrayOutputStream()
             tracer.trace("build") {
