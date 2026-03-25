@@ -86,6 +86,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Internal
     abstract val storedTraceFile: RegularFileProperty
 
+    @get:Input
+    @get:Optional
+    abstract val toolchain: Property<String>
+
     @get:Inject
     abstract val execOps: ExecOperations
 
@@ -117,6 +121,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             val args =
                 buildList {
                     if (swiftBinPath.orNull == null) {
+                        toolchain.orNull?.let {
+                            add("--toolchain")
+                            add(it)
+                        }
                         add("--sdk")
                         add("macosx")
                         add("swift")
@@ -164,6 +172,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                         it.standardOutput = standardOutput
                         it.errorOutput = errorOutput
                         it.isIgnoreExitValue = true
+                        toolchain.orNull?.let { toolchain ->
+                            it.environment("TOOLCHAINS", toolchain)
+                        }
                     }.also {
                         logger.printExecLogs(
                             "buildPackage",

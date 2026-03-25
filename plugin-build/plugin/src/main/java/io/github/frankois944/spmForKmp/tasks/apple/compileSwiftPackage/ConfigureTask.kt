@@ -30,6 +30,7 @@ internal fun CompileSwiftPackageTask.configureTask(
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
     this.bridgeSourceBuiltDir.set(packageDirectoriesConfig.spmWorkingDir.resolve("Sources"))
     this.traceEnabled.set(project.isTraceEnabled)
+    this.toolchain.set(swiftPackageEntry.toolchain)
     this.storedTraceFile.set(
         project.projectDir
             .resolve(SPM_TRACE_NAME)

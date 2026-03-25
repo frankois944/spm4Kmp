@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMultiplatform::class)
+
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.swiftPackageConfig
 import java.net.URI
@@ -80,6 +82,7 @@ kotlin {
                     token = System.getenv("GITEA_TOKEN")!!,
                 )
             }
+            // this is experimental, DON'T use in production
             newPublicationInteroperability = true
             dependency {
                 if (System.getenv("GITEA_TOKEN") != null) {

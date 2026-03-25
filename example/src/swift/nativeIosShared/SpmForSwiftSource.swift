@@ -43,6 +43,11 @@ import registrydummy
     public func cMethod() {
         hev_socks5_tunnel_quit()
     }
+
+    public func localFile() -> String {
+        let settingsURL = Bundle.module.url(forResource: "bridgeString", withExtension: "txt")!
+        return try! String(contentsOf: settingsURL)
+    }
 }
 
 

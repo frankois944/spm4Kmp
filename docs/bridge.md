@@ -75,3 +75,10 @@ val contentFromSwift = MySwiftBridge().exportedMethod()
 
 val aView = MySwiftBridge().exportedView() as UIView
 ```
+
+## Handle Resources (since v1.6.0)
+
+To handle resources in your bridge, like images, fonts, etc.
+
+- Add a folder named `Resources` and put your resources inside like `bridgeString.txt`.
+- Access from Swift with `Bundle.module.url(forResource: "bridgeString", withExtension: "txt")`.
