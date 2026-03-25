@@ -63,64 +63,70 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
                 val entries = swiftPackageEntries + project.swiftContainer()
-                createMissingCinteropTask(entries)
-                if (entries.firstOrNull()?.newPublicationInteroperabilityFeature == true) {
-                    logger.warn(
-                        "Caution: experimental interoperability mode is enabled " +
-                            "(https://kotlinlang.org/docs/whatsnew2320.html#new-interoperability-" +
-                            "mode-for-c-or-objective-c-libraries)",
-                    )
-                }
-                mergeEntries(entries).forEach { swiftPackageEntry ->
-                    if (!swiftPackageEntry.useExtension) {
+                val mergedEntry = mergeEntries(entries)
+                if (!HostManager.hostIsMac && mergedEntry.all { it.useExtension }) {
+                    logger.warn("Host is not a Mac, skipping spmForKmp")
+                } else {
+                    createMissingCinteropTask(entries)
+                    if (entries.firstOrNull()?.newPublicationInteroperabilityFeature == true) {
                         logger.warn(
-                            """
-                            Please migrate your configuration to use the extension way (https://spmforkmp.eu/usages/multiTarget/)
-                            This will be a error in the future
-                            """.trimIndent(),
+                            "Caution: experimental interoperability mode is enabled " +
+                                "(https://kotlinlang.org/docs/whatsnew2320.html#new-interoperability-" +
+                                "mode-for-c-or-objective-c-libraries)",
                         )
                     }
-
-                    val spmWorkingDir =
-                        resolveAndCreateDir(
-                            File(swiftPackageEntry.spmWorkingPath),
-                            "spmKmpPlugin",
-                            swiftPackageEntry.internalName,
-                        )
-                    val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
-                    val sharedCacheDir = swiftPackageEntry.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
-                    val sharedConfigDir = swiftPackageEntry.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
-                    val sharedSecurityDir = swiftPackageEntry.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
-                    val bridgeSourceDir =
-                        resolveAndCreateDir(
-                            File(swiftPackageEntry.customPackageSourcePath),
-                            swiftPackageEntry.internalName,
-                        )
-
-                    if (!project.disableStartupFile()) {
-                        StartingFile.createStartingFileIfNeeded(bridgeSourceDir)
-                    }
-
-                    tasks
-                        .withType(CInteropProcess::class.java)
-                        .forEach {
-                            logger.debug("CInteropProcess task found: {}", it)
+                    mergedEntry.forEach { swiftPackageEntry ->
+                        if (!swiftPackageEntry.useExtension) {
+                            logger.warn(
+                                """
+                                Please migrate your configuration to use the extension way (https://spmforkmp.eu/usages/multiTarget/)
+                                This will be a error in the future
+                                """.trimIndent(),
+                            )
                         }
 
-                    configAppleTargets(
-                        taskGroup = taskGroup,
-                        cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
-                        swiftPackageEntry = swiftPackageEntry,
-                        packageDirectoriesConfig =
-                            PackageDirectoriesConfig(
-                                spmWorkingDir = spmWorkingDir,
-                                packageScratchDir = packageScratchDir,
-                                sharedCacheDir = sharedCacheDir,
-                                sharedConfigDir = sharedConfigDir,
-                                sharedSecurityDir = sharedSecurityDir,
-                                bridgeSourceDir = bridgeSourceDir,
-                            ),
-                    )
+                        val spmWorkingDir =
+                            resolveAndCreateDir(
+                                File(swiftPackageEntry.spmWorkingPath),
+                                "spmKmpPlugin",
+                                swiftPackageEntry.internalName,
+                            )
+                        val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
+                        val sharedCacheDir = swiftPackageEntry.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
+                        val sharedConfigDir = swiftPackageEntry.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
+                        val sharedSecurityDir =
+                            swiftPackageEntry.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
+                        val bridgeSourceDir =
+                            resolveAndCreateDir(
+                                File(swiftPackageEntry.customPackageSourcePath),
+                                swiftPackageEntry.internalName,
+                            )
+
+                        if (!project.disableStartupFile()) {
+                            StartingFile.createStartingFileIfNeeded(bridgeSourceDir)
+                        }
+
+                        tasks
+                            .withType(CInteropProcess::class.java)
+                            .forEach {
+                                logger.debug("CInteropProcess task found: {}", it)
+                            }
+
+                        configAppleTargets(
+                            taskGroup = taskGroup,
+                            cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
+                            swiftPackageEntry = swiftPackageEntry,
+                            packageDirectoriesConfig =
+                                PackageDirectoriesConfig(
+                                    spmWorkingDir = spmWorkingDir,
+                                    packageScratchDir = packageScratchDir,
+                                    sharedCacheDir = sharedCacheDir,
+                                    sharedConfigDir = sharedConfigDir,
+                                    sharedSecurityDir = sharedSecurityDir,
+                                    bridgeSourceDir = bridgeSourceDir,
+                                ),
+                        )
+                    }
                 }
 
                 // link the main definition File
