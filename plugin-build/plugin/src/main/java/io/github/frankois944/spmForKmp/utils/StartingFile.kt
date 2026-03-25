@@ -18,9 +18,9 @@ internal object StartingFile {
             public override init() {
                 super.init()
             }
-            public static fun staticMethod() {
+            public static func staticMethod() {
             }
-            public fun instanceMethod() {
+            public func instanceMethod() {
             }
         }
         **/
