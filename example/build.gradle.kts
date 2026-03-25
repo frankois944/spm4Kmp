@@ -99,7 +99,7 @@ kotlin {
                     // Libraries from the package
                     products = {
                         // Export to Kotlin for use in shared Kotlin code
-                        add("FirebaseAnalytics", exportToKotlin = true)
+                        add(ProductName("FirebaseAnalytics"), exportToKotlin = true)
                         add(ProductName("FirebaseFirestoreInternal", alias = "FirebaseFirestore"), exportToKotlin = true)
                         add(ProductName("FirebaseCore"), exportToKotlin = true)
                         // add FirebaseDatabase to your own swift code but don't export it
@@ -108,7 +108,7 @@ kotlin {
                     // (Optional) Package name, can be required in some cases
                     packageName = "firebase-ios-sdk",
                     // Package version
-                    version = "12.3.0",
+                    version = "12.11.0",
                 )
                 localBinary(
                     path = "$testResources/DummyFrameworkV2.xcframework.zip",
@@ -145,6 +145,27 @@ kotlin {
                     exportToKotlin = true,
                     checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
                     isCLang = true,
+                )
+            }
+        }
+
+        target.swiftPackageConfig(cinteropName = "nativeFirebaseStuff") {
+            minIos = "15.0"
+            exportedPackageSettings {
+                includeProduct = listOf(
+                    "FirebaseMessaging",
+                    "FirebasePerformance",
+                )
+            }
+            dependency {
+                remotePackageVersion(
+                    url = uri("https://github.com/firebase/firebase-ios-sdk"),
+                    products = {
+                        add(ProductName("FirebaseMessaging"), exportToKotlin = true)
+                        add(ProductName("FirebasePerformance"), exportToKotlin = true)
+                    },
+                    packageName = "firebase-ios-sdk",
+                    version = "12.11.0"
                 )
             }
         }
