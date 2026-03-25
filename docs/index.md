@@ -25,8 +25,6 @@ The plugin uses the embedded Swift Package Manager, so **no third-party dependen
 - **Use SPM third-Party Dependency**: Add external dependency and use it inside your bridge
 - **Import Swift-compatible code to Kotlin**: Enable SPM dependencies and your own Swift code to be exposed directly in your Kotlin code ([if compatible](./section-help/faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code)).
 
-# 💙 [Vote for me on the Golden Kodee Community Awards 2026](https://golden-kodee.awardsplatform.com/entry/vote/mNKjQxkX/qyMdRblZ?search=b619a0e328bb6c6b-19) ❤️
-
 ## Support My Project ⭐️
 
 If you find this project useful, please consider giving it a star or a coffee!

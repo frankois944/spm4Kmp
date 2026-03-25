@@ -76,9 +76,9 @@ It's always recommended to use the latest version of Xcode, but sometimes the Sw
 
 It's possible to support older/earlier versions of Swift, you have :
 
-- The property [swiftBinPath](../references/swiftPackageConfig.md#swiftbinpath) to change the swift command used by the plugin.
+- The property [swiftBinPath](../references/swiftPackageConfig.md#swiftbinpath) or [toolchain](../references/swiftPackageConfig.md#toolchain) to change the swift command used by the plugin.
 
-- This official tool [swiftly](https://www.swift.org/blog/introducing-swiftly_10/) to easily install another version of swift on macOS.
+- This official tool [swiftly](https://www.swift.org/blog/introducing-swiftly_10/) to easily install another version/toolchain of swift on macOS.
 
 So follow the swiftly guide to install another swift version and set the swiftBinPath property correctly.
 
