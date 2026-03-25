@@ -48,6 +48,8 @@ import java.io.File
 internal fun Project.configAppleTargets(
     taskGroup: MutableMap<AppleCompileTarget, Task>,
     cInteropTaskNamesWithDefFile: MutableMap<String, File>,
+    cInteropTaskNamesWithProducerTask: MutableMap<String, Task>,
+    cInteropTaskNamesWithExportTask: MutableMap<String, Task>,
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
@@ -187,6 +189,8 @@ internal fun Project.configAppleTargets(
                 }
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
                 cInteropTaskNamesWithDefFile[cinteropTaskName] = file
+                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask.get()
+                cInteropTaskNamesWithExportTask[cinteropTaskName] = exportedManifestTask.get()
             }
         }
 
@@ -203,15 +207,13 @@ internal fun Project.configAppleTargets(
         definitionTask.configure {
             it.dependsOn(copyPackageResourcesTask)
         }
+        exportedManifestTask.configure {
+            it.dependsOn(definitionTask)
+        }
 
         // Keep a handle to the "root" for this target
         taskGroup[cinteropTarget] = definitionTask.get()
     }
-
-    taskGroup[allTargets.first()] =
-        exportedManifestTask
-            .get()
-            .dependsOn(taskGroup[allTargets.first()])
 }
 
 internal fun createCInteropTask(

@@ -62,9 +62,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 val taskGroup = mutableMapOf<AppleCompileTarget, Task>()
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
-                val entries = swiftPackageEntries + project.swiftContainer()
+                // Contains the definition producer task linked with the cinterop task name
+                val cInteropTaskNamesWithProducerTask = mutableMapOf<String, Task>()
+                // Contains the exported-package task linked with the cinterop task name
+                val cInteropTaskNamesWithExportTask = mutableMapOf<String, Task>()
+                val entries = (swiftPackageEntries + project.swiftContainer()).toSet()
                 createMissingCinteropTask(entries)
-                if (entries.firstOrNull()?.newPublicationInteroperabilityFeature == true) {
+                if (entries.any { entry -> entry.newPublicationInteroperabilityFeature }) {
                     logger.warn(
                         "Caution: experimental interoperability mode is enabled " +
                             "(https://kotlinlang.org/docs/whatsnew2320.html#new-interoperability-" +
@@ -110,6 +114,8 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     configAppleTargets(
                         taskGroup = taskGroup,
                         cInteropTaskNamesWithDefFile = cInteropTaskNamesWithDefFile,
+                        cInteropTaskNamesWithProducerTask = cInteropTaskNamesWithProducerTask,
+                        cInteropTaskNamesWithExportTask = cInteropTaskNamesWithExportTask,
                         swiftPackageEntry = swiftPackageEntry,
                         packageDirectoriesConfig =
                             PackageDirectoriesConfig(
@@ -129,7 +135,17 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         val cinteropTarget =
                             AppleCompileTarget.fromKonanTarget(cinterop.konanTarget)
                                 ?: return@configureEach
-                        taskGroup[cinteropTarget]?.let {
+                        val producerTask = cInteropTaskNamesWithProducerTask[cinterop.name]
+                        val exportTask = cInteropTaskNamesWithExportTask[cinterop.name]
+                        val targetRootTask = taskGroup[cinteropTarget]
+                        producerTask?.let {
+                            cinterop.dependsOn(producerTask)
+                            cinterop.mustRunAfter(producerTask)
+                            exportTask?.let { task ->
+                                cinterop.dependsOn(task)
+                                cinterop.mustRunAfter(task)
+                            }
+                        } ?: targetRootTask?.let {
                             cinterop.dependsOn(taskGroup[cinteropTarget])
                             cinterop.mustRunAfter(taskGroup[cinteropTarget])
                         } ?: run {
@@ -175,7 +191,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
     private fun Project.createMissingCinteropTask(swiftPackageEntry: Set<PackageRootDefinitionExtension>) {
         swiftPackageEntry.forEach { entry ->
             if (!entry.useExtension) {
-                return
+                return@forEach
             }
             entry.targetName?.let { targetName ->
                 val ktTarget =
@@ -206,17 +222,11 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
     }
 
     private fun mergeEntries(entries: Set<PackageRootDefinitionExtension>): Set<PackageRootDefinitionExtension> {
-        val mergedEntries = mutableSetOf<PackageRootDefinitionExtension>()
-        entries.forEach { entry ->
-            val foundEntry =
-                mergedEntries
-                    .firstOrNull { mergedEntry ->
-                        mergedEntry.internalName == entry.internalName
-                    }
-            if (foundEntry == null) {
-                mergedEntries.add(entry)
-            }
-        }
-        return mergedEntries
+        return entries
+            .groupBy { it.internalName }
+            .values
+            .map { groupedEntries ->
+                groupedEntries.firstOrNull { it.targetName == null } ?: groupedEntries.first()
+            }.toSet()
     }
 }
