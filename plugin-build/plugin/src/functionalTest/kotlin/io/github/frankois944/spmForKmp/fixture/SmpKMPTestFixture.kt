@@ -81,7 +81,7 @@ spmforkmp.enableTracing=true
     private fun Subproject.Builder.setupSources(cinteropsName: String) {
         configuration.swiftSources.forEach { source ->
             withFile(
-                "src/swift/$cinteropsName/${source.filename}",
+                "src/swift/${source.cinteropName ?: cinteropsName}/${source.filename}",
                 source.content,
             )
         }

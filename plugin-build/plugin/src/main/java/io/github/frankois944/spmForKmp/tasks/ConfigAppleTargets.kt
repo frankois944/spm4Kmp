@@ -44,7 +44,7 @@ import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "LongParameterList")
 internal fun Project.configAppleTargets(
     taskGroup: MutableMap<AppleCompileTarget, Task>,
     cInteropTaskNamesWithDefFile: MutableMap<String, File>,
