@@ -1,5 +1,13 @@
 # Tips
 
+## How can I Import Swift Code into my Kotlin code.
+
+A [playground](https://github.com/frankois944/Swift-Import-Interoperability-with-Kotlin-Multiplatform) of how to import Swift code into Kotlin is available.
+
+You can find different use-cases about how to import Swift code, the repository will grow.
+
+Request and feedback are welcome !
+
 ## Reduce Build Time
 
 [spmWorkingPath](../references/swiftPackageConfig.md#spmworkingpath) change the path to Swift Package working file.
