@@ -12,7 +12,7 @@ class PackageRegistryTest : BaseTest() {
     @Test
     fun `build with package registry`() {
         val token = System.getenv("GITEA_TOKEN")
-        if (token == null) {
+        if (token.isNullOrEmpty()) {
             println("SKIP TEST because no GITEA_TOKEN set")
             return
         }
