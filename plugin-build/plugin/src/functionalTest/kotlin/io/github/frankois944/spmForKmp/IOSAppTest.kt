@@ -9,6 +9,10 @@ import java.util.concurrent.TimeUnit
 class IOSAppTest : BaseTest() {
     @Test
     fun `build and test example app`() {
+        if (System.getenv("GITEA_TOKEN").isNullOrEmpty()) {
+            println("SKIP TEST because no GITEA_TOKEN set")
+            return
+        }
         val xcodeBuildCommand =
             listOf(
                 "xcodebuild",
