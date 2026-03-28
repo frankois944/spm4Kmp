@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.publish) apply false
+    id("dev.opensavvy.dokka-mkdocs") version "0.6.1"
 }
 
 subprojects {
