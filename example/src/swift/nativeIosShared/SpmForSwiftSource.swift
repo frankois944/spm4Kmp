@@ -45,8 +45,13 @@ import registrydummy
     }
 
     public func localFile() -> String {
-        let settingsURL = Bundle.module.url(forResource: "bridgeString", withExtension: "txt")!
-        return try! String(contentsOf: settingsURL)
+        // explicit declation of Foundation.Bundle for backward compatibility (xcode < 26)
+        guard let url = Foundation.Bundle.module.url(forResource: "bridgeString",
+                                                     withExtension: "txt") else {
+            assertionFailure("bridgeString.txt not found in Bundle.module")
+            return ""
+        }
+        return (try? String(contentsOf: url)) ?? ""
     }
 }
 
