@@ -1,7 +1,6 @@
 import Foundation
+import CryptoKit
 import UIKit
-
-import CryptoSwift
 import FirebaseDatabase
 import HevSocks5Tunnel
 #if canImport(registrydummy)
@@ -33,7 +32,9 @@ import registrydummy
     }
 
     public func getValueFromCrypt() -> String {
-        return "123".md5()
+        let data = Data("123".utf8)
+        let digest = Insecure.MD5.hash(data: data)
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 
     public func doAsyncStuff() async {
@@ -45,9 +46,8 @@ import registrydummy
     }
 
     public func localFile() -> String {
-        // explicit declation of Foundation.Bundle for backward compatibility (xcode < 26)
-        guard let url = Foundation.Bundle.module.url(forResource: "bridgeString",
-                                                     withExtension: "txt") else {
+        // Explicit use of Foundation.Bundle via alias to avoid CryptoSwift's Bundle shadowing on older Xcode
+        guard let url = Bundle.module.url(forResource: "bridgeString", withExtension: "txt") else {
             assertionFailure("bridgeString.txt not found in Bundle.module")
             return ""
         }
