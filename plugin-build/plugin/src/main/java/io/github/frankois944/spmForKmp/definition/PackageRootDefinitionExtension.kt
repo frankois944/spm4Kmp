@@ -284,6 +284,16 @@ public abstract class PackageRootDefinitionExtension
         internal var newPublicationInteroperabilityFeature: Boolean = false
 
         /**
+         * When set to `true`, uses `xcodebuild` instead of `swift build` to compile the Swift package.
+         *
+         * Prefer this option when the package uses Xcode-specific build settings or contains targets
+         * that are not compilable with the plain Swift toolchain.
+         *
+         * Default: `false`
+         */
+        public var useXcodeBuild: Boolean = false
+
+        /**
          * New experimental interoperability mode for C or Objective-C libraries (for kotlin >= 2.3.20)
          *
          * In general, Kotlin/Native enables importing C and Objective-C libraries into Kotlin. However,
