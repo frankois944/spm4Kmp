@@ -221,12 +221,11 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         }
     }
 
-    private fun mergeEntries(entries: Set<PackageRootDefinitionExtension>): Set<PackageRootDefinitionExtension> {
-        return entries
+    private fun mergeEntries(entries: Set<PackageRootDefinitionExtension>): Set<PackageRootDefinitionExtension> =
+        entries
             .groupBy { it.internalName }
             .values
             .map { groupedEntries ->
                 groupedEntries.firstOrNull { it.targetName == null } ?: groupedEntries.first()
             }.toSet()
-    }
 }

@@ -90,7 +90,7 @@ class MultiRemotePackageTest : BaseTest() {
                             @objc public class MySwiftClass: NSObject {
                             }
                             """.trimIndent(),
-                    )
+                    ),
                 ).build()
 
         val result =
