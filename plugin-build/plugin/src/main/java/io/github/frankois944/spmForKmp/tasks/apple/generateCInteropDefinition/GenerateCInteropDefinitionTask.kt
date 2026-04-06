@@ -148,6 +148,9 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Internal
     abstract val currentBuildDirectory: DirectoryProperty
 
+    @get:Input
+    abstract val useXcodeBuild: Property<Boolean>
+
     private val checkoutFolder: File
         get() =
             File(scratchDir.get())

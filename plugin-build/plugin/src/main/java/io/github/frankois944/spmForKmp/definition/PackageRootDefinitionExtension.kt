@@ -291,7 +291,7 @@ public abstract class PackageRootDefinitionExtension
          *
          * Default: `false`
          */
-        public var useXcodeBuild: Boolean = false
+        public var useXcodeBuild: Boolean = true
 
         /**
          * New experimental interoperability mode for C or Objective-C libraries (for kotlin >= 2.3.20)

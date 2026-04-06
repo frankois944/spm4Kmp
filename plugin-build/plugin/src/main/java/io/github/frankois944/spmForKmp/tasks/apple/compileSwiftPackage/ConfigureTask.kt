@@ -50,4 +50,5 @@ internal fun CompileSwiftPackageTask.configureTask(
             add(targetBuildDir)
         },
     )
+    this.useXcodeBuild.set(swiftPackageEntry.useXcodeBuild)
 }

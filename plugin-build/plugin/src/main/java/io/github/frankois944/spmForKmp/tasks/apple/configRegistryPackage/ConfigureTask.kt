@@ -19,4 +19,5 @@ internal fun ConfigRegistryPackageTask.configureTask(
             .resolve(packageDirectoriesConfig.spmWorkingDir.name)
             .resolve("ConfigRegistryPackageTask.html"),
     )
+    this.useXcodeBuild.set(swiftPackageEntry.useXcodeBuild)
 }

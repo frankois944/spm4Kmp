@@ -57,4 +57,5 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
             .resolve("defFiles")
             .resolve(cinteropTarget.toString()),
     )
+    this.useXcodeBuild.set(swiftPackageEntry.useXcodeBuild)
 }
