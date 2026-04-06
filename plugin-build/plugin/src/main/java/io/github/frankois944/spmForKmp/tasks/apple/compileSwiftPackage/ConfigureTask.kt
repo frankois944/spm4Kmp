@@ -51,4 +51,5 @@ internal fun CompileSwiftPackageTask.configureTask(
         },
     )
     this.useXcodeBuild.set(swiftPackageEntry.useXcodeBuild)
+    this.schemeName.set(swiftPackageEntry.internalName)
 }

@@ -96,6 +96,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Inject
     abstract val execOps: ExecOperations
 
+    @get:Input
+    abstract val schemeName: Property<String>
+
     init {
         description = "Compile the Swift Package manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
@@ -123,7 +126,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             if (useXcodeBuild.get()) {
                 logger.debug("Building XcodeBuild")
                 tracer.trace("Build with XcodeBuild") {
-                    buildWithXcodeBuildCommandLine(tracer)
+                    buildWithXcodeBuildCommandLine()
                 }
             } else {
                 logger.debug("Building Swift command line")
@@ -203,66 +206,58 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             }
     }
 
-    private fun buildWithXcodeBuildCommandLine(tracer: TaskTracer) {
+    private fun buildWithXcodeBuildCommandLine() {
         val args =
             buildList {
-                if (swiftBinPath.orNull == null) {
-                    toolchain.orNull?.let {
-                        add("--toolchain")
-                        add(it)
-                    }
-                    add("--sdk")
-                    add("macosx")
-                    add("swift")
-                }
-                add("build")
-                add("-q")
                 add("--sdk")
-                tracer.trace("getSDKPath") {
-                    add(execOps.getSDKPath(cinteropTarget.get(), logger))
+                add("macosx")
+                add("xcodebuild")
+                add("build")
+                toolchain.orNull?.let {
+                    add("-toolchain")
+                    add(it)
                 }
-                add("--triple")
-                add(cinteropTarget.get().triple(osVersion.orNull.orEmpty()))
-                add("--scratch-path")
+                // add("-quiet")
+                add("-scheme")
+                add(schemeName.get())
+                add("-destination")
+                add(cinteropTarget.get().destination())
+                add("-derivedDataPath")
                 add(packageScratchDir.get())
-                add("--disable-sandbox")
-                add("-c")
-                add(if (debugMode.get()) "debug" else "release")
-                add("--jobs")
+                add("-configuration")
+                add(if (debugMode.get()) "Debug" else "Release")
+                add("-j")
                 add(Runtime.getRuntime().availableProcessors().toString())
-                sharedCacheDir.orNull?.let {
-                    add("--cache-path")
-                    add(it)
+                add("COMPILER_INDEX_STORE_ENABLE=NO")
+                add("INDEX_ENABLE_DATA_STORE=NO")
+                add("DEAD_CODE_STRIPPING=YES")
+                add("DEBUG_INFORMATION_FORMAT=dwarf")
+                add("SUPPORTED_PLATFORMS=${cinteropTarget.get().sdk()}")
+                add("SDKROOT=${cinteropTarget.get().sdk()}")
+                add("ARCHS=${cinteropTarget.get().arch()}")
+                add("BUILD_LIBRARY_FOR_DISTRIBUTION=YES")
+                add("SKIP_INSTALL=NO")
+                add("DEFINES_MODULE=YES")
+                add("SWIFT_INSTALL_OBJC_HEADER=YES")
+                add("SWIFT_EMIT_MODULE_INTERFACE=YES")
+                osVersion.orNull.orEmpty().let { osVersion ->
+                    add("IPHONEOS_DEPLOYMENT_TARGET=$osVersion")
                 }
-                sharedConfigDir.orNull?.let {
-                    add("--config-path")
-                    add(it)
-                }
-                sharedSecurityDir.orNull?.let {
-                    add("--security-path")
-                    add(it)
-                }
-                add("--disable-index-store")
-                add("-debug-info-format")
-                add("none")
             }
 
         val standardOutput = ByteArrayOutputStream()
         val errorOutput = ByteArrayOutputStream()
         execOps
             .exec {
-                it.executable = swiftBinPath.orNull ?: "xcrun"
+                it.executable = "xcrun"
                 it.workingDir = File(workingDir.get())
                 it.args = args
-                it.standardOutput = standardOutput
-                it.errorOutput = errorOutput
+                // it.standardOutput = standardOutput
+                // it.errorOutput = errorOutput
                 it.isIgnoreExitValue = true
-                toolchain.orNull?.let { toolchain ->
-                    it.environment("TOOLCHAINS", toolchain)
-                }
             }.also {
                 logger.printExecLogs(
-                    "buildPackage",
+                    "xcodebuild",
                     args,
                     it.exitValue != 0,
                     standardOutput,

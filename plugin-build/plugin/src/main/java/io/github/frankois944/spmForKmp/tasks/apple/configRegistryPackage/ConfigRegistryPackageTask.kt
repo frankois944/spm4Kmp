@@ -80,14 +80,11 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
     @get:Inject
     abstract val execOps: ExecOperations
 
-    @get:Input
-    abstract val useXcodeBuild: Property<Boolean>
-
     init {
         description = "Generate Package Registry Manifest"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
-            HostManager.hostIsMac && registries.get().isNotEmpty() && !useXcodeBuild.get()
+            HostManager.hostIsMac && registries.get().isNotEmpty()
         }
     }
 

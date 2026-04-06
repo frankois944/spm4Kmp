@@ -5,6 +5,7 @@ package io.github.frankois944.spmForKmp.tasks
 import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_COPY_PACKAGE_RESOURCES
 import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
+import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_XCODE_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.TASK_GENERATE_REGISTRY_FILE
@@ -21,6 +22,8 @@ import io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources.CopyPack
 import io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinitionWIthXcode.GenerateCInteropDefinitionWithXcodeTask
+import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinitionWIthXcode.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.GenerateExportableManifestTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.GenerateManifestTask
@@ -135,24 +138,49 @@ internal fun Project.configAppleTargets(
             }
 
         val definitionTask =
-            tasks.register(
-                getTaskName(
-                    TASK_GENERATE_CINTEROP_DEF,
-                    swiftPackageEntry.internalName,
-                    cinteropTarget,
-                ),
-                GenerateCInteropDefinitionTask::class.java,
-            ) {
-                it.configureTask(
-                    targetBuildDir = targetBuildDir,
-                    cinteropTarget = cinteropTarget,
-                    swiftPackageEntry = swiftPackageEntry,
-                    packageDirectoriesConfig = packageDirectoriesConfig,
-                    packageDependencies = packageDependencies,
-                )
+            if (swiftPackageEntry.useXcodeBuild) {
+                tasks
+                    .register(
+                        getTaskName(
+                            TASK_GENERATE_CINTEROP_XCODE_DEF,
+                            swiftPackageEntry.internalName,
+                            cinteropTarget,
+                        ),
+                        GenerateCInteropDefinitionWithXcodeTask::class.java,
+                    ) {
+                        it.configureTask(
+                            targetBuildDir = targetBuildDir,
+                            cinteropTarget = cinteropTarget,
+                            swiftPackageEntry = swiftPackageEntry,
+                            packageDirectoriesConfig = packageDirectoriesConfig,
+                            packageDependencies = packageDependencies,
+                        )
+                    }.let {
+                        Pair(it, it.get().outputFiles)
+                    }
+            } else {
+                tasks
+                    .register(
+                        getTaskName(
+                            TASK_GENERATE_CINTEROP_DEF,
+                            swiftPackageEntry.internalName,
+                            cinteropTarget,
+                        ),
+                        GenerateCInteropDefinitionTask::class.java,
+                    ) {
+                        it.configureTask(
+                            targetBuildDir = targetBuildDir,
+                            cinteropTarget = cinteropTarget,
+                            swiftPackageEntry = swiftPackageEntry,
+                            packageDirectoriesConfig = packageDirectoriesConfig,
+                            packageDependencies = packageDependencies,
+                        )
+                    }.let {
+                        Pair(it, it.get().outputFiles)
+                    }
             }
 
-        val outputFiles = definitionTask.get().outputFiles
+        val outputFiles = definitionTask.second
 
         if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
             val ktTarget =
@@ -189,7 +217,7 @@ internal fun Project.configAppleTargets(
                 }
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
                 cInteropTaskNamesWithDefFile[cinteropTaskName] = file
-                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask.get()
+                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask.first.get()
                 cInteropTaskNamesWithExportTask[cinteropTaskName] = exportedManifestTask.get()
             }
         }
@@ -204,7 +232,7 @@ internal fun Project.configAppleTargets(
         copyPackageResourcesTask.configure {
             it.dependsOn(compileTask)
         }
-        definitionTask.configure {
+        definitionTask.first.configure {
             it.dependsOn(copyPackageResourcesTask)
         }
         exportedManifestTask.configure {
@@ -212,7 +240,7 @@ internal fun Project.configAppleTargets(
         }
 
         // Keep a handle to the "root" for this target
-        taskGroup[cinteropTarget] = definitionTask.get()
+        taskGroup[cinteropTarget] = definitionTask.first.get()
     }
 }
 

@@ -43,9 +43,20 @@ public enum class AppleCompileTarget : Serializable {
 
     internal fun triple(version: String) = "${this.arch()}-apple-${this.osCompiler()}$version${this.simulatorSuffix()}"
 
+    internal fun destination(): String =
+        when (this) {
+            iosArm64 -> "generic/platform=iOS"
+            iosX64, iosSimulatorArm64 -> "generic/platform=iOS Simulator"
+            watchosArm64 -> "generic/platform=watchOS"
+            watchosSimulatorArm64, watchosX64 -> "generic/platform=watchOS Simulator"
+            tvosArm64 -> "generic/platform=tvOS,arch=arm64"
+            tvosX64, tvosSimulatorArm64 -> "generic/platform=tvOS Simulator"
+            macosArm64, macosX64 -> "generic/platform=macOS"
+        }
+
     internal fun packageBuildDirName() = "${this.arch()}-apple-${this.osCompiler()}${this.simulatorSuffix()}"
 
-    private fun osCompiler(): String =
+    internal fun osCompiler(): String =
         when (this) {
             iosX64, iosArm64, iosSimulatorArm64 -> "ios"
             watchosX64, watchosArm64, watchosSimulatorArm64 -> "watchos"
@@ -75,7 +86,7 @@ public enum class AppleCompileTarget : Serializable {
             macosX64, macosArm64 -> "macosx"
         }
 
-    private fun arch() =
+    internal fun arch() =
         when (this) {
             iosX64 -> "x86_64"
             iosArm64, iosSimulatorArm64 -> "arm64"
