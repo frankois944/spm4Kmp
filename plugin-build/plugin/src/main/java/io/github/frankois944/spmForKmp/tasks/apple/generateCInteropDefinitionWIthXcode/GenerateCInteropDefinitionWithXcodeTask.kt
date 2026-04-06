@@ -3,6 +3,8 @@ package io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinitionWI
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -20,8 +22,6 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
-import java.io.File
-import javax.inject.Inject
 
 @CacheableTask
 @Suppress("TooManyFunctions")
@@ -143,5 +143,6 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
+        // module location "/Users/francoisdabonot/devs/spm4Kmp/example/SPM/spmKmpPlugin/nativeIosShared/scratch/Build/Intermediates.noindex/GeneratedModuleMaps-iphoneos/"
     }
 }

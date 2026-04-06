@@ -20,6 +20,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.ByteArrayOutputStream
@@ -258,6 +259,45 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             }.also {
                 logger.printExecLogs(
                     "xcodebuild",
+                    args,
+                    it.exitValue != 0,
+                    standardOutput,
+                    errorOutput,
+                )
+            }
+        createStaticLibrary()
+    }
+
+    private fun createStaticLibrary() {
+        logger.debug("Created static library for the bridge")
+        val args =
+            buildList {
+                add("--sdk")
+                add("macosx")
+                add("libtool")
+                add("-static")
+                add("-o")
+                add("lib${schemeName.get().capitalized()}.a")
+                add("${schemeName.get()}.o")
+            }
+        val standardOutput = ByteArrayOutputStream()
+        val errorOutput = ByteArrayOutputStream()
+        val mode = if (debugMode.get()) "Debug" else "Release"
+        execOps
+            .exec {
+                it.executable = "xcrun"
+                it.workingDir =
+                    File(packageScratchDir.get())
+                        .resolve("Build")
+                        .resolve("Products")
+                        .resolve("$mode-${cinteropTarget.get().sdk()}")
+                it.args = args
+                it.standardOutput = standardOutput
+                it.errorOutput = errorOutput
+                it.isIgnoreExitValue = true
+            }.also {
+                logger.printExecLogs(
+                    "libtool",
                     args,
                     it.exitValue != 0,
                     standardOutput,
