@@ -36,6 +36,7 @@ internal fun GenerateExportableManifestTask.configureTask(
             packageScratchDir = packageDirectoriesConfig.packageScratchDir,
             cinteropTarget = targets.first(),
             buildMode = getBuildMode(swiftPackageEntry),
+            useXcodeBuild = swiftPackageEntry.useXcodeBuild,
         ).absolutePath,
     )
     this.includeProduct.set(swiftPackageEntry.exportedPackageSettings.includeProduct)

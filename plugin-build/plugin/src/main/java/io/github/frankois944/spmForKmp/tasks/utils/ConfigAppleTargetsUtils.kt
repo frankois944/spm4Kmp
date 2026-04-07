@@ -36,7 +36,15 @@ internal fun getTargetBuildDirectory(
     packageScratchDir: File,
     cinteropTarget: AppleCompileTarget,
     buildMode: String,
+    useXcodeBuild: Boolean,
 ): File =
-    packageScratchDir
-        .resolve(cinteropTarget.packageBuildDirName())
-        .resolve(buildMode)
+    if (useXcodeBuild) {
+        packageScratchDir
+            .resolve("Build")
+            .resolve("Products")
+            .resolve(buildMode.capitalized() + "-" + cinteropTarget.sdk())
+    } else {
+        packageScratchDir
+            .resolve(cinteropTarget.packageBuildDirName())
+            .resolve(buildMode)
+    }

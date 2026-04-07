@@ -109,6 +109,7 @@ internal fun Project.configAppleTargets(
                 packageScratchDir = packageDirectoriesConfig.packageScratchDir,
                 cinteropTarget = cinteropTarget,
                 buildMode = buildMode,
+                useXcodeBuild = swiftPackageEntry.useXcodeBuild,
             )
 
         val copyPackageResourcesTask =
@@ -137,6 +138,7 @@ internal fun Project.configAppleTargets(
                 )
             }
 
+        var outputFiles: List<File> = listOf()
         val definitionTask =
             if (swiftPackageEntry.useXcodeBuild) {
                 tasks
@@ -155,8 +157,8 @@ internal fun Project.configAppleTargets(
                             packageDirectoriesConfig = packageDirectoriesConfig,
                             packageDependencies = packageDependencies,
                         )
-                    }.let {
-                        Pair(it, it.get().outputFiles)
+                    }.also {
+                        outputFiles = it.get().outputFiles
                     }
             } else {
                 tasks
@@ -175,12 +177,10 @@ internal fun Project.configAppleTargets(
                             packageDirectoriesConfig = packageDirectoriesConfig,
                             packageDependencies = packageDependencies,
                         )
-                    }.let {
-                        Pair(it, it.get().outputFiles)
+                    }.also {
+                        outputFiles = it.get().outputFiles
                     }
             }
-
-        val outputFiles = definitionTask.second
 
         if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
             val ktTarget =
@@ -217,7 +217,7 @@ internal fun Project.configAppleTargets(
                 }
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
                 cInteropTaskNamesWithDefFile[cinteropTaskName] = file
-                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask.first.get()
+                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask.get()
                 cInteropTaskNamesWithExportTask[cinteropTaskName] = exportedManifestTask.get()
             }
         }
@@ -232,7 +232,7 @@ internal fun Project.configAppleTargets(
         copyPackageResourcesTask.configure {
             it.dependsOn(compileTask)
         }
-        definitionTask.first.configure {
+        definitionTask.configure {
             it.dependsOn(copyPackageResourcesTask)
         }
         exportedManifestTask.configure {
@@ -240,7 +240,7 @@ internal fun Project.configAppleTargets(
         }
 
         // Keep a handle to the "root" for this target
-        taskGroup[cinteropTarget] = definitionTask.first.get()
+        taskGroup[cinteropTarget] = definitionTask.get()
     }
 }
 

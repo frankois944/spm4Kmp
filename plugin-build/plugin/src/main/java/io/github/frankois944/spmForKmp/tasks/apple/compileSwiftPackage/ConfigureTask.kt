@@ -42,10 +42,19 @@ internal fun CompileSwiftPackageTask.configureTask(
     this.generatedDirs.set(
         buildList {
             if (isFirstTarget) {
-                add(packageDirectoriesConfig.packageScratchDir.resolve("artifacts"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("plugins"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("registry"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("checkouts"))
+                if (swiftPackageEntry.useXcodeBuild) {
+                    add(
+                        packageDirectoriesConfig.packageScratchDir
+                            .resolve("Build")
+                            .resolve("Intermediates.noindex")
+                            .resolve("GeneratedModuleMaps-${cinteropTarget.sdk()}"),
+                    )
+                } else {
+                    add(packageDirectoriesConfig.packageScratchDir.resolve("artifacts"))
+                    add(packageDirectoriesConfig.packageScratchDir.resolve("plugins"))
+                    add(packageDirectoriesConfig.packageScratchDir.resolve("registry"))
+                    add(packageDirectoriesConfig.packageScratchDir.resolve("checkouts"))
+                }
             }
             add(targetBuildDir)
         },

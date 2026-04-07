@@ -20,7 +20,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.ByteArrayOutputStream
@@ -127,7 +126,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             if (useXcodeBuild.get()) {
                 logger.debug("Building XcodeBuild")
                 tracer.trace("Build with XcodeBuild") {
-                    buildWithXcodeBuildCommandLine()
+                    buildWithXcodeBuildCommandLine(tracer)
                 }
             } else {
                 logger.debug("Building Swift command line")
@@ -207,7 +206,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
             }
     }
 
-    private fun buildWithXcodeBuildCommandLine() {
+    private fun buildWithXcodeBuildCommandLine(tracer: TaskTracer) {
         val args =
             buildList {
                 add("--sdk")
@@ -265,7 +264,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     errorOutput,
                 )
             }
-        createStaticLibrary()
+        tracer.trace("createStaticLibrary") {
+            createStaticLibrary()
+        }
     }
 
     private fun createStaticLibrary() {
@@ -277,7 +278,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 add("libtool")
                 add("-static")
                 add("-o")
-                add("lib${schemeName.get().capitalized()}.a")
+                add("lib${schemeName.get()}.a")
                 add("${schemeName.get()}.o")
             }
         val standardOutput = ByteArrayOutputStream()

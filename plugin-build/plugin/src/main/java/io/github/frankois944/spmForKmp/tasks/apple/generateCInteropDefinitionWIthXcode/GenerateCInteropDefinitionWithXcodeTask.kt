@@ -1,8 +1,11 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinitionWIthXcode
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
+import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -12,6 +15,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
@@ -97,7 +101,26 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
 
     @get:OutputFiles
     val outputFiles: List<File>
-        get() = emptyList()
+        get() =
+            buildList {
+                getModuleConfigs().forEachIndexed { index, moduleName ->
+                    // if (index == 0) {
+                    add(
+                        definitionFolder
+                            .get()
+                            .asFile
+                            .resolve("${moduleName.name}.def"),
+                    )
+                    /*} else {
+                        add(
+                            definitionFolder
+                                .get()
+                                .asFile
+                                .resolve("${moduleName.name}.def"),
+                        )
+                    }*/
+                }
+            }
 
     @get:Input
     abstract val traceEnabled: Property<Boolean>
@@ -116,24 +139,61 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
     @get:Input
     abstract val useXcodeBuild: Property<Boolean>
 
-    private val checkoutFolder: File
-        get() =
-            File(scratchDir.get())
-                .resolve("checkouts")
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val moduleMapsDirectory: DirectoryProperty
 
-    private val artifactFolder: File
-        get() =
-            File(scratchDir.get())
-                .resolve("artifacts")
+    private fun getModuleConfigs(): List<ModuleConfig> =
+        buildList {
+            // the first item must be the product name
+            add(
+                ModuleConfig(
+                    name = productName.get(),
+                    compilerOpts = compilerOpts.get(),
+                    linkerOpts = linkerOpts.get(),
+                ),
+            )
+            addAll(
+                packages
+                    .get()
+                    .filterExportableDependency()
+                    .also {
+                        logger.debug("Filtered exportable dependency: {}", it)
+                    }.flatMap { dependency ->
+                        when (dependency) {
+                            is SwiftDependency.Package -> {
+                                dependency.productsConfig.productPackages
+                                    .flatMap { product ->
+                                        product.products
+                                    }.map { product ->
+                                        ModuleConfig(
+                                            name = product.name,
+                                            alias = product.alias,
+                                            packageName = dependency.packageName,
+                                            spmPackageName = dependency.packageName,
+                                        )
+                                    }
+                            }
 
-    private lateinit var checkoutPublicFolder: List<File>
-
-    private lateinit var artifactPublicFolder: List<File>
-
-    private lateinit var builtModulesFolder: List<File>
+                            is SwiftDependency.Binary -> {
+                                listOf(
+                                    ModuleConfig(
+                                        name = dependency.packageName,
+                                        spmPackageName = dependency.packageName,
+                                        isCLang = dependency.isCLang,
+                                    ),
+                                )
+                            }
+                        }
+                    },
+            )
+        }.distinctBy { it.name }
+            .also {
+                logger.warn("Product names to export: {}", it)
+            }
 
     init {
-        description = "Generate the cinterop definitions files"
+        description = "Generate the cinterop definitions files from xcodebuild"
         group = "io.github.frankois944.spmForKmp.tasks"
         onlyIf {
             HostManager.hostIsMac
@@ -143,6 +203,50 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
     @Suppress("LongMethod")
     @TaskAction
     fun generateDefinitions() {
-        // module location "/Users/francoisdabonot/devs/spm4Kmp/example/SPM/spmKmpPlugin/nativeIosShared/scratch/Build/Intermediates.noindex/GeneratedModuleMaps-iphoneos/"
+        tracer =
+            TaskTracer(
+                "GenerateCInteropDefinitionWithXcodeTask-${target.get()}",
+                traceEnabled.get(),
+                outputFile = storedTraceFile.get().asFile,
+            )
+        tracer.trace("GenerateCInteropDefinitionTask") {
+            tracer.trace("cleanup old definitions") {
+                removeOldDefinition()
+            }
+        }
     }
+
+    private fun getExtraLinkers(): String {
+        val xcodeDevPath = execOps.getXcodeDevPath(logger)
+        return buildList {
+            add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
+        }.joinToString(" ")
+    }
+
+    private fun removeOldDefinition() {
+        definitionFolder.get().asFileTree.forEach { file ->
+            if (file.name.endsWith("_default.def") && file.exists() && file.delete()) {
+                logger.debug("Removing old definition {}", file)
+            }
+        }
+    }
+
+    private fun getCustomizedDefinitionConfig(): String =
+        buildString {
+            if (strictEnums.get().isNotEmpty()) {
+                appendLine("strictEnums = ${strictEnums.get().joinToString(" ")}")
+            }
+            if (nonStrictEnums.get().isNotEmpty()) {
+                appendLine("nonStrictEnums = ${nonStrictEnums.get().joinToString(" ")}")
+            }
+            foreignExceptionMode.orNull?.let {
+                appendLine("foreignExceptionMode = $it")
+            }
+            disableDesignatedInitializerChecks.orNull?.let {
+                appendLine("disableDesignatedInitializerChecks = $it")
+            }
+            userSetupHint.orNull?.let {
+                appendLine("userSetupHint = \"$it\"")
+            }
+        }
 }

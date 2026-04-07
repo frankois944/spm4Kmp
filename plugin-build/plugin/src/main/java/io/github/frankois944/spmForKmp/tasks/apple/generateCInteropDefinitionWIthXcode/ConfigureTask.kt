@@ -58,4 +58,10 @@ internal fun GenerateCInteropDefinitionWithXcodeTask.configureTask(
             .resolve(cinteropTarget.toString()),
     )
     this.useXcodeBuild.set(swiftPackageEntry.useXcodeBuild)
+    this.moduleMapsDirectory.set(
+        packageDirectoriesConfig.packageScratchDir
+            .resolve("Build")
+            .resolve("Intermediates.noindex")
+            .resolve("GeneratedModuleMaps-${cinteropTarget.sdk()}"),
+    )
 }
