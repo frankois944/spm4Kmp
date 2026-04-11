@@ -169,7 +169,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     init {
         description = "Generate the cinterop definitions files"
-        group = "io.github.frankois944.spmForKmp.tasks"
+        group = "io.github.frankois944.spmForKmp.tasks.definition"
         onlyIf {
             HostManager.hostIsMac
         }
@@ -331,7 +331,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                 moduleConfig.isFramework = true
                 moduleConfig.buildDir =
                     getModuleArtifactsPath(
-                        fromPath = Path.of(scratchDir.get()),
+                        fromArtifactPath = Path.of(scratchDir.get()).resolve("artifacts"),
                         productName = productName.get(),
                         moduleConfig = moduleConfig,
                         target = target.get(),
@@ -468,7 +468,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     private fun generateCFrameworkDefinition(moduleConfig: ModuleConfig): String {
         val libraryPaths =
             getModuleArtifactsPath(
-                fromPath = Path.of(scratchDir.get()),
+                fromArtifactPath =
+                    Path
+                        .of(scratchDir.get())
+                        .resolve("artifacts"),
                 productName = productName.get(),
                 moduleConfig = moduleConfig,
                 target = target.get(),

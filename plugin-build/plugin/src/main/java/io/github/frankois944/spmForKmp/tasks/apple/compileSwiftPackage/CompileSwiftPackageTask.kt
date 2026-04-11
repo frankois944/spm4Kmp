@@ -101,7 +101,7 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     init {
         description = "Compile the Swift Package manifest"
-        group = "io.github.frankois944.spmForKmp.tasks"
+        group = "io.github.frankois944.spmForKmp.tasks.compile"
         onlyIf {
             HostManager.hostIsMac
         }

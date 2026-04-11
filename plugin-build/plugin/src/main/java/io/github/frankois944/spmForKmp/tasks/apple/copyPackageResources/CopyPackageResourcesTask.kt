@@ -61,7 +61,7 @@ internal abstract class CopyPackageResourcesTask : DefaultTask() {
 
     init {
         description = "Copy package resource to application"
-        group = "io.github.frankois944.spmForKmp.tasks"
+        group = "io.github.frankois944.spmForKmp.tasks.resources"
         onlyIf {
             HostManager.hostIsMac
         }

@@ -46,13 +46,12 @@ internal fun findHeadersModule(
     }
 
 internal fun getModuleArtifactsPath(
-    fromPath: Path,
+    fromArtifactPath: Path,
     productName: String,
     moduleConfig: ModuleConfig,
     target: AppleCompileTarget,
 ): Path =
-    fromPath
-        .resolve("artifacts")
+    fromArtifactPath
         .resolve(productName.lowercase())
         .resolve(moduleConfig.name)
         .resolve("${moduleConfig.name}.xcframework")
@@ -65,7 +64,7 @@ internal fun getModulesInBuildDirectory(buildDir: File): List<File> =
             ext == "build" || ext == "framework" || file.name == "Modules"
         }?.toList() ?: throw RuntimeException("No Module/Framework found in ${buildDir.path}")
 
-private val moduleNameRegex = """module\s+(\S+)\s+""".toRegex()
+internal val moduleNameRegex = """module\s+(\S+)\s+""".toRegex()
 
 internal fun GenerateCInteropDefinitionTask.extractModuleNameFromModuleMap(module: String): String? =
     moduleNameRegex

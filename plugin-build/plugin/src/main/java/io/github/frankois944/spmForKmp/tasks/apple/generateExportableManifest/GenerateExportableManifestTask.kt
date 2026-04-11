@@ -109,7 +109,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
 
     init {
         description = "Generate a Swift Package manifest with exported product"
-        group = "io.github.frankois944.spmForKmp.tasks"
+        group = "io.github.frankois944.spmForKmp.tasks.manifest"
         onlyIf {
             HostManager.hostIsMac
         }

@@ -82,7 +82,7 @@ internal abstract class ConfigRegistryPackageTask : DefaultTask() {
 
     init {
         description = "Generate Package Registry Manifest"
-        group = "io.github.frankois944.spmForKmp.tasks"
+        group = "io.github.frankois944.spmForKmp.tasks.registry"
         onlyIf {
             HostManager.hostIsMac && registries.get().isNotEmpty()
         }
