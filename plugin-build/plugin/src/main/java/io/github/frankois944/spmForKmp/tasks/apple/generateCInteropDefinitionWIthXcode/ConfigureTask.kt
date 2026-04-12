@@ -57,6 +57,12 @@ internal fun GenerateCInteropDefinitionWithXcodeTask.configureTask(
             .resolve("defFiles")
             .resolve(cinteropTarget.toString()),
     )
+    this.moduleMapFolder.set(
+        packageDirectoriesConfig
+            .spmWorkingDir
+            .resolve("moduleMaps")
+            .resolve(cinteropTarget.toString()),
+    )
     this.useXcodeBuild.set(swiftPackageEntry.useXcodeBuild)
     this.moduleMapsDirectory.set(
         packageDirectoriesConfig.packageScratchDir

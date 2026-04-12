@@ -6,6 +6,7 @@ import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.Ge
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.exists
 
 internal fun findFolders(
     path: File,
@@ -56,6 +57,11 @@ internal fun getModuleArtifactsPath(
         .resolve(moduleConfig.name)
         .resolve("${moduleConfig.name}.xcframework")
         .resolve(target.xcFrameworkArchName())
+        .takeIf {
+            it.exists()
+        }.let {
+            requireNotNull(it) { "Couldn't find $productName in $fromArtifactPath" }
+        }
 
 internal fun getModulesInBuildDirectory(buildDir: File): List<File> =
     buildDir

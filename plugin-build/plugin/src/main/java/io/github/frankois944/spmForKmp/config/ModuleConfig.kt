@@ -16,8 +16,12 @@ internal data class ModuleConfig(
     var compilerOpts: List<String> = emptyList(),
     var swiftDependency: SwiftDependency? = null,
     var isCLang: Boolean = false,
-    var customSearchHeaderPath: MutableList<File> = mutableListOf(),
-)
+    val customSearchHeaderPath: MutableList<File> = mutableListOf(),
+) {
+    fun addCustomSearchHeaderPath(path: File) {
+        customSearchHeaderPath.add(path)
+    }
+}
 
 internal fun List<ModuleConfig>.containsPackage(name: String): Boolean =
     this

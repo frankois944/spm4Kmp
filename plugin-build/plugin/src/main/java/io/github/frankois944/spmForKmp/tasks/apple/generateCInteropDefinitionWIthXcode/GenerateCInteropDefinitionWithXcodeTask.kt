@@ -13,11 +13,6 @@ import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
 import io.github.frankois944.spmForKmp.tasks.utils.moduleNameRegex
 import io.github.frankois944.spmForKmp.utils.SwiftManifestParser
 import io.github.frankois944.spmForKmp.utils.checkSum
-import java.io.File
-import java.nio.file.Path
-import javax.inject.Inject
-import kotlin.io.path.exists
-import kotlin.io.path.nameWithoutExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
@@ -37,12 +32,19 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
+import java.io.File
+import javax.inject.Inject
+import kotlin.io.path.exists
+import kotlin.io.path.nameWithoutExtension
 
 @CacheableTask
 @Suppress("TooManyFunctions")
 internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() {
     @get:OutputDirectory
     abstract val definitionFolder: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val moduleMapFolder: DirectoryProperty
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -120,7 +122,7 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                             definitionFolder
                                 .get()
                                 .asFile
-                                .resolve("${moduleName.name}.def"),
+                                .resolve("${moduleName.name}_bridge.def"),
                         )
                     } else {
                         add(
@@ -162,6 +164,7 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                     name = productName.get(),
                     compilerOpts = compilerOpts.get(),
                     linkerOpts = linkerOpts.get(),
+                    customSearchHeaderPath = mutableListOf(moduleMapsDirectory.get().asFile),
                 ),
             )
             addAll(
@@ -182,6 +185,7 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                                             alias = product.alias,
                                             packageName = dependency.packageName,
                                             spmPackageName = dependency.packageName,
+                                            customSearchHeaderPath = mutableListOf(moduleMapsDirectory.get().asFile),
                                         )
                                     }
                             }
@@ -192,6 +196,7 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                                         name = dependency.packageName,
                                         spmPackageName = dependency.packageName,
                                         isCLang = dependency.isCLang,
+                                        customSearchHeaderPath = mutableListOf(moduleMapsDirectory.get().asFile),
                                     ),
                                 )
                             }
@@ -208,20 +213,20 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
             File(scratchDir.get())
                 .resolve("SourcePackages")
                 .resolve("checkouts")
-                .takeIf { it.exists() }
                 .let {
-                    logger.warn("Found checkouts folder: {}", it)
-                    requireNotNull(it) { "checkouts folder not found" }
+                    logger.debug("Found checkouts folder: {}", it)
+                    require(it.exists()) { "checkouts folder not found" }
+                    it
                 }
     private val artifactFolder: File
         get() =
             File(scratchDir.get())
                 .resolve("SourcePackages")
                 .resolve("artifacts")
-                .takeIf { it.exists() }
                 .let {
                     logger.warn("Found artifact folder: {}", it)
-                    requireNotNull(it) { "artifact folder not found" }
+                    require(it.exists()) { "checkouts folder not found" }
+                    it
                 }
 
     private fun lookingForArtifactFramework(moduleConfig: ModuleConfig): File =
@@ -232,62 +237,11 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
             .resolve(target.get().xcFrameworkArchName())
             .resolve("Headers")
             .resolve(moduleConfig.name)
-            .also {
+            .takeIf { it.exists() }
+            .let {
                 logger.warn("Found artifact: {} for {}", it, moduleConfig)
+                requireNotNull(it) { "Invalid artifact framework" }
             }
-
-   /* private fun configureModules(
-        moduleConfigs: List<ModuleConfig>,
-        builtModules: List<File>,
-    ) {
-        moduleConfigs.forEachIndexed { index, moduleConfig ->
-            logger.warn("LOOKING for module dir {}", moduleConfig.name)
-            if (moduleConfig.isCLang) {
-                logger.warn(
-                    """
-                    CLang is experimental and not fully tested; please create an issue if you encounter a bug.
-                    Only C language-based xcFramework is currently supported.
-                    """.trimIndent(),
-                )
-                moduleConfig.isFramework = true
-                moduleConfig.buildDir =
-                    getModuleArtifactsPath(
-                        fromPath = Path.of(scratchDir.get()),
-                        productName = productName.get(),
-                        moduleConfig = moduleConfig,
-                        target = target.get(),
-                    )
-                moduleConfig.definitionFile = definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
-            } else {
-                builtModules
-                    .find {
-                        logger.warn("CHECK {} == {}", moduleConfig.name, it.nameWithoutExtension)
-                        it.nameWithoutExtension.equals(moduleConfig.name, ignoreCase = true)
-                    }?.let { buildDir ->
-                        moduleConfig.isFramework = buildDir.extension == "framework"
-                        logger.warn("create definitionFilePath $buildDir $moduleConfig")
-                        val definitionFilePath =
-                            if (index == 0) {
-                                definitionFolder.get().asFile.resolve("${moduleConfig.name}_bridge.def")
-                            } else {
-                                definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
-                            }
-                        moduleConfig.definitionFile = definitionFilePath
-                        logger.warn("set definitionFilePath $definitionFolder")
-                    } ?: let {
-                    lookingForArtifactFramework(moduleConfig).let { location ->
-                        logger.warn("FOUND ARTIFACT MODULE ${location.name}")
-                        if (location.exists()) {
-                            moduleConfig.isFramework = false
-                            moduleConfig.definitionFile =
-                                definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
-                            moduleConfig.customSearchHeaderPath.add(location)
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 
     private lateinit var checkoutPublicFolder: List<File>
 
@@ -320,7 +274,6 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
             tracer.trace("artifactPublicFolder") {
                 artifactPublicFolder = findHeadersModule(artifactFolder, target.get())
             }
-            val compiledBinaryFile = compiledBinary.asFile.get()
             val moduleConfigs = tracer.trace("collect module configs") { getModuleConfigs() }
 
             val builtModules = mutableListOf<File>()
@@ -329,7 +282,6 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                     .get()
                     .asFile
                     .listFiles { file ->
-                        logger.warn("FILTER FRAMEWORK $file has extension framework")
                         file.extension == "framework"
                     },
             )
@@ -341,8 +293,6 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                         file.extension == "modulemap"
                     },
             )
-
-            logger.warn("BUILD MODULE $builtModules")
 
             moduleConfigs.forEachIndexed { index, moduleConfig ->
                 logger.debug("LOOKING for module dir {}", moduleConfig.name)
@@ -360,20 +310,21 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                             productName = productName.get(),
                             moduleConfig = moduleConfig,
                             target = target.get(),
-                        ).also {
-                            if (!it.exists()) {
-                                throw GradleException("Invalid artifact path for module $moduleConfig path: $it [not found]")
-                            }
-                        }
-                    moduleConfig.definitionFile = definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
+                        )
+                    moduleConfig.definitionFile =
+                        definitionFolder
+                            .get()
+                            .asFile
+                            .resolve("${moduleConfig.name}.def")
+                    moduleConfig.customSearchHeaderPath.add(moduleMapsDirectory.get().asFile)
                 } else {
                     builtModules
                         .find {
-                            logger.warn("CHECK {} == {}", moduleConfig.name, it.nameWithoutExtension)
+                            logger.debug("CHECK {} == {}", moduleConfig.name, it.nameWithoutExtension)
                             it.nameWithoutExtension.equals(moduleConfig.name, ignoreCase = true)
                         }?.let { buildDir ->
                             moduleConfig.isFramework = buildDir.extension == "framework"
-                            moduleConfig.buildDir = buildDir.toPath()
+                            moduleConfig.buildDir = buildDir.parentFile.toPath()
                             val definitionFilePath =
                                 if (index == 0) {
                                     definitionFolder.get().asFile.resolve("${moduleConfig.name}_bridge.def")
@@ -381,46 +332,46 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                                     definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
                                 }
                             moduleConfig.definitionFile = definitionFilePath
+                            moduleConfig.customSearchHeaderPath.add(moduleMapsDirectory.get().asFile)
                         } ?: let {
                         lookingForArtifactFramework(moduleConfig).let { location ->
-                            if (location.exists()) {
-                                logger.warn("FOUND ARTIFACT MODULE ${location.name}")
-                                moduleConfig.isFramework = false
-                                moduleConfig.buildDir = location.toPath()
-                                moduleConfig.definitionFile =
-                                    definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
-                                moduleConfig.customSearchHeaderPath.add(location)
-                            } else {
-                                throw GradleException("${location.name} not found")
-                            }
+                            logger.warn("FOUND ARTIFACT MODULE ${location.name}")
+                            moduleConfig.isFramework = false
+                            moduleConfig.buildDir = location.toPath()
+                            moduleConfig.definitionFile =
+                                definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
+                            moduleConfig.customSearchHeaderPath.add(location)
+                            moduleConfig.customSearchHeaderPath.add(moduleMapsDirectory.get().asFile)
                         }
                     }
                 }
             }
 
             logger.warn(
-                ">>>>Modules configured\n{}",
+                "Modules configured\n{}",
                 moduleConfigs.joinToString("\n"),
             )
-
             // Génère les fichiers de définition
             tracer.trace("generate definition files") {
                 moduleConfigs.forEachIndexed { index, moduleConfig ->
                     tracer.trace("build ${moduleConfig.name} definition") {
-                        buildDefinitionFile(index, moduleConfig, compiledBinaryFile).let { definition ->
-                            try {
-                                logger.warn("write def file : ${moduleConfig.definitionFile} \n##\n ${definition.trimIndent()}")
-                                moduleConfig.definitionFile.writeText(definition.trimIndent())
-                                logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
-                                logger.debug("At Path: {}", moduleConfig.definitionFile.path)
-                                logger.debug("{}", moduleConfig.definitionFile.readText())
-                            } catch (e: Exception) {
-                                throw GradleException(
-                                    "Error writing definition file for module ${moduleConfig.name}",
-                                    e,
-                                )
+                        buildDefinitionFile(index, moduleConfig, compiledBinary.get().asFile)
+                            .let { definition ->
+                                logger.warn("FULL DEFINITION\n{}\n{}", moduleConfig.name, definition)
+
+                                try {
+                                    logger.warn("write def file : ${moduleConfig.definitionFile} \n##\n ${definition.trimIndent()}")
+                                    moduleConfig.definitionFile.writeText(definition.trimIndent())
+                                    logger.debug("Definition File : {}", moduleConfig.definitionFile.name)
+                                    logger.debug("At Path: {}", moduleConfig.definitionFile.path)
+                                    logger.debug("{}", moduleConfig.definitionFile.readText())
+                                } catch (e: Exception) {
+                                    throw GradleException(
+                                        "Error writing definition file for module ${moduleConfig.name}",
+                                        e,
+                                    )
+                                }
                             }
-                        }
                     }
                 }
             }
@@ -471,8 +422,8 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
         logger.debug("Building definition file for: {}", moduleConfig)
         return tracer.trace("buildDefinitionFile") {
             try {
-                val moduleName =
-                    tracer.trace("resolve module name") {
+                val moduleName = moduleConfig.name
+                    /*tracer.trace("resolve module name") {
                         if (moduleConfig.isCLang) {
                             moduleConfig.name
                         } else {
@@ -485,7 +436,7 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
                                     )
                             }
                         }
-                    }
+                    }*/
 
                 val baseDefinition =
                     tracer.trace("generate base definition") {
@@ -534,32 +485,55 @@ internal abstract class GenerateCInteropDefinitionWithXcodeTask : DefaultTask() 
         }
     }
 
-    private fun getModuleMap(moduleConfig: ModuleConfig): File {
+    /*private fun getModuleMap(moduleConfig: ModuleConfig): File {
         val moduleMapPossiblePath = moduleMapsDirectory.get().asFile
-        logger.warn("  {}", moduleMapPossiblePath)
+        logger.warn("moduleMapPossiblePath  {}", moduleMapPossiblePath)
         val file = moduleMapPossiblePath.resolve(moduleConfig.name + ".modulemap")
         if (file.exists()) {
             logger.warn("modulemap found {}", file)
             return file
         }
-        val moduleMapFromArtifacts = lookingForArtifactFramework(moduleConfig)
-        if (moduleMapFromArtifacts.resolve("module.modulemap").exists()) {
-            logger.debug("modulemap found from artifact {}", moduleMapFromArtifacts)
-            moduleConfig.customSearchHeaderPath.add(moduleMapFromArtifacts)
-            return moduleMapFromArtifacts.resolve("module.modulemap")
+
+        val first =
+            artifactFolder
+                .resolve(moduleConfig.packageName)
+                .resolve(moduleConfig.name)
+                .resolve("${moduleConfig.name}.xcframework")
+                .resolve(target.get().xcFrameworkArchName())
+                .resolve("${moduleConfig.name}.framework")
+                .resolve("Modules")
+                .resolve("module.modulemap")
+        if (first.exists()) {
+            return first
         }
+        logger.warn("Invalid module.modulemap {} - {} ", moduleConfig.name, first)
+        val second =
+            artifactFolder
+                .resolve(productName.get())
+                .resolve(moduleConfig.name)
+                .resolve("${moduleConfig.name}.xcframework")
+                .resolve(target.get().xcFrameworkArchName())
+                .resolve("Headers")
+                .resolve("module.modulemap")
+        if (second.exists()) {
+            return second
+        }
+        logger.warn("Invalid module.modulemap {} - {} ", moduleConfig.name, second)
         error("Module map file not found for module: ${moduleConfig.name}")
-    }
+    }*/
 
     private fun generateCFrameworkDefinition(moduleConfig: ModuleConfig): String {
         val libraryPaths =
             getModuleArtifactsPath(
-                fromArtifactPath = Path.of(scratchDir.get()),
+                fromArtifactPath = artifactFolder.toPath(),
                 productName = productName.get(),
                 moduleConfig = moduleConfig,
                 target = target.get(),
-            )
-        check(libraryPaths.exists())
+            ).takeIf {
+                it.exists()
+            }.let {
+                requireNotNull(it) { "Wrong path for XCframework $it [NOT FOUND]" }
+            }
         val packageName =
             packageDependencyPrefix.orNull?.let {
                 "$it.${moduleConfig.name}"
@@ -682,15 +656,20 @@ ${getCustomizedDefinitionConfig()}
             val includeModulePath = "${moduleConfig.buildDir.resolve("include")}"
 
             val buildDirPath = currentBuildDirectory.get().asFile.path
+            val moduleMapPath =
+                moduleMapsDirectory
+                    .get()
+                    .asFile
+                    .path
 
             tracer.trace("render definition") {
                 """
 language = Objective-C
 modules = $moduleName
 package = $packageName
-libraryPaths = "${currentBuildDirectory.get().asFile}"
-compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"$buildDirPath"
-linkerOpts = $linkerOps ${getExtraLinkers()} -F"$buildDirPath"
+libraryPaths = "$buildDirPath"
+compilerOpts = $compilerOpts -fmodules -I"$moduleMapPath"
+linkerOpts = $linkerOps ${getExtraLinkers()}
 ${getCustomizedDefinitionConfig()}
                 """.trimIndent()
             }
