@@ -91,8 +91,10 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                             "spmKmpPlugin",
                             swiftPackageEntry.internalName,
                         )
-                    val packageScratchDir = resolveAndCreateDir(spmWorkingDir, "scratch")
-                    val sharedCacheDir = swiftPackageEntry.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
+                    val packageScratchBaseDir = resolveAndCreateDir(spmWorkingDir, "scratch")
+                    val sharedCacheDir =
+                        swiftPackageEntry.sharedCachePath?.let { resolveAndCreateDir(File(it)) }
+                            ?: resolveAndCreateDir(spmWorkingDir, "sharedCache")
                     val sharedConfigDir = swiftPackageEntry.sharedConfigPath?.let { resolveAndCreateDir(File(it)) }
                     val sharedSecurityDir = swiftPackageEntry.sharedSecurityPath?.let { resolveAndCreateDir(File(it)) }
                     val bridgeSourceDir =
@@ -120,7 +122,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         packageDirectoriesConfig =
                             PackageDirectoriesConfig(
                                 spmWorkingDir = spmWorkingDir,
-                                packageScratchDir = packageScratchDir,
+                                packageScratchBaseDir = packageScratchBaseDir,
                                 sharedCacheDir = sharedCacheDir,
                                 sharedConfigDir = sharedConfigDir,
                                 sharedSecurityDir = sharedSecurityDir,
@@ -221,12 +223,11 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
         }
     }
 
-    private fun mergeEntries(entries: Set<PackageRootDefinitionExtension>): Set<PackageRootDefinitionExtension> {
-        return entries
+    private fun mergeEntries(entries: Set<PackageRootDefinitionExtension>): Set<PackageRootDefinitionExtension> =
+        entries
             .groupBy { it.internalName }
             .values
             .map { groupedEntries ->
                 groupedEntries.firstOrNull { it.targetName == null } ?: groupedEntries.first()
             }.toSet()
-    }
 }

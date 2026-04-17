@@ -21,7 +21,7 @@ internal object Hashing {
 
         md5Digest.update(config.bridgeSourceDir.path.toByteArray())
         md5Digest.update(config.spmWorkingDir.path.toByteArray())
-        md5Digest.update(config.packageScratchDir.path.toByteArray())
+        md5Digest.update(config.packageScratchBaseDir.path.toByteArray())
         config.sharedCacheDir?.path?.let {
             md5Digest.update(it.toByteArray())
         }

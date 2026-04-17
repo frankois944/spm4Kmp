@@ -33,7 +33,7 @@ internal fun GenerateExportableManifestTask.configureTask(
     this.exportedDirectory.set(exportedManifestDirectory)
     this.compiledTargetDir.set(
         getTargetBuildDirectory(
-            packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+            packageScratchDir = packageDirectoriesConfig.targetScratchDir(targets.first()),
             cinteropTarget = targets.first(),
             buildMode = getBuildMode(swiftPackageEntry),
         ).absolutePath,

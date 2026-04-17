@@ -101,9 +101,11 @@ internal fun Project.configAppleTargets(
     val buildMode = getBuildMode(swiftPackageEntry)
     allTargets.forEachIndexed { index, cinteropTarget ->
         logger.debug("SETUP {}", cinteropTarget)
+        val targetScratchDir = packageDirectoriesConfig.targetScratchDir(cinteropTarget)
+        targetScratchDir.mkdirs()
         val targetBuildDir =
             getTargetBuildDirectory(
-                packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+                packageScratchDir = targetScratchDir,
                 cinteropTarget = cinteropTarget,
                 buildMode = buildMode,
             )
@@ -117,6 +119,7 @@ internal fun Project.configAppleTargets(
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     buildMode = buildMode,
                     cinteropTarget = cinteropTarget,
+                    targetScratchDir = targetScratchDir,
                 )
             }
 
@@ -130,7 +133,7 @@ internal fun Project.configAppleTargets(
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     targetBuildDir = targetBuildDir,
-                    isFirstTarget = index == 0,
+                    targetScratchDir = targetScratchDir,
                 )
             }
 
@@ -149,6 +152,7 @@ internal fun Project.configAppleTargets(
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     packageDependencies = packageDependencies,
+                    targetScratchDir = targetScratchDir,
                 )
             }
 

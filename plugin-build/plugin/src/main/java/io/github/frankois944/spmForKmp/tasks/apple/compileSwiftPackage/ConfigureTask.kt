@@ -15,13 +15,13 @@ internal fun CompileSwiftPackageTask.configureTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
     targetBuildDir: File,
-    isFirstTarget: Boolean,
+    targetScratchDir: File,
 ) {
     this.cinteropTarget.set(cinteropTarget)
     this.debugMode.set(swiftPackageEntry.debug)
     this.packageSwift.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
     this.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
-    this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
+    this.packageScratchDir.set(targetScratchDir.absolutePath)
     this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
     this.osVersion.set(computeOsVersion(cinteropTarget, swiftPackageEntry))
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir?.absolutePath)
@@ -41,12 +41,10 @@ internal fun CompileSwiftPackageTask.configureTask(
     this.packageResolveFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_RESOLVE_NAME))
     this.generatedDirs.set(
         buildList {
-            if (isFirstTarget) {
-                add(packageDirectoriesConfig.packageScratchDir.resolve("artifacts"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("plugins"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("registry"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("checkouts"))
-            }
+            add(targetScratchDir.resolve("artifacts"))
+            add(targetScratchDir.resolve("plugins"))
+            add(targetScratchDir.resolve("registry"))
+            add(targetScratchDir.resolve("checkouts"))
             add(targetBuildDir)
         },
     )

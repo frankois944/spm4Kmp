@@ -17,6 +17,7 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
     packageDependencies: List<SwiftDependency>,
+    targetScratchDir: File,
 ) {
     this.compiledBinary.set(
         targetBuildDir
@@ -31,7 +32,7 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
         computeOsVersion(cinteropTarget, swiftPackageEntry),
     )
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-    this.scratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
+    this.scratchDir.set(targetScratchDir.absolutePath)
     this.packageDependencyPrefix.set(swiftPackageEntry.packageDependencyPrefix)
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)

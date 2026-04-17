@@ -5,11 +5,13 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
 import org.gradle.api.Project
+import java.io.File
 
 internal fun CopyPackageResourcesTask.configureTask(
     packageDirectoriesConfig: PackageDirectoriesConfig,
     buildMode: String,
     cinteropTarget: AppleCompileTarget,
+    targetScratchDir: File,
 ) {
     val buildProductDir: String? =
         project.propertyOrNull("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String
@@ -46,7 +48,7 @@ internal fun CopyPackageResourcesTask.configureTask(
     }
 
     this.builtDirectory.set(
-        packageDirectoriesConfig.packageScratchDir
+        targetScratchDir
             .resolve(cinteropTarget.packageBuildDirName())
             .resolve(buildMode),
     )
