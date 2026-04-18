@@ -11,6 +11,7 @@ internal object StartingFile {
         Ensure that your class is public and has the @objcMembers / @objc annotation.
         This file has been created because the folder is empty.
         Ignore this file if you don't need it or set "spmforkmp.disableStartupFile=true" inside your gradle file
+        More tips : https://github.com/frankois944/Swift-Import-Interoperability-with-Kotlin-Multiplatform
         **/
 
         /**
