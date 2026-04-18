@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.0'
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
