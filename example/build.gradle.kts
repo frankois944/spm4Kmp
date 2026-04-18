@@ -2,7 +2,6 @@
 
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.swiftPackageConfig
-import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
