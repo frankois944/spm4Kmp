@@ -76,7 +76,7 @@ val contentFromSwift = MySwiftBridge().exportedMethod()
 val aView = MySwiftBridge().exportedView() as UIView
 ```
 
-## Handle Resources (since v1.6.0)
+## Handle Resources (since v1.7.1)
 
 To handle resources in your bridge, like images, fonts, etc.
 

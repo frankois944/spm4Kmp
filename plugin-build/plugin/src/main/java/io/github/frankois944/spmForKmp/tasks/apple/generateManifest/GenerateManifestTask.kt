@@ -17,14 +17,15 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
-import java.nio.file.Path
 import javax.inject.Inject
-import kotlin.io.path.exists
 
 @CacheableTask
 internal abstract class GenerateManifestTask : DefaultTask() {
     @get:Input
     abstract val packageDependencies: ListProperty<SwiftDependency>
+
+    @get:Input
+    abstract val hasResourceFolder: Property<Boolean>
 
     @get:Input
     abstract val packageName: Property<String>
@@ -109,12 +110,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                                 targetSettings = targetSettings.get(),
                                 exportedPackage = null,
                                 resourcesPaths =
-                                    getResourcePaths(
-                                        manifestFile
-                                            .get()
-                                            .asFile.parentFile
-                                            .toPath(),
-                                    ),
+                                    getResourcePaths(),
                             ),
                     )
                 manifestFile.get().asFile.writeText(manifest)
@@ -123,12 +119,10 @@ internal abstract class GenerateManifestTask : DefaultTask() {
         tracer.writeHtmlReport()
     }
 
-    private fun getResourcePaths(packagePath: Path): List<String>? =
-        listOf("Resources")
-            .takeIf {
-                packagePath
-                    .resolve("Sources")
-                    .resolve("Resources")
-                    .exists()
-            }
+    private fun getResourcePaths(): List<String>? =
+        if (hasResourceFolder.get()) {
+            listOf("Resources")
+        } else {
+            null
+        }
 }

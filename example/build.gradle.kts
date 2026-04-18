@@ -2,7 +2,6 @@
 
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.swiftPackageConfig
-import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -83,7 +82,7 @@ kotlin {
                 )
             }
             // this is experimental, DON'T use in production
-            newPublicationInteroperability = true
+            // newPublicationInteroperability = true
             dependency {
                 if (System.getenv("GITEA_TOKEN") != null) {
                     registryPackage(
