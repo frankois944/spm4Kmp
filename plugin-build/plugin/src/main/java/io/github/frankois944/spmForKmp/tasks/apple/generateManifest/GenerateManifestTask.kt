@@ -124,11 +124,13 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     }
 
     private fun getResourcePaths(packagePath: Path): List<String>? =
-        listOf("Resources")
-            .takeIf {
-                packagePath
-                    .resolve("Sources")
-                    .resolve("Resources")
-                    .exists()
-            }
+        if (packagePath
+                .resolve("Sources")
+                .resolve("Resources")
+                .exists()
+        ) {
+            listOf("Resources")
+        } else {
+            null
+        }
 }
