@@ -132,4 +132,8 @@ $(SRCROOT)/../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
 ++ import FireBaseCore.FIRApp
 ```
 
-Basicaly every `cocoapods` package prefix has been removed but could be recovered by setting [packageDependencyPrefix](../references/swiftPackageConfig.md#packagedependencyprefix).
+Basically every `cocoapods` package prefix has been removed but could be recovered by setting [packageDependencyPrefix](../references/swiftPackageConfig.md#packagedependencyprefix).
+
+## Include dependency into your xcode project.
+
+Sometimes it requires to include the native dependency into your xcode project to fix dependency resolution issues; [more details here](../bridgeWithDependencies.md#automatic-dependency-build-inclusion).

@@ -182,21 +182,21 @@ OUTPUT $standardOutput
 ###
             """.trimMargin()
         if (!errorOutput.toString().contains("unexpected binary")) {
+            errorString.lines().forEach { errorLine ->
+                error(errorLine)
+            }
             throw GradleException(
                 "spmForKmp failed when running $action",
-                Exception(errorString),
+                Exception("ERROR FOUND WHEN EXEC $action"),
             )
         } else {
-            warn(errorString)
+            errorString.lines().forEach { errorLine ->
+                warn(errorLine)
+            }
         }
     } else {
-        debug(
-            """
-RUN $action
-ARGS xcrun ${args.joinToString(" ")}
-OUTPUT $standardOutput
-###
-            """.trimMargin(),
-        )
+        debug("RUN $action")
+        debug("ARGS xcrun ${args.joinToString(" ")}")
+        debug("OUTPUT $standardOutput")
     }
 }
