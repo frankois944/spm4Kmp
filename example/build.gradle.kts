@@ -145,18 +145,6 @@ kotlin {
                     checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
                     isCLang = true,
                 )
-            }
-        }
-
-        target.swiftPackageConfig(cinteropName = "nativeFirebaseStuff") {
-            minIos = "15.0"
-            exportedPackageSettings {
-                includeProduct = listOf(
-                    "FirebaseMessaging",
-                    "FirebasePerformance",
-                )
-            }
-            dependency {
                 remotePackageVersion(
                     url = uri("https://github.com/firebase/firebase-ios-sdk"),
                     products = {
@@ -164,7 +152,7 @@ kotlin {
                         add(ProductName("FirebasePerformance"), exportToKotlin = true)
                     },
                     packageName = "firebase-ios-sdk",
-                    version = "12.11.0"
+                    version = "12.11.0",
                 )
             }
         }
