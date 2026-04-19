@@ -1,13 +1,23 @@
-# Migration from versions < 1.0
+# Migration from 0.x to 1.0
 
-- `copyDependenciesToApp` has been **deleted** and is now the default behavior.
+This page lists all breaking changes introduced in 1.0.
 
-The exported package is now generated when needed or when you explicitly need it with the [includeProduct](../references/exportedPackageConfig.md#includeproduct) configuration.
+---
 
-- `isIncludedInExportedPackage` has been **deleted**
+## `copyDependenciesToApp` removed
 
-Replaced by [includeProduct](../references/exportedPackageConfig.md#includeproduct) configuration.
+This option has been deleted — its behavior is now the default.
 
-- The configuration `linkerOpts` and `compilerOpts` has been removed from dependency configuration, only the [root one are available.](../references/swiftPackageConfig.md#linkeropts)
+The exported package is generated automatically when needed, or explicitly via the [`includeProduct`](../references/exportedPackageConfig.md#includeproduct) configuration.
 
-- Legacy `SwiftDependency` has been removed from public api.
+## `isIncludedInExportedPackage` removed
+
+Replaced by the [`includeProduct`](../references/exportedPackageConfig.md#includeproduct) configuration.
+
+## `linkerOpts` and `compilerOpts` removed from dependency config
+
+Per-dependency `linkerOpts` and `compilerOpts` are no longer available. Use the [root-level options](../references/swiftPackageConfig.md#linkeropts) on `swiftPackageConfig` instead.
+
+## `SwiftDependency` removed from public API
+
+The legacy `SwiftDependency` type has been removed. Use the DSL methods (`remotePackageVersion`, `remotePackageBranch`, etc.) available in the [`dependency {}`](../references/dependency/dependencyConfig.md) block.

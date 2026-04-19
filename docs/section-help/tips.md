@@ -26,9 +26,9 @@ By default, Swift Package Manager (SPM) working files are stored within the Grad
 
 Example configuration in your `build.gradle.kts`:
 ```kotlin
-spm {
+swiftPackageConfig {
     // ...
-    spmWorkingPath = file("../.spm-working")
+    spmWorkingPath = "${projectDir.resolve("SPM")}"
 }
 ```
 

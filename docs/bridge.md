@@ -1,26 +1,26 @@
-# Bridge The Native API
+# Bridge the Native API
+
+The bridge is a folder of Swift files that acts as the glue between your Swift/Apple SDK code and Kotlin. The plugin compiles these files and exposes them to Kotlin via `cinterop`.
 
 ## How It Works
 
-When syncing the project, the plugin creates a folder at `src/swift/[cinteropName]` or `src/swift/[targetName]` if `cinteropName` **is not defined**, for example `src/swift/iosArm64`.
+When syncing the project, the plugin creates the bridge folder at:
 
-The content of this folder is your bridge between Swift and Kotlin, **everything inside is copied to the build directory**.
+- `src/swift/[cinteropName]` — when `cinteropName` is set
+- `src/swift/[targetName]` — otherwise (e.g. `src/swift/iosArm64`)
 
-!!! note "StartYourBridgeHere.swift"
+Everything inside this folder is copied to the build directory and compiled into the bridge.
 
-    A template file named `StartYourBridgeHere.swift` is added when the bridge is empty; it contains some example and
-    this is your starting point to create your bridge.
+!!! note "Getting Started"
+    When the bridge folder is empty, the plugin adds a `StartYourBridgeHere.swift` template with examples to help you get started.
 
-    This behavior can be disabled by adding `spmforkmp.disableStartupFile=true` to your `gradle.properties` file.
+    To disable this behavior, add `spmforkmp.disableStartupFile=true` to your `gradle.properties`.
 
+---
 
-## Example
+## Gradle Configuration
 
-### Gradle
-
-The following configuration is a simple bridge between Kotlin and the Swift Apple Native SDK.
-
-The plug-in uses the [cinterop feature of KMP](https://kotlinlang.org/docs/native-get-started.html) to export the compatible code to your Apple target code.
+A minimal bridge setup — no external dependencies, just the Apple native SDK:
 
 ```kotlin title="build.gradle.kts"
 kotlin {
@@ -37,26 +37,26 @@ kotlin {
 
 <details>
 <summary>Legacy (< 1.1.0)</summary>
+
 ```kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {
     }
 }
 ```
+
 </details>
 
+---
 
+## Writing Your Bridge
 
-### Bridge
+!!! warning "Objective-C Compatibility Required"
+    Swift code must be annotated with [`@objc` / `@objcMembers`](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and declared `public` to be visible in Kotlin. Pure Swift types are not bridgeable.
 
-!!! warning "Make your Swift code compatible with Kotlin."
+    See the [playground](./section-help/tips.md#how-can-i-import-swift-code-into-my-kotlin-code) for practical interoperability examples.
 
-    Your Swift code needs to be marked as [@objc/@objcMembers](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and the visibility set as `public`
-    or it won't be exported and available from your Kotlin code.
-
-A [playground](./section-help/tips.md#how-can-i-import-swift-code-into-my-kotlin-code) to help you import Swift code into your Kotlin code.
-
-```swift title="src/swift/[cinteropname]/mySwiftFile.swift"
+```swift title="src/swift/[cinteropName]/mySwiftFile.swift"
 import UIKit
 
 @objcMembers public class MySwiftBridge: NSObject {
@@ -70,16 +70,23 @@ import UIKit
 ```
 
 ```kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
-import [cinteropname].MySwiftBridge
+import [cinteropName].MySwiftBridge
 
 val contentFromSwift = MySwiftBridge().exportedMethod()
 
 val aView = MySwiftBridge().exportedView() as UIView
 ```
 
-## Handle Resources (since v1.7.1)
+---
 
-To handle resources in your bridge, like images, fonts, etc.
+## Bundle Resources (since v1.7.1)
 
-- Add a folder named `Resources` and put your resources inside like `bridgeString.txt`.
-- Access from Swift with `Bundle.module.url(forResource: "bridgeString", withExtension: "txt")`.
+To bundle resources (images, fonts, data files, etc.) alongside your bridge:
+
+1. Create a `Resources` folder inside your bridge directory
+2. Place your files there (e.g. `bridgeString.txt`)
+3. Access them from Swift using `Bundle.module`:
+
+```swift
+let url = Bundle.module.url(forResource: "bridgeString", withExtension: "txt")
+```
