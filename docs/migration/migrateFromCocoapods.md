@@ -1,14 +1,16 @@
-# Migrate From The Cocoapods Plugin To The Swift Package Manager Plugin
+# Migrate from the CocoaPods Plugin to the SPM Plugin
 
+This guide covers the essential steps to migrate from the Kotlin CocoaPods plugin to the `spmForKmp` plugin.
 
-This is a short guide for doing a quick migration from the Cocoapods KMP plugin to spmForKmp Plugin, it's **covering only the basics**.
+!!! info "Diff notation"
+    - Lines prefixed with `--` should be **removed**
+    - Lines prefixed with `++` should be **added**
 
-* -- : removed lines
-* ++ : added lines
+---
 
 ## Gradle
 
-### Toml
+### `libs.versions.toml`
 
 ``` toml linenums="1" hl_lines="5 11 12" title="libs.versions.toml"
 [versions]
@@ -25,7 +27,7 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 ++ spmForKmp = { id = "io.github.frankois944.spmForKmp", version.ref = "spmForKmp" }
 ```
 
-### Build.kts
+### Root `build.gradle.kts`
 
 ```kotlin linenums="1" hl_lines="5 6" title="build.gradle.kts"
 plugins {
@@ -38,6 +40,10 @@ plugins {
     alias(libs.plugins.composeCompiler).apply(false)
 }
 ```
+
+### Module `build.gradle.kts`
+
+Replace the `cocoapods {}` block with `swiftPackageConfig {}` for each target:
 
 ``` kotlin linenums="1" hl_lines="3 4 11-26 28-50" title="myKMPApp/build.gradle.kts"
 plugins {
@@ -57,14 +63,14 @@ kotlin {
     -    ios.deploymentTarget = "16.6"
     -    pod("FirebaseCore") {
     -        version = libs.versions.firebaseIOS.get()
-    -     }
-    -     pod("FirebaseAnalytics") {
-    -         version = libs.versions.firebaseIOS.get()
-    -     }
-    -     pod("CryptoSwift") {
+    -    }
+    -    pod("FirebaseAnalytics") {
+    -        version = libs.versions.firebaseIOS.get()
+    -    }
+    -    pod("CryptoSwift") {
     -        version = "1.2.3"
     -        linkOnly = true
-    -     }
+    -    }
     - }
 
     + listOf(
@@ -90,50 +96,60 @@ kotlin {
     +            )
     +        }
     +    }
+    + }
 }
 ```
 
+---
 
 ## Xcode
 
 ### Remove CocoaPods Integration
 
-- From your iOSApp folder :
+From your iOS app folder, run:
 
-``` title="run command"
+``` title="Terminal"
 pod deintegrate
 ```
-### Add New Build Phase
 
-From the *Build Phases* tab of your project, create a `New Run Script Phase` and put it at the **top** of the list.
+### Add a New Build Phase
 
-Add inside the newly created script:
+In the **Build Phases** tab of your Xcode project:
 
-``` title="Run script"
+1. Click **+** and choose **New Run Script Phase**
+2. Drag it to the **top** of the phase list
+3. Paste the following script:
+
+``` bash title="Run Script"
 cd "$SRCROOT/../../"
 ./gradlew :shared:embedAndSignAppleFrameworkForXcode
 ```
 
-### Update The Build Settings
+### Update Build Settings
 
-From the *Build Settings* tab of your project, add or Update the following settings :
+In the **Build Settings** tab, set or update the following:
 
-``` title="Other Linker Flags "
--framework shared
-```
-``` title="Framework Search Paths"
-$(SRCROOT)/../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
-```
+| Setting | Value |
+| --- | --- |
+| **Other Linker Flags** | `-framework shared` |
+| **Framework Search Paths** | `$(SRCROOT)/../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)` |
+
+---
 
 ## Kotlin Code
 
-```
+Update import statements — the `cocoapods` package prefix is removed:
+
+```diff
 -- import cocoapods.FireBaseCore.FIRApp
 ++ import FireBaseCore.FIRApp
 ```
 
-Basically every `cocoapods` package prefix has been removed but could be recovered by setting [packageDependencyPrefix](../references/swiftPackageConfig.md#packagedependencyprefix).
+!!! tip
+    The original prefix can be restored by configuring [`packageDependencyPrefix`](../references/swiftPackageConfig.md#packagedependencyprefix).
 
-## Include dependency into your xcode project.
+---
 
-Sometimes it requires to include the native dependency into your xcode project to fix dependency resolution issues; [more details here](../bridgeWithDependencies.md#automatic-dependency-build-inclusion).
+## Troubleshooting
+
+If you run into dependency resolution issues or crash in Xcode, you may need to include the native dependency directly in your Xcode project. See [Automatic Dependency Build Inclusion](../bridgeWithDependencies.md#automatic-dependency-build-inclusion) for details.
