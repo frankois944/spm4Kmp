@@ -42,6 +42,7 @@ This compilation error stems from a specific incompatibility between Kotlin and 
 
 ### Solutions
 Choose one of the following:
+
 - **Upgrade:** Move to **Kotlin 2.1.21** or later (Recommended).
 - **Downgrade:** Use **Xcode 16.2** or earlier.
 
@@ -67,7 +68,7 @@ While the plugin supports applying multiple configurations to a single target, d
 
 !!! danger "Potential Risks"
     - **Increased Build Times**: Each configuration creates its own isolated workspace, significantly prolonging the build process.
-    - **Workspace Conflicts**: Simultaneous configurations can lead to "missing file" errors due to synchronization conflicts.
+    - **Workspace Conflicts**: Simultaneous configurations can lead to "missing file" errors due to caching conflicts.
 
 !!! tip "Best Practice"
     Whenever possible, consolidate your configurations or use separate targets to avoid these complications.
