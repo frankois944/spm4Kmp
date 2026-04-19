@@ -105,7 +105,7 @@ swiftPackageConfig {
     Your Swift code needs to be marked as [@objc/@objcMembers](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and the visibility set as `public`
     or it won't be exported and available from your Kotlin code.
 
-A [playground](./section-help/tips.md#how-can-i-import-swift-code-into-my-kotlin-code) to help you to import Swift code into your Kotlin code.
+A [playground](./section-help/tips.md#how-can-i-import-swift-code-into-my-kotlin-code) to help you import Swift code into your Kotlin code.
 
 ```swift title="src/swift/[cinteropname]/mySwiftFile.swift"
 import Foundation
