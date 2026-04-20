@@ -7,6 +7,28 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class IOSAppTest : BaseTest() {
+    private fun findSimulatorId(): String {
+        val process =
+            ProcessBuilder("xcrun", "simctl", "list", "devices", "available")
+                .redirectErrorStream(true)
+                .start()
+
+        val output = process.inputStream.bufferedReader().readText()
+        process.waitFor()
+
+        println(output)
+
+        val regex = Regex("""iPhone.*\(([-A-F0-9]+)\)""")
+        return regex
+            .find(output)
+            ?.groupValues
+            ?.get(1)
+            .also {
+                println("found id:$it")
+            }
+            ?: error("No simulator found")
+    }
+
     @Test
     fun `build and test example app`() {
         if (System.getenv("GITEA_TOKEN").isNullOrEmpty()) {
@@ -23,7 +45,7 @@ class IOSAppTest : BaseTest() {
                 "-configuration",
                 "Debug",
                 "-destination",
-                "platform=iOS Simulator,name=iPhone SE (3rd generation)",
+                "id=${findSimulatorId()}",
                 "-derivedDataPath",
                 "./build",
                 "-clonedSourcePackagesDirPath",

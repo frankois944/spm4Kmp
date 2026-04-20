@@ -8,13 +8,13 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=frankois944_spm4Kmp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=frankois944_spm4Kmp)
 [![GitHub License](https://img.shields.io/github/license/frankois944/spm4kmp)](https://github.com/frankois944/spm4Kmp/blob/main/LICENSE)
 
-The Swift Package Manager for Kotlin Multiplatform Plugin, aka `spmForKmp` Gradle Plugin, is an **alternative of the [dying](https://blog.cocoapods.org/CocoaPods-Specs-Repo/) CocoaPods Plugin** used by [KMP cocoapods plugin](https://kotlinlang.org/docs/native-cocoapods.html#set-up-an-environment-to-work-with-cocoapods).
+The Swift Package Manager for Kotlin Multiplatform Plugin (`spmForKmp`) is a modern **alternative to the [deprecated](https://blog.cocoapods.org/CocoaPods-Specs-Repo/) CocoaPods Plugin** previously used by the [KMP CocoaPods plugin](https://kotlinlang.org/docs/native-cocoapods.html#set-up-an-environment-to-work-with-cocoapods).
 
-It will help you to integrate Swift Package and simplify communication between Swift/Kotlin Multiplatform projects targeting the **Apple platform**.
+It helps you integrate Swift Packages and simplifies communication between Swift and Kotlin Multiplatform projects targeting **Apple platforms**.
 
-You can also easily **use your own Swift code** to your Kotlin's Apple sourceSet!
+You can also easily **use your own Swift code** in your Kotlin Apple source sets!
 
-The plugin uses the embedded Swift Package Manager, so **no third-party dependency is needed**, and it's less intrusive.
+The plugin uses the native Swift Package Manager, so **no third-party dependencies are required**, making it less intrusive and more reliable.
 
 # [READ THE DOCUMENTATION](https://spmforkmp.eu/)
 

@@ -6,42 +6,36 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=frankois944_spm4Kmp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=frankois944_spm4Kmp)
 [![GitHub License](https://img.shields.io/github/license/frankois944/spm4kmp)](https://github.com/frankois944/spm4Kmp/blob/main/LICENSE)
 
-The Swift Package Manager for Kotlin Multiplatform Plugin, aka `spmForKmp` Gradle Plugin, is an **alternative of the [dying](https://blog.cocoapods.org/CocoaPods-Specs-Repo/) CocoaPods Plugin** used by [KMP cocoapods plugin](https://kotlinlang.org/docs/native-cocoapods.html#set-up-an-environment-to-work-with-cocoapods).
+---
 
-It will help you to integrate Swift Package and simplify communication between Swift/Kotlin Multiplatform projects targeting the **Apple platform**.
+`spmForKmp` is a modern **alternative to the [deprecated CocoaPods plugin](https://blog.cocoapods.org/CocoaPods-Specs-Repo/)** for Kotlin Multiplatform projects targeting Apple platforms.
 
-The plugin uses the embedded Swift Package Manager, so **no third-party dependency is needed**, and it's less intrusive than CocoaPods.
+It integrates Swift Packages and bridges Swift↔Kotlin communication using the **native Swift Package Manager** — no third-party dependencies required.
 
-!!! warning "Please Be Aware"
+!!! warning "Pure Swift Packages"
+    [Pure Swift packages cannot be exported directly to Kotlin](./section-help/faq.md#whats-a-pure-swift-package). The plugin helps you create a bridge to work around this limitation — currently the most effective approach until native Swift import is supported in KMP.
 
-    [Pure Swift packages can't be exported to Kotlin](./section-help/faq.md#whats-a-pure-swift-package); the plugin will help you to create a bridge to bypass this issue.
-
-    It's a manual job, but until the Swift-import is (not currently planned) available in KMP, it's the only way.
-
+---
 
 ## Features
 
-- **Create a Swift↔Kotlin bridge**: Import your own Swift code for functionality that can't be done in Kotlin.
-- **Use SPM third-Party Dependency**: Add external dependency and use it inside your bridge
-- **Import Swift-compatible code to Kotlin**: Enable SPM dependencies and your own Swift code to be exposed directly in your Kotlin code ([if compatible](./section-help/faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code)).
+- **Swift-Import to Kotlin** — import your own Swift code for functionality unavailable in Kotlin
+- **SPM third-party dependencies** — add external packages and use them inside your bridge
+- **Export to Kotlin** — expose SPM dependencies and Swift code directly in Kotlin ([when compatible](./section-help/faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code))
 
-## Swift-Import Playground
+---
 
-[Take a look on the playground](./section-help/tips.md#how-can-i-import-swift-code-into-my-kotlin-code) to understand how you can import Swift code into your kotlin code.
+## Getting Started
 
-## Support My Project ⭐️
+Check out the [playground](./section-help/tips.md#how-can-i-import-swift-code-into-my-kotlin-code) to see how to import Swift code into Kotlin, or browse the [sample project](https://github.com/frankois944/spm4Kmp/tree/main/example) to see the plugin in action.
 
-If you find this project useful, please consider giving it a star or a coffee!
+---
+
+## Feedback & Support
+
+Feature requests, bug reports, and edge-case feedback are very welcome — [join the discussion](https://github.com/frankois944/spm4Kmp/discussions).
+
+If you find the project useful, a star or a coffee goes a long way!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A51MG1Y9)
-
 [![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
-
-
-## Feedback
-
-This project greatly needs feedback, feature requests, and information about the edge case for progressing; let's [talk](https://github.com/frankois944/spm4Kmp/discussions).
-
-## Example
-
-A [sample](https://github.com/frankois944/spm4Kmp/tree/main/example) is available for people wanted to see the usage.

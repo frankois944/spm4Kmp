@@ -2,7 +2,6 @@
 
 import io.github.frankois944.spmForKmp.definition.product.ProductName
 import io.github.frankois944.spmForKmp.swiftPackageConfig
-import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -83,7 +82,7 @@ kotlin {
                 )
             }
             // this is experimental, DON'T use in production
-            newPublicationInteroperability = true
+            // newPublicationInteroperability = true
             dependency {
                 if (System.getenv("GITEA_TOKEN") != null) {
                     registryPackage(
@@ -146,18 +145,6 @@ kotlin {
                     checksum = "f66fc314edbdb7611c5e8522bc50ee62e7930f37f80631b8d08b2a40c81a631a",
                     isCLang = true,
                 )
-            }
-        }
-
-        target.swiftPackageConfig(cinteropName = "nativeFirebaseStuff") {
-            minIos = "15.0"
-            exportedPackageSettings {
-                includeProduct = listOf(
-                    "FirebaseMessaging",
-                    "FirebasePerformance",
-                )
-            }
-            dependency {
                 remotePackageVersion(
                     url = uri("https://github.com/firebase/firebase-ios-sdk"),
                     products = {
@@ -165,7 +152,7 @@ kotlin {
                         add(ProductName("FirebasePerformance"), exportToKotlin = true)
                     },
                     packageName = "firebase-ios-sdk",
-                    version = "12.11.0"
+                    version = "12.11.0",
                 )
             }
         }

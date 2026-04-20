@@ -1,139 +1,165 @@
-# Tips
+# Tips & Tricks
 
-## How can I Import Swift Code into my Kotlin code.
+This page provides various tips, optimizations, and workarounds to help you get the most out of `spm4Kmp`.
 
-A [playground](https://github.com/frankois944/Swift-Import-Interoperability-with-Kotlin-Multiplatform) of how to import Swift code into Kotlin is available.
+---
 
-You can find different use-cases about how to import Swift code, the repository will grow.
+## Importing Swift Code into Kotlin {#how-can-i-import-swift-code-into-my-kotlin-code}
 
-Request and feedback are welcome !
+If you're looking for practical examples of how to bridge Swift and Kotlin, check out the dedicated playground repository.
 
-## Reduce Build Time
+!!! tip "Playground Repository"
+    A [playground](https://github.com/frankois944/Swift-Import-Interoperability-with-Kotlin-Multiplatform) demonstrating various Swift-Kotlin interoperability use cases is available.
 
-[spmWorkingPath](../references/swiftPackageConfig.md#spmworkingpath) change the path to Swift Package working file.
+The repository is regularly updated with new examples. Feedback and requests for specific use cases are always welcome!
 
-By setting [spmWorkingPath](https://github.com/frankois944/spm4Kmp/blob/cf80e65b3076d9e0bcd94a847e1209d4b9b91141/example/build.gradle.kts#L108C1-L108C104) outside the build folder, the working files won't be removed if you clean the project, and you can **exclude** the folder from [indexing](https://www.jetbrains.com/help/idea/indexing.html#exclude).
+---
 
-Swift Package Manager has its own cache, so it's fine to detach it from the Kotlin build folder.
+## Optimizing Build Performance
+
+### Reduce Build Time
+
+By default, Swift Package Manager (SPM) working files are stored within the Gradle build folder. You can change this behavior using the [`spmWorkingPath`](../references/swiftPackageConfig.md#spmworkingpath) property.
+
+!!! info "Pro Tip: Detach Working Path"
+    Setting `spmWorkingPath` outside the build folder prevents working files from being deleted during a `./gradlew clean`. Additionally, you should [exclude](https://www.jetbrains.com/help/idea/indexing.html#exclude) this folder from IDE indexing to improve responsiveness.
+
+Example configuration in your `build.gradle.kts`:
+```kotlin
+swiftPackageConfig {
+    // ...
+    spmWorkingPath = "${projectDir.resolve("SPM")}"
+}
+```
 
 ### CI/CD Caching
 
-Add to your cache the content of the `build/spmKmpPlugin` folder or the `spmWorkingDir` value if set.
+To speed up your CI/CD pipelines, ensure you cache the SPM working directory:
+- The default directory: `build/spmKmpPlugin`
+- Or your custom `spmWorkingPath` if set.
 
-Also, check my [GitHub action workflow](https://github.com/frankois944/spm4Kmp/blob/main/.github/workflows/pre-merge.yaml) where I build the example app with cached built files.
+!!! example "GitHub Actions"
+    Check the [pre-merge workflow](https://github.com/frankois944/spm4Kmp/blob/main/.github/workflows/pre-merge.yaml) for a real-world example of building with cached SPM files.
 
-## Firebase
+---
 
-A [full example](https://github.com/frankois944/FirebaseKmpDemo) of how to implement Firebase with the plugin
+## Implementing Firebase
 
-## Working With _objcnames.classes_ Types
+Integrating Firebase into a KMP project can be complex. We provide a complete reference implementation to guide you.
 
-### Example
+!!! info "Firebase Example"
+    View the [Full Firebase KMP Demo](https://github.com/frankois944/FirebaseKmpDemo) for a step-by-step implementation.
 
-when using a UIView (work with any ObjC Types, ex: UIViewController...).
+---
+
+## Handling Objective-C Types (`_objcnames.classes_`) {#working-with-objcnamesclasses-types}
+
+When working with Objective-C types (like `UIView`, `UIViewController`, etc.), `cinterop` might occasionally need a "hint" to correctly map the types.
+
+### Example Solution
+
+If `cinterop` fails to recognize a specific type, you can force its inclusion by creating a dummy Swift class or using `NSObject` as a bridge.
 
 ```swift title="mySwiftBridge.swift"
+import UIKit
 
-// Force cinterop to include `platform.UIKit.UIView`
+// Option 1: Force cinterop to include `platform.UIKit.UIView` via a dummy class
 @objcMembers public class MyDummyView: UIView {}
 
-// Or force by inheritance
-@objcMembers public class TestClass: NSObject /* or UIView */ {
+// Option 2: Use inheritance or explicit NSObject mapping
+@objcMembers public class TestClass: NSObject {
 
-    // return `UIView` is not enough to let cinterop use the correct type
+    // Simply returning `UIView` may not always be enough for cinterop
     public func getView() -> UIView {
         return UIView()
     }
 
-    public func setView(view: UIView) {
-        // store view
-    }
-
-    // or if you don't want to declare an extra MyDummyView
-
+    // Using NSObject can sometimes be more reliable for mapping
     public func getViewWithNSObject() -> NSObject {
         return UIView()
     }
-
-    public func setViewWithNSObject(view: NSObject) {
-        // store view
-    }
-
 }
 ```
+
 ```kotlin title="iosMain/myKotlinFile.kt"
+import platform.UIKit.UIView
+
+// In your Kotlin code:
 fun getView(): UIView = TestClass().getView()
-fun setView(view: UIView) = TestClass().setViewWithView(view)
 
-// or
-
-fun getView(): UIView = TestClass().getViewWithNSObject() as UIView
-fun setView(view: UIView) = TestClass().setViewWithNSObject(view)
+// Or with explicit casting if using the NSObject approach:
+fun getViewCasted(): UIView = TestClass().getViewWithNSObject() as UIView
 ```
 
-## Support Xcode 15 And Earlier Or Another Version Of Swift
+---
+
+## Custom Swift Versions & Toolchains {#support-xcode-15-and-earlier-or-another-version-of-swift}
 
 !!! warning "Experimental"
+    This feature is experimental and may not cover all use cases. Please [report any issues](https://github.com/frankois944/spm4Kmp/issues) you encounter.
 
-    This is experimental; this tips is not fully tested for every use cases.
-    You can create an issue if needed.
+The plugin uses the system Swift command directly. If you need to support older Xcode versions or specific Swift toolchains, you can customize the binary path.
 
-Each version of Xcode embedded a specific version of Swift, and the plugin uses Swift directly instead of Xcode to work.
+### Using `swiftly`
+We recommend using [swiftly](https://www.swift.org/blog/introducing-swiftly_10/) to manage multiple Swift versions on macOS.
 
-It's always recommended to use the latest version of Xcode, but sometimes the Swift version can mess with the plugin.
-
-It's possible to support older/earlier versions of Swift, you have :
-
-- The property [swiftBinPath](../references/swiftPackageConfig.md#swiftbinpath) or [toolchain](../references/swiftPackageConfig.md#toolchain) to change the swift command used by the plugin.
-
-- This official tool [swiftly](https://www.swift.org/blog/introducing-swiftly_10/) to easily install another version/toolchain of swift on macOS.
-
-So follow the swiftly guide to install another swift version and set the swiftBinPath property correctly.
+1. Install the desired Swift version via `swiftly`.
+2. Set the [`swiftBinPath`](../references/swiftPackageConfig.md#swiftbinpath) in your configuration:
 
 ```kotlin
-swiftBinPath = "/path/to/.swiftly/bin/swift"
-```
-
-## Support Concurrency in KMP iOS Test
-
-If you're trying to test your code and your bridge contains async method, you will face a compiler error like
-
-```
-Failed to look up symbolic reference at 0x10497d0f5 - offset 342419 - symbol symbolic _____y___________pG ScC 4Nats10ServerInfoV s5ErrorP in .../debugTest/test.kexe
-```
-
-Or
-
-```
-Library not loaded: libswift_Concurrency.dylib
-```
-
-That's because the minimal target of the KMP test is too low: iOS 12 for physical devices and iOS 14 for simulators.
-
-Swift concurrency is available only from iOS 15.0; that can be fixed:
-
-### Example
-
-```kotlin
-iosSimulatorArm64().binaries.getTest("debug").apply {
-freeCompilerArgs +=
-    listOf(
-        "-Xoverride-konan-properties=osVersionMin.ios_simulator_arm64=16.0",
-    )
+spm {
+    // ...
+    swiftBinPath = "/path/to/.swiftly/bin/swift"
 }
 ```
 
-## Disable Swift Package Automatic IDE Resolution
+---
 
-If your project has a Swift package manifest, the IDE automatically resolves the package but for nothing.
+## Swift Concurrency in iOS Tests {#support-concurrency-in-kmp-ios-test}
 
-It makes the project **run slower** and can use a **lot of disk space** (never used and deleted).
+If your bridge uses `async/await` and you encounter errors during KMP tests (e.g., `Library not loaded: libswift_Concurrency.dylib`), it's likely due to the minimum deployment target.
 
-I recommend disabling it in the IDE settings [Sync Project after changes in the build script](jetbrains://idea/settings?name=Build%2C+Execution%2C+Deployment--Build+Tools).
+### The Problem
+Kotlin Multiplatform tests often default to a low minimum target (e.g., iOS 12/14), while Swift Concurrency requires **iOS 15.0+**.
 
-Also, after disabling this settings, you can delete the folder "/Users/[you]/Library/Caches/JetBrains/IntelliJIdea[Version]/DerivedData"
+### The Fix
+Override the minimum OS version for your test binaries:
+
+```kotlin
+kotlin {
+    iosSimulatorArm64().binaries.getTest("debug").apply {
+        freeCompilerArgs += listOf(
+            "-Xoverride-konan-properties=osVersionMin.ios_simulator_arm64=16.0",
+        )
+    }
+}
+```
+
+---
+
+## Disabling Automatic IDE Package Resolution {#disable-swift-package-automatic-ide-resolution}
+
+If your project contains a `Package.swift` manifest, IntelliJ/Android Studio might attempt to resolve it automatically. This can slow down the IDE and consume unnecessary disk space.
+
+!!! tip "Recommendation"
+    Disable the setting: **Sync Project after changes in the build script** in [IDE Settings](jetbrains://idea/settings?name=Build%2C+Execution%2C+Deployment--Build+Tools).
+
+After disabling this, you can safely reclaim disk space by deleting:
+`~/Library/Caches/JetBrains/IntelliJIdea[Version]/DerivedData`
 
 <figure markdown="span">
-  ![Image title](../assets/project-setting-desactivation.png){ width="500" }
-<figcaption>Sync Project after changes in the build script</figcaption>
+  ![IDE Settings Optimization](../assets/project-setting-desactivation.png){ width="500" }
+  <figcaption>Optimizing IDE sync settings</figcaption>
 </figure>
+
+---
+
+## Enabling Execution Tracing
+
+To debug performance or execution flow, you can enable detailed tracing.
+
+1. Add the following flag to your `gradle.properties`:
+   ```properties
+   spmforkmp.enableTracing=true
+   ```
+2. Find the generated traces in the `spmForKmpTrace` directory.

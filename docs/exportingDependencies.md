@@ -1,28 +1,26 @@
-# Export Dependencies To Kotlin
+# Export Dependencies to Kotlin
 
-## How It works
-
-On completion with [using external dependencies](bridgeWithDependencies.md), it's possible to export them to your Kotlin module, if they are [compatible](./section-help/faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code).
+Building on [using external dependencies](bridgeWithDependencies.md), you can export compatible packages directly to your Kotlin module — no bridge wrapping needed.
 
 !!! note
+    If a package doesn't work with the plugin, please [open an issue](https://github.com/frankois944/spm4Kmp/issues).
 
-    If your package doesn't work with the plugin, please create an [issue](https://github.com/frankois944/spm4Kmp/issues).
+---
 
-### Bridge Incompatible Dependencies
+## How It Works
 
-In a case the exported dependency is written in [Swift](./section-help/faq.md), **manual work needs to be done** like [this](bridgeWithDependencies.md#example).
+When a dependency has an Objective-C compatible interface, it can be exported directly via `exportToKotlin = true`. The plugin runs `cinterop` over the package's generated Objective-C header and makes its types available in your Kotlin code.
 
-For example, the [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) can't work directly on Kotlin, so the Plugin's bridge is here to fill the gape between Kotlin and Swift.
+!!! warning "Only export ObjC-compatible packages"
+    Exporting a [pure Swift package](./section-help/faq.md#when-exporting-a-product-i-have-only-swift_typedefs-or-swift_-available-in-my-kotlin-code) produces only empty `SWIFT_TYPEDEFS` in Kotlin and wastes build time. If the package is pure Swift, wrap it in a [bridge](bridgeWithDependencies.md#example) instead.
+
+---
 
 ## Example
 
+Exporting [FirebaseAnalytics](https://github.com/firebase/firebase-ios-sdk) — an ObjC-compatible library — directly to Kotlin.
+
 ### Gradle
-
-The following configuration exports to Kotlin the package [FirebaseAnalytics](https://github.com/firebase/firebase-ios-sdk) which is a ObjC library.
-
-!!! warning "Don't export incompatible library"
-
-    Exporting an incompatible library is useless and will only increase build time.
 
 ```kotlin title="build.gradle.kts"
 kotlin {
@@ -31,18 +29,17 @@ kotlin {
         iosSimulatorArm64()
         // and more Apple targets...
     ).forEach { target ->
-        target.swiftPackageConfig(groupName = "[cinteropName]") {
+        target.swiftPackageConfig(cinteropName = "[cinteropName]") {
             dependency {
                 remotePackageVersion(
                     url = uri("https://github.com/firebase/firebase-ios-sdk"),
-                    products = {
-                        add("FirebaseAnalytics", exportToKotlin = true), // exported
-                        add("FirebaseCore") // non-exported
-                    },
                     version = "11.8.0",
+                    products = {
+                        add("FirebaseAnalytics", exportToKotlin = true) // exported
+                        add("FirebaseCore")                              // not exported
+                    },
                 )
-                // Another SwiftDependency
-                // ...
+                // more dependencies...
             }
         }
     }
@@ -51,36 +48,34 @@ kotlin {
 
 <details>
 <summary>Legacy (< 1.1.0)</summary>
+
 ```kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {
         dependency {
             remotePackageVersion(
                 url = uri("https://github.com/firebase/firebase-ios-sdk"),
-                products = {
-                    add("FirebaseAnalytics", exportToKotlin = true), // exported
-                    add("FirebaseCore") // non-exported
-                },
                 version = "11.8.0",
+                products = {
+                    add("FirebaseAnalytics", exportToKotlin = true)
+                    add("FirebaseCore")
+                },
             )
-            // Another SwiftDependency
-            // ...
         }
     }
 }
 ```
+
 </details>
 
-### Bridge
+### Kotlin Usage
 
 ```kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
 import FirebaseAnalytics.FIRConsentStatusGranted
 
 @ExperimentalForeignApi
 val consentStatusGranted = FIRConsentStatusGranted
-
 ```
 
 !!! note
-
-    The bridge can remain empty as we don't need it; we only want to use the exported product.
+    The bridge file can remain empty — no Swift wrapping is needed when exporting an ObjC-compatible product directly.

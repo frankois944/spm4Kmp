@@ -1,57 +1,53 @@
 # Use External Dependencies
 
-## How It works
-
-On completion with the [basic configuration](bridge.md), it's possible to use external dependency with your bridge.
-
-The plug-in uses the Swift Packages features to gather all dependency inside the bridge.
+Building on the [basic bridge setup](bridge.md), you can pull in external Swift packages and use them inside your bridge.
 
 !!! note
+    If a package doesn't work with the plugin, please [open an issue](https://github.com/frankois944/spm4Kmp/issues).
 
-    If your package doesn't work with the plugin, please create an [issue](https://github.com/frankois944/spm4Kmp/issues).
+---
 
-#### Automatic Dependency Build Inclusion
+## How It Works
 
-The plugin will automatically include the dependency requirement in your application, if possible.
+The plugin fetches dependencies via Swift Package Manager and makes them available inside your bridge Swift files. The dependency is linked into the final binary automatically where possible.
 
-Also, it can detect if the dependency [must be included in your Xcode project](./bridgeWithDependencies.md#local-package), **BUT** the detection is not 100% accurate.
+### Automatic Dependency Inclusion {#automatic-dependency-build-inclusion}
 
-!!! warning "I have a build error or runtime crash from my native dependency"
-    If you encounter during the compilation an error like `Undefined symbol: ...` or a dependency crash during the runtime
-    please follow the steps below.
+The plugin attempts to automatically include native dependencies in your application. It can also detect when a dependency [needs to be added to your Xcode project](#local-package), though detection is not 100% reliable.
 
-    - Run your application on Xcode and check for errors
-        * If you have a `Undefined symbol` build error, you *MUST* add your dependency to Xcode
-        * If you have objc/C++/C runtime crash , you *MUST* add your dependency to Xcode
+!!! warning "Build error or runtime crash from a native dependency?"
+    If you see `Undefined symbol: ...` at build time or a native crash at runtime:
 
-    - You have two choices:
-        * Use the [includeProduct](./references/exportedPackageConfig.md#includeproduct) option to generate a [local package](./bridgeWithDependencies.md#local-package) to include in your Xcode project
-            * Your Xcode project will be automatically synched with the required dependency
-        * Manually add the dependency to your Xcode project
+    1. Run your app in Xcode and check the error:
+        - `Undefined symbol` → you **must** add the dependency to Xcode
+        - ObjC / C++ / C runtime crash → you **must** add the dependency to Xcode
+    2. Choose one of:
+        - Use the [`includeProduct`](./references/exportedPackageConfig.md#includeproduct) option to generate a [local package](#local-package) that Xcode picks up automatically
+        - Manually add the dependency to your Xcode project
 
-### Use Dependencies In Your Application
+### Making Dependencies Available to Your App
 
-By default, the dependencies are not available from your application, but if you need them, you can add them inside the [includeProduct](./references/exportedPackageConfig.md#includeproduct) configuration,
-and then the dependency will be included inside a local package.
+By default, bridge dependencies are not visible to your app code. To expose them, add them to the [`includeProduct`](./references/exportedPackageConfig.md#includeproduct) configuration — the plugin will bundle them into a local package.
 
-### Local Package
+### Local Package {#local-package}
 
-If the dependencies must be declared on the Xcode side; in that case, you will see the following message during the build:
+When a dependency must be declared on the Xcode side, the plugin prints a message during the build:
+
 ```
-Spm4Kmp: The following dependencies [some_dependency_name] need to be added to your xcode project
-A local Swift package has been generated at
-/path/to/the/local/package
-Please add it to your xcode project as a local package dependency
-...
+Spm4Kmp: The following dependencies [some_dependency_name] need to be added to your Xcode project.
+A local Swift package has been generated at /path/to/the/local/package
+Please add it to your Xcode project as a local package dependency.
 ```
 
-Set `spmforkmp.hideLocalPackageMessage=true` inside gradle.properties to hide this message
+Add the generated package to your Xcode project as a local dependency. To silence the message once done, set `spmforkmp.hideLocalPackageMessage=true` in `gradle.properties`.
+
+---
 
 ## Example
 
-### Gradle
+Adding [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) — a pure Swift library that cannot be used directly in Kotlin, so the bridge wraps it.
 
-The following configuration imports the package [CryptoSwift](https://github.com/krzyzanowskim/CryptoSwift) which is a pure Swift library, that can't be used directly in Kotlin.
+### Gradle
 
 ```kotlin title="build.gradle.kts"
 kotlin {
@@ -60,17 +56,16 @@ kotlin {
         iosSimulatorArm64()
         // and more Apple targets...
     ).forEach { target ->
-        target.swiftPackageConfig(groupName = "[cinteropName]") {
+        target.swiftPackageConfig(cinteropName = "[cinteropName]") {
             dependency {
                 remotePackageVersion(
                     url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                    version = "1.8.4",
                     products = {
                         add("CryptoSwift")
                     },
-                    version = "1.8.4",
                 )
-                // Another SwiftDependency
-                // ...
+                // more dependencies...
             }
         }
     }
@@ -79,35 +74,33 @@ kotlin {
 
 <details>
 <summary>Legacy (< 1.1.0)</summary>
+
 ```kotlin title="build.gradle.kts"
 swiftPackageConfig {
     create("[cinteropName]") {
         dependency {
             remotePackageVersion(
                 url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
+                version = "1.8.4",
                 products = {
                     add("CryptoSwift")
                 },
-                version = "1.8.4",
             )
-            // Another SwiftDependency
-            // ...
         }
     }
 }
 ```
+
 </details>
 
 ### Bridge
 
-!!! warning "Make your Swift code compatible with Kotlin."
+!!! warning "Objective-C Compatibility Required"
+    Bridge code must be annotated with [`@objc` / `@objcMembers`](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and declared `public` to be visible in Kotlin.
 
-    Your Swift code needs to be marked as [@objc/@objcMembers](https://www.hackingwithswift.com/example-code/language/what-is-the-objcmembers-attribute) and the visibility set as `public`
-    or it won't be exported and available from your Kotlin code.
+    See the [playground](./section-help/tips.md#how-can-i-import-swift-code-into-my-kotlin-code) for interoperability examples.
 
-A [playground](./section-help/tips.md#how-can-i-import-swift-code-into-my-kotlin-code) to help you to import Swift code into your Kotlin code.
-
-```swift title="src/swift/[cinteropname]/mySwiftFile.swift"
+```swift title="src/swift/[cinteropName]/mySwiftFile.swift"
 import Foundation
 import CryptoSwift
 
@@ -119,14 +112,14 @@ import CryptoSwift
 ```
 
 ```kotlin title="iosMain/kotlin/com/example/myKotlinFile.kt"
-import [cinteropname].MySwiftBridge
+import [cinteropName].MySwiftBridge
 
-val contentFromSwift = MySwiftBridge().toMD5(value = "someString")
+val hash = MySwiftBridge().toMD5(value = "someString")
 ```
 
-## Supported Dependency Sources
+---
 
-The plugin supports the following configurations :
+## Supported Dependency Sources
 
 === "Version"
 
@@ -134,6 +127,18 @@ The plugin supports the following configurations :
     remotePackageVersion(
         url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
         version = "1.8.4",
+        products = {
+            add("CryptoSwift")
+        },
+    )
+    ```
+
+=== "Branch"
+
+    ```kotlin
+    remotePackageBranch(
+        url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
+        branch = "main",
         products = {
             add("CryptoSwift")
         },
@@ -152,27 +157,16 @@ The plugin supports the following configurations :
     )
     ```
 
-=== "Branch"
-
-    ```kotlin
-    remotePackageBranch(
-        url = uri("https://github.com/krzyzanowskim/CryptoSwift.git"),
-        branch = "main",
-        products = {
-            add("CryptoSwift")
-        },
-    ),
-    ```
 === "Local"
 
     ```kotlin
     localPackage(
-        path = "Absolute path to the local package folder",
+        path = "/absolute/path/to/local/package",
         packageName = "LocalSourceDummyFramework",
         products = {
             add("LocalSourceDummyFramework")
         },
-    ),
+    )
     ```
 
 === "Local Binary"
@@ -180,8 +174,8 @@ The plugin supports the following configurations :
     ```kotlin
     localBinary(
         path = "/path/to/LocalFramework.xcframework",
-        packageName = "LocalFramework"
-    ),
+        packageName = "LocalFramework",
+    )
     ```
 
 === "Remote Binary"
@@ -194,10 +188,8 @@ The plugin supports the following configurations :
     )
     ```
 
-[SwiftDependency reference](./references/dependency/dependencyConfig.md)
+See the full [SwiftDependency reference](./references/dependency/dependencyConfig.md) for all available options.
 
-### XCFramework
+### XCFrameworks
 
-The XCFrameworks are used for Local/Remote Binary and protecting source code distribution, learn [more](https://www.avanderlee.com/swift/binary-targets-swift-package-manager).
-
-An example is [available](https://github.com/frankois944/spm4Kmp/tree/main/BinaryPackageSource).
+XCFrameworks are used for local/remote binary dependencies and for distributing pre-built code without exposing source. [Learn more](https://www.avanderlee.com/swift/binary-targets-swift-package-manager) or browse the [example](https://github.com/frankois944/spm4Kmp/tree/main/BinaryPackageSource).
