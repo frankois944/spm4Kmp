@@ -511,7 +511,7 @@ modules = $moduleName
 package = $packageName
 libraryPaths = "${currentBuildDirectory.get().asFile}"
 compilerOpts = -fmodules -framework "$frameworkName" -F"$buildDirPath"
-linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"$buildDirPath"
+linkerOpts = -framework "$frameworkName" -F"$buildDirPath" ${getExtraLinkers()}
 ${getCustomizedDefinitionConfig()}
                 """.trimIndent()
             }
@@ -600,7 +600,7 @@ modules = $moduleName
 package = $packageName
 libraryPaths = "${currentBuildDirectory.get().asFile}"
 compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"$buildDirPath"
-linkerOpts = $linkerOps ${getExtraLinkers()} -F"$buildDirPath"
+linkerOpts =  -F"$buildDirPath" $linkerOps ${getExtraLinkers()}
 ${getCustomizedDefinitionConfig()}
                 """.trimIndent()
             }
