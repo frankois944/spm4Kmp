@@ -31,7 +31,7 @@ class BinaryPackageTest : BaseTest() {
                                 url = uri("https://github.com/wanliyunyan/LibXray/releases/download/25.8.3/LibXray.xcframework.zip"),
                                 packageName = "LibXray",
                                 exportToKotlin = true,
-                                checksum = "1f478c370bbe9cce12ed7f2f6101853a74c3a2220253dbaf5abcc446260c393d",
+                                checksum = "90da1dfbf1b52b647958974002a329a60e291b463fcb69a53e2e42b74ead0a94",
                             )
                             """.trimIndent(),
                     ),
