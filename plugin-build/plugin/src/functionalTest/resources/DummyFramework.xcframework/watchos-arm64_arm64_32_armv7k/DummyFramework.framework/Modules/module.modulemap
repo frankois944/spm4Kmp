@@ -7,5 +7,4 @@ framework module DummyFramework {
 
 module DummyFramework.Swift {
   header "DummyFramework-Swift.h"
-  requires objc
 }

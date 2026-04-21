@@ -47,34 +47,25 @@ import registrydummy
 
     public static func localFile() -> String {
         guard let url = Bundle.module.url(forResource: "bridgeString", withExtension: "txt") else {
-            assertionFailure("bridgeString.txt not found in Bundle.module")
-            return ""
-        }
-        return (try? String(contentsOf: url)) ?? ""
-    }
-
-    public static func localFile2() -> String {
-        guard let url = Bundle.module.url(forResource: "bridgeString-4", withExtension: "txt") else {
-            assertionFailure("bridgeString.txt not found in Bundle.module")
+            fatalError("bridgeString.txt not found in Bundle.module")
             return ""
         }
         return (try? String(contentsOf: url)) ?? ""
     }
 
     public static func copyFile() -> String {
-        guard let url = Bundle.module.url(forResource: "bridgeString-3", withExtension: "txt") else {
-            assertionFailure("bridgeString-3.txt not found in Bundle.module")
+        guard let url = Bundle.module.url(forResource: "Resources-copy/bridgeString-3", withExtension: "txt") else {
+            fatalError("bridgeString-3.txt not found in Bundle.module")
             return ""
         }
         return (try? String(contentsOf: url)) ?? ""
     }
 
     public static func embedFile() -> String {
-        guard let url = Bundle.module.url(forResource: "bridgeString-2", withExtension: "txt") else {
-            assertionFailure("bridgeString-2.txt not found in Bundle.module")
-            return ""
-        }
-        return (try? String(contentsOf: url)) ?? ""
+        return String(
+            bytes: PackageResources.bridgeString_2_txt,
+            encoding: .utf8
+        )!
     }
 }
 

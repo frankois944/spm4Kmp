@@ -10,7 +10,7 @@
 		</data>
 		<key>Resources/Info.plist</key>
 		<data>
-		R3874RdURvYyWof7HrZIwB7eq74=
+		hUyr+SmHuOrPfPHd4SctxSgna8o=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -19,7 +19,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			fXddc/999O2lQEYXhMLnXLf5s0y9rtwoGLNNnobcKa0=
+			9hUNt7fC4om5yE8lk0kjTXFH1gayBfWD6wap6oK4gE0=
 			</data>
 		</dict>
 		<key>Headers/DummyFramework.h</key>
@@ -33,77 +33,77 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			IpREcz+/XlGrWth3fPBSx9VvYYz2Eph3dUsOj4yY5uE=
+			wMzG7SLg9wAlorAQ9aiFo9xu+s8gEJkEhWWh4s37CPc=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/arm64-apple-macos.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			RPjGaQ4pmVdNmU9Vuacurvv9iS/v3M+WYJGeD7PtwcQ=
+			QHxWquifcWZ6TgW25R9wYd+zdvgB/Yyr5fgS6YOe4Hg=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/arm64-apple-macos.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			UWns/tNc8aQ+e1Hnn6jAoGoLJ89z0X8ejpJu3hsJE+c=
+			lpbBYbSaGKoFZ/bxXdJ+cLMBHBhHcyPWq/5GUuxBQFw=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/arm64-apple-macos.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			RPjGaQ4pmVdNmU9Vuacurvv9iS/v3M+WYJGeD7PtwcQ=
+			QHxWquifcWZ6TgW25R9wYd+zdvgB/Yyr5fgS6YOe4Hg=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/arm64-apple-macos.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			YsozNm5u/8jYPShto8oRaXZmGX+rK753x3vJn+P9R2s=
+			V19aVvGDNr/SSHcHCicr/ATUenATDpbqu+7GmgFSWlg=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/x86_64-apple-macos.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			IpREcz+/XlGrWth3fPBSx9VvYYz2Eph3dUsOj4yY5uE=
+			wMzG7SLg9wAlorAQ9aiFo9xu+s8gEJkEhWWh4s37CPc=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/x86_64-apple-macos.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			ec3YfHVGdN6xWHqBQp+flpz0u+OexNa/r6c/yldXj6M=
+			XR9vjW2E7ko6yFJPR15faYL4/q5bxOci3zcFXqjWfw4=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/x86_64-apple-macos.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			r0tuXS5/xdY9mGlFFFLHcWbkQRhCE/SGxKs/7LNGHi8=
+			pQEjKEYs4oKSMkutT3REyDy8eAB/EKPf5G3Lz4xBifw=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/x86_64-apple-macos.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			ec3YfHVGdN6xWHqBQp+flpz0u+OexNa/r6c/yldXj6M=
+			XR9vjW2E7ko6yFJPR15faYL4/q5bxOci3zcFXqjWfw4=
 			</data>
 		</dict>
 		<key>Modules/DummyFramework.swiftmodule/x86_64-apple-macos.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			cRHF4Mzx6uzAIs+ELb6mq0O0haJWXxFv+15BFCJOsrs=
+			CojU+cdWW1CPEofjwnw5wWa635qsk5PsYQLj39UPUIc=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Sn25LK/z2havc3TZ8i1bIbMC2TFmjE7+keiBSahXL+o=
+			5B6ij6HyL3LTTaXbcjOadrJq3DKyaUwyq8XQEET0x/w=
 			</data>
 		</dict>
 		<key>Resources/IAmAResource.txt</key>
@@ -117,7 +117,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			vNdn5D0h8YstDQvU9AGPjaf01Qp3IrQRTMsXRLjbd7g=
+			VblalslAHM9xeYi+/GKeecKdxZm2oOKtbcd91BMJXQU=
 			</data>
 		</dict>
 	</dict>

@@ -2,20 +2,20 @@
 triple:          'arm64-apple-darwin'
 binary-path:     '/Users/francoisdabonot/Library/Developer/Xcode/DerivedData/DummyFramework-gmgptkiwmpwmubadmvtpttfnqxtf/Build/Intermediates.noindex/ArchiveIntermediates/DummyFramework/InstallationBuildProductsLocation/Library/Frameworks/DummyFramework.framework/DummyFramework'
 relocations:
-  - { offset: 0x31E2E, size: 0x8, addend: 0x0, symName: _DummyFrameworkVersionString, symObjAddr: 0x0, symBinAddr: 0x5700, symSize: 0x0 }
-  - { offset: 0x31E62, size: 0x8, addend: 0x0, symName: _DummyFrameworkVersionNumber, symObjAddr: 0x38, symBinAddr: 0x5738, symSize: 0x0 }
-  - { offset: 0x31EA2, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C14printSomeValueyyF', symObjAddr: 0x0, symBinAddr: 0x4000, symSize: 0x88 }
-  - { offset: 0x31FEF, size: 0x8, addend: 0x0, symName: ___swift_instantiateConcreteTypeFromMangledName, symObjAddr: 0x88, symBinAddr: 0x4088, symSize: 0x40 }
-  - { offset: 0x32003, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CMa', symObjAddr: 0x5E8, symBinAddr: 0x45E8, symSize: 0x20 }
-  - { offset: 0x32017, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CfETo', symObjAddr: 0x6EC, symBinAddr: 0x46EC, symSize: 0x10 }
-  - { offset: 0x32053, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C14printSomeValueyyF', symObjAddr: 0x0, symBinAddr: 0x4000, symSize: 0x88 }
-  - { offset: 0x320BB, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C14printSomeValueyyFTo', symObjAddr: 0xC8, symBinAddr: 0x40C8, symSize: 0xA4 }
-  - { offset: 0x3211C, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C03getC8ResourceSSyF', symObjAddr: 0x16C, symBinAddr: 0x416C, symSize: 0x194 }
-  - { offset: 0x321B2, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C03getC8ResourceSSyFTo', symObjAddr: 0x300, symBinAddr: 0x4300, symSize: 0x58 }
-  - { offset: 0x321C6, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C0C17ResourceIsMissingSSSgyF', symObjAddr: 0x358, symBinAddr: 0x4358, symSize: 0x150 }
-  - { offset: 0x3221D, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C0C17ResourceIsMissingSSSgyFTo', symObjAddr: 0x4A8, symBinAddr: 0x44A8, symSize: 0x68 }
-  - { offset: 0x32237, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfC', symObjAddr: 0x510, symBinAddr: 0x4510, symSize: 0x20 }
-  - { offset: 0x3225F, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfc', symObjAddr: 0x530, symBinAddr: 0x4530, symSize: 0xB8 }
-  - { offset: 0x322BC, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfcTo', symObjAddr: 0x608, symBinAddr: 0x4608, symSize: 0xB4 }
-  - { offset: 0x32313, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CfD', symObjAddr: 0x6BC, symBinAddr: 0x46BC, symSize: 0x30 }
+  - { offset: 0x296A2, size: 0x8, addend: 0x0, symName: _DummyFrameworkVersionString, symObjAddr: 0x0, symBinAddr: 0x56D0, symSize: 0x0 }
+  - { offset: 0x296D9, size: 0x8, addend: 0x0, symName: _DummyFrameworkVersionNumber, symObjAddr: 0x38, symBinAddr: 0x5708, symSize: 0x0 }
+  - { offset: 0x2971B, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C14printSomeValueyyF', symObjAddr: 0x0, symBinAddr: 0x4000, symSize: 0x88 }
+  - { offset: 0x298B6, size: 0x8, addend: 0x0, symName: ___swift_instantiateConcreteTypeFromMangledNameV2, symObjAddr: 0x88, symBinAddr: 0x4088, symSize: 0x50 }
+  - { offset: 0x298CA, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CMa', symObjAddr: 0x5A8, symBinAddr: 0x45A8, symSize: 0x20 }
+  - { offset: 0x298DE, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CfETo', symObjAddr: 0x698, symBinAddr: 0x4698, symSize: 0x10 }
+  - { offset: 0x2995E, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C14printSomeValueyyF', symObjAddr: 0x0, symBinAddr: 0x4000, symSize: 0x88 }
+  - { offset: 0x299FB, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C14printSomeValueyyFTo', symObjAddr: 0xD8, symBinAddr: 0x40D8, symSize: 0x88 }
+  - { offset: 0x29A8F, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C03getC8ResourceSSyF', symObjAddr: 0x160, symBinAddr: 0x4160, symSize: 0x18C }
+  - { offset: 0x29B38, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C03getC8ResourceSSyFTo', symObjAddr: 0x2EC, symBinAddr: 0x42EC, symSize: 0x58 }
+  - { offset: 0x29B4C, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C0C17ResourceIsMissingSSSgyF', symObjAddr: 0x344, symBinAddr: 0x4344, symSize: 0x148 }
+  - { offset: 0x29BA3, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0C0C17ResourceIsMissingSSSgyFTo', symObjAddr: 0x48C, symBinAddr: 0x448C, symSize: 0x68 }
+  - { offset: 0x29BC2, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfC', symObjAddr: 0x4F4, symBinAddr: 0x44F4, symSize: 0x18 }
+  - { offset: 0x29BEF, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfc', symObjAddr: 0x50C, symBinAddr: 0x450C, symSize: 0x9C }
+  - { offset: 0x29C61, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CACycfcTo', symObjAddr: 0x5C8, symBinAddr: 0x45C8, symSize: 0xA0 }
+  - { offset: 0x29CCD, size: 0x8, addend: 0x0, symName: '_$s14DummyFramework02MyaB0CfD', symObjAddr: 0x668, symBinAddr: 0x4668, symSize: 0x30 }
 ...

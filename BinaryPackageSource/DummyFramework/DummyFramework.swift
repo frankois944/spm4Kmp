@@ -12,7 +12,7 @@ import Foundation
     private let bundle = Bundle(identifier: "com.dummy.DummyFramework")!
 
     @objc public func printSomeValue() {
-        print("Hello the work")
+        print("Hello the world !!")
     }
 
     @objc public func getMyResource() -> String {
