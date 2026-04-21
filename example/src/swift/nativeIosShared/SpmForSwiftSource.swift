@@ -53,6 +53,14 @@ import registrydummy
         return (try? String(contentsOf: url)) ?? ""
     }
 
+    public static func localFile2() -> String {
+        guard let url = Bundle.module.url(forResource: "bridgeString-4", withExtension: "txt") else {
+            assertionFailure("bridgeString.txt not found in Bundle.module")
+            return ""
+        }
+        return (try? String(contentsOf: url)) ?? ""
+    }
+
     public static func copyFile() -> String {
         guard let url = Bundle.module.url(forResource: "bridgeString-3", withExtension: "txt") else {
             assertionFailure("bridgeString-3.txt not found in Bundle.module")
