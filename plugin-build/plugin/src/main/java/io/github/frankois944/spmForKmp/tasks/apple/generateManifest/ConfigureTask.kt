@@ -10,13 +10,17 @@ import io.github.frankois944.spmForKmp.manifest.ResourcesPaths
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
 
 private fun buildResourcesPath(packageDirectoriesConfig: PackageDirectoriesConfig): ResourcesPaths {
-    val copyDir = packageDirectoriesConfig.bridgeSourceDir.resolve("Resources-copy")
-    val processDir = packageDirectoriesConfig.bridgeSourceDir.resolve("Resources-process")
-    val embedDir = packageDirectoriesConfig.bridgeSourceDir.resolve("Resources-embed")
+    val base = packageDirectoriesConfig.bridgeSourceDir
+    fun java.io.File.relativePathIfExists() = takeIf { it.exists() }?.relativeToOrSelf(base)?.path
+
+    val processDir =
+        listOf(base.resolve("Resources-process"), base.resolve("Resources"))
+            .firstOrNull { it.exists() }
+
     return ResourcesPaths(
-        copiedPath = copyDir.takeIf { it.exists() }?.relativeToOrSelf(packageDirectoriesConfig.bridgeSourceDir)?.path,
-        processPath = processDir.takeIf { it.exists() }?.relativeToOrSelf(packageDirectoriesConfig.bridgeSourceDir)?.path,
-        embedPath = embedDir.takeIf { it.exists() }?.relativeToOrSelf(packageDirectoriesConfig.bridgeSourceDir)?.path,
+        copiedPath = base.resolve("Resources-copy").relativePathIfExists(),
+        processPath = processDir?.relativeToOrSelf(base)?.path,
+        embedPath = base.resolve("Resources-embed").relativePathIfExists(),
     )
 }
 
