@@ -149,6 +149,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                                     targetSettings = null,
                                     exportedPackage = exportedPackage.get(),
                                     onlyDeps = requiredDependencies,
+                                    resourcesPaths = null,
                                 ),
                         )
                     manifestFile.writeText(manifest)

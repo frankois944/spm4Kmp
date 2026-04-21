@@ -45,10 +45,25 @@ import registrydummy
         hev_socks5_tunnel_quit()
     }
 
-    public func localFile() -> String {
-        // Explicit use of Foundation.Bundle via alias to avoid CryptoSwift's Bundle shadowing on older Xcode
+    public static func localFile() -> String {
         guard let url = Bundle.module.url(forResource: "bridgeString", withExtension: "txt") else {
             assertionFailure("bridgeString.txt not found in Bundle.module")
+            return ""
+        }
+        return (try? String(contentsOf: url)) ?? ""
+    }
+
+    public static func copyFile() -> String {
+        guard let url = Bundle.module.url(forResource: "bridgeString-3", withExtension: "txt") else {
+            assertionFailure("bridgeString-3.txt not found in Bundle.module")
+            return ""
+        }
+        return (try? String(contentsOf: url)) ?? ""
+    }
+
+    public static func embedFile() -> String {
+        guard let url = Bundle.module.url(forResource: "bridgeString-2", withExtension: "txt") else {
+            assertionFailure("bridgeString-2.txt not found in Bundle.module")
             return ""
         }
         return (try? String(contentsOf: url)) ?? ""
