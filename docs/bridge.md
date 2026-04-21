@@ -79,12 +79,19 @@ val aView = MySwiftBridge().exportedView() as UIView
 
 ---
 
-## Bundle Resources (since v1.7.1)
+## Bundle Resources (since v1.9.0)
 
 To bundle resources (images, fonts, data files, etc.) alongside your bridge:
 
-1. Create a `Resources` folder inside your bridge directory
-2. Place your files there (e.g. `bridgeString.txt`)
+1. Choose a resource type and create the corresponding folder:
+
+| Type | Folder Name | Documentation |
+|------|-------------|---|
+| **Process** (Recommended) | `Resources-process` | [Process](https://developer.apple.com/documentation/packagedescription/resource/process(_:localization:)) |
+| **Copy** | `Resources-copy` | [Copy](https://developer.apple.com/documentation/packagedescription/resource/copy(_:)) |
+| **Embed** | `Resources-embed` | [Embed](https://developer.apple.com/documentation/packagedescription/resource/embedincode(_:)) |
+
+2. Place your files in the chosen folder (e.g. `bridgeString.txt`)
 3. Access them from Swift using `Bundle.module`:
 
 ```swift
