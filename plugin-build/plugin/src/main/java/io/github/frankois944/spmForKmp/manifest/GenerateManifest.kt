@@ -100,7 +100,7 @@ private fun getResourceSettings(paths: ResourcesPaths?): String? =
     } else {
         buildString {
             append("resources: [")
-            val paths =
+            val builtPaths =
                 buildList {
                     paths.processPath?.let {
                         add(".process(\"$it\")")
@@ -112,7 +112,7 @@ private fun getResourceSettings(paths: ResourcesPaths?): String? =
                         add(".embedInCode(\"$it\")")
                     }
                 }.joinToString(",")
-            append(paths)
+            append(builtPaths)
             append("]")
         }
     }
