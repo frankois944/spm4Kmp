@@ -11,7 +11,11 @@ internal data class ResourcesPaths(
     val copiedPath: String?,
     val processPath: String?,
     val embedPath: String?,
-) : Serializable
+) : Serializable {
+    internal companion object {
+        private const val serialVersionUID: Long = 1
+    }
+}
 
 internal data class TemplateParameters(
     val forExportedPackage: Boolean,
