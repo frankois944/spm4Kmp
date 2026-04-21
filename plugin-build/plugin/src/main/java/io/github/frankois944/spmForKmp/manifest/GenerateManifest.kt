@@ -37,7 +37,7 @@ internal fun generateManifest(parameters: TemplateParameters): String {
             swiftBuildDir = parameters.generatedPackageDirectory,
             settings = parameters.targetSettings,
         ).takeIf { it.isNotEmpty() }
-
+    val getResourceSetting = getResourceSettings(parameters.resourcesPaths)
     val name = parameters.exportedPackage?.name ?: parameters.productName
     val type =
         parameters.exportedPackage?.isStatic?.let {
@@ -82,8 +82,8 @@ let package = Package(
     }
             ],
             path: "Sources"
+            ${getResourceSetting?.let { ",$it" }.orEmpty()}
             ${getTargetSetting?.let { ",$it" }.orEmpty()}
-            ${getResourceSettings(parameters.resourcesPaths)}
         )
         $binaryDependencies
     ]
@@ -91,14 +91,29 @@ let package = Package(
         """
 }
 
-private fun getResourceSettings(paths: List<String>?): String =
-    if (paths.isNullOrEmpty()) {
-        ""
+private fun getResourceSettings(paths: ResourcesPaths?): String? =
+    if (paths?.embedPath.isNullOrEmpty() &&
+        paths?.copiedPath.isNullOrEmpty() &&
+        paths?.processPath.isNullOrEmpty()
+    ) {
+        null
     } else {
         buildString {
-            append(", resources: [")
-            append(paths.joinToString(",") { ".process(\"$it\")" })
-            append("],")
+            append("resources: [")
+            val paths =
+                buildList {
+                    paths.processPath?.let {
+                        add(".process(\"$it\")")
+                    }
+                    paths.copiedPath?.let {
+                        add(".copy(\"$it\")")
+                    }
+                    paths.embedPath?.let {
+                        add(".embedInCode(\"$it\")")
+                    }
+                }.joinToString(",")
+            append(paths)
+            append("]")
         }
     }
 

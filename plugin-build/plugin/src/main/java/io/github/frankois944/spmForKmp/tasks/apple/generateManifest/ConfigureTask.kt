@@ -6,7 +6,19 @@ import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
+import io.github.frankois944.spmForKmp.manifest.ResourcesPaths
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+
+private fun buildResourcesPath(packageDirectoriesConfig: PackageDirectoriesConfig): ResourcesPaths {
+    val copyDir = packageDirectoriesConfig.bridgeSourceDir.resolve("Resources-copy")
+    val processDir = packageDirectoriesConfig.bridgeSourceDir.resolve("Resources-process")
+    val embedDir = packageDirectoriesConfig.bridgeSourceDir.resolve("Resources-embed")
+    return ResourcesPaths(
+        copiedPath = copyDir.takeIf { it.exists() }?.relativeToOrSelf(packageDirectoriesConfig.bridgeSourceDir)?.path,
+        processPath = processDir.takeIf { it.exists() }?.relativeToOrSelf(packageDirectoriesConfig.bridgeSourceDir)?.path,
+        embedPath = embedDir.takeIf { it.exists() }?.relativeToOrSelf(packageDirectoriesConfig.bridgeSourceDir)?.path,
+    )
+}
 
 internal fun GenerateManifestTask.configureTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
@@ -24,7 +36,7 @@ internal fun GenerateManifestTask.configureTask(
     this.targetSettings.set(swiftPackageEntry.bridgeSettings as BridgeSettings)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
     this.traceEnabled.set(project.isTraceEnabled)
-    this.hasResourceFolder.set(packageDirectoriesConfig.bridgeSourceDir.resolve("Resources").exists())
+    this.resourcesPaths.set(buildResourcesPath(packageDirectoriesConfig))
     this.storedTraceFile.set(
         project.projectDir
             .resolve(SPM_TRACE_NAME)

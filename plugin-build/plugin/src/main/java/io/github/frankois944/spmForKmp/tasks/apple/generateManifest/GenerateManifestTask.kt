@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.tasks.apple.generateManifest
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
+import io.github.frankois944.spmForKmp.manifest.ResourcesPaths
 import io.github.frankois944.spmForKmp.manifest.TemplateParameters
 import io.github.frankois944.spmForKmp.manifest.generateManifest
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
@@ -9,12 +10,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.konan.target.HostManager
 import javax.inject.Inject
@@ -25,7 +21,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
     abstract val packageDependencies: ListProperty<SwiftDependency>
 
     @get:Input
-    abstract val hasResourceFolder: Property<Boolean>
+    abstract val resourcesPaths: Property<ResourcesPaths>
 
     @get:Input
     abstract val packageName: Property<String>
@@ -109,8 +105,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                                 toolsVersion = toolsVersion.get(),
                                 targetSettings = targetSettings.get(),
                                 exportedPackage = null,
-                                resourcesPaths =
-                                    getResourcePaths(),
+                                resourcesPaths = resourcesPaths.get(),
                             ),
                     )
                 manifestFile.get().asFile.writeText(manifest)
@@ -118,11 +113,4 @@ internal abstract class GenerateManifestTask : DefaultTask() {
         }
         tracer.writeHtmlReport()
     }
-
-    private fun getResourcePaths(): List<String>? =
-        if (hasResourceFolder.get()) {
-            listOf("Resources")
-        } else {
-            null
-        }
 }

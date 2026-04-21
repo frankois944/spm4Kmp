@@ -54,7 +54,9 @@ class IosTest {
 
     @Test
     fun getFileContentFromBridgeTest() {
-        assertEquals("My content\n", TestClass().localFile())
+        assertEquals("My embed content\n", TestClass.embedFile())
+        assertEquals("My process content\n", TestClass.localFile())
+        assertEquals("My copy content\n", TestClass.copyFile())
     }
 
     @Test
