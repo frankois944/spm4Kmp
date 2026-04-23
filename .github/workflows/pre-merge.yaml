@@ -77,9 +77,8 @@ jobs:
         run: ./gradlew :plugin-build:plugin:ktlintCheck :plugin-build:plugin:detektMain --continue
       - name: Run Gradle tasks
         run: |
-          rm -rf plugin-build/plugin/build/functionalTest plugin-build/plugin/build/jacoco plugin-build/plugin/build/reports plugin-build/plugin/build/test-results plugin-build/plugin/build/kotlin/compileFunctionalTestKotlin
           ./gradlew :example:cleanIosSimulatorArm64Test :example:iosSimulatorArm64Test --tests "com.example.IosTest"
-          ./gradlew :preMerge :plugin-build:plugin:jacocoTestReport --continue
+          ./gradlew :plugin-build:plugin:clean :preMerge :plugin-build:plugin:jacocoTestReport --continue
       #- name: build iosExampleApp
       #  run: set -o pipefail && xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" clean test | xcbeautify --renderer github-actions
       #  working-directory: "example/iosApp"
