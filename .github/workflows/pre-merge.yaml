@@ -45,11 +45,11 @@ jobs:
         with:
           xcode-version: '26.0'
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'jetbrains'
           java-version: '21'
@@ -57,13 +57,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache Konan
         id: cache-konan
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
       - name: Cache example
         id: cache-example-scratch
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             example/build/spmKmpPlugin
@@ -72,7 +72,7 @@ jobs:
             example/SPM
           key: ${{ runner.os }}-example-scratch
       - name: Cache Gradle Caches
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
       - name: Linter
         run: ./gradlew :plugin-build:plugin:ktlintCheck :plugin-build:plugin:detektMain --continue
       - name: Run Gradle tasks
@@ -83,7 +83,7 @@ jobs:
       #  run: set -o pipefail && xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' -derivedDataPath "./build" -clonedSourcePackagesDirPath "./spm" clean test | xcbeautify --renderer github-actions
       #  working-directory: "example/iosApp"
       - name: Archive test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: test-pre-merge-report
@@ -95,7 +95,7 @@ jobs:
           paths: 'plugin-build/plugin/build/test-results/functionalTest/TEST-*.xml'
           show: "all"
       - name: Print Test Report
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         if: ${{ !cancelled() }}
         with:
           report_paths: 'plugin-build/plugin/build/test-results/functionalTest/TEST-*.xml'
@@ -103,7 +103,7 @@ jobs:
           pr_id: ${{ github.event.workflow_run.pull_requests[0].number }}
           include_passed: true
       - name: SonarQubeScan
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@v7
         with:
           args: >
             -Dsonar.organization=frankois944
