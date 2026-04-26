@@ -98,6 +98,10 @@ internal fun Project.configAppleTargets(
             )
         }
 
+    exportedManifestTask.configure {
+        it.dependsOn(manifestTask)
+    }
+
     val buildMode = getBuildMode(swiftPackageEntry)
     allTargets.forEachIndexed { index, cinteropTarget ->
         logger.debug("SETUP {}", cinteropTarget)
@@ -130,7 +134,6 @@ internal fun Project.configAppleTargets(
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     targetBuildDir = targetBuildDir,
-                    isFirstTarget = index == 0,
                 )
             }
 
@@ -206,9 +209,6 @@ internal fun Project.configAppleTargets(
         }
         definitionTask.configure {
             it.dependsOn(copyPackageResourcesTask)
-        }
-        exportedManifestTask.configure {
-            it.dependsOn(definitionTask)
         }
 
         // Keep a handle to the "root" for this target
