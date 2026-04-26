@@ -1,3 +1,4 @@
+
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -8,6 +9,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.publish) apply false
+    id("com.dorongold.task-tree").version("4.0.1")
 }
 
 subprojects {

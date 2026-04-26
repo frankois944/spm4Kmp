@@ -15,7 +15,6 @@ internal fun CompileSwiftPackageTask.configureTask(
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
     targetBuildDir: File,
-    isFirstTarget: Boolean,
 ) {
     this.cinteropTarget.set(cinteropTarget)
     this.debugMode.set(swiftPackageEntry.debug)
@@ -41,12 +40,6 @@ internal fun CompileSwiftPackageTask.configureTask(
     this.packageResolveFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_RESOLVE_NAME))
     this.generatedDirs.set(
         buildList {
-            if (isFirstTarget) {
-                add(packageDirectoriesConfig.packageScratchDir.resolve("artifacts"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("plugins"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("registry"))
-                add(packageDirectoriesConfig.packageScratchDir.resolve("checkouts"))
-            }
             add(targetBuildDir)
         },
     )
