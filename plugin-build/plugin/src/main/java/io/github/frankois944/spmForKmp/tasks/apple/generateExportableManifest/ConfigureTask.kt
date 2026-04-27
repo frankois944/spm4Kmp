@@ -31,12 +31,14 @@ internal fun GenerateExportableManifestTask.configureTask(
             .asFile
             .resolve(productName)
     this.exportedDirectory.set(exportedManifestDirectory)
-    this.compiledTargetDir.set(
-        getTargetBuildDirectory(
-            packageScratchDir = packageDirectoriesConfig.packageScratchDir,
-            cinteropTarget = targets.first(),
-            buildMode = getBuildMode(swiftPackageEntry),
-        ).absolutePath,
+    this.compiledTargetDirs.set(
+        targets.map { target ->
+            getTargetBuildDirectory(
+                packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+                cinteropTarget = target,
+                buildMode = getBuildMode(swiftPackageEntry),
+            ).absolutePath
+        },
     )
     this.includeProduct.set(swiftPackageEntry.exportedPackageSettings.includeProduct)
     this.hideLocalPackageMessage.set(project.hideLocalPackageMessage())

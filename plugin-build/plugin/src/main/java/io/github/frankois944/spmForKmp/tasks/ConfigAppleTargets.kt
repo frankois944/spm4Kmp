@@ -98,10 +98,6 @@ internal fun Project.configAppleTargets(
             )
         }
 
-    exportedManifestTask.configure {
-        it.dependsOn(manifestTask)
-    }
-
     val buildMode = getBuildMode(swiftPackageEntry)
     allTargets.forEachIndexed { index, cinteropTarget ->
         logger.debug("SETUP {}", cinteropTarget)
@@ -134,8 +130,15 @@ internal fun Project.configAppleTargets(
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     targetBuildDir = targetBuildDir,
+                    isFirstTarget = index == 0,
                 )
             }
+
+        // mustRunAfter (not dependsOn) so we get correct ordering when both targets are in the
+        // build graph, without forcing unrelated targets to compile in a single-target build.
+        exportedManifestTask.configure {
+            it.mustRunAfter(compileTask)
+        }
 
         val definitionTask =
             tasks.register(
