@@ -229,6 +229,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
                         .get()
                         .asSequence()
                         .flatMap { dir ->
+                            @Suppress("UseOrEmpty")
                             File(dir).listFiles { it.extension == "framework" }?.asSequence()
                                 ?: emptySequence()
                         }.firstOrNull {
