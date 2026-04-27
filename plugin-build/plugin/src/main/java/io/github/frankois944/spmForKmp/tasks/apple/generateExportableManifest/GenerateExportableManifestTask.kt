@@ -55,7 +55,7 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
     abstract val exportedPackage: Property<ExportedPackage>
 
     @get:Input
-    abstract val compiledTargetDir: Property<String>
+    abstract val compiledTargetDirs: ListProperty<String>
 
     @get:Input
     abstract val includeProduct: ListProperty<String>
@@ -223,32 +223,39 @@ internal abstract class GenerateExportableManifestTask : DefaultTask() {
             } else if (moduleToInclude.contains(module.name.lowercase())) {
                 requireDependencies.add(module)
             } else {
-                File(compiledTargetDir.get())
-                    .listFiles { it.extension == "framework" }
-                    .firstOrNull {
-                        logger.debug("checking module {} at {}", module.name, it)
-                        it.nameWithoutExtension.equals(module.name, ignoreCase = true)
-                    }?.let { moduleLocation ->
-                        // if the module is inside the compiled build directory
-                        var plist = moduleLocation.resolve("Info.plist")
-                        if (!plist.exists()) {
-                            logger.debug(
-                                "The plist is not at the root of the framework, try the Resource folder instead",
-                            )
-                            plist = moduleLocation.resolve("Resources").resolve("Info.plist")
+                // Search all compiled target dirs; the first one that has the framework wins.
+                val moduleLocation =
+                    compiledTargetDirs
+                        .get()
+                        .asSequence()
+                        .flatMap { dir ->
+                            File(dir).listFiles { it.extension == "framework" }?.asSequence()
+                                ?: emptySequence()
+                        }.firstOrNull {
+                            logger.debug("checking module {} at {}", module.name, it)
+                            it.nameWithoutExtension.equals(module.name, ignoreCase = true)
                         }
-                        logger.debug("Looking inside the Info.plist {}", plist)
-                        val libraryName = getPlistValue(plist, "CFBundleExecutable")
-                        logger.debug("Found libraryName {}", libraryName)
-                        val binaryFile = moduleLocation.resolve(libraryName)
-                        if (!execOps.isDynamicLibrary(binaryFile, logger)) {
-                            logger.debug(
-                                "Found static framework {} add it to the require dependency list",
-                                moduleLocation,
-                            )
-                            requireDependencies.add(module)
-                        }
+                if (moduleLocation != null) {
+                    // if the module is inside a compiled build directory
+                    var plist = moduleLocation.resolve("Info.plist")
+                    if (!plist.exists()) {
+                        logger.debug(
+                            "The plist is not at the root of the framework, try the Resource folder instead",
+                        )
+                        plist = moduleLocation.resolve("Resources").resolve("Info.plist")
                     }
+                    logger.debug("Looking inside the Info.plist {}", plist)
+                    val libraryName = getPlistValue(plist, "CFBundleExecutable")
+                    logger.debug("Found libraryName {}", libraryName)
+                    val binaryFile = moduleLocation.resolve(libraryName)
+                    if (!execOps.isDynamicLibrary(binaryFile, logger)) {
+                        logger.debug(
+                            "Found static framework {} add it to the require dependency list",
+                            moduleLocation,
+                        )
+                        requireDependencies.add(module)
+                    }
+                }
             }
         }
         return requireDependencies
