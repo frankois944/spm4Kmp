@@ -130,7 +130,6 @@ internal fun Project.configAppleTargets(
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     targetBuildDir = targetBuildDir,
-                    isFirstTarget = index == 0,
                 )
             }
 
