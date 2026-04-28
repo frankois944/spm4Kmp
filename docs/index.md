@@ -36,7 +36,7 @@ Check out the [playground](./section-help/tips.md#how-can-i-import-swift-code-in
 
 - **AI Agent Skill**: Use our [AI Agent Skill](skill.md) to get assistance with your project.
 
-- Join our [Slack channel](https://spmforkmp.slack.com)
+- Join our [Slack channel](https://join.slack.com/t/spmforkmp/shared_invite/zt-3wfd9ot44-XQDSCzr1zCz~lWoYwv5SfA)
 
 If you find the project useful, a star or a coffee goes a long way!
 

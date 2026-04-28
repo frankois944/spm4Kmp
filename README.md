@@ -20,7 +20,7 @@ The plugin uses the native Swift Package Manager, so **no third-party dependenci
 
 ## 💬 Community & Support
 
-- **Slack**: Join our [Slack channel](https://spmforkmp.slack.com) for help and discussions.
+- **Slack**: Join our [Slack channel](https://join.slack.com/t/spmforkmp/shared_invite/zt-3wfd9ot44-XQDSCzr1zCz~lWoYwv5SfA) for help and discussions.
 - **AI Agent Skill**: Use our [AI Agent Skill](https://spmforkmp.eu/skill) to get assistance with your project.
 
 # QuickStart
