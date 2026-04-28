@@ -18,6 +18,11 @@ The plugin uses the native Swift Package Manager, so **no third-party dependenci
 
 # [READ THE DOCUMENTATION](https://spmforkmp.eu/)
 
+## 💬 Community & Support
+
+- **Slack**: Join our [Slack channel](https://spmforkmp.slack.com) for help and discussions.
+- **AI Agent Skill**: Use our [AI Agent Skill](https://spmforkmp.eu/skill) to get assistance with your project.
+
 # QuickStart
 
 ## Gradle Plugin
@@ -68,4 +73,4 @@ If you find this project useful, please consider giving it a star!
 
 ---
 
-For additional help or detailed documentation, refer to the official repository or contact the plugin maintainers. Happy coding! 🎉
+For additional help or detailed documentation, join our [Slack channel](https://spmforkmp.slack.com), refer to the official repository or contact the plugin maintainers. Happy coding! 🎉

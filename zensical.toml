@@ -11,6 +11,7 @@ extra_javascript = ["javascripts/extra.js"]
 nav = [
   {"Swift Package Manager For Kotlin Multiplatform" = [
     "index.md",
+      "skill.md",
     "migration/migrateFromCocoapods.md",
     "license.md"
   ]},

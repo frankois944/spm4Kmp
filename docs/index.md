@@ -31,11 +31,16 @@ Check out the [playground](./section-help/tips.md#how-can-i-import-swift-code-in
 
 ---
 
-## Feedback & Support
 
-Feature requests, bug reports, and edge-case feedback are very welcome — [join the discussion](https://github.com/frankois944/spm4Kmp/discussions).
+## 💬 Community & Support
+
+- **AI Agent Skill**: Use our [AI Agent Skill](skill.md) to get assistance with your project.
+
+- Join our [Slack channel](https://spmforkmp.slack.com)
 
 If you find the project useful, a star or a coffee goes a long way!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A51MG1Y9)
 [![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
+
+
