@@ -102,7 +102,7 @@ internal fun Project.configAppleTargets(
         }
 
     val buildMode = getBuildMode(swiftPackageEntry)
-    allTargets.forEachIndexed { index, cinteropTarget ->
+    allTargets.forEach { cinteropTarget ->
         logger.debug("SETUP {}", cinteropTarget)
         val targetBuildDir =
             getTargetBuildDirectory(
@@ -134,13 +134,8 @@ internal fun Project.configAppleTargets(
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     targetBuildDir = targetBuildDir,
-                    isFirstTarget = index == 0,
                 )
             }
-
-        exportedManifestTask.configure {
-            it.mustRunAfter(compileTask)
-        }
 
         var outputFiles: List<File> = listOf()
         val definitionTask =
@@ -238,6 +233,9 @@ internal fun Project.configAppleTargets(
         }
         definitionTask.configure {
             it.dependsOn(copyPackageResourcesTask)
+        }
+        exportedManifestTask.configure {
+            it.dependsOn(definitionTask)
         }
         // Keep a handle to the "root" for this target
         taskGroup[cinteropTarget] = definitionTask.get()
