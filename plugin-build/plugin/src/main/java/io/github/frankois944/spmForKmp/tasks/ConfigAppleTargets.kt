@@ -138,6 +138,10 @@ internal fun Project.configAppleTargets(
                 )
             }
 
+        exportedManifestTask.configure {
+            it.mustRunAfter(compileTask)
+        }
+
         var outputFiles: List<File> = listOf()
         val definitionTask =
             if (swiftPackageEntry.useXcodeBuild) {
@@ -235,10 +239,6 @@ internal fun Project.configAppleTargets(
         definitionTask.configure {
             it.dependsOn(copyPackageResourcesTask)
         }
-        exportedManifestTask.configure {
-            it.dependsOn(definitionTask)
-        }
-
         // Keep a handle to the "root" for this target
         taskGroup[cinteropTarget] = definitionTask.get()
     }
