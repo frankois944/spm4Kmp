@@ -12,6 +12,7 @@ val testResources = "${layout.projectDirectory.asFile.path}/../plugin-build/plug
 
 kotlin {
 
+    val useXcodeAsBuildTool = true
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
@@ -29,11 +30,21 @@ kotlin {
                 } else {
                     "ios-arm64"
                 }
+            val productDir =
+                if (target.name == "iosSimulatorArm64") {
+                    "iphonesimulator"
+                } else {
+                    "iphoneos"
+                }
+            // SPM/spmKmpPlugin/nativeIosShared/scratch/Build/Products/Release-iphoneos/libhev-socks5-tunnel.a
+
             linkerOpts +=
                 listOf(
                     "-rpath",
                     "${projectDir.path}/SPM/spmKmpPlugin/nativeIosShared/scratch/$scratchDir/release/",
+                    "${projectDir.path}/SPM/spmKmpPlugin/nativeIosShared/scratch/Build/Products/Release-$productDir/", // useXcodeBuild = true
                     "-L${projectDir.path}/SPM/spmKmpPlugin/nativeIosShared/scratch/artifacts/nativeiosshared/HevSocks5Tunnel/HevSocks5Tunnel.xcframework/$artifactDir/",
+                    "-L${projectDir.path}/SPM/spmKmpPlugin/nativeIosShared/scratch/Build/Products/Release-iphonesimulator/", // useXcodeBuild = true
                     "-lhev-socks5-tunnel",
                 )
             freeCompilerArgs +=
@@ -50,6 +61,7 @@ kotlin {
          * Or when you want to keep compatibility with older versions of the plugin
          */
         target.swiftPackageConfig(cinteropName = "nativeIosShared") {
+            useXcodeBuild = useXcodeAsBuildTool
             // optional parameters
             // the ios minimal version
             // minIos = "12.0"
@@ -69,7 +81,6 @@ kotlin {
             //  - give : "customName.FirebaseCore" instead of "FirebaseCore"
             // packageDependencyPrefix = null // default null
             spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
-            // spmWorkingPath = "${projectDir.resolve("SPM")}" // change the Swift Package Manager working Dir
             // swiftBinPath = "/path/to/.swiftly/bin/swift"
             // exportedPackageSettings {
             //     includeProduct = listOf("HevSocks5Tunnel")

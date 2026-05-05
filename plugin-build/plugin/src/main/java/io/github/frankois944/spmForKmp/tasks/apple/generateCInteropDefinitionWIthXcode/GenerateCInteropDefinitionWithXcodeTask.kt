@@ -572,9 +572,10 @@ headerFilter = "$libraryPaths/Headers/**"
 language = Objective-C
 modules = $moduleName
 package = $packageName
+skipNonImportableModules = true
 libraryPaths = "${currentBuildDirectory.get().asFile}"
-compilerOpts = -fmodules -framework "$frameworkName" -F"$buildDirPath"
-linkerOpts = ${getExtraLinkers()} -framework "$frameworkName" -F"$buildDirPath"
+compilerOpts = -fmodules -framework "$moduleName" -F"$buildDirPath"
+linkerOpts = ${getExtraLinkers()} -framework "$moduleName" -F"$buildDirPath"
 ${getCustomizedDefinitionConfig()}
                 """.trimIndent()
             }
@@ -667,8 +668,9 @@ ${getCustomizedDefinitionConfig()}
 language = Objective-C
 modules = $moduleName
 package = $packageName
+skipNonImportableModules = true
 libraryPaths = "$buildDirPath"
-compilerOpts = $compilerOpts -fmodules -I"$moduleMapPath"
+compilerOpts = $compilerOpts -fmodules "-fmodule-map-file=$moduleMapPath/$moduleName.modulemap"
 linkerOpts = $linkerOps ${getExtraLinkers()}
 ${getCustomizedDefinitionConfig()}
                 """.trimIndent()
