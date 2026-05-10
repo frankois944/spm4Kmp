@@ -214,7 +214,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                         mainCompilationTarget,
                         cinteropName = entry.internalName.capitalized(),
                         file = getAndCreateFakeDefinitionFile(),
-                        extraOpts = extraOpts,
+                        extraOpts = extraOpts + entry.extraOpts,
                     )
                 }
             }

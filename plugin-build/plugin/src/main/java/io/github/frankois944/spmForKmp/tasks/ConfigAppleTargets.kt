@@ -2,12 +2,7 @@
 
 package io.github.frankois944.spmForKmp.tasks
 
-import io.github.frankois944.spmForKmp.TASK_COMPILE_PACKAGE
-import io.github.frankois944.spmForKmp.TASK_COPY_PACKAGE_RESOURCES
-import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
-import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
-import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
-import io.github.frankois944.spmForKmp.TASK_GENERATE_REGISTRY_FILE
+import io.github.frankois944.spmForKmp.*
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.NewPublicationInteroperabilityFeature
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
@@ -190,7 +185,12 @@ internal fun Project.configAppleTargets(
                     ) {
                         extraOpts.addAll(NewPublicationInteroperabilityFeature.extraOpts())
                     }
-                    createCInteropTask(mainCompilation, cinteropName, extraOpts, file)
+                    createCInteropTask(
+                        mainCompilation,
+                        cinteropName,
+                        extraOpts + swiftPackageEntry.extraOpts,
+                        file
+                    )
                 }
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
                 cInteropTaskNamesWithDefFile[cinteropTaskName] = file
