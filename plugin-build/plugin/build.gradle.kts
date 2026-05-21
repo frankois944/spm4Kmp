@@ -14,6 +14,13 @@ plugins {
     alias(libs.plugins.pluginPublish)
     alias(libs.plugins.autonomousapps.testkit)
     jacoco
+    id("org.jetbrains.dokka") version "2.2.0"
+    id("dev.opensavvy.dokka-mkdocs") version "0.6.1"
+}
+
+dependencies {
+    // Embeds the documentation from project :foo-bar
+    dokka(project(":plugin"))
 }
 
 val jacocoAgentJar: Configuration by configurations.creating
