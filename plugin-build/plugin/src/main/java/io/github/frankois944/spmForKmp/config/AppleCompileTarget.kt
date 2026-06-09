@@ -33,6 +33,7 @@ public enum class AppleCompileTarget : Serializable {
     iosSimulatorArm64,
     watchosX64,
     watchosArm64,
+    watchosArm32,
     watchosSimulatorArm64,
     tvosX64,
     tvosArm64,
@@ -48,7 +49,7 @@ public enum class AppleCompileTarget : Serializable {
     private fun osCompiler(): String =
         when (this) {
             iosX64, iosArm64, iosSimulatorArm64 -> "ios"
-            watchosX64, watchosArm64, watchosSimulatorArm64 -> "watchos"
+            watchosX64, watchosArm64, watchosSimulatorArm64, watchosArm32 -> "watchos"
             tvosX64, tvosArm64, tvosSimulatorArm64 -> "tvos"
             macosX64, macosArm64 -> "macosx"
         }
@@ -57,8 +58,9 @@ public enum class AppleCompileTarget : Serializable {
         when (this) {
             iosArm64 -> "ios-arm64"
             iosX64, iosSimulatorArm64 -> "ios-arm64_x86_64-simulator"
-            watchosArm64 -> "watchos-arm64_arm64_32_armv7k"
-            watchosX64, watchosSimulatorArm64 -> "watchos-arm64_x86_64-simulator"
+            watchosArm64, watchosArm32 -> "watchos-arm64_arm64_32_armv7k"
+            watchosX64 -> "watchos-arm64_x86_64"
+            watchosSimulatorArm64 -> "watchos-arm64_x86_64-simulator"
             tvosArm64 -> "tvos-arm64"
             tvosX64, tvosSimulatorArm64 -> "tvos-arm64_x86_64-simulator"
             macosX64, macosArm64 -> "macos-arm64_x86_64"
@@ -68,7 +70,7 @@ public enum class AppleCompileTarget : Serializable {
         when (this) {
             iosArm64 -> "iphoneos"
             iosX64, iosSimulatorArm64 -> "iphonesimulator"
-            watchosArm64 -> "watchos"
+            watchosArm64, watchosArm32 -> "watchos"
             watchosX64, watchosSimulatorArm64 -> "watchsimulator"
             tvosArm64 -> "appletvos"
             tvosX64, tvosSimulatorArm64 -> "appletvsimulator"
@@ -80,7 +82,9 @@ public enum class AppleCompileTarget : Serializable {
             iosX64 -> "x86_64"
             iosArm64, iosSimulatorArm64 -> "arm64"
             watchosX64 -> "x86_64"
-            watchosArm64, watchosSimulatorArm64 -> "arm64"
+            watchosArm32 -> "armv7k"
+            watchosArm64 -> "arm64_32"
+            watchosSimulatorArm64 -> "aarch64"
             tvosX64 -> "x86_64"
             tvosArm64, tvosSimulatorArm64 -> "arm64"
             macosX64 -> "x86_64"
@@ -112,6 +116,7 @@ public enum class AppleCompileTarget : Serializable {
             watchosX64,
             watchosArm64,
             watchosSimulatorArm64,
+            watchosArm32,
             -> minWatchos
 
             tvosX64,
@@ -133,6 +138,7 @@ public enum class AppleCompileTarget : Serializable {
                 KonanTarget.IOS_X64 -> iosX64
                 KonanTarget.IOS_ARM64 -> iosArm64
                 KonanTarget.IOS_SIMULATOR_ARM64 -> iosSimulatorArm64
+                KonanTarget.WATCHOS_ARM32 -> watchosArm32
                 KonanTarget.WATCHOS_X64 -> watchosX64
                 KonanTarget.WATCHOS_ARM64 -> watchosArm64
                 KonanTarget.WATCHOS_SIMULATOR_ARM64 -> watchosSimulatorArm64
