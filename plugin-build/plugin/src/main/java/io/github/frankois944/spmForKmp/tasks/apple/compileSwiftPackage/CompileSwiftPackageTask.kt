@@ -139,7 +139,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add(cinteropTarget.get().triple(osVersion.orNull.orEmpty()))
                     add("--scratch-path")
                     add(packageScratchDir.get())
-                    add("--disable-sandbox")
                     add("-c")
                     add(if (debugMode.get()) "debug" else "release")
                     add("--jobs")
