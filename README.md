@@ -66,10 +66,9 @@ If you find this project useful, please consider giving it a star!
 [![GitHub stars](https://img.shields.io/github/stars/frankois944/spm4Kmp?style=social)](https://github.com/frankois944/spm4Kmp)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A51MG1Y9)
-
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=frankois944/spm4Kmp&type=date&legend=top-left)](https://www.star-history.com/#frankois944/spm4Kmp&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/chart?repos=frankois944/spm4Kmp&type=timeline&legend=top-left&sealed_token=Dzd-IpoYxv1DN8NFeWn_yIe0B7f8wGdvvV16w6OBoCjqpi5WCeykWII8JnlF09aRGLUClpYtfhCBd8G8-nGuFW3YhqSQss07qcTaqXYgU5OwKwtQJWAVRQ)](https://www.star-history.com/?repos=frankois944%2Fspm4Kmp&type=timeline&legend=top-left)
 
 ---
 
