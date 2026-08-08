@@ -130,7 +130,18 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 }
 
                 // link the main definition File
+                val ownedTaskPrefixes = entries.map { "cinterop" + it.internalName.capitalized() }
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
+                    // Only configure the cinterop tasks created/managed by this plugin;
+                    // other plugins (or the user) may declare their own cinterops
+                    // with their own definitionFile that must not be overwritten.
+                    val isOwned =
+                        cinterop.name in cInteropTaskNamesWithDefFile ||
+                            ownedTaskPrefixes.any { prefix -> cinterop.name.startsWith(prefix) }
+                    if (!isOwned) {
+                        logger.debug("Skipping foreign cinterop task: {}", cinterop.name)
+                        return@configureEach
+                    }
                     if (HostManager.hostIsMac) {
                         val cinteropTarget =
                             AppleCompileTarget.fromKonanTarget(cinterop.konanTarget)
