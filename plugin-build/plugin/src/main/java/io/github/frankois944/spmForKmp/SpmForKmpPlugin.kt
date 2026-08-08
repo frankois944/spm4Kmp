@@ -130,7 +130,7 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                 }
 
                 // link the main definition File
-                val ownedTaskPrefixes = entries.map { "cinterop" + it.internalName.capitalized() }
+                val ownedTaskPrefixes = entries.map { entry -> "cinterop" + entry.internalName.capitalized() }
                 tasks.withType(CInteropProcess::class.java).configureEach { cinterop ->
                     // Only configure the cinterop tasks created/managed by this plugin;
                     // other plugins (or the user) may declare their own cinterops
