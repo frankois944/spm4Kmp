@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.1'
       - name: Checkout Repo
         uses: actions/checkout@v6 # v4
       - name: Cache Gradle Caches
