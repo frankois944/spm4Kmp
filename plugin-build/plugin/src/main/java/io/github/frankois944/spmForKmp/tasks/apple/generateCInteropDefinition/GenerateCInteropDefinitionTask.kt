@@ -562,9 +562,15 @@ ${getCustomizedDefinitionConfig()}
                                             }
                                         }
                                     }
-                                    addAll(builtModulesFolder)
                                 }
                             }
+                        }
+
+                        tracer.trace("built modules from build directory") {
+                            // include every built module directory (.build) so transitive
+                            // Clang/ObjC modules (e.g. @import from generated Swift headers)
+                            // can be resolved by cinterop via implicit module maps
+                            addAll(builtModulesFolder)
                         }
 
                         tracer.trace("headers from artifacts (xcframework)") {
