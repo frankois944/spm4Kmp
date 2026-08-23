@@ -41,9 +41,9 @@ jobs:
       IS_GITHUB_ACTION: true
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '26.1'
+      #- uses: maxim-lobanov/setup-xcode@v1
+      #  with:
+       #   xcode-version: '26.1'
       - name: Checkout Repo
         uses: actions/checkout@v6
         with:
