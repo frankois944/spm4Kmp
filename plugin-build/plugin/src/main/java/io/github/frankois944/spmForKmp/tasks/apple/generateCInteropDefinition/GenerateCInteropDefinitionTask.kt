@@ -6,8 +6,9 @@ import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
+import io.github.frankois944.spmForKmp.tasks.utils.computeModuleConfigs
+import io.github.frankois944.spmForKmp.tasks.utils.definitionFileOf
 import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
-import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findFolders
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
 import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
@@ -67,6 +68,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Input
     abstract val debugMode: Property<Boolean>
 
+    /**
+     * When true, the generated definitions must not contain any path specific to the
+     * machine running the build, so the resulting klibs can be published.
+     * See `PackageRootDefinitionExtension.publishSafe`.
+     */
+    @get:Input
+    abstract val publishSafe: Property<Boolean>
+
     @get:Input
     @get:Optional
     abstract val osVersion: Property<String>
@@ -114,24 +123,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:OutputFiles
     val outputFiles: List<File>
         get() =
-            buildList {
-                getModuleConfigs().forEachIndexed { index, moduleName ->
-                    if (index == 0) {
-                        add(
-                            definitionFolder
-                                .get()
-                                .asFile
-                                .resolve("${moduleName.name}_bridge.def"),
-                        )
-                    } else {
-                        add(
-                            definitionFolder
-                                .get()
-                                .asFile
-                                .resolve("${moduleName.name}.def"),
-                        )
-                    }
-                }
+            getModuleConfigs().mapIndexed { index, moduleConfig ->
+                definitionFileOf(definitionFolder.get().asFile, moduleConfig, index)
             }
 
     @get:Input
@@ -173,53 +166,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     private fun getModuleConfigs(): List<ModuleConfig> =
-        buildList {
-            // the first item must be the product name
-            add(
-                ModuleConfig(
-                    name = productName.get(),
-                    compilerOpts = compilerOpts.get(),
-                    linkerOpts = linkerOpts.get(),
-                ),
-            )
-            addAll(
-                packages
-                    .get()
-                    .filterExportableDependency()
-                    .also {
-                        logger.debug("Filtered exportable dependency: {}", it)
-                    }.flatMap { dependency ->
-                        when (dependency) {
-                            is SwiftDependency.Package -> {
-                                dependency.productsConfig.productPackages
-                                    .flatMap { product ->
-                                        product.products
-                                    }.map { product ->
-                                        ModuleConfig(
-                                            name = product.name,
-                                            alias = product.alias,
-                                            packageName = dependency.packageName,
-                                            spmPackageName = dependency.packageName,
-                                        )
-                                    }
-                            }
-
-                            is SwiftDependency.Binary -> {
-                                listOf(
-                                    ModuleConfig(
-                                        name = dependency.packageName,
-                                        spmPackageName = dependency.packageName,
-                                        isCLang = dependency.isCLang,
-                                    ),
-                                )
-                            }
-                        }
-                    },
-            )
-        }.distinctBy { it.name }
-            .also {
-                logger.debug("Product names to export: {}", it)
-            }
+        computeModuleConfigs(
+            productName = productName.get(),
+            compilerOpts = compilerOpts.get(),
+            linkerOpts = linkerOpts.get(),
+            packages = packages.get(),
+        ).also {
+            logger.debug("Product names to export: {}", it)
+        }
 
     private fun lookingForArtifactFramework(moduleConfig: ModuleConfig): File =
         artifactFolder
@@ -231,11 +185,36 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             .resolve(moduleConfig.name)
 
     private fun getExtraLinkers(): String {
+        // The toolchain path is tied to the Xcode installed on this machine; never bake it
+        // into a definition that is meant to be published.
+        if (publishSafe.get()) return ""
         val xcodeDevPath = execOps.getXcodeDevPath(logger)
         return buildList {
             add("-L\"$xcodeDevPath/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.get().sdk()}\"")
         }.joinToString(" ")
     }
+
+    /**
+     * `libraryPaths` points at the Swift package scratch directory of the current machine.
+     *
+     * It cannot simply be dropped in publishSafe mode: `cinterop` resolves the archive named by
+     * `staticLibraries` through it, at generation time, to embed the archive into the klib
+     * (`Could not find 'lib<name>.a' binary in neither of []` otherwise). So it is kept on the
+     * one definition that declares `staticLibraries`, and removed from all the others, where it
+     * resolves nothing and only leaks the path of the build machine.
+     */
+    private fun libraryPathsLine(declaresStaticLibraries: Boolean): String? =
+        if (publishSafe.get() && !declaresStaticLibraries) {
+            null
+        } else {
+            "libraryPaths = \"${currentBuildDirectory.get().asFile}\""
+        }
+
+    private fun renderDefinition(lines: List<String?>): String =
+        lines
+            .filterNotNull()
+            .filter { it.isNotBlank() }
+            .joinToString("\n")
 
     @Suppress("LongMethod")
     @TaskAction
@@ -342,13 +321,8 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
                     }?.let { buildDir ->
                         moduleConfig.isFramework = buildDir.extension == "framework"
                         moduleConfig.buildDir = buildDir.toPath()
-                        val definitionFilePath =
-                            if (index == 0) {
-                                definitionFolder.get().asFile.resolve("${moduleConfig.name}_bridge.def")
-                            } else {
-                                definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
-                            }
-                        moduleConfig.definitionFile = definitionFilePath
+                        moduleConfig.definitionFile =
+                            definitionFileOf(definitionFolder.get().asFile, moduleConfig, index)
                     } ?: let {
                     lookingForArtifactFramework(moduleConfig).let { location ->
                         logger.debug("FOUND ARTIFACT MODULE ${location.name}")
@@ -399,13 +373,13 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
                             moduleConfig.isFramework -> {
                                 tracer.trace("Swift framework definition") {
-                                    generateFrameworkDefinition(moduleName, moduleConfig)
+                                    generateFrameworkDefinition(moduleName, moduleConfig, index == 0)
                                 }
                             }
 
                             else -> {
                                 tracer.trace("non-framework definition") {
-                                    generateNonFrameworkDefinition(moduleName, moduleConfig)
+                                    generateNonFrameworkDefinition(moduleName, moduleConfig, index == 0)
                                 }
                             }
                         }
@@ -489,6 +463,7 @@ headerFilter = "$libraryPaths/Headers/**"
     private fun generateFrameworkDefinition(
         moduleName: String,
         moduleConfig: ModuleConfig,
+        declaresStaticLibraries: Boolean,
     ): String =
         tracer.trace("generateFrameworkDefinition") {
             val frameworkName =
@@ -505,15 +480,26 @@ headerFilter = "$libraryPaths/Headers/**"
                 tracer.trace("resolve build dir path") { currentBuildDirectory.get().asFile.path }
 
             tracer.trace("render definition") {
-                """
-language = Objective-C
-modules = $moduleName
-package = $packageName
-libraryPaths = "${currentBuildDirectory.get().asFile}"
-compilerOpts = -fmodules -framework "$frameworkName" -F"$buildDirPath"
-linkerOpts = -framework "$frameworkName" -F"$buildDirPath" ${getExtraLinkers()}
-${getCustomizedDefinitionConfig()}
-                """.trimIndent()
+                val frameworkFlag = "-framework \"$frameworkName\""
+                val linkerOptions =
+                    if (publishSafe.get()) {
+                        // -F points at the local scratch directory: it is kept out of the klib
+                        // manifest and added to this project's own link tasks instead.
+                        frameworkFlag
+                    } else {
+                        "$frameworkFlag -F\"$buildDirPath\" ${getExtraLinkers()}"
+                    }
+                renderDefinition(
+                    listOf(
+                        "language = Objective-C",
+                        "modules = $moduleName",
+                        "package = $packageName",
+                        libraryPathsLine(declaresStaticLibraries),
+                        "compilerOpts = -fmodules $frameworkFlag -F\"$buildDirPath\"",
+                        "linkerOpts = $linkerOptions",
+                        getCustomizedDefinitionConfig().trimEnd(),
+                    ),
+                )
             }
         }
 
@@ -521,6 +507,7 @@ ${getCustomizedDefinitionConfig()}
     private fun generateNonFrameworkDefinition(
         moduleName: String,
         moduleConfig: ModuleConfig,
+        declaresStaticLibraries: Boolean,
     ): String =
         tracer.trace("generateNonFrameworkDefinition") {
             // There are some dirty hacks for getting the headers paths needed by cinterop
@@ -594,15 +581,26 @@ ${getCustomizedDefinitionConfig()}
             val buildDirPath = currentBuildDirectory.get().asFile.path
 
             tracer.trace("render definition") {
-                """
-language = Objective-C
-modules = $moduleName
-package = $packageName
-libraryPaths = "${currentBuildDirectory.get().asFile}"
-compilerOpts = $compilerOpts -fmodules -I"$includeModulePath" $headerSearchPaths -F"$buildDirPath"
-linkerOpts =  -F"$buildDirPath" $linkerOps ${getExtraLinkers()}
-${getCustomizedDefinitionConfig()}
-                """.trimIndent()
+                val linkerOptions =
+                    if (publishSafe.get()) {
+                        // Only user supplied, relocatable options survive in a publishable klib.
+                        linkerOps.trim()
+                    } else {
+                        "-F\"$buildDirPath\" $linkerOps ${getExtraLinkers()}"
+                    }
+                val compilerOptions =
+                    "$compilerOpts -fmodules -I\"$includeModulePath\" $headerSearchPaths -F\"$buildDirPath\""
+                renderDefinition(
+                    listOf(
+                        "language = Objective-C",
+                        "modules = $moduleName",
+                        "package = $packageName",
+                        libraryPathsLine(declaresStaticLibraries),
+                        "compilerOpts = $compilerOptions",
+                        linkerOptions.takeIf { it.isNotBlank() }?.let { "linkerOpts = $it" },
+                        getCustomizedDefinitionConfig().trimEnd(),
+                    ),
+                )
             }
         }
 

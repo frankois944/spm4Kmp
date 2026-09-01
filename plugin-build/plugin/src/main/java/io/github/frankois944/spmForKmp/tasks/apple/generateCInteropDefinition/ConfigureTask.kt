@@ -27,6 +27,7 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     this.productName.set(swiftPackageEntry.internalName)
     this.packages.set(packageDependencies)
     this.debugMode.set(swiftPackageEntry.debug)
+    this.publishSafe.set(swiftPackageEntry.publishSafe)
     this.osVersion.set(
         computeOsVersion(cinteropTarget, swiftPackageEntry),
     )
@@ -36,7 +37,9 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
-    this.currentBridgeHash.set(Hashing.hashDirectory(packageDirectoriesConfig))
+    // Lazy: hashing walks the bridge sources; only do it when the task input
+    // is actually fingerprinted (execution), never at configuration time.
+    this.currentBridgeHash.set(project.provider { Hashing.hashDirectory(packageDirectoriesConfig) })
     this.strictEnums.set(swiftPackageEntry.strictEnums)
     this.nonStrictEnums.set(swiftPackageEntry.nonStrictEnums)
     this.foreignExceptionMode.set(swiftPackageEntry.foreignExceptionMode)

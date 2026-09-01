@@ -17,8 +17,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.reflect.TypeOf
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.kotlinToolingVersion
@@ -59,13 +59,13 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
 
             afterEvaluate {
                 // Contains the group of task (with their dependency) by target
-                val taskGroup = mutableMapOf<AppleCompileTarget, Task>()
+                val taskGroup = mutableMapOf<AppleCompileTarget, TaskProvider<*>>()
                 // Contains the cinterop .def file linked with the task name
                 val cInteropTaskNamesWithDefFile = mutableMapOf<String, File>()
                 // Contains the definition producer task linked with the cinterop task name
-                val cInteropTaskNamesWithProducerTask = mutableMapOf<String, Task>()
+                val cInteropTaskNamesWithProducerTask = mutableMapOf<String, TaskProvider<*>>()
                 // Contains the exported-package task linked with the cinterop task name
-                val cInteropTaskNamesWithExportTask = mutableMapOf<String, Task>()
+                val cInteropTaskNamesWithExportTask = mutableMapOf<String, TaskProvider<*>>()
                 val entries = (swiftPackageEntries + project.swiftContainer()).toSet()
                 createMissingCinteropTask(entries)
                 if (entries.any { entry -> entry.newPublicationInteroperabilityFeature }) {
@@ -104,12 +104,6 @@ public abstract class SpmForKmpPlugin : Plugin<Project> {
                     if (!project.disableStartupFile()) {
                         StartingFile.createStartingFileIfNeeded(bridgeSourceDir)
                     }
-
-                    tasks
-                        .withType(CInteropProcess::class.java)
-                        .forEach {
-                            logger.debug("CInteropProcess task found: {}", it)
-                        }
 
                     configAppleTargets(
                         taskGroup = taskGroup,
