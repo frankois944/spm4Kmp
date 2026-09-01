@@ -25,6 +25,9 @@ import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.Ge
 import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.GenerateManifestTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.configureTask
+import io.github.frankois944.spmForKmp.tasks.utils.addPublishSafeLinkerOptions
+import io.github.frankois944.spmForKmp.tasks.utils.computeModuleConfigs
+import io.github.frankois944.spmForKmp.tasks.utils.definitionFileOf
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
