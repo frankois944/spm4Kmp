@@ -35,7 +35,6 @@ import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
 import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import io.github.frankois944.spmForKmp.utils.compareVersions
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -49,10 +48,10 @@ import java.io.File
 
 @Suppress("LongMethod", "LongParameterList")
 internal fun Project.configAppleTargets(
-    taskGroup: MutableMap<AppleCompileTarget, Task>,
+    taskGroup: MutableMap<AppleCompileTarget, TaskProvider<*>>,
     cInteropTaskNamesWithDefFile: MutableMap<String, File>,
-    cInteropTaskNamesWithProducerTask: MutableMap<String, Task>,
-    cInteropTaskNamesWithExportTask: MutableMap<String, Task>,
+    cInteropTaskNamesWithProducerTask: MutableMap<String, TaskProvider<*>>,
+    cInteropTaskNamesWithExportTask: MutableMap<String, TaskProvider<*>>,
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
@@ -172,7 +171,21 @@ internal fun Project.configAppleTargets(
                 )
             }
 
-        val outputFiles = definitionTask.get().outputFiles
+        // Predict the definition file paths from the entry configuration instead of
+        // realizing the task (`definitionTask.get()`) at configuration time.
+        val definitionFolder =
+            packageDirectoriesConfig.spmWorkingDir
+                .resolve("defFiles")
+                .resolve(cinteropTarget.toString())
+        val outputFiles =
+            computeModuleConfigs(
+                productName = swiftPackageEntry.internalName,
+                compilerOpts = swiftPackageEntry.compilerOpts,
+                linkerOpts = swiftPackageEntry.linkerOpts,
+                packages = packageDependencies,
+            ).mapIndexed { index2, moduleConfig ->
+                definitionFileOf(definitionFolder, moduleConfig, index2)
+            }
 
         if (outputFiles.isNotEmpty() && HostManager.hostIsMac) {
             val ktTarget =
@@ -181,6 +194,16 @@ internal fun Project.configAppleTargets(
                     .targets
                     .findByName(cinteropTarget.name) as KotlinNativeTarget
             val mainCompilation = ktTarget.compilations.getByName("main")
+
+            if (swiftPackageEntry.publishSafe) {
+                // The definitions no longer carry the local search paths; the binaries of this
+                // project still need them to link.
+                addPublishSafeLinkerOptions(
+                    ktTarget = ktTarget,
+                    cinteropTarget = cinteropTarget,
+                    targetBuildDir = targetBuildDir,
+                )
+            }
 
             outputFiles.forEachIndexed { cindex, file ->
 
@@ -214,8 +237,8 @@ internal fun Project.configAppleTargets(
                 }
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
                 cInteropTaskNamesWithDefFile[cinteropTaskName] = file
-                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask.get()
-                cInteropTaskNamesWithExportTask[cinteropTaskName] = exportedManifestTask.get()
+                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask
+                cInteropTaskNamesWithExportTask[cinteropTaskName] = exportedManifestTask
             }
         }
 
@@ -236,8 +259,8 @@ internal fun Project.configAppleTargets(
             it.dependsOn(copyPackageResourcesTask)
         }
 
-        // Keep a handle to the "root" for this target
-        taskGroup[cinteropTarget] = definitionTask.get()
+        // Keep a handle to the "root" for this target (as a provider, no realization)
+        taskGroup[cinteropTarget] = definitionTask
     }
 }
 

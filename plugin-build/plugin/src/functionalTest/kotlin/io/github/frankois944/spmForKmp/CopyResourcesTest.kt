@@ -90,7 +90,7 @@ class CopyResourcesTest : BaseTest() {
                                products = {
                                    add("Valet")
                                },
-                               revision = "29bea846b29f9880a07dd1828596953d0fd495ce",
+                               revision = "43f517941ced37752c0cd5e2b53a3c9d021c848b",
                             )
                             """.trimIndent(),
                     ),
