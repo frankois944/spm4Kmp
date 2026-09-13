@@ -37,7 +37,7 @@ internal fun CompileSwiftPackageTask.configureTask(
             .resolve(cinteropTarget.toString())
             .resolve("CompileSwiftPackageTask.html"),
     )
-    this.packageResolveFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_RESOLVE_NAME))
+    this.packageResolveFile.setFrom(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_RESOLVE_NAME))
     this.generatedDirs.set(
         buildList {
             add(targetBuildDir)

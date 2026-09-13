@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.utils
 
+import io.github.frankois944.spmForKmp.SPM_ARTIFACTS_DIR_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.GenerateCInteropDefinitionTask
@@ -52,7 +53,7 @@ internal fun getModuleArtifactsPath(
     target: AppleCompileTarget,
 ): Path =
     fromPath
-        .resolve("artifacts")
+        .resolve(SPM_ARTIFACTS_DIR_NAME)
         .resolve(productName.lowercase())
         .resolve(moduleConfig.name)
         .resolve("${moduleConfig.name}.xcframework")

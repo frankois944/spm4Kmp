@@ -10,6 +10,8 @@ import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMa
 import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findFolders
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
+import io.github.frankois944.spmForKmp.tasks.utils.getArtifactsDirectory
+import io.github.frankois944.spmForKmp.tasks.utils.getCheckoutsDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
 import io.github.frankois944.spmForKmp.utils.SwiftManifestParser
@@ -149,14 +151,10 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     abstract val currentBuildDirectory: DirectoryProperty
 
     private val checkoutFolder: File
-        get() =
-            File(scratchDir.get())
-                .resolve("checkouts")
+        get() = getCheckoutsDirectory(File(scratchDir.get()))
 
     private val artifactFolder: File
-        get() =
-            File(scratchDir.get())
-                .resolve("artifacts")
+        get() = getArtifactsDirectory(File(scratchDir.get()))
 
     private lateinit var checkoutPublicFolder: List<File>
 
