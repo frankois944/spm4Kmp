@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.utils.BaseTest
+import org.junit.jupiter.api.Assumptions.assumeFalse
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -9,8 +10,8 @@ import java.util.concurrent.TimeUnit
 
 class IOSAppTest : BaseTest() {
     /**
-     * The identifier of an available iPhone simulator, or `null` when the machine has none —
-     * or no Xcode toolchain at all to ask.
+     * The identifier of an iPhone simulator this machine can actually boot, or `null` when it
+     * has none — or no Xcode toolchain at all to ask.
      */
     private fun findSimulatorId(): String? =
         runCatching {
@@ -24,14 +25,30 @@ class IOSAppTest : BaseTest() {
 
             println(output)
 
-            SIMULATOR_ID
-                .find(output)
-                ?.groupValues
-                ?.get(1)
-                .also {
-                    println("found id:$it")
-                }
+            findUsableIPhone(output).also {
+                println("found id:$it")
+            }
         }.getOrNull()
+
+    /**
+     * `simctl` groups the devices by runtime and still lists those of a runtime that is not
+     * installed, under an `-- Unavailable: … --` header. Picking one of those gives `xcodebuild`
+     * a destination it cannot match, so only the devices of an installed runtime are considered.
+     */
+    private fun findUsableIPhone(devices: String): String? {
+        var usableRuntime = false
+        devices.lineSequence().forEach { line ->
+            val header = RUNTIME_HEADER.find(line.trim())
+            if (header != null) {
+                usableRuntime = !header.groupValues[1].startsWith("Unavailable", ignoreCase = true)
+                return@forEach
+            }
+            if (usableRuntime && !line.contains("unavailable", ignoreCase = true)) {
+                SIMULATOR_ID.find(line)?.let { return it.groupValues[1] }
+            }
+        }
+        return null
+    }
 
     @Test
     fun `build and test example app`() {
@@ -135,8 +152,17 @@ class IOSAppTest : BaseTest() {
         val xcodebuildExit = if (xcodebuildFinished) xcodebuild.exitValue() else -1
         val xcbeautifyExit = if (xcbeautifyFinished) xcbeautify.exitValue() else -1
 
-        // Emulate `set -o pipefail`: fail if either process failed
         val finalOutput = outputSb.toString()
+
+        // The simulator listed by `simctl` can still be unusable by `xcodebuild`, typically when
+        // its runtime is not installed on the machine. Nothing was tested, but nothing is broken
+        // either: report the test as skipped instead of failing the build of a runner without a
+        // usable simulator.
+        assumeFalse(finalOutput.hasNoUsableDestination()) {
+            "SKIP TEST because no usable iOS simulator was found:\n$finalOutput"
+        }
+
+        // Emulate `set -o pipefail`: fail if either process failed
         assert(xcodebuildExit == 0 && xcbeautifyExit == 0) {
             buildString {
                 appendLine("Pipeline failed:")
@@ -151,7 +177,23 @@ class IOSAppTest : BaseTest() {
         //      }
     }
 
+    /**
+     * Whether `xcodebuild` refused to run because the machine has nothing to run the app on,
+     * as opposed to a real failure of the build or of the tests.
+     */
+    private fun String.hasNoUsableDestination(): Boolean =
+        NO_DESTINATION_ERRORS.any { contains(it, ignoreCase = true) }
+
     private companion object {
         val SIMULATOR_ID = Regex("""iPhone.*\(([-A-F0-9]+)\)""")
+        val RUNTIME_HEADER = Regex("""^-- (.+) --$""")
+
+        val NO_DESTINATION_ERRORS =
+            listOf(
+                "Unable to find a destination matching",
+                "Unable to find a device matching",
+                "Please download and install the platform",
+                "Unsupported destination",
+            )
     }
 }
