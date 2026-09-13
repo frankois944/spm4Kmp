@@ -8,6 +8,7 @@ import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.TASK_GENERATE_REGISTRY_FILE
+import io.github.frankois944.spmForKmp.TASK_RESOLVE_PACKAGE
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.NewPublicationInteroperabilityFeature
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
@@ -25,6 +26,8 @@ import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.Ge
 import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.GenerateManifestTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.resolveSwiftPackage.ResolveSwiftPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.resolveSwiftPackage.configureTask
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
@@ -95,6 +98,18 @@ internal fun Project.configAppleTargets(
             it.configureTask(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
+            )
+        }
+
+    val resolveTask: TaskProvider<ResolveSwiftPackageTask> =
+        tasks.register(
+            getTaskName(TASK_RESOLVE_PACKAGE, swiftPackageEntry.internalName),
+            ResolveSwiftPackageTask::class.java,
+        ) {
+            it.configureTask(
+                swiftPackageEntry = swiftPackageEntry,
+                packageDirectoriesConfig = packageDirectoriesConfig,
+                packageDependencies = packageDependencies,
             )
         }
 
@@ -208,8 +223,11 @@ internal fun Project.configAppleTargets(
         packageRegistryTask.configure {
             it.dependsOn(manifestTask)
         }
-        compileTask.configure {
+        resolveTask.configure {
             it.dependsOn(packageRegistryTask)
+        }
+        compileTask.configure {
+            it.dependsOn(resolveTask)
         }
         copyPackageResourcesTask.configure {
             it.dependsOn(compileTask)
