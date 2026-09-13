@@ -1,33 +1,37 @@
 package io.github.frankois944.spmForKmp
 
 import io.github.frankois944.spmForKmp.utils.BaseTest
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class IOSAppTest : BaseTest() {
-    private fun findSimulatorId(): String {
-        val process =
-            ProcessBuilder("xcrun", "simctl", "list", "devices", "available")
-                .redirectErrorStream(true)
-                .start()
+    /**
+     * The identifier of an available iPhone simulator, or `null` when the machine has none —
+     * or no Xcode toolchain at all to ask.
+     */
+    private fun findSimulatorId(): String? =
+        runCatching {
+            val process =
+                ProcessBuilder("xcrun", "simctl", "list", "devices", "available")
+                    .redirectErrorStream(true)
+                    .start()
 
-        val output = process.inputStream.bufferedReader().readText()
-        process.waitFor()
+            val output = process.inputStream.bufferedReader().readText()
+            process.waitFor()
 
-        println(output)
+            println(output)
 
-        val regex = Regex("""iPhone.*\(([-A-F0-9]+)\)""")
-        return regex
-            .find(output)
-            ?.groupValues
-            ?.get(1)
-            .also {
-                println("found id:$it")
-            }
-            ?: error("No simulator found")
-    }
+            SIMULATOR_ID
+                .find(output)
+                ?.groupValues
+                ?.get(1)
+                .also {
+                    println("found id:$it")
+                }
+        }.getOrNull()
 
     @Test
     fun `build and test example app`() {
@@ -35,6 +39,14 @@ class IOSAppTest : BaseTest() {
             println("SKIP TEST because no GITEA_TOKEN set")
             return
         }
+
+        // Nothing to run the app on: report the test as skipped rather than failing a machine
+        // that has no simulator installed.
+        val simulatorId = findSimulatorId()
+        assumeTrue(simulatorId != null) {
+            "SKIP TEST because no iPhone simulator is available"
+        }
+
         val xcodeBuildCommand =
             listOf(
                 "xcodebuild",
@@ -45,7 +57,7 @@ class IOSAppTest : BaseTest() {
                 "-configuration",
                 "Debug",
                 "-destination",
-                "id=${findSimulatorId()}",
+                "id=$simulatorId",
                 "-derivedDataPath",
                 "./build",
                 "-clonedSourcePackagesDirPath",
@@ -137,5 +149,9 @@ class IOSAppTest : BaseTest() {
 //        if (!isCI && xcodebuildExit == 0 && xcbeautifyExit == 0) {
         //          println(finalOutput)
         //      }
+    }
+
+    private companion object {
+        val SIMULATOR_ID = Regex("""iPhone.*\(([-A-F0-9]+)\)""")
     }
 }
