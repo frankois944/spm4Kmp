@@ -105,6 +105,7 @@ jobs:
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v8
         with:
+          skipSignatureVerification: true
           args: >
             -Dsonar.organization=frankois944
             -Dsonar.projectKey=frankois944_spm4Kmp
