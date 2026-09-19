@@ -8,13 +8,17 @@ import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import io.github.frankois944.spmForKmp.tasks.utils.computeModuleConfigs
 import io.github.frankois944.spmForKmp.tasks.utils.definitionFileOf
+import io.github.frankois944.spmForKmp.tasks.utils.definitionLibraryPathsLine
 import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
 import io.github.frankois944.spmForKmp.tasks.utils.findFolders
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
+import io.github.frankois944.spmForKmp.tasks.utils.frameworkDefinitionLinkerOpts
 import io.github.frankois944.spmForKmp.tasks.utils.getArtifactsDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getCheckoutsDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
 import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
+import io.github.frankois944.spmForKmp.tasks.utils.nonFrameworkDefinitionLinkerOpts
+import io.github.frankois944.spmForKmp.tasks.utils.renderDefinition
 import io.github.frankois944.spmForKmp.utils.SwiftManifestParser
 import io.github.frankois944.spmForKmp.utils.checkSum
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
@@ -193,26 +197,14 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     /**
-     * `libraryPaths` points at the Swift package scratch directory of the current machine.
-     *
-     * It cannot simply be dropped in publishSafe mode: `cinterop` resolves the archive named by
-     * `staticLibraries` through it, at generation time, to embed the archive into the klib
-     * (`Could not find 'lib<name>.a' binary in neither of []` otherwise). So it is kept on the
-     * one definition that declares `staticLibraries`, and removed from all the others, where it
-     * resolves nothing and only leaks the path of the build machine.
+     * See [definitionLibraryPathsLine].
      */
     private fun libraryPathsLine(declaresStaticLibraries: Boolean): String? =
-        if (publishSafe.get() && !declaresStaticLibraries) {
-            null
-        } else {
-            "libraryPaths = \"${currentBuildDirectory.get().asFile}\""
-        }
-
-    private fun renderDefinition(lines: List<String?>): String =
-        lines
-            .filterNotNull()
-            .filter { it.isNotBlank() }
-            .joinToString("\n")
+        definitionLibraryPathsLine(
+            publishSafe = publishSafe.get(),
+            declaresStaticLibraries = declaresStaticLibraries,
+            buildDirectory = currentBuildDirectory.get().asFile,
+        )
 
     @Suppress("LongMethod")
     @TaskAction
@@ -479,14 +471,15 @@ headerFilter = "$libraryPaths/Headers/**"
 
             tracer.trace("render definition") {
                 val frameworkFlag = "-framework \"$frameworkName\""
+                // -F points at the local scratch directory: in publishSafe mode, it is kept out of
+                // the klib manifest and added to this project's own link tasks instead.
                 val linkerOptions =
-                    if (publishSafe.get()) {
-                        // -F points at the local scratch directory: it is kept out of the klib
-                        // manifest and added to this project's own link tasks instead.
-                        frameworkFlag
-                    } else {
-                        "$frameworkFlag -F\"$buildDirPath\" ${getExtraLinkers()}"
-                    }
+                    frameworkDefinitionLinkerOpts(
+                        publishSafe = publishSafe.get(),
+                        frameworkFlag = frameworkFlag,
+                        buildDirPath = buildDirPath,
+                        extraLinkers = { getExtraLinkers() },
+                    )
                 renderDefinition(
                     listOf(
                         "language = Objective-C",
@@ -579,13 +572,14 @@ headerFilter = "$libraryPaths/Headers/**"
             val buildDirPath = currentBuildDirectory.get().asFile.path
 
             tracer.trace("render definition") {
+                // Only user supplied, relocatable options survive in a publishable klib.
                 val linkerOptions =
-                    if (publishSafe.get()) {
-                        // Only user supplied, relocatable options survive in a publishable klib.
-                        linkerOps.trim()
-                    } else {
-                        "-F\"$buildDirPath\" $linkerOps ${getExtraLinkers()}"
-                    }
+                    nonFrameworkDefinitionLinkerOpts(
+                        publishSafe = publishSafe.get(),
+                        userLinkerOpts = linkerOps,
+                        buildDirPath = buildDirPath,
+                        extraLinkers = { getExtraLinkers() },
+                    )
                 val compilerOptions =
                     "$compilerOpts -fmodules -I\"$includeModulePath\" $headerSearchPaths -F\"$buildDirPath\""
                 renderDefinition(
