@@ -28,7 +28,7 @@ internal fun Project.addPublishSafeLinkerOptions(
             }.standardOutput
             .asText
             .map { output ->
-                "${output.trim()}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${cinteropTarget.sdk()}"
+                swiftRuntimeLibraryPath(xcodeDevPath = output, target = cinteropTarget)
             }
 
     val buildDirPath = targetBuildDir.absolutePath
@@ -37,14 +37,33 @@ internal fun Project.addPublishSafeLinkerOptions(
         binary.linkTaskProvider.configure { linkTask ->
             linkTask.toolOptions.freeCompilerArgs.addAll(
                 swiftRuntimePath.map { runtimePath ->
-                    listOf(
-                        "-linker-option",
-                        "-F$buildDirPath",
-                        "-linker-option",
-                        "-L$runtimePath",
-                    )
+                    publishSafeLinkerArguments(buildDirPath = buildDirPath, swiftRuntimePath = runtimePath)
                 },
             )
         }
     }
 }
+
+/**
+ * The Swift libraries of the Xcode toolchain for [target], from the output of `xcode-select -p`.
+ */
+internal fun swiftRuntimeLibraryPath(
+    xcodeDevPath: String,
+    target: AppleCompileTarget,
+): String = "${xcodeDevPath.trim()}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/${target.sdk()}"
+
+/**
+ * The Kotlin/Native compiler arguments giving the local search paths to the linker of a binary.
+ *
+ * Each path is a single argument: they are passed as is to the linker, without shell quoting.
+ */
+internal fun publishSafeLinkerArguments(
+    buildDirPath: String,
+    swiftRuntimePath: String,
+): List<String> =
+    listOf(
+        "-linker-option",
+        "-F$buildDirPath",
+        "-linker-option",
+        "-L$swiftRuntimePath",
+    )
