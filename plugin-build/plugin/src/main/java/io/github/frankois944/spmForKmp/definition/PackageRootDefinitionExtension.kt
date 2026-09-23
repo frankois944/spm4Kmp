@@ -146,6 +146,35 @@ constructor(
      */
     public var compilerOpts: List<String> = emptyList()
 
+    /**
+     * Produces relocatable `.def` files, and therefore relocatable klibs, suitable for publication.
+     *
+     * By default, the generated cinterop definitions carry absolute paths of the machine that ran
+     * the build (the Swift package `scratch` directory and the active `Xcode.app` toolchain).
+     * `cinterop` copies them verbatim into the klib manifest (`libraryPaths`, `linkerOpts`), so a
+     * library published to a Maven repository ships link options pointing at directories that only
+     * exist on the publishing machine. Consumers then get `ld: warning: search path ... not found`
+     * on every Apple link.
+     *
+     * When set to `true`:
+     * - `libraryPaths` is omitted from the generated definitions. It is redundant: `cinterop`
+     *   embeds the archive named by `staticLibraries` inside the klib itself.
+     * - the absolute `-F`/`-L` search paths are removed from `linkerOpts`; only relocatable
+     *   options (`-framework`, and the ones you declare through [linkerOpts]) are kept.
+     * - those search paths are instead added to the link tasks of **this** project, so the local
+     *   binaries (`linkDebugTest*`, frameworks, ...) keep linking exactly as before.
+     *
+     * Consumers of the published library must provide the native dependencies themselves,
+     * as described in [the distribution guide](https://spmforkmp.eu/usages/distribution/).
+     *
+     * Note: `compilerOpts` still contains the header search paths, which `cinterop` needs to run.
+     * They are inert for consumers (they are not passed to the linker) but are still recorded in
+     * the klib manifest.
+     *
+     * Default value: `false`
+     */
+    public var publishSafe: Boolean = false
+
     internal val packageDependenciesConfig: Dependency = Dependency()
 
     /**

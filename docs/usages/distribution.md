@@ -17,6 +17,18 @@ It will fix issues with linking, missing resources, App Store compliance, and mo
 
     The user **doesn't have access** to the Kotlin library source code, which is great!
 
+## Publish Safe
+
+Set `publishSafe = true` on a library you publish, so its klibs don't embed the paths of the build machine (every consumer would get `ld: warning: search path '...' not found`).
+
+```kotlin title="library/build.gradle.kts"
+swiftPackageConfig(cinteropName = "myBridge") {
+    publishSafe = true
+}
+```
+
+The library's own binaries still link. A consumer linking with Gradle rather than Xcode must provide the native dependencies through `linkerOpts`.
+
 ## Example
 
 A Compose Multiplatform Component library using a native video player.

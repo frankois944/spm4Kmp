@@ -74,6 +74,8 @@ kotlin {
             // exportedPackageSettings {
             //     includeProduct = listOf("HevSocks5Tunnel")
             // }
+            // remove library distribution linker warning on consumer
+            // publishSafe = true
             minIos = "16.0"
             if (System.getenv("GITEA_TOKEN") != null) {
                 registry(

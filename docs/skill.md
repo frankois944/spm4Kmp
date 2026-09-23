@@ -20,12 +20,12 @@ If you have `npx` installed, you can easily install or update the skill:
 #### Project-level installation
 Run this command in your project root:
 ```bash
-npx skills add spmforkmp
+npx skills add frankois944/skills/spmforkmp
 ```
 
 #### Global installation
 ```bash
-npx skills add -g spmforkmp
+npx skills add -g frankois944/skills/spmforkmp
 ```
 
 ## Support

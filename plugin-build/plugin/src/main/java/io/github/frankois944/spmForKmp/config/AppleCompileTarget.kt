@@ -84,7 +84,7 @@ public enum class AppleCompileTarget : Serializable {
             watchosX64 -> "x86_64"
             watchosArm32 -> "armv7k"
             watchosArm64 -> "arm64_32"
-            watchosSimulatorArm64 -> "aarch64"
+            watchosSimulatorArm64 -> "arm64"
             tvosX64 -> "x86_64"
             tvosArm64, tvosSimulatorArm64 -> "arm64"
             macosX64 -> "x86_64"
