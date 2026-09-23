@@ -6,6 +6,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 internal fun ExecOperations.getXcodeDevPath(logger: Logger): String {
     val args =
@@ -200,3 +201,58 @@ OUTPUT $standardOutput
         debug("OUTPUT $standardOutput")
     }
 }
+
+/**
+ * Whether the toolchain understands `swift build --build-system <name>`.
+ *
+ * The flag only exists from Swift 6.0 onwards; the plugin still supports older toolchains through
+ * `swiftBinPath`/`toolchain`, so the capability is probed instead of being derived from a version.
+ * `native` is a valid value wherever the flag exists (Swift 6.0 offered `native`/`xcode`, later
+ * releases `native`/`swiftbuild`), so detecting the flag is enough to know the value is accepted.
+ *
+ * The result is memoized per toolchain: the probe is cheap but runs once per compile task.
+ */
+private val buildSystemFlagSupport = ConcurrentHashMap<String, Boolean>()
+
+internal fun ExecOperations.supportsBuildSystemFlag(
+    swiftBinPath: String?,
+    toolchain: String?,
+    logger: Logger,
+): Boolean =
+    buildSystemFlagSupport.computeIfAbsent("${swiftBinPath.orEmpty()}|${toolchain.orEmpty()}") { _ ->
+        val args =
+            buildList {
+                if (swiftBinPath == null) {
+                    toolchain?.let {
+                        add("--toolchain")
+                        add(it)
+                    }
+                    add("--sdk")
+                    add("macosx")
+                    add("swift")
+                }
+                add("build")
+                add("--help")
+            }
+
+        val standardOutput = ByteArrayOutputStream()
+        val errorOutput = ByteArrayOutputStream()
+        val result =
+            exec {
+                it.executable = swiftBinPath ?: "xcrun"
+                it.args = args
+                it.standardOutput = standardOutput
+                it.errorOutput = errorOutput
+                it.isIgnoreExitValue = true
+                toolchain?.let { value ->
+                    it.environment("TOOLCHAINS", value)
+                }
+            }
+
+        if (result.exitValue != 0) {
+            logger.info("Could not probe `swift build --help`, assuming --build-system is unavailable")
+            false
+        } else {
+            standardOutput.toString().contains("--build-system")
+        }
+    }
