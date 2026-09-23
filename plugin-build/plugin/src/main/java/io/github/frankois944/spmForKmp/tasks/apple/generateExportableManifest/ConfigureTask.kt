@@ -6,6 +6,7 @@ import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.hideLocalPackageMessage
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
@@ -34,6 +35,7 @@ internal fun GenerateExportableManifestTask.configureTask(
     this.compiledTargetDirs.set(
         targets.map { target ->
             getTargetBuildDirectory(
+                buildSystem = project.resolveBuildSystem(swiftPackageEntry),
                 packageScratchDir = packageDirectoriesConfig.packageScratchDir,
                 cinteropTarget = target,
                 buildMode = getBuildMode(swiftPackageEntry),

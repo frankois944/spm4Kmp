@@ -5,20 +5,22 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.operations.getXcodeDevPath
+import io.github.frankois944.spmForKmp.tasks.utils.BuiltModule
+import io.github.frankois944.spmForKmp.config.SpmBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
-import io.github.frankois944.spmForKmp.tasks.utils.computeModuleConfigs
-import io.github.frankois944.spmForKmp.tasks.utils.definitionFileOf
 import io.github.frankois944.spmForKmp.tasks.utils.definitionLibraryPathsLine
+import io.github.frankois944.spmForKmp.tasks.utils.frameworkDefinitionLinkerOpts
+import io.github.frankois944.spmForKmp.tasks.utils.nonFrameworkDefinitionLinkerOpts
+import io.github.frankois944.spmForKmp.tasks.utils.renderDefinition
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBinaryModule
+import io.github.frankois944.spmForKmp.tasks.utils.spmBuildLayout
 import io.github.frankois944.spmForKmp.tasks.utils.extractModuleNameFromModuleMap
+import io.github.frankois944.spmForKmp.tasks.utils.filterExportableDependency
 import io.github.frankois944.spmForKmp.tasks.utils.findFolders
 import io.github.frankois944.spmForKmp.tasks.utils.findHeadersModule
-import io.github.frankois944.spmForKmp.tasks.utils.frameworkDefinitionLinkerOpts
 import io.github.frankois944.spmForKmp.tasks.utils.getArtifactsDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getCheckoutsDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getModuleArtifactsPath
-import io.github.frankois944.spmForKmp.tasks.utils.getModulesInBuildDirectory
-import io.github.frankois944.spmForKmp.tasks.utils.nonFrameworkDefinitionLinkerOpts
-import io.github.frankois944.spmForKmp.tasks.utils.renderDefinition
 import io.github.frankois944.spmForKmp.utils.SwiftManifestParser
 import io.github.frankois944.spmForKmp.utils.checkSum
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
@@ -86,8 +88,19 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Optional
     abstract val osVersion: Property<String>
 
+    /**
+     * The scratch directory holding the resolved dependencies — the checkouts and the extracted
+     * xcframeworks the generated definitions point at — shared by every target.
+     */
     @get:Input
-    abstract val scratchDir: Property<String>
+    abstract val sharedScratchDir: Property<String>
+
+    /** The scratch directory this target was built into. */
+    @get:Input
+    abstract val targetScratchDir: Property<String>
+
+    @get:Input
+    abstract val buildSystem: Property<SpmBuildSystem>
 
     @get:Input
     @get:Optional
@@ -129,8 +142,24 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:OutputFiles
     val outputFiles: List<File>
         get() =
-            getModuleConfigs().mapIndexed { index, moduleConfig ->
-                definitionFileOf(definitionFolder.get().asFile, moduleConfig, index)
+            buildList {
+                getModuleConfigs().forEachIndexed { index, moduleName ->
+                    if (index == 0) {
+                        add(
+                            definitionFolder
+                                .get()
+                                .asFile
+                                .resolve("${moduleName.name}_bridge.def"),
+                        )
+                    } else {
+                        add(
+                            definitionFolder
+                                .get()
+                                .asFile
+                                .resolve("${moduleName.name}.def"),
+                        )
+                    }
+                }
             }
 
     @get:Input
@@ -147,17 +176,33 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     @get:Internal
     abstract val currentBuildDirectory: DirectoryProperty
 
+    /**
+     * How to read the scratch directory the package was built into: the two build systems lay it
+     * out differently, see [io.github.frankois944.spmForKmp.tasks.utils.SpmBuildLayout].
+     */
+    private val layout
+        get() =
+            spmBuildLayout(
+                buildSystem = buildSystem.get(),
+                packageScratchDir = File(targetScratchDir.get()),
+                target = target.get(),
+                buildMode = if (debugMode.get()) "debug" else "release",
+            )
+
     private val checkoutFolder: File
-        get() = getCheckoutsDirectory(File(scratchDir.get()))
+        get() = getCheckoutsDirectory(File(sharedScratchDir.get()))
 
     private val artifactFolder: File
-        get() = getArtifactsDirectory(File(scratchDir.get()))
+        get() = getArtifactsDirectory(File(sharedScratchDir.get()))
 
     private lateinit var checkoutPublicFolder: List<File>
 
     private lateinit var artifactPublicFolder: List<File>
 
     private lateinit var builtModulesFolder: List<File>
+
+    /** Flags making the built modules visible to clang, see the layout. */
+    private var moduleVisibilityOpts: String = ""
 
     init {
         description = "Generate the cinterop definitions files"
@@ -168,14 +213,55 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     private fun getModuleConfigs(): List<ModuleConfig> =
-        computeModuleConfigs(
-            productName = productName.get(),
-            compilerOpts = compilerOpts.get(),
-            linkerOpts = linkerOpts.get(),
-            packages = packages.get(),
-        ).also {
-            logger.debug("Product names to export: {}", it)
-        }
+        buildList {
+            // the first item must be the product name
+            add(
+                ModuleConfig(
+                    name = productName.get(),
+                    compilerOpts = compilerOpts.get(),
+                    linkerOpts = linkerOpts.get(),
+                ),
+            )
+            addAll(
+                packages
+                    .get()
+                    .filterExportableDependency()
+                    .also {
+                        logger.debug("Filtered exportable dependency: {}", it)
+                    }.flatMap { dependency ->
+                        when (dependency) {
+                            is SwiftDependency.Package -> {
+                                dependency.productsConfig.productPackages
+                                    .flatMap { product ->
+                                        product.products
+                                    }.map { product ->
+                                        ModuleConfig(
+                                            name = product.name,
+                                            alias = product.alias,
+                                            packageName = dependency.packageName,
+                                            spmPackageName = dependency.packageName,
+                                        )
+                                    }
+                            }
+
+                            is SwiftDependency.Binary -> {
+                                listOf(
+                                    ModuleConfig(
+                                        name = dependency.packageName,
+                                        packageName = dependency.packageName,
+                                        spmPackageName = dependency.packageName,
+                                        isCLang = dependency.isCLang,
+                                        swiftDependency = dependency,
+                                    ),
+                                )
+                            }
+                        }
+                    },
+            )
+        }.distinctBy { it.name }
+            .also {
+                logger.debug("Product names to export: {}", it)
+            }
 
     private fun lookingForArtifactFramework(moduleConfig: ModuleConfig): File =
         artifactFolder
@@ -185,6 +271,25 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             .resolve(target.get().xcFrameworkArchName())
             .resolve("Headers")
             .resolve(moduleConfig.name)
+
+    /**
+     * A binary module, read from its xcframework rather than from the build directory: only
+     * `native` copies the slice there, see
+     * [io.github.frankois944.spmForKmp.tasks.utils.resolveBinaryModule].
+     */
+    private fun resolveBinaryDependency(moduleConfig: ModuleConfig) =
+        resolveBinaryModule(
+            dependency = moduleConfig.swiftDependency as? SwiftDependency.Binary,
+            identities =
+                listOf(
+                    moduleConfig.packageName,
+                    moduleConfig.spmPackageName.orEmpty(),
+                    productName.get().lowercase(),
+                ),
+            moduleName = moduleConfig.name,
+            artifactsDir = artifactFolder,
+            target = target.get(),
+        )
 
     private fun getExtraLinkers(): String {
         // The toolchain path is tied to the Xcode installed on this machine; never bake it
@@ -244,7 +349,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
             val moduleConfigs = tracer.trace("collect module configs") { getModuleConfigs() }
             val builtModules =
                 tracer.trace("scan built modules") {
-                    getModulesInBuildDirectory(currentBuildDirectory.get().asFile)
+                    layout.builtModules()
+                }
+            moduleVisibilityOpts =
+                tracer.trace("module visibility flags") {
+                    layout.moduleVisibilityCompilerOpts().joinToString(" ")
                 }
 
             tracer.trace("configure modules") {
@@ -283,51 +392,89 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     private fun configureModules(
         moduleConfigs: List<ModuleConfig>,
-        builtModules: List<File>,
+        builtModules: List<BuiltModule>,
     ) {
         moduleConfigs.forEachIndexed { index, moduleConfig ->
             logger.debug("LOOKING for module dir {}", moduleConfig.name)
             if (moduleConfig.isCLang) {
-                logger.warn(
-                    """
-                    CLang is experimental and not fully tested; please create an issue if you encounter a bug.
-                    Only C language-based xcFramework is currently supported.
-                    """.trimIndent(),
-                )
-                moduleConfig.isFramework = true
-                moduleConfig.buildDir =
-                    getModuleArtifactsPath(
-                        fromPath = Path.of(scratchDir.get()),
-                        productName = productName.get(),
-                        moduleConfig = moduleConfig,
-                        target = target.get(),
-                    )
-                moduleConfig.definitionFile = definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
+                configureCLangModule(moduleConfig)
             } else {
-                builtModules
-                    .find {
-                        logger.debug("CHECK {} == {}", moduleConfig.name, it.nameWithoutExtension)
-                        it.nameWithoutExtension.equals(moduleConfig.name, ignoreCase = true)
-                    }?.let { buildDir ->
-                        moduleConfig.isFramework = buildDir.extension == "framework"
-                        moduleConfig.buildDir = buildDir.toPath()
-                        moduleConfig.definitionFile =
-                            definitionFileOf(definitionFolder.get().asFile, moduleConfig, index)
-                    } ?: let {
-                    lookingForArtifactFramework(moduleConfig).let { location ->
-                        logger.debug("FOUND ARTIFACT MODULE ${location.name}")
-                        if (location.exists()) {
-                            moduleConfig.isFramework = false
-                            moduleConfig.buildDir = location.toPath()
-                            moduleConfig.definitionFile =
-                                definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
-                            moduleConfig.customSearchHeaderPath.add(location)
-                        }
-                    }
-                }
+                configureModule(index, moduleConfig, builtModules)
             }
         }
     }
+
+    private fun configureCLangModule(moduleConfig: ModuleConfig) {
+        logger.warn(
+            """
+            CLang is experimental and not fully tested; please create an issue if you encounter a bug.
+            Only C language-based xcFramework is currently supported.
+            """.trimIndent(),
+        )
+        moduleConfig.isFramework = true
+        moduleConfig.buildDir =
+            getModuleArtifactsPath(
+                fromPath = Path.of(sharedScratchDir.get()),
+                productName = productName.get(),
+                moduleConfig = moduleConfig,
+                target = target.get(),
+            )
+        moduleConfig.definitionFile = definitionFolder.get().asFile.resolve("${moduleConfig.name}.def")
+    }
+
+    /**
+     * A module comes from one of three places: what the build system just built, the xcframework
+     * of a binary dependency, or — for a dependency neither of those resolves — the headers the
+     * resolve step extracted.
+     */
+    private fun configureModule(
+        index: Int,
+        moduleConfig: ModuleConfig,
+        builtModules: List<BuiltModule>,
+    ) {
+        val built =
+            builtModules.find {
+                logger.debug("CHECK {} == {}", moduleConfig.name, it.name)
+                it.name.equals(moduleConfig.name, ignoreCase = true)
+            }
+        if (built != null) {
+            moduleConfig.applyBuiltModule(built)
+            moduleConfig.definitionFile = definitionFileFor(index, moduleConfig)
+            return
+        }
+        val binary = resolveBinaryDependency(moduleConfig)
+        if (binary != null) {
+            logger.debug("FOUND BINARY MODULE {} in {}", binary.name, binary.buildDir)
+            moduleConfig.applyBuiltModule(binary)
+            moduleConfig.customSearchHeaderPath.addAll(binary.headerSearchPaths)
+            moduleConfig.definitionFile = definitionFileFor(index, moduleConfig)
+            return
+        }
+        val location = lookingForArtifactFramework(moduleConfig)
+        logger.debug("FOUND ARTIFACT MODULE {}", location.name)
+        if (location.exists()) {
+            moduleConfig.isFramework = false
+            moduleConfig.buildDir = location.toPath()
+            moduleConfig.definitionFile = definitionFileFor(index, moduleConfig)
+            moduleConfig.customSearchHeaderPath.add(location)
+        }
+    }
+
+    private fun ModuleConfig.applyBuiltModule(built: BuiltModule) {
+        isFramework = built.isFramework
+        buildDir = built.buildDir.toPath()
+        moduleMap = built.moduleMap
+        generatedHeaderPaths = built.headerSearchPaths
+    }
+
+    /** The first module is the bridge, and its definition carries the compiled library. */
+    private fun definitionFileFor(
+        index: Int,
+        moduleConfig: ModuleConfig,
+    ): File =
+        definitionFolder.get().asFile.resolve(
+            if (index == 0) "${moduleConfig.name}_bridge.def" else "${moduleConfig.name}.def",
+        )
 
     @Suppress("LongMethod")
     private fun buildDefinitionFile(
@@ -402,21 +549,11 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     }
 
     private fun getModuleMap(moduleConfig: ModuleConfig): File {
-        val moduleMapPossiblePath =
-            listOf(
-                "module.modulemap", // non framework
-                "include/module.modulemap", // non framework
-                "Modules/module.modulemap", // framework
-                "Modules/include/module.modulemap", // framework
-            )
-        logger.debug("Looking for modulemap {}", moduleMapPossiblePath)
-        for (modulePath in moduleMapPossiblePath) {
-            val file = moduleConfig.buildDir.resolve(modulePath)
-            if (file.exists()) {
-                logger.debug("modulemap found {}", path)
-                return file.toFile()
-            }
+        moduleConfig.moduleMap?.let { moduleMap ->
+            logger.debug("modulemap found {}", moduleMap)
+            return moduleMap
         }
+        // a module the build system did not produce: it comes from an xcframework artifact
         val moduleMapFromArtifacts = lookingForArtifactFramework(moduleConfig)
         if (moduleMapFromArtifacts.resolve("module.modulemap").exists()) {
             logger.debug("modulemap found from artifact {}", moduleMapFromArtifacts)
@@ -429,7 +566,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
     private fun generateCFrameworkDefinition(moduleConfig: ModuleConfig): String {
         val libraryPaths =
             getModuleArtifactsPath(
-                fromPath = Path.of(scratchDir.get()),
+                fromPath = Path.of(sharedScratchDir.get()),
                 productName = productName.get(),
                 moduleConfig = moduleConfig,
                 target = target.get(),
@@ -469,15 +606,22 @@ headerFilter = "$libraryPaths/Headers/**"
             val buildDirPath =
                 tracer.trace("resolve build dir path") { currentBuildDirectory.get().asFile.path }
 
+            // a binary dependency's framework lives in its xcframework slice, not in the build
+            // directory, so the directory actually holding it is named as well
+            val frameworkSearchPaths =
+                listOfNotNull(buildDirPath, moduleConfig.buildDir.parent?.toString())
+                    .distinct()
+                    .joinToString(" ") { "-F\"$it\"" }
+
             tracer.trace("render definition") {
                 val frameworkFlag = "-framework \"$frameworkName\""
-                // -F points at the local scratch directory: in publishSafe mode, it is kept out of
-                // the klib manifest and added to this project's own link tasks instead.
+                // The search paths are local to this machine: in publishSafe mode they are kept
+                // out of the klib manifest and added to this project's own link tasks instead.
                 val linkerOptions =
                     frameworkDefinitionLinkerOpts(
                         publishSafe = publishSafe.get(),
                         frameworkFlag = frameworkFlag,
-                        buildDirPath = buildDirPath,
+                        frameworkSearchPaths = frameworkSearchPaths,
                         extraLinkers = { getExtraLinkers() },
                     )
                 renderDefinition(
@@ -486,7 +630,7 @@ headerFilter = "$libraryPaths/Headers/**"
                         "modules = $moduleName",
                         "package = $packageName",
                         libraryPathsLine(declaresStaticLibraries),
-                        "compilerOpts = -fmodules $frameworkFlag -F\"$buildDirPath\"",
+                        "compilerOpts = -fmodules $moduleVisibilityOpts $frameworkFlag $frameworkSearchPaths",
                         "linkerOpts = $linkerOptions",
                         getCustomizedDefinitionConfig().trimEnd(),
                     ),
@@ -508,7 +652,7 @@ headerFilter = "$libraryPaths/Headers/**"
                 tracer.trace("build header search paths") {
                     buildList {
                         addAll(moduleConfig.customSearchHeaderPath)
-                        logger.debug("SEARCH IN {}", scratchDir.get())
+                        logger.debug("SEARCH IN {}", sharedScratchDir.get())
                         logger.debug("spmPackageName IN {}", moduleConfig.spmPackageName)
                         tracer.trace("looking for headers from checkout") {
                             moduleConfig.spmPackageName?.let { packageName ->
@@ -567,7 +711,12 @@ headerFilter = "$libraryPaths/Headers/**"
 
             val linkerOps = moduleConfig.linkerOpts.joinToString(" ")
 
-            val includeModulePath = "${moduleConfig.buildDir.resolve("include")}"
+            // `native` generates `<Module>-Swift.h` inside the module's own build directory,
+            // `swiftbuild` collects them all in one GeneratedModuleMaps directory.
+            val includeModulePaths =
+                moduleConfig.generatedHeaderPaths
+                    .ifEmpty { listOf(moduleConfig.buildDir.resolve("include").toFile()) }
+                    .joinToString(" ") { "-I\"$it\"" }
 
             val buildDirPath = currentBuildDirectory.get().asFile.path
 
@@ -581,7 +730,8 @@ headerFilter = "$libraryPaths/Headers/**"
                         extraLinkers = { getExtraLinkers() },
                     )
                 val compilerOptions =
-                    "$compilerOpts -fmodules -I\"$includeModulePath\" $headerSearchPaths -F\"$buildDirPath\""
+                    "$compilerOpts -fmodules $moduleVisibilityOpts $includeModulePaths " +
+                        "$headerSearchPaths -F\"$buildDirPath\""
                 renderDefinition(
                     listOf(
                         "language = Objective-C",

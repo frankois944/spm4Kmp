@@ -24,9 +24,9 @@ abstract class SmpKMPTestFixture private constructor(
         val buildPath: String = "build/functionalTest",
         var customPackageSourcePath: String = "src/swift",
         var cinteropsName: String = "dummy",
-        var minIos: String? = "12.0",
-        var minMacos: String? = "10.15",
-        var minTvos: String? = "12.0",
+        var minIos: String? = "15.0",
+        var minMacos: String? = "12.0",
+        var minTvos: String? = "15.0",
         var minWatchos: String? = "4.0",
         var toolsVersion: String = "5.9",
         var packageDependencyPrefix: String? = null,
@@ -61,6 +61,10 @@ kotlin.mpp.enableCInteropCommonization=true
 org.gradle.caching=${ if (extension.gradleCaching) "true" else "false" }
 spmforkmp.enableTracing=true
 """
+        // lets the whole suite be run against either build system, see the functionalTest task
+        System.getProperty("spmForKmp.testBuildSystem")?.let { buildSystem ->
+            content += "spmforkmp.buildSystem=$buildSystem\n"
+        }
         // code coverage
         if (jacocoDestfile != null) {
             content +=

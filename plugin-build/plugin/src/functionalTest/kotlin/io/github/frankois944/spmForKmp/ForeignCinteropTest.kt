@@ -30,7 +30,7 @@ class ForeignCinteropTest : BaseTest() {
                         content =
                             """
                             it.swiftPackageConfig(cinteropName = "dummy") {
-                                minIos = "12.0"
+                                minIos = "15.0"
                             }
                             it.compilations {
                                 val main by getting {

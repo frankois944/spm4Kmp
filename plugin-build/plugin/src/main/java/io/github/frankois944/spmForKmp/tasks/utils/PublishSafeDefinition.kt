@@ -35,21 +35,25 @@ internal fun definitionLibraryPathsLine(
 /**
  * The `linkerOpts` of a framework definition.
  *
- * In publishSafe mode, `-F` (the local scratch directory) and [extraLinkers] (the local Xcode
- * toolchain) are kept out of the klib manifest, and [extraLinkers] is not even invoked: these
- * search paths are added to the link tasks of the project owning the Swift package instead,
- * see [addPublishSafeLinkerOptions].
+ * In publishSafe mode, [frameworkSearchPaths] (local scratch directory, and the xcframework slice
+ * of a binary dependency) and [extraLinkers] (the local Xcode toolchain) are kept out of the klib
+ * manifest, and [extraLinkers] is not even invoked: these search paths are added to the link tasks
+ * of the project owning the Swift package instead, see [addPublishSafeLinkerOptions].
+ *
+ * @param frameworkSearchPaths the `-F` options, already rendered: `native` copies every framework
+ * into the build directory, while `swiftbuild` leaves a binary dependency in its xcframework, so
+ * how many directories there are depends on the build system.
  */
 internal fun frameworkDefinitionLinkerOpts(
     publishSafe: Boolean,
     frameworkFlag: String,
-    buildDirPath: String,
+    frameworkSearchPaths: String,
     extraLinkers: () -> String,
 ): String =
     if (publishSafe) {
         frameworkFlag
     } else {
-        "$frameworkFlag -F\"$buildDirPath\" ${extraLinkers()}"
+        "$frameworkFlag $frameworkSearchPaths ${extraLinkers()}".trim()
     }
 
 /**

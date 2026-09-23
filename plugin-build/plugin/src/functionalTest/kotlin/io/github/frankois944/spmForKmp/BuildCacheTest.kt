@@ -7,6 +7,7 @@ import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
+import io.github.frankois944.spmForKmp.utils.TestBuildSystem
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
@@ -207,7 +208,7 @@ class BuildCacheTest : BaseTest() {
         GradleBuilder.runner(projectDir, "build", "--build-cache").build()
 
         listOf("artifacts", "checkouts").forEach { name ->
-            val dir = File(projectDir, "$SCRATCH_PATH/$name")
+            val dir = File(projectDir, "$RESOLVE_PATH/$name")
             assert(dir.deleteRecursively()) { "could not delete $dir" }
 
             // `build()` fails the test on a broken build, so reaching the assertions below
@@ -246,7 +247,7 @@ class BuildCacheTest : BaseTest() {
         scratchDirs: List<String> = listOf("artifacts"),
     ) {
         val projectDir = fixture.gradleProject.rootDir
-        val restoredDirs = scratchDirs.map { File(projectDir, "$SCRATCH_PATH/$it") }
+        val restoredDirs = scratchDirs.map { File(projectDir, "$RESOLVE_PATH/$it") }
         val compileTasks = targets.map { ":library:${compileTaskName(it)}" }
 
         // Given a cold build populating the build cache
@@ -336,6 +337,15 @@ class BuildCacheTest : BaseTest() {
 
     private companion object {
         const val SCRATCH_PATH = "library/build/spmKmpPlugin/dummy/scratch"
+
+        /**
+         * Where the resolved dependencies land.
+         *
+         * `native` resolves into the scratch directory itself; `swiftbuild` needs a scratch
+         * directory per target, so the resolution moves to one they all share.
+         */
+        val RESOLVE_PATH: String
+            get() = if (TestBuildSystem.isSwiftBuild) "$SCRATCH_PATH/shared" else SCRATCH_PATH
         const val RESOLVE_TASK_NAME = "SwiftPackageConfigAppleDummyResolveSwiftPackage"
 
         val STORED_ENTRY = """Stored cache entry for task '(:[^']+)'""".toRegex()

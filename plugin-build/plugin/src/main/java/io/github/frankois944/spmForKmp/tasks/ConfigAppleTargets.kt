@@ -33,6 +33,10 @@ import io.github.frankois944.spmForKmp.tasks.utils.computeModuleConfigs
 import io.github.frankois944.spmForKmp.tasks.utils.definitionFileOf
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
+import io.github.frankois944.spmForKmp.tasks.utils.BinaryDependencies
+import io.github.frankois944.spmForKmp.tasks.utils.getArtifactsDirectory
+import io.github.frankois944.spmForKmp.tasks.utils.sharedResolveDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
 import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
@@ -75,6 +79,7 @@ internal fun Project.configAppleTargets(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
                 packageDependencies = packageDependencies,
+                targets = allTargets,
             )
         }
 
@@ -112,6 +117,7 @@ internal fun Project.configAppleTargets(
                 swiftPackageEntry = swiftPackageEntry,
                 packageDirectoriesConfig = packageDirectoriesConfig,
                 packageDependencies = packageDependencies,
+                targets = allTargets,
             )
         }
 
@@ -120,6 +126,7 @@ internal fun Project.configAppleTargets(
         logger.debug("SETUP {}", cinteropTarget)
         val targetBuildDir =
             getTargetBuildDirectory(
+                buildSystem = resolveBuildSystem(swiftPackageEntry),
                 packageScratchDir = packageDirectoriesConfig.packageScratchDir,
                 cinteropTarget = cinteropTarget,
                 buildMode = buildMode,
@@ -134,6 +141,7 @@ internal fun Project.configAppleTargets(
                     packageDirectoriesConfig = packageDirectoriesConfig,
                     buildMode = buildMode,
                     cinteropTarget = cinteropTarget,
+                    buildSystem = resolveBuildSystem(swiftPackageEntry),
                 )
             }
 
@@ -205,6 +213,18 @@ internal fun Project.configAppleTargets(
                     ktTarget = ktTarget,
                     cinteropTarget = cinteropTarget,
                     targetBuildDir = targetBuildDir,
+                    binaryDependencies =
+                        BinaryDependencies(
+                            artifactsDir =
+                                getArtifactsDirectory(
+                                    sharedResolveDirectory(
+                                        buildSystem = resolveBuildSystem(swiftPackageEntry),
+                                        packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+                                    ),
+                                ),
+                            productName = swiftPackageEntry.internalName,
+                            declared = packageDependencies,
+                        ),
                 )
             }
 

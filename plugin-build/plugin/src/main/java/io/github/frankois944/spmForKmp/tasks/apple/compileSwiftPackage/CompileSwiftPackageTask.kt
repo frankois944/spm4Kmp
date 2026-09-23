@@ -1,10 +1,12 @@
 package io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.config.SpmBuildSystem
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import io.github.frankois944.spmForKmp.operations.supportsBuildSystemFlag
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
+import io.github.frankois944.spmForKmp.tasks.utils.linkSharedResolveEntries
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -62,8 +64,24 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Input
     abstract val debugMode: Property<Boolean>
 
+    /** The engine to build with, see [io.github.frankois944.spmForKmp.config.SpmBuildSystem]. */
+    @get:Input
+    abstract val buildSystem: Property<SpmBuildSystem>
+
+    /**
+     * The scratch directory this target is built into. Under `swiftbuild` it is one directory per
+     * target, see [io.github.frankois944.spmForKmp.tasks.utils.targetScratchDirectory].
+     */
     @get:Input
     abstract val packageScratchDir: Property<String>
+
+    /**
+     * The scratch directory holding the resolved dependencies, shared by every target.
+     *
+     * Equal to [packageScratchDir] under `native`, which resolves and builds in the same place.
+     */
+    @get:Input
+    abstract val sharedResolveDir: Property<String>
 
     @get:OutputDirectories
     abstract val generatedDirs: ListProperty<File>
@@ -133,14 +151,31 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 prepareWorkingDir()
             }
 
-            // Swift 6.4 (Xcode 27) switched the default build system to `swiftbuild`, which lays the
-            // scratch directory out as `out/Products/<Config>-<sdk>` instead of `<triple>/<mode>` and
-            // drops the architecture from the path entirely — so targets sharing an SDK overwrite each
-            // other's static archive. Pin the legacy layout until the plugin can consume the new one.
-            val useNativeBuildSystem =
+            // Point this target's scratch directory at the shared resolution, so SwiftPM reuses
+            // the checkouts instead of creating a working copy per target.
+            tracer.trace("linkSharedResolveEntries") {
+                linkSharedResolveEntries(
+                    targetScratchDir = File(packageScratchDir.get()),
+                    sharedResolveDir = File(sharedResolveDir.get()),
+                    logger = logger,
+                )
+            }
+
+            // SwiftPM defaults to `swiftbuild` from Swift 6.4, so the engine is always named
+            // explicitly rather than left to the toolchain's default: which one built the package
+            // decides how the plugin reads the scratch directory afterwards.
+            val canSelectBuildSystem =
                 tracer.trace("probeBuildSystemFlag") {
                     execOps.supportsBuildSystemFlag(swiftBinPath.orNull, toolchain.orNull, logger)
                 }
+            if (!canSelectBuildSystem && buildSystem.get() != SpmBuildSystem.NATIVE) {
+                // the flag arrived with Swift 6.0, and every toolchain without it builds `native`
+                logger.warn(
+                    "spmForKmp: this toolchain does not support `swift build --build-system`, " +
+                        "building {} with the native build system instead.",
+                    cinteropTarget.get(),
+                )
+            }
 
             val args =
                 buildList {
@@ -155,9 +190,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     }
                     add("build")
                     add("-q")
-                    if (useNativeBuildSystem) {
+                    if (canSelectBuildSystem) {
                         add("--build-system")
-                        add("native")
+                        add(buildSystem.get().flagValue())
                     }
                     add("--sdk")
                     tracer.trace("getSDKPath") {

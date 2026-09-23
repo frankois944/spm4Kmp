@@ -7,6 +7,7 @@ import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
+import io.github.frankois944.spmForKmp.utils.TestBuildSystem
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -79,6 +80,9 @@ class WatchOSTest : BaseTest() {
                 .builder()
                 .withBuildPath(testProjectDir.root.absolutePath)
                 .withTargets(AppleCompileTarget.watchosSimulatorArm64)
+                // The default (4.0) is kept low for watchosArm32/armv7k, but the `swiftbuild`
+                // build system validates it against the watchOS SDK, which supports 9.0 and up.
+                .withMinWatchOs("9.0")
                 .withRawDependencies(
                     KotlinSource.of(
                         content =
@@ -112,15 +116,31 @@ class WatchOSTest : BaseTest() {
                 .build()
 
         assertThat(result).task(":library:build").succeeded()
-        // The binary slice must be copied into the build directory of the arm64 simulator triple
-        assertTrue(
-            fixture.gradleProject.rootDir
-                .walk()
-                .any {
-                    it.isDirectory &&
-                        it.name == "DummyFramework.framework" &&
-                        it.parentFile?.parentFile?.name == "arm64-apple-watchos-simulator"
-                },
-        )
+        if (TestBuildSystem.isSwiftBuild) {
+            // `swiftbuild` copies nothing: the binary stays in its xcframework and the generated
+            // definition points at the slice for this triple.
+            val definitions =
+                fixture.gradleProject.rootDir
+                    .walk()
+                    .filter { it.isFile && it.name == "DummyFramework.def" }
+                    .toList()
+            assertTrue(definitions.isNotEmpty(), "no DummyFramework definition was generated")
+            assertTrue(
+                definitions.any { it.readText().contains(".xcframework") },
+                "the definition must point at the xcframework slice:\n" +
+                    definitions.joinToString("\n") { it.readText() },
+            )
+        } else {
+            // `native` copies the binary slice into the build directory of the arm64 simulator triple
+            assertTrue(
+                fixture.gradleProject.rootDir
+                    .walk()
+                    .any {
+                        it.isDirectory &&
+                            it.name == "DummyFramework.framework" &&
+                            it.parentFile?.parentFile?.name == "arm64-apple-watchos-simulator"
+                    },
+            )
+        }
     }
 }
