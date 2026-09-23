@@ -3,6 +3,8 @@ package io.github.frankois944.spmForKmp.tasks.apple.copyPackageResources
 import io.github.frankois944.spmForKmp.SPM_TRACE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
+import io.github.frankois944.spmForKmp.config.SpmBuildSystem
+import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
 import org.gradle.api.Project
 
@@ -10,6 +12,7 @@ internal fun CopyPackageResourcesTask.configureTask(
     packageDirectoriesConfig: PackageDirectoriesConfig,
     buildMode: String,
     cinteropTarget: AppleCompileTarget,
+    buildSystem: SpmBuildSystem,
 ) {
     val buildProductDir: String? =
         project.propertyOrNull("io.github.frankois944.spmForKmp.BUILT_PRODUCTS_DIR") as? String
@@ -46,9 +49,12 @@ internal fun CopyPackageResourcesTask.configureTask(
     }
 
     this.builtDirectory.set(
-        packageDirectoriesConfig.packageScratchDir
-            .resolve(cinteropTarget.packageBuildDirName())
-            .resolve(buildMode),
+        getTargetBuildDirectory(
+            buildSystem = buildSystem,
+            packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+            cinteropTarget = cinteropTarget,
+            buildMode = buildMode,
+        ),
     )
     this.codeSignIdentityName.set(
         System.getenv("EXPANDED_CODE_SIGN_IDENTITY") ?: System.getenv("EXPANDED_CODE_SIGN_IDENTITY_NAME"),

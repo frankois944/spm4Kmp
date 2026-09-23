@@ -2,10 +2,13 @@ package io.github.frankois944.spmForKmp.tasks.apple.resolveSwiftPackage
 
 import io.github.frankois944.spmForKmp.SPM_WORKSPACE_STATE_NAME
 import io.github.frankois944.spmForKmp.operations.printExecLogs
+import io.github.frankois944.spmForKmp.tasks.utils.SHARED_RESOLVE_ENTRIES
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
+import io.github.frankois944.spmForKmp.tasks.utils.linkSharedResolveEntries
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -93,6 +96,17 @@ internal abstract class ResolveSwiftPackageTask : DefaultTask() {
     abstract val expectsCheckouts: Property<Boolean>
 
     /**
+     * The scratch directory of every target of the package, each of which links back to the
+     * shared resolution.
+     *
+     * The links are made here rather than by the compile task because the module maps SwiftPM
+     * generates reference the checkouts through them, by absolute path: a compile task restored
+     * from the build cache never runs, and would leave those paths dangling.
+     */
+    @get:Input
+    abstract val targetScratchDirs: ListProperty<String>
+
+    /**
      * Whether the package has a remote binary dependency, extracted in [artifactDir].
      */
     @get:Input
@@ -114,7 +128,9 @@ internal abstract class ResolveSwiftPackageTask : DefaultTask() {
             HostManager.hostIsMac
         }
         outputs.upToDateWhen {
-            isResolved(expectsCheckouts, checkoutDir) && isResolved(expectsArtifacts, artifactDir)
+            isResolved(expectsCheckouts, checkoutDir) &&
+                isResolved(expectsArtifacts, artifactDir) &&
+                sharedResolveLinksExist()
         }
     }
 
@@ -137,8 +153,35 @@ internal abstract class ResolveSwiftPackageTask : DefaultTask() {
             tracer.trace("resolve") {
                 resolve(args)
             }
+            tracer.trace("linkSharedResolveEntries") {
+                linkTargetScratchDirs()
+            }
         }
         tracer.writeHtmlReport()
+    }
+
+    /**
+     * Whether every target scratch directory still points at the shared resolution.
+     *
+     * A `clean` removes them while the shared directory may survive, so their absence has to
+     * make this task run again.
+     */
+    private fun sharedResolveLinksExist(): Boolean =
+        targetScratchDirs.get().all { path ->
+            val dir = File(path)
+            dir.canonicalFile == File(packageScratchDir.get()).canonicalFile ||
+                SHARED_RESOLVE_ENTRIES.all { entry -> dir.resolve(entry).exists() }
+        }
+
+    private fun linkTargetScratchDirs() {
+        val shared = File(packageScratchDir.get())
+        targetScratchDirs.get().forEach { path ->
+            linkSharedResolveEntries(
+                targetScratchDir = File(path),
+                sharedResolveDir = shared,
+                logger = logger,
+            )
+        }
     }
 
     private fun isResolved(

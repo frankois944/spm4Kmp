@@ -2,6 +2,7 @@
 
 package io.github.frankois944.spmForKmp.definition
 
+import io.github.frankois944.spmForKmp.config.SpmBuildSystem
 import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_IOS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_MAC_OS_VERSION
 import io.github.frankois944.spmForKmp.config.DEFAULT_MIN_TV_OS_VERSION
@@ -65,6 +66,24 @@ constructor(
      * If `null`, the platform is skipped inside the Package manifest.
      */
     public var minIos: String? = DEFAULT_MIN_IOS_VERSION
+
+    /**
+     * The build system SwiftPM compiles the package with.
+     *
+     * SwiftPM defaults to [SpmBuildSystem.SWIFTBUILD] from Swift 6.4 (Xcode 27) and deprecates
+     * [SpmBuildSystem.NATIVE], but the two lay their build directory out differently and the
+     * plugin still defaults to `native` until the new one is proven.
+     *
+     * Set it to [SpmBuildSystem.SWIFTBUILD] to build with the new engine. It needs a toolchain
+     * that understands `swift build --build-system`; on an older one the plugin falls back to
+     * `native` and warns.
+     *
+     * Can also be set for the whole build with the `spmforkmp.buildSystem` Gradle property,
+     * which this value overrides.
+     *
+     * Default value: `null`, meaning the plugin decides.
+     */
+    public var buildSystem: SpmBuildSystem? = null
 
     /**
      * Specifies the minimum supported macOS version for the Swift Package Manager (SPM) integration.
