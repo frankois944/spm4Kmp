@@ -3,6 +3,7 @@ package io.github.frankois944.spmForKmp.tasks.apple.compileSwiftPackage
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
+import io.github.frankois944.spmForKmp.operations.supportsBuildSystemFlag
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
@@ -132,6 +133,15 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 prepareWorkingDir()
             }
 
+            // Swift 6.4 (Xcode 27) switched the default build system to `swiftbuild`, which lays the
+            // scratch directory out as `out/Products/<Config>-<sdk>` instead of `<triple>/<mode>` and
+            // drops the architecture from the path entirely — so targets sharing an SDK overwrite each
+            // other's static archive. Pin the legacy layout until the plugin can consume the new one.
+            val useNativeBuildSystem =
+                tracer.trace("probeBuildSystemFlag") {
+                    execOps.supportsBuildSystemFlag(swiftBinPath.orNull, toolchain.orNull, logger)
+                }
+
             val args =
                 buildList {
                     if (swiftBinPath.orNull == null) {
@@ -145,6 +155,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     }
                     add("build")
                     add("-q")
+                    if (useNativeBuildSystem) {
+                        add("--build-system")
+                        add("native")
+                    }
                     add("--sdk")
                     tracer.trace("getSDKPath") {
                         add(execOps.getSDKPath(cinteropTarget.get(), logger))
