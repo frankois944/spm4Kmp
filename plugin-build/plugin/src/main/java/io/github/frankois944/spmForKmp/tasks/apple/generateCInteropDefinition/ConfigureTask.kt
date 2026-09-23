@@ -6,8 +6,11 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.computeOsVersion
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+import io.github.frankois944.spmForKmp.tasks.utils.sharedResolveDirectory
+import io.github.frankois944.spmForKmp.tasks.utils.targetScratchDirectory
 import io.github.frankois944.spmForKmp.utils.Hashing
 import java.io.File
 
@@ -32,7 +35,20 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
         computeOsVersion(cinteropTarget, swiftPackageEntry),
     )
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
-    this.scratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
+    this.buildSystem.set(project.resolveBuildSystem(swiftPackageEntry))
+    this.sharedScratchDir.set(
+        sharedResolveDirectory(
+            buildSystem = project.resolveBuildSystem(swiftPackageEntry),
+            packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+        ).absolutePath,
+    )
+    this.targetScratchDir.set(
+        targetScratchDirectory(
+            buildSystem = project.resolveBuildSystem(swiftPackageEntry),
+            packageScratchDir = packageDirectoriesConfig.packageScratchDir,
+            target = cinteropTarget,
+        ).absolutePath,
+    )
     this.packageDependencyPrefix.set(swiftPackageEntry.packageDependencyPrefix)
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)

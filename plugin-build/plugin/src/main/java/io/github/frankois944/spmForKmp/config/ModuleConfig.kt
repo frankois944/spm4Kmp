@@ -17,6 +17,10 @@ internal data class ModuleConfig(
     var swiftDependency: SwiftDependency? = null,
     var isCLang: Boolean = false,
     var customSearchHeaderPath: MutableList<File> = mutableListOf(),
+    /** The module map the build system generated, when it produced one. */
+    var moduleMap: File? = null,
+    /** Where the generated `<Module>-Swift.h` header lives. */
+    var generatedHeaderPaths: List<File> = emptyList(),
 )
 
 internal fun List<ModuleConfig>.containsPackage(name: String): Boolean =

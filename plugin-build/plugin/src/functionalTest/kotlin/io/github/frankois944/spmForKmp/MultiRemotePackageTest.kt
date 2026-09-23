@@ -23,7 +23,7 @@ class MultiRemotePackageTest : BaseTest() {
                         content =
                             """
                             it.swiftPackageConfig(cinteropName = "nativeAnalytics") {
-                                minIos = "12.0"
+                                minIos = "15.0"
                                 dependency {
                                     remotePackageVersion(
                                         url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
@@ -40,7 +40,7 @@ class MultiRemotePackageTest : BaseTest() {
                                 }
                             }
                             it.swiftPackageConfig(cinteropName = "nativePerformance") {
-                                minIos = "12.0"
+                                minIos = "15.0"
                                 dependency {
                                     remotePackageVersion(
                                         url = URI("https://github.com/firebase/firebase-ios-sdk.git"),

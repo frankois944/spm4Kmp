@@ -134,13 +134,6 @@ internal fun getModuleArtifactsPath(
         .resolve("${moduleConfig.name}.xcframework")
         .resolve(target.xcFrameworkArchName())
 
-internal fun getModulesInBuildDirectory(buildDir: File): List<File> =
-    buildDir
-        .listFiles { file ->
-            val ext = file.extension
-            ext == "build" || ext == "framework" || file.name == "Modules"
-        }?.toList() ?: throw RuntimeException("No Module/Framework found in ${buildDir.path}")
-
 private val moduleNameRegex = """module\s+(\S+)\s+""".toRegex()
 
 internal fun GenerateCInteropDefinitionTask.extractModuleNameFromModuleMap(module: String): String? =

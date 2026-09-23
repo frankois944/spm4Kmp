@@ -9,6 +9,7 @@ import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
+import io.github.frankois944.spmForKmp.utils.TestBuildSystem
 import io.github.frankois944.spmForKmp.utils.getExportedPackageContent
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -221,13 +222,26 @@ class CopyResourcesTest : BaseTest() {
                 .resolve("spmKmpPlugin")
                 .resolve("dummy")
                 .resolve("scratch")
-        val expectedBuildDir = scratchDir.resolve("arm64-apple-ios-simulator").resolve("release")
-        val incorrectBuildDir = scratchDir.resolve("arm64 x86_64-apple-ios-simulator").resolve("release")
+        val expectedBuildDir =
+            TestBuildSystem.targetBuildDir(
+                scratchDir = scratchDir,
+                targetName = "iosSimulatorArm64",
+                triple = "arm64-apple-ios-simulator",
+                configuration = "release",
+                sdk = "iphonesimulator",
+            )
         assert(expectedBuildDir.exists()) {
             "Expected target build directory to exist at ${expectedBuildDir.absolutePath}"
         }
-        assert(!incorrectBuildDir.exists()) {
-            "Unexpected multi-arch build directory should not exist at ${incorrectBuildDir.absolutePath}"
+        // The regression this guards: ARCHS="arm64 x86_64" leaking into a directory name.
+        // Checked across the whole scratch directory so it holds whichever layout produced it.
+        val multiArchDirs =
+            scratchDir
+                .walkTopDown()
+                .filter { it.isDirectory && it.name.contains(' ') }
+                .toList()
+        assert(multiArchDirs.isEmpty()) {
+            "Unexpected multi-arch build directories: ${multiArchDirs.map { it.absolutePath }}"
         }
 
         if (destination.exists()) {

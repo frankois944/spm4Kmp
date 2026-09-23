@@ -1,6 +1,7 @@
 package io.github.frankois944.spmForKmp.tasks.utils
 
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
+import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import java.io.File
@@ -20,6 +21,7 @@ internal fun Project.addPublishSafeLinkerOptions(
     ktTarget: KotlinNativeTarget,
     cinteropTarget: AppleCompileTarget,
     targetBuildDir: File,
+    binaryDependencies: BinaryDependencies,
 ) {
     val swiftRuntimePath =
         providers
@@ -32,17 +34,62 @@ internal fun Project.addPublishSafeLinkerOptions(
             }
 
     val buildDirPath = targetBuildDir.absolutePath
+    val binaries = binaryDependencies.declared.filterIsInstance<SwiftDependency.Binary>()
+
+    // `native` copies every framework into the build directory, so `-F <buildDir>` covers them
+    // all. `swiftbuild` leaves a binary dependency inside its xcframework, so each slice holding
+    // a framework is a search path of its own. Resolved lazily: the remote ones are only
+    // extracted once the resolve task has run.
+    val frameworkSearchPaths =
+        providers.provider {
+            binaryFrameworkSearchPaths(
+                dependencies = binaries,
+                artifactsDir = binaryDependencies.artifactsDir,
+                productName = binaryDependencies.productName,
+                target = cinteropTarget,
+            )
+        }
 
     ktTarget.binaries.configureEach { binary ->
         binary.linkTaskProvider.configure { linkTask ->
             linkTask.toolOptions.freeCompilerArgs.addAll(
-                swiftRuntimePath.map { runtimePath ->
-                    publishSafeLinkerArguments(buildDirPath = buildDirPath, swiftRuntimePath = runtimePath)
+                swiftRuntimePath.zip(frameworkSearchPaths) { runtimePath, extraSearchPaths ->
+                    publishSafeLinkerArguments(
+                        buildDirPath = buildDirPath,
+                        swiftRuntimePath = runtimePath,
+                        extraFrameworkPaths = extraSearchPaths,
+                    )
                 },
             )
         }
     }
 }
+
+/**
+ * The directories holding the frameworks of the binary dependencies, for [target].
+ *
+ * Empty under `native`, where SwiftPM copies them into the build directory, and empty for a
+ * dependency whose slice carries a plain library rather than a framework.
+ */
+internal fun binaryFrameworkSearchPaths(
+    dependencies: List<SwiftDependency.Binary>,
+    artifactsDir: File,
+    productName: String,
+    target: AppleCompileTarget,
+): List<String> =
+    dependencies
+        .mapNotNull { dependency ->
+            resolveBinaryModule(
+                dependency = dependency,
+                identities = listOf(dependency.packageName, productName.lowercase()),
+                moduleName = dependency.packageName,
+                artifactsDir = artifactsDir,
+                target = target,
+            )?.takeIf { it.isFramework }
+                ?.buildDir
+                ?.parentFile
+                ?.absolutePath
+        }.distinct()
 
 /**
  * The Swift libraries of the Xcode toolchain for [target], from the output of `xcode-select -p`.
@@ -60,10 +107,15 @@ internal fun swiftRuntimeLibraryPath(
 internal fun publishSafeLinkerArguments(
     buildDirPath: String,
     swiftRuntimePath: String,
+    extraFrameworkPaths: List<String> = emptyList(),
 ): List<String> =
-    listOf(
-        "-linker-option",
-        "-F$buildDirPath",
-        "-linker-option",
-        "-L$swiftRuntimePath",
-    )
+    buildList {
+        add("-linker-option")
+        add("-F$buildDirPath")
+        add("-linker-option")
+        add("-L$swiftRuntimePath")
+        extraFrameworkPaths.forEach { path ->
+            add("-linker-option")
+            add("-F$path")
+        }
+    }
