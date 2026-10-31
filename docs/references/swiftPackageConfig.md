@@ -21,12 +21,14 @@ kotlin {
 | Property | Type | Default |
 | --- | --- | --- |
 | [`customPackageSourcePath`](#custompackagesourcepath) | `String` | `src/swift` |
-| [`minIos`](#minios) | `String?` | `"12.0"` |
-| [`minMacos`](#minmacos) | `String?` | `"10.13"` |
-| [`minTvos`](#mintvos) | `String?` | `"12.0"` |
+| [`minIos`](#minios) | `String?` | `"15.0"` |
+| [`minMacos`](#minmacos) | `String?` | `"12.0"` |
+| [`minTvos`](#mintvos) | `String?` | `"15.0"` |
 | [`minWatchos`](#minwatchos) | `String?` | `"4.0"` |
 | [`toolsVersion`](#toolsversion) | `String` | `"5.9"` |
 | [`debug`](#debug) | `Boolean` | `false` |
+| [`buildSystem`](#buildsystem) | `SpmBuildSystem?` | `null` (`NATIVE`) |
+| [`publishSafe`](#publishsafe) | `Boolean` | `false` |
 | [`packageDependencyPrefix`](#packagedependencyprefix) | `String?` | `null` |
 | [`linkerOpts`](#linkeropts) | `List<String>` | `[]` |
 | [`compilerOpts`](#compileropts) | `List<String>` | `[]` |
@@ -74,7 +76,7 @@ Setting a platform to `null` removes it from the generated `Package.swift` manif
 
 Minimum iOS deployment target.
 
-Default: `"12.0"`
+Default: `"15.0"`
 
 ```kotlin
 minIos = "16.0"
@@ -84,17 +86,17 @@ minIos = "16.0"
 
 Minimum macOS deployment target.
 
-Default: `"10.13"`
+Default: `"12.0"`
 
 ```kotlin
-minMacos = "12.0"
+minMacos = "13.0"
 ```
 
 ### minTvos
 
 Minimum tvOS deployment target.
 
-Default: `"12.0"`
+Default: `"15.0"`
 
 ```kotlin
 minTvos = "16.0"
@@ -107,7 +109,7 @@ Minimum watchOS deployment target.
 Default: `"4.0"`
 
 ```kotlin
-minWatchos = "7.0"
+minWatchos = "9.0"
 ```
 
 ---
@@ -133,6 +135,41 @@ Default: `false`
 ```kotlin
 debug = true
 ```
+
+### buildSystem
+
+The build system SwiftPM compiles the package with, `swift build --build-system`.
+
+SwiftPM made `swiftbuild` its default in Swift 6.4 (Xcode 27) and deprecated `native`. The two lay
+their build directory out differently, and the plugin reads whichever one built the package, so the
+engine is always named explicitly rather than left to the toolchain's default.
+
+Default: `null`, meaning the plugin decides — currently `SpmBuildSystem.NATIVE`.
+
+```kotlin
+buildSystem = SpmBuildSystem.SWIFTBUILD
+```
+
+| Value | |
+| --- | --- |
+| `SpmBuildSystem.NATIVE` | The build system SwiftPM used up to Swift 6.3. Deprecated upstream, and the plugin's current default. |
+| `SpmBuildSystem.SWIFTBUILD` | The Swift Build engine, SwiftPM's default from Swift 6.4. |
+
+It can also be set for the whole build, which the DSL value overrides:
+
+```properties
+spmforkmp.buildSystem=swiftbuild
+```
+
+!!! note "Requirements"
+
+    `swiftbuild` needs a toolchain that offers it: the `--build-system` flag arrived in Swift 6.0,
+    which listed `native`/`xcode`, and `swiftbuild` only appears in later releases. On a toolchain
+    without it the plugin falls back to `native` and warns.
+
+    Two further constraints come from the build system itself: your
+    [deployment targets](#deployment-targets) must be within what the installed SDK supports, and
+    `watchosArm32` cannot be built at all.
 
 ### swiftBinPath
 
@@ -312,6 +349,17 @@ See the [Package Registry usage guide](../usages/packageRegistry.md) for a full 
 
 These settings map directly to [Kotlin/Native definition file](https://kotlinlang.org/docs/native-definition-file.html) directives and are applied during cinterop generation.
 
+### publishSafe
+
+Keeps the paths of the build machine out of the generated cinterop definitions, so the klibs of a
+published library do not reference directories that only exist on the machine that built them.
+Without it, every consumer gets `ld: warning: search path '...' not found` on each Apple link.
+
+Default: `false`
+
+```kotlin
+publishSafe = true
+```
 ### strictEnums
 
 Enums that should be generated as proper Kotlin `enum class` types instead of integer constants.
