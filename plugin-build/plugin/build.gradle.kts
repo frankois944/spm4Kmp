@@ -131,8 +131,21 @@ tasks.named<Test>("functionalTest") {
     val jacocoTaskExtension = the<JacocoTaskExtension>()
 
     finalizedBy(tasks.jacocoTestReport)
+    // Run the suite against a given SwiftPM build system:
+    //   ./gradlew :plugin-build:plugin:functionalTest -Pspmforkmp.testBuildSystem=swiftbuild
+    providers.gradleProperty("spmforkmp.testBuildSystem").orNull?.let {
+        systemProperty("spmForKmp.testBuildSystem", it)
+    }
+
     val testRuns = layout.buildDirectory.dir("functionalTest")
-    systemProperty("testEnv.workDir", LazyString(testRuns.map { it.asFile.apply { mkdirs() }.absolutePath }))
+    systemProperty("testEnv.workDir", LazyString(testRuns.map { it.asFile.absolutePath }))
+
+    // The directory must exist before BaseTest creates its temporary folders inside it.
+    // Creating it as a side effect of resolving the system property above does not survive the
+    // configuration cache: the value is restored without the side effect ever running.
+    doFirst {
+        testRuns.get().asFile.mkdirs()
+    }
 
     val jacocoAgentJar = jacocoAgentJar.singleFile.absolutePath
 

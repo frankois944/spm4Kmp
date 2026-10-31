@@ -9,6 +9,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.hideLocalPackageMessage
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import org.gradle.internal.extensions.stdlib.capitalized
 
 internal fun GenerateExportableManifestTask.configureTask(
@@ -34,6 +35,7 @@ internal fun GenerateExportableManifestTask.configureTask(
     this.compiledTargetDirs.set(
         targets.map { target ->
             getTargetBuildDirectory(
+                buildSystem = project.resolveBuildSystem(swiftPackageEntry),
                 packageScratchDir = packageDirectoriesConfig.packageScratchDir,
                 cinteropTarget = target,
                 buildMode = getBuildMode(swiftPackageEntry),
