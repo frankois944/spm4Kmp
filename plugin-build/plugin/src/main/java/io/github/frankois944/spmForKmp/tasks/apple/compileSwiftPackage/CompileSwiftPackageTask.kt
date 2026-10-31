@@ -134,7 +134,6 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         }
     }
 
-
     /**
      * The value to pass to `swift build --build-system`, or `null` when the toolchain has no such
      * flag and builds whatever it defaults to.
