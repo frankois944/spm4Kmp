@@ -6,9 +6,9 @@ import io.github.frankois944.spmForKmp.SWIFT_PACKAGE_RESOLVE_NAME
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
-import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.computeOsVersion
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.sharedResolveDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.spmBuildLayout
 import io.github.frankois944.spmForKmp.tasks.utils.targetScratchDirectory

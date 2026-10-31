@@ -12,6 +12,7 @@ import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
 
 private fun buildResourcesPath(packageDirectoriesConfig: PackageDirectoriesConfig): ResourcesPaths {
     val base = packageDirectoriesConfig.bridgeSourceDir
+
     fun java.io.File.relativePathIfExists() = takeIf { it.exists() }?.relativeToOrSelf(base)?.path
 
     val processDir =

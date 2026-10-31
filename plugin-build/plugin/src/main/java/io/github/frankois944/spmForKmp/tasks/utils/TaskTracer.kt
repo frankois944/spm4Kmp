@@ -322,8 +322,8 @@ internal class TaskTracer(
                 ""
             }
         return """
-                                                                                                                                                                                    <li>
-                                                                                                                                                                                      <div><strong>${
+                                                                                                                                                                                                <li>
+                                                                                                                                                                                                  <div><strong>${
             esc(
                 span.name,
             )
@@ -334,15 +334,15 @@ internal class TaskTracer(
                 pct,
             )
         }%)</span></div>
-                                                                                                                                                                                      <div class=\"bar\" style=\"width:${
+                                                                                                                                                                                                  <div class=\"bar\" style=\"width:${
             String.format(
                 locale = Locale.US,
                 "%.1f",
                 barWidth,
             )
         }%\"></div>
-                                                                                                                                                                                      $childrenHtml
-                                                                                                                                                                                    </li>
+                                                                                                                                                                                                  $childrenHtml
+                                                                                                                                                                                                </li>
             """.trimIndent()
     }
 

@@ -370,8 +370,7 @@ class BuildCacheTest : BaseTest() {
             }
             """.trimIndent()
 
-        fun compileTaskName(target: AppleCompileTarget) =
-            "SwiftPackageConfigAppleDummyCompileSwiftPackage${target.name.titleCase()}"
+        fun compileTaskName(target: AppleCompileTarget) = "SwiftPackageConfigAppleDummyCompileSwiftPackage${target.name.titleCase()}"
 
         fun cinteropTaskName(target: AppleCompileTarget) = "cinteropDummy${target.name.titleCase()}"
 

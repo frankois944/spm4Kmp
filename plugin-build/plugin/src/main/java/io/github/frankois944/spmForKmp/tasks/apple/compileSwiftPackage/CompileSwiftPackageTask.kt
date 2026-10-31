@@ -4,7 +4,7 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.SpmBuildSystem
 import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
-import io.github.frankois944.spmForKmp.operations.supportsBuildSystemFlag
+import io.github.frankois944.spmForKmp.operations.supportedBuildSystems
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import io.github.frankois944.spmForKmp.tasks.utils.linkSharedResolveEntries
 import org.gradle.api.DefaultTask
@@ -134,6 +134,38 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
         }
     }
 
+
+    /**
+     * The value to pass to `swift build --build-system`, or `null` when the toolchain has no such
+     * flag and builds whatever it defaults to.
+     *
+     * The engine is always named explicitly where it can be: which one built the package decides
+     * how the plugin reads the scratch directory afterwards. A toolchain that does not offer the
+     * requested one falls back to `native` — Swift 6.0 to 6.3 offered `native`/`xcode` and no
+     * `swiftbuild` — rather than letting SwiftPM reject the argument.
+     */
+    private fun selectBuildSystem(): String? {
+        val available = execOps.supportedBuildSystems(swiftBinPath.orNull, toolchain.orNull, logger)
+        val requested = buildSystem.get().flagValue()
+        val selected =
+            when {
+                available.isEmpty() -> null
+                requested in available -> requested
+                else -> SpmBuildSystem.NATIVE.flagValue().takeIf { it in available }
+            }
+        if (selected != requested) {
+            logger.warn(
+                "spmForKmp: this toolchain does not support `swift build --build-system {}` ({}), " +
+                    "building {} with {} instead.",
+                requested,
+                available.ifEmpty { setOf("no --build-system flag") }.joinToString(),
+                cinteropTarget.get(),
+                selected ?: "the toolchain default",
+            )
+        }
+        return selected
+    }
+
     @Suppress("LongMethod")
     @TaskAction
     fun compilePackage() {
@@ -161,21 +193,10 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                 )
             }
 
-            // SwiftPM defaults to `swiftbuild` from Swift 6.4, so the engine is always named
-            // explicitly rather than left to the toolchain's default: which one built the package
-            // decides how the plugin reads the scratch directory afterwards.
-            val canSelectBuildSystem =
-                tracer.trace("probeBuildSystemFlag") {
-                    execOps.supportsBuildSystemFlag(swiftBinPath.orNull, toolchain.orNull, logger)
+            val selected =
+                tracer.trace("probeBuildSystems") {
+                    selectBuildSystem()
                 }
-            if (!canSelectBuildSystem && buildSystem.get() != SpmBuildSystem.NATIVE) {
-                // the flag arrived with Swift 6.0, and every toolchain without it builds `native`
-                logger.warn(
-                    "spmForKmp: this toolchain does not support `swift build --build-system`, " +
-                        "building {} with the native build system instead.",
-                    cinteropTarget.get(),
-                )
-            }
 
             val args =
                 buildList {
@@ -190,9 +211,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     }
                     add("build")
                     add("-q")
-                    if (canSelectBuildSystem) {
+                    selected?.let { engine ->
                         add("--build-system")
-                        add(buildSystem.get().flagValue())
+                        add(engine)
                     }
                     add("--sdk")
                     tracer.trace("getSDKPath") {

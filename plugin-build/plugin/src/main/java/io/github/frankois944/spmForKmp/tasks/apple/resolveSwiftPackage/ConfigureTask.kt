@@ -7,10 +7,10 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
-import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.getArtifactsDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getCheckoutsDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.sharedResolveDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.targetScratchDirectory
 

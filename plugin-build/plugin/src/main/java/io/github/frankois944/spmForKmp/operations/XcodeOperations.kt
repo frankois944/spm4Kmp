@@ -203,23 +203,25 @@ OUTPUT $standardOutput
 }
 
 /**
- * Whether the toolchain understands `swift build --build-system <name>`.
+ * The values the toolchain accepts for `swift build --build-system`, empty when it has no such
+ * flag.
  *
- * The flag only exists from Swift 6.0 onwards; the plugin still supports older toolchains through
- * `swiftBinPath`/`toolchain`, so the capability is probed instead of being derived from a version.
- * `native` is a valid value wherever the flag exists (Swift 6.0 offered `native`/`xcode`, later
- * releases `native`/`swiftbuild`), so detecting the flag is enough to know the value is accepted.
+ * The flag only exists from Swift 6.0 onwards, and which engines it offers changed: Swift 6.0
+ * listed `native`/`xcode`, later releases `native`/`swiftbuild`. The plugin still supports older
+ * toolchains through `swiftBinPath`/`toolchain`, so the engines are read off `--help` rather than
+ * derived from a version, and asking for one the toolchain does not have is caught before
+ * SwiftPM reports it as an unparsable argument.
  *
  * The result is memoized per toolchain: the probe is cheap but runs once per compile task.
  */
-private val buildSystemFlagSupport = ConcurrentHashMap<String, Boolean>()
+private val buildSystemSupport = ConcurrentHashMap<String, Set<String>>()
 
-internal fun ExecOperations.supportsBuildSystemFlag(
+internal fun ExecOperations.supportedBuildSystems(
     swiftBinPath: String?,
     toolchain: String?,
     logger: Logger,
-): Boolean =
-    buildSystemFlagSupport.computeIfAbsent("${swiftBinPath.orEmpty()}|${toolchain.orEmpty()}") { _ ->
+): Set<String> =
+    buildSystemSupport.computeIfAbsent("${swiftBinPath.orEmpty()}|${toolchain.orEmpty()}") { _ ->
         val args =
             buildList {
                 if (swiftBinPath == null) {
@@ -251,8 +253,29 @@ internal fun ExecOperations.supportsBuildSystemFlag(
 
         if (result.exitValue != 0) {
             logger.info("Could not probe `swift build --help`, assuming --build-system is unavailable")
-            false
+            emptySet()
         } else {
-            standardOutput.toString().contains("--build-system")
+            parseBuildSystems(standardOutput.toString())
         }
     }
+
+/**
+ * The engine names listed under `--build-system` in the output of `swift build --help`.
+ *
+ * Only the block belonging to that option is read, so an engine name appearing elsewhere in the
+ * help — in a description, or as another option's value — is not mistaken for one.
+ */
+internal fun parseBuildSystems(help: String): Set<String> {
+    val lines = help.lines()
+    val start = lines.indexOfFirst { it.contains("--build-system <") }
+    if (start < 0) return emptySet()
+    return lines
+        .asSequence()
+        .drop(start + 1)
+        .takeWhile { line -> line.isBlank() || !line.trimStart().startsWith("--") }
+        .mapNotNull { line ->
+            BUILD_SYSTEM_ENTRY.find(line)?.groupValues?.get(1)
+        }.toSet()
+}
+
+private val BUILD_SYSTEM_ENTRY = """^\s+(\S+)\s+-\s""".toRegex()
