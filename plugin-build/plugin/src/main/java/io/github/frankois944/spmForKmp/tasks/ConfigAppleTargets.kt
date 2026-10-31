@@ -154,7 +154,6 @@ internal fun Project.configAppleTargets(
                     cinteropTarget = cinteropTarget,
                     swiftPackageEntry = swiftPackageEntry,
                     packageDirectoriesConfig = packageDirectoriesConfig,
-                    targetBuildDir = targetBuildDir,
                 )
             }
 

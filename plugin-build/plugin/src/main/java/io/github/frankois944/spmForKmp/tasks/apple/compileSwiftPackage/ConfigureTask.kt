@@ -12,13 +12,11 @@ import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.sharedResolveDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.spmBuildLayout
 import io.github.frankois944.spmForKmp.tasks.utils.targetScratchDirectory
-import java.io.File
 
 internal fun CompileSwiftPackageTask.configureTask(
     cinteropTarget: AppleCompileTarget,
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
-    targetBuildDir: File,
 ) {
     val buildSystem = project.resolveBuildSystem(swiftPackageEntry)
     this.buildSystem.set(buildSystem)

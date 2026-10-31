@@ -110,12 +110,17 @@ internal fun publishSafeLinkerArguments(
     extraFrameworkPaths: List<String> = emptyList(),
 ): List<String> =
     buildList {
-        add("-linker-option")
-        add("-F$buildDirPath")
-        add("-linker-option")
-        add("-L$swiftRuntimePath")
-        extraFrameworkPaths.forEach { path ->
-            add("-linker-option")
-            add("-F$path")
-        }
+        addLinkerOption("-F$buildDirPath")
+        addLinkerOption("-L$swiftRuntimePath")
+        extraFrameworkPaths.forEach { path -> addLinkerOption("-F$path") }
     }
+
+/**
+ * Kotlin/Native passes an option through to the linker as two arguments: the flag, then the value.
+ */
+private const val LINKER_OPTION = "-linker-option"
+
+private fun MutableList<String>.addLinkerOption(option: String) {
+    add(LINKER_OPTION)
+    add(option)
+}
