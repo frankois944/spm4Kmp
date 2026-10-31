@@ -23,9 +23,8 @@ class WatchOSTest : BaseTest() {
                     AppleCompileTarget.watchosArm32,
                     AppleCompileTarget.watchosArm64,
                     AppleCompileTarget.watchosX64,
-                    AppleCompileTarget.watchosSimulatorArm64
-                )
-                .withRawTargetBlock(
+                    AppleCompileTarget.watchosSimulatorArm64,
+                ).withRawTargetBlock(
                     KotlinSource.of(
                         content =
                             """
@@ -33,8 +32,7 @@ class WatchOSTest : BaseTest() {
                             }
                             """.trimIndent(),
                     ),
-                )
-                .withKotlinSources(
+                ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("dummy.*"),
                         content =
@@ -43,8 +41,7 @@ class WatchOSTest : BaseTest() {
                             val view = ObjectCls()
                             """.trimIndent(),
                     ),
-                )
-                .withSwiftSources(
+                ).withSwiftSources(
                     SwiftSource.of(
                         content =
                             """

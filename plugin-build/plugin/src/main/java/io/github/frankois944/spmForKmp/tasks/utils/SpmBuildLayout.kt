@@ -184,8 +184,7 @@ internal class SwiftBuildLayout(
      * The module maps sit outside the products directory, under `Intermediates.noindex`, so they
      * have to be named as an output of their own.
      */
-    override fun compileOutputDirectories(): List<File> =
-        listOf(productsDirectory, generatedModuleMapsDirectory)
+    override fun compileOutputDirectories(): List<File> = listOf(productsDirectory, generatedModuleMapsDirectory)
 
     private companion object {
         const val MACOS_SDK = "macosx"

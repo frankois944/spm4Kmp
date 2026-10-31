@@ -28,17 +28,17 @@ import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.GenerateMani
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.resolveSwiftPackage.ResolveSwiftPackageTask
 import io.github.frankois944.spmForKmp.tasks.apple.resolveSwiftPackage.configureTask
+import io.github.frankois944.spmForKmp.tasks.utils.BinaryDependencies
 import io.github.frankois944.spmForKmp.tasks.utils.addPublishSafeLinkerOptions
 import io.github.frankois944.spmForKmp.tasks.utils.computeModuleConfigs
 import io.github.frankois944.spmForKmp.tasks.utils.definitionFileOf
+import io.github.frankois944.spmForKmp.tasks.utils.getArtifactsDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
-import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
-import io.github.frankois944.spmForKmp.tasks.utils.BinaryDependencies
-import io.github.frankois944.spmForKmp.tasks.utils.getArtifactsDirectory
-import io.github.frankois944.spmForKmp.tasks.utils.sharedResolveDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
+import io.github.frankois944.spmForKmp.tasks.utils.sharedResolveDirectory
 import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import io.github.frankois944.spmForKmp.utils.compareVersions
 import org.gradle.api.Project
@@ -255,7 +255,7 @@ internal fun Project.configAppleTargets(
                         mainCompilation,
                         cinteropName,
                         extraOpts + swiftPackageEntry.extraOpts,
-                        file
+                        file,
                     )
                 }
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)

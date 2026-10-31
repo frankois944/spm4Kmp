@@ -181,8 +181,7 @@ class IOSAppTest : BaseTest() {
      * Whether `xcodebuild` refused to run because the machine has nothing to run the app on,
      * as opposed to a real failure of the build or of the tests.
      */
-    private fun String.hasNoUsableDestination(): Boolean =
-        NO_DESTINATION_ERRORS.any { contains(it, ignoreCase = true) }
+    private fun String.hasNoUsableDestination(): Boolean = NO_DESTINATION_ERRORS.any { contains(it, ignoreCase = true) }
 
     private companion object {
         val SIMULATOR_ID = Regex("""iPhone.*\(([-A-F0-9]+)\)""")

@@ -20,8 +20,7 @@ class TvOSTest : BaseTest() {
                     AppleCompileTarget.tvosSimulatorArm64,
                     AppleCompileTarget.tvosArm64,
                     AppleCompileTarget.tvosX64,
-                )
-                .withRawTargetBlock(
+                ).withRawTargetBlock(
                     KotlinSource.of(
                         content =
                             """
@@ -29,8 +28,7 @@ class TvOSTest : BaseTest() {
                             }
                             """.trimIndent(),
                     ),
-                )
-                .withKotlinSources(
+                ).withKotlinSources(
                     KotlinSource.of(
                         imports = listOf("dummy.*"),
                         content =
@@ -39,8 +37,7 @@ class TvOSTest : BaseTest() {
                             val view = ObjectCls()
                             """.trimIndent(),
                     ),
-                )
-                .withSwiftSources(
+                ).withSwiftSources(
                     SwiftSource.of(
                         content =
                             """

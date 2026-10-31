@@ -6,10 +6,10 @@ import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
 import io.github.frankois944.spmForKmp.definition.PackageRootDefinitionExtension
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
-import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
 import io.github.frankois944.spmForKmp.tasks.utils.hideLocalPackageMessage
 import io.github.frankois944.spmForKmp.tasks.utils.isTraceEnabled
+import io.github.frankois944.spmForKmp.tasks.utils.resolveBuildSystem
 import org.gradle.internal.extensions.stdlib.capitalized
 
 internal fun GenerateExportableManifestTask.configureTask(
